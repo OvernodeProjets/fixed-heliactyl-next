@@ -1,0 +1,1712 @@
+<%- include('../components/top') %>
+<style>
+    .select-all-checkbox {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 0.5rem;
+        margin-right: 1rem;
+    }
+    
+    .select-all-checkbox input[type="checkbox"] {
+        margin-right: 0.5rem;
+    }
+    
+    .select-all-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.875rem;
+        user-select: none;
+    }
+    /* Existing styles */
+    @media (max-width: 640px) {
+        .file-manager-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .file-manager-title {
+            margin-bottom: 1rem;
+        }
+        .file-manager-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .file-manager-actions button {
+            flex: 1;
+            white-space: nowrap;
+        }
+        .breadcrumb {
+            flex-wrap: wrap;
+        }
+        .file-list-item {
+            flex-wrap: wrap;
+            padding: 0.5rem;
+        }
+        .file-info {
+            width: 100%;
+            margin-top: 0.5rem;
+            justify-content: space-between;
+        }
+        .drop-zone {
+            padding: 1rem;
+        }
+    }
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-content {
+        background-color: #1a1c20;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        max-width: 90%;
+        max-height: 90%;
+        overflow: auto;
+        transform: scale(0.9);
+        opacity: 0;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    .modal-overlay.active .modal-content {
+        transform: scale(1);
+        opacity: 1;
+    }
+    
+    /* New styles for smoother transitions and better UX */
+    .file-list-item {
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .file-list-item:hover {
+        transform: translateY(-2px);
+    }
+    .file-list-item:active {
+        transform: translateY(0);
+    }
+    .action-button {
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .action-button:hover {
+        transform: translateY(-2px);
+    }
+    .action-button:active {
+        transform: translateY(0);
+    }
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .loading-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top: 4px solid #ffffff;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .file-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    .file-card {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .file-card .context-menu-button {
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+    }
+    .file-card:hover .context-menu-button {
+        opacity: 1;
+    }
+    #mass-actions-bar {
+        transition: all 0.3s ease-in-out;
+    }
+    .file-card input[type="checkbox"] {
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+    }
+    .file-card:hover input[type="checkbox"],
+    .file-card input[type="checkbox"]:checked {
+        opacity: 1;
+    }
+    .file-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    .file-name {
+        font-size: 0.9rem;
+        word-break: break-word;
+    }
+    .toast {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        background-color: #4CAF50;
+        color: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 9999;
+    }
+    .toast.show {
+        opacity: 1;
+    }
+    .context-menu {
+    position: fixed;
+    background-color: #05050e;
+    border: 1px solid #0d0d22;
+    border-radius: 4px;
+    padding: 5px 0;
+    min-width: 150px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+} 
+
+.context-menu-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.context-menu-item:hover {
+    background-color: #2c2e33;
+}
+</style>
+
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="mb-5 lg:flex lg:items-center lg:justify-between">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight" id="server-name"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg></h2>
+          <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/briefcase -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path fill-rule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Zm9.586 4.594a.75.75 0 0 0-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.116-.062l3-3.75Z" clip-rule="evenodd" />
+              </svg>                    
+              <span id="server-description"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg></span>
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/map-pin -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path d="M4.08 5.227A3 3 0 0 1 6.979 3H17.02a3 3 0 0 1 2.9 2.227l2.113 7.926A5.228 5.228 0 0 0 18.75 12H5.25a5.228 5.228 0 0 0-3.284 1.153L4.08 5.227Z" />
+                <path fill-rule="evenodd" d="M5.25 13.5a3.75 3.75 0 1 0 0 7.5h13.5a3.75 3.75 0 1 0 0-7.5H5.25Zm10.5 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm3.75-.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" clip-rule="evenodd" />
+              </svg>              
+              Server <%= req.query.id %>
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/currency-dollar -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 0 0 .374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 0 0-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08Zm3.094 8.016a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+              </svg>              
+              Volumetric Shield enabled
+            </div>
+            <div class="hidden mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/calendar -->
+              <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clip-rule="evenodd" />
+              </svg>
+              <span id="server-name-breadcrumb"></span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-5 flex lg:mt-0 lg:ml-4">
+          <span class="hidden sm:block">
+            <a href="/servers" class="inline-flex items-center rounded-xl border border-transparent bg-indigo-900/50 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-800">
+              <!-- Heroicon name: mini/pencil -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
+                <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+              </svg>                
+              Back to server list
+            </a>
+          </span>
+        </div>
+      </div>      
+    <%- include('../components/server') %>
+
+    <div class="bg-white/5 rounded-xl p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold heavy">Files</h2>
+            <div class="flex items-center space-x-2">
+                <div class="p-2.5 bg-black/20 rounded-lg">
+                    <input 
+                        type="checkbox" 
+                        id="select-all" 
+                        class="form-checkbox h-4 w-4 text-indigo-500 border border-white/5 bg-white/5 rounded focus:ring-indigo-500"
+                    >
+                    <label for="select-all" class="select-all-label px-4">Select All</label>
+                </div>
+    <div class="relative flex-grow">
+        <input 
+            type="text" 
+            id="file-search" 
+            class="w-full bg-black/20 border border-transparent rounded-lg py-2 px-4 pl-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+            placeholder="Search files..."
+        >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-2.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+    </div>
+    <div class="flex items-center space-x-2">
+        <select 
+            id="sort-by" 
+            class=" bg-black/20 rounded-lg border border-transparent py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+        >
+            <option value="name">Name</option>
+            <option value="size">Size</option>
+            <option value="type">Type</option>
+            <option value="date">Date Modified</option>
+        </select>
+        <button 
+            id="sort-direction" 
+            class=" rounded-full border border-transparent rounded-lg p-2.5 text-white hover:bg-black/15 transition-all duration-200"
+            title="Toggle sort direction"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+            </svg>
+        </button>
+    </div>
+</div>
+            <div class="flex space-x-2">
+                <button id="upload-file" class="action-button bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-1.5 px-4 rounded-full transition">Upload</button>
+                <button id="create-folder" class="action-button bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-1.5 px-4 rounded-full transition">New Folder</button>
+                <button id="new-file" class="action-button bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-1.5 px-4 rounded-full transition">New File</button>
+            </div>
+        </div>
+        
+        <div id="file-list" class="file-grid">
+            <!-- File list will be populated here -->
+        </div>
+    </div>
+    <div id="drop-zone" class="drop-zone mt-4 border-2 border-dashed border-white/10 p-8 rounded-2xl transition-all duration-200 hover:border-indigo-500/50 hover:bg-indigo-500/5 group">
+        <div class="flex flex-col items-center justify-center gap-4">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-neutral-500 group-hover:text-indigo-400 transition-colors duration-200">
+                <path fill-rule="evenodd" d="M11.47 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1-1.06 1.06l-3.22-3.22V16.5a.75.75 0 0 1-1.5 0V4.81L8.03 8.03a.75.75 0 0 1-1.06-1.06l4.5-4.5ZM3 15.75a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75Zm0 2.25a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
+            </svg>
+            <div class="text-center">
+                <p class="text-sm font-medium text-neutral-300 group-hover:text-indigo-300 transition-colors duration-200">Drag and drop files here</p>
+                <p class="text-xs text-neutral-500 group-hover:text-indigo-400 transition-colors duration-200 mt-1">or click "Upload File"</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- File Edit Modal -->
+<div id="file-edit-modal" class="modal-overlay z-50">
+    <div class="modal-content w-3/4 h-3/4 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold" id="modal-title">Edit File</h3>
+            <button id="close-modal" class="text-gray-500 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div id="monaco-editor" class="flex-grow"></div>
+        <div class="mt-4 flex justify-end">
+            <button id="save-file" class="action-button bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- Create Folder Modal -->
+<div id="create-folder-modal" class="modal-overlay z-50">
+    <div class="modal-content">
+        <h3 class="text-xl font-semibold mb-4">Create New Folder</h3>
+        <input type="text" id="new-folder-name" class="w-full p-2 mb-4 bg-white/5 border border-white/5 focus:ring-2 focus:ring-indigo-500 focus:border-white/5 text-white rounded-lg" placeholder="Folder Name">
+        <div class="flex justify-end">
+            <button id="create-folder-cancel" class="action-button bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-2 px-4 rounded-xl transition mr-2">Cancel</button>
+            <button id="create-folder-confirm" class="action-button bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-xl transition">Create</button>
+        </div>
+    </div>
+</div>
+
+<div id="mass-actions-bar" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white/5 backdrop-blur-lg text-white py-3 px-6 rounded-full shadow-lg hidden z-50 transition-all duration-300 ease-in-out">
+    <div class="flex items-center space-x-4">
+        <span id="selected-count" class="text-md mr-8 font-medium"></span>
+        <div class="flex space-x-2">
+            <button id="mass-delete" class="bg-red-500 hover:bg-red-600 text-white transition-all duration-200 ease-in-out hover:scale-105 font-medium py-2 px-4 rounded-full flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Delete
+            </button>
+            <button id="mass-archive" class="bg-neutral-500 hover:bg-neutral-600 text-white transition-all duration-200 ease-in-out hover:scale-105 font-medium py-2 px-4 rounded-full flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
+                Archive
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- New File Modal -->
+<div id="new-file-modal" class="modal-overlay z-50">
+    <div class="modal-content">
+        <h3 class="text-xl font-semibold mb-4">Create New File</h3>
+        <input type="text" id="new-file-name" class="w-full p-2 mb-4 bg-white/5 border border-white/5 focus:ring-2 focus:ring-indigo-500 focus:border-white/5 text-white rounded-lg" placeholder="File Name">
+        <div class="flex justify-end">
+            <button id="new-file-cancel" class="action-button bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-2 px-4 rounded-xl transition mr-2">Cancel</button>
+            <button id="new-file-confirm" class="action-button bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-xl transition">Create</button>
+        </div>
+    </div>
+</div>
+
+<!-- Context Menu -->
+<div id="context-menu" class="context-menu z-50 bg-white/5 backdrop-blur" style="display: none;">
+    <div class="context-menu-item hover:bg-white/5" id="context-menu-edit">Edit</div>
+    <div class="context-menu-item hover:bg-white/5" id="context-menu-delete">Delete</div>
+    <div class="context-menu-item hover:bg-white/5" id="context-menu-rename">Rename</div>
+    <div class="context-menu-item hover:bg-white/5" id="context-menu-download">Download</div>
+    <div class="context-menu-item hover:bg-white/5" id="context-menu-clone">Clone</div>
+    <div class="context-menu-item hover:bg-white/5" id="context-menu-decompress">Unarchive</div>
+</div>
+
+<div id="upload-progress-modal" class="modal-overlay backdrop-blur z-50">
+    <div class="modal-content w-96">
+        <h3 class="text-xl font-semibold mb-4">Uploading Files</h3>
+        <div id="upload-progress-container" class="space-y-4">
+            <!-- Progress bars will be added here dynamically -->
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="loading-overlay">
+    <div class="spinner"></div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast">
+    Operation completed successfully
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js" integrity="sha512-6bIYsGqvLpAiEBXPdRQeFf5cueeBECtAKJjIHer3BhBZNTV3WLcLA8Tm3pDfxUwTMIS+kAZwTUvJ1IrMdX8C5w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+let currentPath = '/home/container';
+const archiveExtensions = ['.tar.gz', '.zip', '.rar', '.7z', '.tar'];
+const serverId = new URLSearchParams(window.location.search).get('id');
+let editor;
+let currentPage = 1;
+let totalPages = 1;
+const itemsPerPage = 50;
+let searchTerm = '';
+let sortBy = 'name';
+let sortDirection = 'asc';
+let fileCache = [];
+
+function sortFiles(files) {
+    return [...files].sort((a, b) => {
+        const aIsFolder = !a.attributes?.is_file;
+        const bIsFolder = !b.attributes?.is_file;
+        
+        // Always show folders first
+        if (aIsFolder && !bIsFolder) return -1;
+        if (!aIsFolder && bIsFolder) return 1;
+        
+        let comparison = 0;
+        switch (sortBy) {
+            case 'name':
+                comparison = a.attributes.name.localeCompare(b.attributes.name);
+                break;
+            case 'size':
+                comparison = (a.attributes?.size || 0) - (b.attributes?.size || 0);
+                break;
+            case 'type':
+                const aExt = a.attributes.name.split('.').pop() || '';
+                const bExt = b.attributes.name.split('.').pop() || '';
+                comparison = aExt.localeCompare(bExt);
+                break;
+            case 'date':
+                const aDate = new Date(a.attributes.modified);
+                const bDate = new Date(b.attributes.modified);
+                comparison = aDate - bDate;
+                break;
+        }
+        
+        return sortDirection === 'asc' ? comparison : -comparison;
+    });
+}
+
+// Add this function to handle file filtering
+function filterFiles(files) {
+    if (!searchTerm) return files;
+    
+    return files.filter(file => {
+        const name = file.attributes.name.toLowerCase();
+        const type = file.attributes.is_file ? 'file' : 'folder';
+        const extension = file.attributes.name.split('.').pop()?.toLowerCase() || '';
+        
+        const searchLower = searchTerm.toLowerCase();
+        
+        return name.includes(searchLower) ||
+               type.includes(searchLower) ||
+               extension.includes(searchLower);
+    });
+}
+
+// Utility functions
+function showLoading() {
+    document.getElementById('loading-overlay').classList.add('active');
+}
+
+function hideLoading() {
+    document.getElementById('loading-overlay').classList.remove('active');
+}
+
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+// Fetch server info
+fetch(`/api/server/${serverId}`)
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('server-name').textContent = data.attributes.name;
+        document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
+    });
+
+function getSelectedFiles() {
+    return Array.from(document.querySelectorAll('.file-card input[type="checkbox"]:checked'))
+        .map(checkbox => checkbox.getAttribute('data-name'));
+}
+
+
+function updateMassActionsBar() {
+    const checkboxes = document.querySelectorAll('.file-card input[type="checkbox"]');
+    const selectedFiles = getSelectedFiles();
+    const massActionsBar = document.getElementById('mass-actions-bar');
+    const selectedCount = document.getElementById('selected-count');
+    const selectAllCheckbox = document.getElementById('select-all');
+
+    if (selectedFiles.length > 0) {
+        massActionsBar.classList.remove('hidden');
+        selectedCount.textContent = `${selectedFiles.length} item${selectedFiles.length > 1 ? 's' : ''} selected`;
+        
+        // Update select all checkbox state
+        selectAllCheckbox.checked = selectedFiles.length === checkboxes.length;
+        selectAllCheckbox.indeterminate = selectedFiles.length > 0 && selectedFiles.length < checkboxes.length;
+    } else {
+        massActionsBar.classList.add('hidden');
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+    }
+}
+
+document.getElementById('mass-delete').addEventListener('click', () => {
+    const selectedFiles = getSelectedFiles();
+    if (selectedFiles.length === 0) return;
+    if (confirm(`Are you sure you want to delete the selected files?`)) {
+        showLoading();
+        fetch(`/api/server/${serverId}/files/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                root: currentPath,
+                files: selectedFiles
+            })
+        }).then(() => {
+            loadFileList(currentPath);
+            updateMassActionsBar();
+            showToast(`Deleted ${selectedFiles.length} item(s) successfully`);
+        }).catch(error => {
+            console.error('Error deleting files:', error);
+            showToast('Error deleting files. Please try again.');
+        }).finally(() => {
+            hideLoading();
+        });
+    }
+});
+
+document.getElementById('mass-archive').addEventListener('click', () => {
+    const selectedFiles = getSelectedFiles();
+    if (selectedFiles.length === 0) return;
+    showLoading();
+    fetch(`/api/server/${serverId}/files/compress`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            root: currentPath,
+            files: selectedFiles
+        })
+    }).then(response => response.json())
+    .then(data => {
+        loadFileList(currentPath);
+        updateMassActionsBar();
+        showToast(`Archive created: ${data.attributes.name}`);
+    }).catch(error => {
+        console.error('Error creating archive:', error);
+        showToast('Error creating archive. Please try again.');
+    }).finally(() => {
+        hideLoading();
+    });
+});
+
+async function loadFileList(path, page = 1) {
+    const selectAllCheckbox = document.getElementById('select-all');
+    selectAllCheckbox.checked = false;
+    selectAllCheckbox.indeterminate = false;
+    showLoading();
+    try {
+        const response = await fetch(`/api/server/${serverId}/files/list?directory=${encodeURIComponent(path)}&page=${page}&per_page=${itemsPerPage}`);
+        const data = await response.json();
+        currentPath = path;
+        
+        if (page === 1) {
+            fileCache = data.data;
+            if (currentPath !== '/') {
+                fileCache.unshift({ attributes: { name: '..', is_file: false } });
+            }
+        } else {
+            fileCache = [...fileCache, ...data.data];
+        }
+        
+        // Apply filtering and sorting
+        const filteredFiles = filterFiles(fileCache);
+        const sortedFiles = sortFiles(filteredFiles);
+        
+        // Update UI
+        const fileList = document.getElementById('file-list');
+        if (page === 1) {
+            fileList.innerHTML = '';
+        }
+        
+        sortedFiles.forEach(item => {
+            const { name, is_file: isFile, mimetype, size } = item.attributes;
+            fileList.appendChild(createFileCard(name, isFile ? 'file' : 'directory', mimetype, size));
+        });
+        
+        // Update pagination
+        currentPage = data.meta.pagination.current_page;
+        totalPages = data.meta.pagination.total_pages;
+        
+        updateMassActionsBar();
+        
+        // Show no results message if needed
+        const noResults = document.getElementById('no-results');
+        if (sortedFiles.length === 0 && searchTerm) {
+            if (!noResults) {
+                const message = document.createElement('div');
+                message.id = 'no-results';
+                message.className = 'text-center text-gray-400 py-8';
+                message.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p>No files or folders match your search</p>
+                `;
+                fileList.appendChild(message);
+            }
+        } else if (noResults) {
+            noResults.remove();
+        }
+        
+    } catch (error) {
+        console.error('Error loading files:', error);
+        showToast('Error loading files. Please try again.');
+    } finally {
+        hideLoading();
+    }
+}
+
+function createFileCard(name, type, mimetype, size) {
+    const card = document.createElement('div');
+    card.className = 'file-card relative bg-white/5 p-4 rounded-lg transition-all duration-200 hover:bg-white/10 cursor-pointer hover:scale-95';
+    const isArchive = type === 'file' && archiveExtensions.some(ext => name.toLowerCase().endsWith(ext));
+    const iconClass = type === 'file' ? (isArchive ? 'archive' : 'file') : 'folder';
+    const formattedSize = type === 'file' ? formatFileSize(size) : '';
+
+    card.innerHTML = `
+        <div class="absolute top-2 left-2">
+            <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-500 rounded focus:ring-indigo-500" data-name="${name}">
+        </div>
+        <div class="absolute top-2 right-2">
+            <button class="context-menu-button text-gray-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                </svg>
+            </button>
+        </div>
+        <div class="file-icon mt-6">${getFileIcon(iconClass)}</div>
+        <div class="file-name mt-2 text-center">${name}</div>
+        ${formattedSize ? `<div class="file-size text-sm text-gray-400 text-center">${formattedSize}</div>` : ''}
+    `;
+
+    const checkbox = card.querySelector('input[type="checkbox"]');
+    if (checkbox) {
+        checkbox.addEventListener('change', () => {
+            updateMassActionsBar();
+        });
+    }
+
+    const contextMenuButton = card.querySelector('.context-menu-button');
+    contextMenuButton.addEventListener('click', (e) => {
+        console.log('Context menu button clicked');
+        e.stopPropagation();
+        e.preventDefault();
+        showContextMenu(e, name, type === 'file');
+    });
+
+    card.addEventListener('click', (e) => {
+        console.log('Card clicked');
+        if (e.target.type === 'checkbox') {
+            e.stopPropagation();
+            updateMassActionsBar();
+        } else if (name === '..') {
+            const parentPath = currentPath.split('/').slice(0, -1).join('/') || '/';
+            loadFileList(parentPath);
+        } else if (type === 'directory') {
+            loadFileList(`${currentPath}${currentPath.endsWith('/') ? '' : '/'}${name}`);
+        } else {
+            openFileEditor(name);
+        }
+    });
+
+    return card;
+}
+
+function showContextMenu(e, name, isFile) {
+    const contextMenu = document.getElementById('context-menu');
+    contextMenu.style.display = 'block';
+    
+    const rect = e.target.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    
+    contextMenu.style.top = `${rect.bottom + scrollTop}px`;
+    contextMenu.style.left = `${rect.left + scrollLeft}px`;
+
+    const isArchive = isFile && archiveExtensions.some(ext => name.toLowerCase().endsWith(ext));
+
+    document.getElementById('context-menu-edit').style.display = isFile && !isArchive ? 'block' : 'none';
+    document.getElementById('context-menu-decompress').style.display = isArchive ? 'block' : 'none';
+
+        document.getElementById('context-menu-edit').onclick = () => {
+            contextMenu.style.display = 'none';
+            openFileEditor(name);
+        };
+
+        document.getElementById('context-menu-delete').onclick = () => {
+            contextMenu.style.display = 'none';
+            deleteItem(name, isFile);
+        };
+
+    document.getElementById('context-menu-decompress').onclick = () => {
+        contextMenu.style.display = 'none';
+        decompressFile(name);
+    };
+
+        document.getElementById('context-menu-rename').onclick = () => {
+            contextMenu.style.display = 'none';
+            renameItem(name, isFile);
+        };
+
+        document.getElementById('context-menu-download').onclick = () => {
+            contextMenu.style.display = 'none';
+            download(name, isFile);
+        };
+
+        document.getElementById('context-menu-clone').onclick = () => {
+            contextMenu.style.display = 'none';
+            cloneItem(name, isFile);
+        };
+
+        document.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+        }, { once: true });
+    }
+function getFileIcon(type) {
+    switch (type) {
+        case 'folder':
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-8 h-8"><path d="M3.75 3A1.75 1.75 0 002 4.75v3.26a3.235 3.235 0 011.75-.51h12.5c.644 0 1.245.188 1.75.51V6.75A1.75 1.75 0 0016.25 5h-4.836a.25.25 0 01-.177-.073L9.823 3.513A1.75 1.75 0 008.586 3H3.75zM3.75 9A1.75 1.75 0 002 10.75v4.5c0 .966.784 1.75 1.75 1.75h12.5A1.75 1.75 0 0018 15.25v-4.5A1.75 1.75 0 0016.25 9H3.75z" /></svg>';
+        case 'archive':
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-8 h-8"><path d="M4.75 3A1.75 1.75 0 003 4.75v10.5c0 .966.784 1.75 1.75 1.75h10.5A1.75 1.75 0 0017 15.25V4.75A1.75 1.75 0 0015.25 3H4.75zM6 8a.75.75 0 01.75-.75h6.5a.75.75 0 010 1.5h-6.5A.75.75 0 016 8zm.75 2.25a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z" /></svg>';
+        default:
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-8 h-8"><path fill-rule="evenodd" d="M4.5 2A1.5 1.5 0 003 3.5v13A1.5 1.5 0 004.5 18h11a1.5 1.5 0 001.5-1.5V7.621a1.5 1.5 0 00-.44-1.06l-4.12-4.122A1.5 1.5 0 0011.378 2H4.5zm2.25 8.5a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5zm0 3a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z" clip-rule="evenodd" /></svg>';
+    }
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function showContextMenu(e, name, isFile) {
+    console.log('showContextMenu called', { name, isFile });
+    e.preventDefault();
+    const contextMenu = document.getElementById('context-menu');
+    
+    // Position the context menu
+    const x = e.clientX;
+    const y = e.clientY;
+    contextMenu.style.display = 'block';
+    contextMenu.style.left = `${x}px`;
+    contextMenu.style.top = `${y}px`;
+
+    console.log('Context menu positioned', { x, y });
+
+    const isArchive = isFile && archiveExtensions.some(ext => name.toLowerCase().endsWith(ext));
+
+    // Show/hide relevant menu items
+    document.getElementById('context-menu-edit').style.display = isFile && !isArchive ? 'block' : 'none';
+    document.getElementById('context-menu-decompress').style.display = isArchive ? 'block' : 'none';
+
+    // Set up event listeners for context menu items
+    const menuItems = ['edit', 'delete', 'rename', 'download', 'clone', 'decompress'];
+    menuItems.forEach(item => {
+        const element = document.getElementById(`context-menu-${item}`);
+        if (element) {
+            element.onclick = () => {
+                console.log(`${item} menu item clicked`);
+                contextMenu.style.display = 'none';
+                switch(item) {
+                    case 'edit': openFileEditor(name); break;
+                    case 'delete': deleteItem(name, isFile); break;
+                    case 'rename': renameItem(name, isFile); break;
+                    case 'download': download(name, isFile); break;
+                    case 'clone': cloneItem(name, isFile); break;
+                    case 'decompress': decompressFile(name); break;
+                }
+            };
+        }
+    });
+
+    // Close the context menu when clicking outside of it
+    document.addEventListener('click', (event) => {
+        if (!contextMenu.contains(event.target)) {
+            console.log('Closing context menu');
+            contextMenu.style.display = 'none';
+        }
+    }, { once: true });
+
+    console.log('Context menu setup complete');
+}
+
+// Add this near the top of the script with other style definitions
+const fileEditorStyles = `
+.modal-content.editor-modal {
+    width: 90vw;
+    height: 90vh;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: #1a1c20;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #27292c;
+    border-bottom: 1px solid #27292c;
+}
+
+.editor-title-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.file-icon-small {
+    width: 16px;
+    height: 16px;
+    color: white;
+    display: none;
+}
+
+.editor-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: white;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.editor-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.editor-button.primary {
+    background-color: #4f46e5;
+    color: white;
+}
+
+.editor-button.primary:hover {
+    background-color: #4338ca;
+}
+
+.editor-button.secondary {
+    background-color: #27292c;
+    color: white;
+}
+
+.editor-button.secondary:hover {
+    background-color: #27292c;
+}
+
+.editor-main {
+    flex-grow: 1;
+    position: relative;
+}
+
+.editor-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #27292c;
+    border-top: 1px solid #27292c;
+    font-size: 0.875rem;
+    color: #9ca3af;
+}
+
+.editor-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.editor-position {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.loading-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #27292c;
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.keyboard-shortcuts {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #2b2d32;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    display: flex;
+    gap: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.keyboard-shortcuts.visible {
+    opacity: 1;
+}
+
+.shortcut {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #9ca3af;
+    font-size: 0.875rem;
+}
+
+.key {
+    padding: 0.25rem 0.5rem;
+    background-color: #34373c;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: #e5e7eb;
+}
+`;
+
+// Add the styles to the document
+const styleSheet = document.createElement("style");
+styleSheet.textContent = fileEditorStyles;
+document.head.appendChild(styleSheet);
+
+function openFileEditor(fileName) {
+    const fileExtension = fileName.split('.').pop().toLowerCase();
+    const nonEditableExtensions = ['jar', 'gz', 'zip', 'rar', 'tar'];
+
+    if (nonEditableExtensions.includes(fileExtension)) {
+        showToast(`Cannot edit ${fileExtension} files directly.`);
+        return;
+    }
+
+    // Update modal HTML structure
+    const modal = document.getElementById('file-edit-modal');
+    modal.querySelector('.modal-content').className = 'modal-content editor-modal';
+    modal.querySelector('.modal-content').innerHTML = `
+        <div class="editor-header">
+            <div class="editor-title-section">
+                <div class="file-icon-small">${getFileIcon('file')}</div>
+                <h3 class="editor-title">${fileName}</h3>
+            </div>
+            <div class="editor-actions">
+                <button id="toggle-word-wrap" class="hidden editor-button secondary" style="display: none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 7h18"></path>
+                        <path d="M3 12h18"></path>
+                        <path d="M3 17h12"></path>
+                    </svg>
+                    Word Wrap
+                </button>
+                <button id="save-file" class="editor-button primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+                    Save & Exit
+                </button>
+                <button id="close-modal" class="editor-button secondary" style="display: none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="editor-main">
+            <div id="monaco-editor" style="width: 100%; height: 100%;"></div>
+        </div>
+        <div class="editor-footer">
+            <div class="editor-status">
+                <span class="file-type">${fileExtension.toUpperCase()}</span>
+                <span class="encoding">UTF-8</span>
+            </div>
+            <div class="editor-position">
+                <span class="cursor-position">Ln 1, Col 1</span>
+                <span class="selection-info"></span>
+            </div>
+        </div>
+        <div class="keyboard-shortcuts">
+            <div class="shortcut"><span class="key">Ctrl/⌘</span> + <span class="key">S</span> Save</div>
+            <div class="shortcut"><span class="key">Ctrl/⌘</span> + <span class="key">F</span> Find</div>
+            <div class="shortcut"><span class="key">Alt</span> + <span class="key">Z</span> Toggle Word Wrap</div>
+        </div>
+    `;
+
+    showModal('file-edit-modal');
+    let filePath = currentPath === '/' ? fileName : `${currentPath}/${fileName}`;
+
+    // Show loading state
+    const editorMain = document.querySelector('.editor-main');
+    editorMain.innerHTML = `
+        <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+            <div class="loading-spinner"></div>
+        </div>
+    `;
+
+    fetch(`/api/server/${serverId}/files/contents?file=${encodeURIComponent(filePath)}`)
+        .then(response => response.text())
+        .then(content => {
+            editorMain.innerHTML = '<div id="monaco-editor" style="width: 100%; height: 100%;"></div>';
+
+            const language = getMonacoLanguage(fileExtension);
+
+            if (!editor) {
+                require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.30.1/min/vs' }});
+                require(['vs/editor/editor.main'], function() {
+                    setupMonacoEditor(content, language);
+                });
+            } else {
+                editor.setValue(content);
+                monaco.editor.setModelLanguage(editor.getModel(), language);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading file content:', error);
+            showToast('Error loading file content. Please try again.');
+        });
+
+    // Setup event listeners
+    document.getElementById('toggle-word-wrap').addEventListener('click', () => {
+        const wordWrap = editor.getOption(monaco.editor.EditorOption.wordWrap);
+        editor.updateOptions({
+            wordWrap: wordWrap === 'off' ? 'on' : 'off'
+        });
+    });
+
+    document.getElementById('save-file').addEventListener('click', () => saveFile(fileName));
+
+    // Show keyboard shortcuts on first interaction
+    let shortcutsVisible = false;
+    document.addEventListener('keydown', () => {
+        if (!shortcutsVisible) {
+            document.querySelector('.keyboard-shortcuts').classList.add('visible');
+            setTimeout(() => {
+                document.querySelector('.keyboard-shortcuts').classList.remove('visible');
+            }, 3000);
+            shortcutsVisible = true;
+        }
+    }, { once: true });
+}
+
+function setupMonacoEditor(content, language) {
+    // Define custom theme
+    monaco.editor.defineTheme('customTheme', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [
+            { background: '#1a1c20' }
+        ],
+        colors: {
+            'editor.background': '#1a1c20',
+            'editor.lineHighlightBackground': '#2d2f34',
+            'editorLineNumber.foreground': '#6b7280',
+            'editorLineNumber.activeForeground': '#e5e7eb',
+            'editor.selectionBackground': '#4f46e580',
+            'editor.inactiveSelectionBackground': '#4f46e540'
+        }
+    });
+
+    // Create editor instance
+    editor = monaco.editor.create(document.getElementById('monaco-editor'), {
+        value: content,
+        language: language,
+        theme: 'customTheme',
+        automaticLayout: true,
+        minimap: {
+            enabled: true,
+            scale: 0.75,
+            renderCharacters: false
+        },
+        fontSize: 14,
+        lineHeight: 21,
+        padding: { top: 10, bottom: 10 },
+        scrollBeyondLastLine: false,
+        renderWhitespace: 'selection',
+        bracketPairColorization: {
+            enabled: true
+        },
+        guides: {
+            bracketPairs: true,
+            indentation: true
+        },
+        smoothScrolling: true,
+        cursorBlinking: 'smooth',
+        cursorSmoothCaretAnimation: true,
+        wordWrap: 'off',
+        lineNumbers: 'on',
+        glyphMargin: false,
+        folding: true,
+        dragAndDrop: true,
+        links: true,
+        formatOnPaste: true,
+        formatOnType: true
+    });
+
+    // Add keyboard shortcuts
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+        document.getElementById('save-file').click();
+    });
+
+    // Update status bar
+    editor.onDidChangeCursorPosition((e) => {
+        const position = e.position;
+        document.querySelector('.cursor-position').textContent = 
+            `Ln ${position.lineNumber}, Col ${position.column}`;
+    });
+
+    editor.onDidChangeCursorSelection((e) => {
+        const selection = editor.getSelection();
+        const selectedText = editor.getModel().getValueInRange(selection);
+        const selectionInfo = document.querySelector('.selection-info');
+        
+        if (selectedText) {
+            const lines = selectedText.split('\n');
+            const chars = selectedText.length;
+            selectionInfo.textContent = `${lines.length} lines, ${chars} characters selected`;
+        } else {
+            selectionInfo.textContent = '';
+        }
+    });
+
+    window.editor = editor;
+}
+
+function getMonacoLanguage(fileExtension) {
+    const languageMap = {
+        js: 'javascript',
+        ts: 'typescript',
+        json: 'json',
+        html: 'html',
+        css: 'css',
+        scss: 'scss',
+        less: 'less',
+        md: 'markdown',
+        xml: 'xml',
+        sql: 'sql',
+        py: 'python',
+        java: 'java',
+        cpp: 'cpp',
+        c: 'c',
+        cs: 'csharp',
+        go: 'go',
+        rs: 'rust',
+        php: 'php',
+        rb: 'ruby',
+        pl: 'perl',
+        sh: 'shell',
+        ps1: 'powershell',
+        yaml: 'yaml',
+        yml: 'yaml',
+        ini: 'ini',
+        txt: 'plaintext'
+    };
+
+    return languageMap[fileExtension] || 'plaintext';
+}
+
+function saveFile(fileName) {
+    const content = window.editor.getValue();
+    showLoading();
+
+    let filePath = currentPath === '/' ? fileName : `${currentPath}/${fileName}`;
+
+    fetch(`/api/server/${serverId}/files/write?file=${encodeURIComponent(filePath)}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain',
+        },
+        body: content
+    }).then(() => {
+        closeModal('file-edit-modal');
+        loadFileList(currentPath);
+        showToast('File saved successfully');
+        window.location.reload()
+    }).catch(err => {
+        console.error('Error:', err);
+        showToast('Error saving file. Please try again.');
+    }).finally(() => {
+        hideLoading();
+    });
+}
+
+function deleteItem(name, isFile) {
+    if (confirm(`Are you sure you want to delete ${isFile ? 'file' : 'folder'} "${name}"?`)) {
+        showLoading();
+        fetch(`/api/server/${serverId}/files/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                root: currentPath,
+                files: [name]
+            })
+        }).then(() => {
+            loadFileList(currentPath);
+            showToast(`${isFile ? 'File' : 'Folder'} deleted successfully`);
+        }).catch(error => {
+            console.error('Error deleting item:', error);
+            showToast('Error deleting item. Please try again.');
+        }).finally(() => {
+            hideLoading();
+        });
+    }
+}
+
+function renameItem(name, isFile) {
+    const newName = prompt(`Enter new name for ${isFile ? 'file' : 'folder'} "${name}":`, name);
+    if (newName && newName !== name) {
+        showLoading();
+        fetch(`/api/server/${serverId}/files/rename`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                root: currentPath,
+                files: [
+                    {
+                        from: name,
+                        to: newName
+                    }
+                ]
+            })
+        }).then(() => {
+            loadFileList(currentPath);
+            showToast(`${isFile ? 'File' : 'Folder'} renamed successfully`);
+        }).catch(error => {
+            console.error('Error renaming item:', error);
+            showToast('Error renaming item. Please try again.');
+        }).finally(() => {
+            hideLoading();
+        });
+    }
+}
+
+function cloneItem(name, isFile) {
+    showLoading();
+    fetch(`/api/server/${serverId}/files/copy`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            location: currentPath + '/' + name,
+        })
+    }).then(() => {
+        loadFileList(currentPath);
+        showToast(`${isFile ? 'File' : 'Folder'} cloned successfully`);
+    }).catch(error => {
+        console.error('Error cloning item:', error);
+        showToast('Error cloning item. Please try again.');
+    }).finally(() => {
+        hideLoading();
+    });
+}
+
+function download(name, isFile) {
+    if (!isFile) {
+        alert('Cannot download a folder. Archive it first before downloading');
+        return;
+    }
+    showLoading();
+    fetch(`/api/server/${serverId}/files/download?file=${encodeURIComponent(currentPath + '/' + name)}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.attributes && data.attributes.url) {
+            window.location.href = data.attributes.url;
+            showToast('Download started');
+            loadFileList(currentPath);
+        } else {
+            console.error('Download URL not found in the response');
+            showToast('Error starting download. Please try again.');
+                        loadFileList(currentPath);
+        }
+    })
+    .catch(error => {
+        console.error('Error downloading file:', error);
+        showToast('Error downloading file. Please try again.');
+                    loadFileList(currentPath);
+    })
+    .finally(() => {
+        hideLoading();
+    });
+}
+
+function decompressFile(fileName) {
+    showLoading();
+    fetch(`/api/server/${serverId}/files/decompress`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            root: currentPath,
+            file: fileName
+        })
+    }).then(() => {
+        loadFileList(currentPath);
+        showToast('File decompressed successfully');
+                    loadFileList(currentPath);
+    }).catch(error => {
+        console.error('Error decompressing file:', error);
+        showToast('Error decompressing file. Please try again.');
+                    loadFileList(currentPath);
+    }).finally(() => {
+        hideLoading();
+    });
+}
+
+function uploadFiles(files) {
+    showModal('upload-progress-modal');
+    const progressContainer = document.getElementById('upload-progress-container');
+    progressContainer.innerHTML = ''; // Clear any existing progress bars
+    
+    const uploadPromises = Array.from(files).map(file => {
+        // Create progress bar element for this file
+        const progressBarId = `progress-${file.name.replace(/[^a-zA-Z0-9]/g, '')}`;
+        const progressElement = document.createElement('div');
+        progressElement.className = 'mb-4';
+        progressElement.innerHTML = `
+            <div class="flex justify-between mb-1">
+                <span class="text-sm truncate">${file.name}</span>
+                <span class="text-sm" id="${progressBarId}-text">0%</span>
+            </div>
+            <div class="w-full bg-neutral-700 rounded-full h-2.5">
+                <div id="${progressBarId}" class="bg-indigo-500 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+        `;
+        progressContainer.appendChild(progressElement);
+
+        return fetch(`/api/server/${serverId}/files/upload`)
+            .then(response => response.json())
+            .then(data => {
+                const formData = new FormData();
+                formData.append('files', file);
+
+                return new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    
+                    xhr.upload.addEventListener('progress', (event) => {
+                        if (event.lengthComputable) {
+                            const percentComplete = Math.round((event.loaded / event.total) * 100);
+                            const progressBar = document.getElementById(progressBarId);
+                            const progressText = document.getElementById(`${progressBarId}-text`);
+                            if (progressBar && progressText) {
+                                progressBar.style.width = `${percentComplete}%`;
+                                progressText.textContent = `${percentComplete}%`;
+                            }
+                        }
+                    });
+
+                    xhr.addEventListener('load', () => {
+                        if (xhr.status === 200) {
+                            if (currentPath !== '/') {
+                                // Move file to correct directory after upload
+                                fetch(`/api/server/${serverId}/files/rename`, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                        root: '/',
+                                        files: [{
+                                            from: file.name,
+                                            to: `${currentPath}/${file.name}`
+                                        }]
+                                    })
+                                }).then(resolve).catch(reject);
+                            } else {
+                                resolve();
+                            }
+                        } else {
+                            reject(new Error(`Upload failed with status ${xhr.status}`));
+                        }
+                    });
+
+                    xhr.addEventListener('error', () => {
+                        reject(new Error('Upload failed'));
+                    });
+
+                    xhr.open('POST', data.attributes.url, true);
+                    xhr.send(formData);
+                });
+            });
+    });
+
+    Promise.all(uploadPromises)
+        .then(() => {
+            closeModal('upload-progress-modal');
+            loadFileList(currentPath);
+            showToast('Files uploaded successfully');
+        })
+        .catch(error => {
+            console.error('Error uploading files:', error);
+            showToast('Error uploading files. Please try again.');
+        });
+}
+
+function showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.add('active');
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.remove('active');
+}
+
+// Event Listeners
+document.getElementById('close-modal').addEventListener('click', () => closeModal('file-edit-modal'));
+document.getElementById('create-folder-cancel').addEventListener('click', () => closeModal('create-folder-modal'));
+document.getElementById('new-file-cancel').addEventListener('click', () => closeModal('new-file-modal'));
+
+document.getElementById('upload-file').addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.onchange = e => {
+        const files = e.target.files;
+        uploadFiles(files);
+    };
+    input.click();
+});
+
+document.getElementById('create-folder').addEventListener('click', () => {
+    showModal('create-folder-modal');
+});
+
+document.getElementById('create-folder-confirm').addEventListener('click', () => {
+    const folderName = document.getElementById('new-folder-name').value;
+    if (folderName) {
+        showLoading();
+        fetch(`/api/server/${serverId}/files/create-folder`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                root: currentPath,
+                name: folderName
+            })
+        }).then(() => {
+            closeModal('create-folder-modal');
+            loadFileList(currentPath);
+            showToast('Folder created successfully');
+                        loadFileList(currentPath);
+        }).catch(error => {
+            console.error('Error creating folder:', error);
+            showToast('Error creating folder. Please try again.');
+                        loadFileList(currentPath);
+        }).finally(() => {
+            hideLoading();
+        });
+    }
+});
+
+document.getElementById('new-file').addEventListener('click', () => {
+    showModal('new-file-modal');
+});
+
+document.getElementById('new-file-confirm').addEventListener('click', () => {
+    const fileName = document.getElementById('new-file-name').value;
+    if (fileName) {
+        showLoading();
+        fetch(`/api/server/${serverId}/files/write?file=${encodeURIComponent(`${currentPath}/${fileName}`)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain',
+            },
+            body: ''  // Empty content for a new file
+        }).then(() => {
+            closeModal('new-file-modal');
+            loadFileList(currentPath);
+            showToast('File created successfully');
+                        loadFileList(currentPath);
+        }).catch(error => {
+            console.error('Error creating new file:', error);
+            showToast('Error creating new file. Please try again.');
+                        loadFileList(currentPath);
+        }).finally(() => {
+            hideLoading();
+        });
+    }
+});
+
+// Drag and drop functionality
+const dropZone = document.getElementById('drop-zone');
+
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('active');
+});
+
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('active');
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('active');
+    const files = e.dataTransfer.files;
+    uploadFiles(files);
+});
+
+// Initial load
+loadFileList('/');
+
+// Add smooth scrolling for better UX
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+});
+
+// Add keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+            case 'u':
+                e.preventDefault();
+                document.getElementById('upload-file').click();
+                break;
+            case 'n':
+                e.preventDefault();
+                document.getElementById('new-file').click();
+                break;
+            case 'f':
+                e.preventDefault();
+                document.getElementById('create-folder').click();
+                break;
+        }
+    }
+});
+
+window.addEventListener('scroll', () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !isLoading) {
+        loadMoreItems();
+    }
+});
+
+document.getElementById('select-all').addEventListener('change', function(e) {
+    const isChecked = e.target.checked;
+    const checkboxes = document.querySelectorAll('.file-card input[type="checkbox"]');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = isChecked;
+    });
+    
+    updateMassActionsBar();
+});
+
+function loadMoreItems() {
+    if (currentPage >= totalPages || isLoading) return;
+
+    isLoading = true;
+    showLoading();
+    
+    loadFileList(currentPath, currentPage + 1);
+}
+
+// Add a mutation observer to dynamically adjust the layout
+const fileListObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+            adjustLayout();
+        }
+    });
+});
+
+fileListObserver.observe(document.getElementById('file-list'), { childList: true });
+
+function adjustLayout() {
+    const fileList = document.getElementById('file-list');
+    if (!fileList) return; // Exit if file list doesn't exist
+
+    const items = fileList.children;
+    if (items.length === 0) return; // Exit if there are no items
+
+    const containerWidth = fileList.offsetWidth;
+    const itemWidth = items[0].offsetWidth;
+
+    // Check if itemWidth is valid
+    if (!itemWidth || itemWidth <= 0) return;
+
+    const columns = Math.floor(containerWidth / itemWidth);
+    
+    // Ensure we have at least one column
+    const finalColumns = Math.max(columns, 1);
+
+    fileList.style.gridTemplateColumns = `repeat(${finalColumns}, 1fr)`;
+}
+
+// Call adjustLayout on window resize
+window.addEventListener('resize', adjustLayout);
+
+// Initial layout adjustment
+adjustLayout();
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Add event listeners
+    const searchInput = document.getElementById('file-search');
+    const sortBySelect = document.getElementById('sort-by');
+    const sortDirectionButton = document.getElementById('sort-direction');
+    
+    // Debounce function for search
+    let searchTimeout;
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            searchTerm = e.target.value;
+            loadFileList(currentPath);
+        }, 300);
+    });
+    
+    sortBySelect.addEventListener('change', (e) => {
+        sortBy = e.target.value;
+        loadFileList(currentPath);
+    });
+    
+    sortDirectionButton.addEventListener('click', () => {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        sortDirectionButton.querySelector('svg').style.transform = 
+            sortDirection === 'asc' ? 'rotate(0deg)' : 'rotate(180deg)';
+        loadFileList(currentPath);
+    });
+});
+</script>
+<%- include('../components/bottom') %>

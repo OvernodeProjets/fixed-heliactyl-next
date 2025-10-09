@@ -1,0 +1,561 @@
+<%- include('../components/top') %>
+<style>
+    .world-card {
+        transition: all 0.2s ease-in-out;
+    }
+    .world-card:hover {
+        transform: translateY(-2px);
+    }
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-content {
+        background-color: #1a1c20;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        max-width: 90%;
+        max-height: 90%;
+        overflow: auto;
+        transform: scale(0.9);
+        opacity: 0;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    .modal-overlay.active .modal-content {
+        transform: scale(1);
+        opacity: 1;
+    }
+    .upload-area {
+        border: 2px dashed rgba(255, 255, 255, 0.2);
+        border-radius: 0.5rem;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .upload-area:hover {
+        border-color: rgba(255, 255, 255, 0.4);
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    .upload-area.dragging {
+        border-color: #6366f1;
+        background-color: rgba(99, 102, 241, 0.1);
+    }
+</style>
+
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="mb-5 lg:flex lg:items-center lg:justify-between">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight" id="server-name"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg></h2>
+          <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/briefcase -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path fill-rule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Zm9.586 4.594a.75.75 0 0 0-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.116-.062l3-3.75Z" clip-rule="evenodd" />
+              </svg>                    
+              <span id="server-description"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg></span>
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/map-pin -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path d="M4.08 5.227A3 3 0 0 1 6.979 3H17.02a3 3 0 0 1 2.9 2.227l2.113 7.926A5.228 5.228 0 0 0 18.75 12H5.25a5.228 5.228 0 0 0-3.284 1.153L4.08 5.227Z" />
+                <path fill-rule="evenodd" d="M5.25 13.5a3.75 3.75 0 1 0 0 7.5h13.5a3.75 3.75 0 1 0 0-7.5H5.25Zm10.5 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm3.75-.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" clip-rule="evenodd" />
+              </svg>              
+              Server <%= req.query.id %>
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/currency-dollar -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 0 0 .374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 0 0-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08Zm3.094 8.016a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+              </svg>              
+              Volumetric Shield enabled
+            </div>
+            <div class="hidden mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/calendar -->
+              <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clip-rule="evenodd" />
+              </svg>
+              <span id="server-name-breadcrumb"></span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-5 flex lg:mt-0 lg:ml-4">
+          <span class="hidden sm:block">
+            <a href="/servers" class="inline-flex items-center rounded-xl border border-transparent bg-indigo-900/50 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-800">
+              <!-- Heroicon name: mini/pencil -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
+                <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+              </svg>                
+              Back to server list
+            </a>
+          </span>
+        </div>
+      </div>   
+
+    <%- include('../components/server') %>
+
+    <!-- Worlds Section -->
+    <div class="bg-white/5 rounded-xl p-6">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-xl font-semibold text-white">World Management</h2>
+                <p class="text-gray-400 text-sm mt-1">Manage your Minecraft worlds and dimensions</p>
+            </div>
+            <div>
+                <button id="import-world" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 hover:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Import World
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="worlds-loading" class="text-center py-12">
+            <svg class="animate-spin h-8 w-8 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+
+        <!-- Worlds List -->
+        <div id="worlds-list" class="hidden space-y-6">
+            <!-- Default World Section -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-medium text-white">Default World</h3>
+                <div id="default-world" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Default world and its dimensions will be populated here -->
+                </div>
+            </div>
+
+            <!-- Custom Worlds Section -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-medium text-white">Custom Worlds</h3>
+                <div id="custom-worlds" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Custom worlds will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="worlds-empty" class="hidden text-center py-12">
+            <div class="w-16 h-16 mx-auto mb-4 bg-indigo-900/50 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-indigo-300">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.893 13.393l-1.135-1.135a2.252 2.252 0 01-.421-.585l-1.08-2.16a.414.414 0 00-.663-.107.827.827 0 01-.812.21l-1.273-.363a.89.89 0 00-.738 1.595l.587.39c.59.395.674 1.23.172 1.732l-.2.2c-.212.212-.33.498-.33.796v.41c0 .409-.11.809-.32 1.158l-1.315 2.191a2.11 2.11 0 01-1.81 1.025 1.055 1.055 0 01-1.055-1.055v-1.172c0-.92-.56-1.747-1.414-2.089l-.655-.261a2.25 2.25 0 01-1.383-2.46l.007-.042a2.25 2.25 0 01.29-.787l.09-.15a2.25 2.25 0 012.37-1.048l1.178.236a1.125 1.125 0 001.302-.795l.208-.73a1.125 1.125 0 00-.578-1.315l-.665-.332-.091.091a2.25 2.25 0 01-1.591.659h-.18c-.249 0-.487.1-.662.274a.931.931 0 01-1.458-1.137l1.411-2.353a2.25 2.25 0 00.286-.76m11.928 9.869A9 9 0 008.965 3.525m11.928 9.868A9 9 0 118.965 3.525" />
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-white mb-2">No Worlds Found</h3>
+            <p class="text-indigo-200/60">Import a world to get started</p>
+        </div>
+    </div>
+</main>
+
+<!-- Import World Modal -->
+<div id="import-modal" class="modal-overlay z-50">
+    <div class="modal-content w-full max-w-xl">
+        <h3 class="text-xl font-semibold mb-4 text-white">Import World</h3>
+<div class="mb-6">
+    <label class="block text-sm font-medium text-gray-300 mb-2">World Name</label>
+    <input type="text" id="world-name" class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter world name">
+</div>
+<div class="upload-area mb-6" id="upload-area">
+    <input type="file" id="world-file" class="hidden" accept=".zip,.gz">
+    <div id="upload-initial" class="text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+        </svg>
+        <p class="text-gray-300 mb-2">Drag and drop your world file here</p>
+        <p class="text-gray-400 text-sm">or click to select file</p>
+        <p class="text-gray-500 text-xs mt-2">Supports .zip files</p>
+    </div>
+    <div id="upload-selected" class="text-center hidden">
+        <div class="bg-indigo-900/50 rounded-lg p-4 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p class="text-indigo-300 font-medium" id="selected-filename">filename.zip</p>
+            <p class="text-indigo-400 text-sm mt-1" id="selected-filesize">0 MB</p>
+        </div>
+        <button id="change-file" class="text-gray-400 hover:text-white text-sm transition">
+            Choose a different file
+        </button>
+    </div>
+    <div id="upload-progress" class="text-center hidden">
+        <div class="mb-4">
+            <div class="h-2 w-full bg-gray-700 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-indigo-500 rounded-full transition-all duration-200" style="width: 0%"></div>
+            </div>
+            <p class="text-gray-400 text-sm mt-2">
+                <span id="progress-text">0%</span> uploaded
+            </p>
+        </div>
+        <p class="text-indigo-400 text-sm animate-pulse">Please don't close this window...</p>
+    </div>
+</div>
+        <div class="flex justify-end">
+            <button id="cancel-import" class="bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-2 px-4 rounded-lg transition mr-2">Cancel</button>
+            <button id="confirm-import" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition">Import World</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete World Modal -->
+<div id="delete-modal" class="modal-overlay z-50">
+    <div class="modal-content">
+        <h3 class="text-xl font-semibold mb-4 text-white">Delete World</h3>
+        <p class="mb-4 text-gray-300" id="delete-message">Are you sure you want to delete this world? This action cannot be undone.</p>
+        <div class="flex justify-end">
+            <button id="cancel-delete" class="bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-2 px-4 rounded-lg transition mr-2">Cancel</button>
+            <button id="confirm-delete" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const serverId = new URLSearchParams(window.location.search).get('id');
+    let worldToDelete = null;
+
+    function loadServerDetails() {
+        fetch(`/api/server/${serverId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('server-name').textContent = data.attributes.name;
+                document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
+                document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
+            })
+            .catch(error => {
+                console.error('Error fetching server details:', error);
+                showError('Failed to load server details. Please try again.');
+            })
+    }
+
+    function loadWorlds() {
+        document.getElementById('worlds-loading').classList.remove('hidden');
+        document.getElementById('worlds-list').classList.add('hidden');
+        document.getElementById('worlds-empty').classList.add('hidden');
+
+        fetch(`/api/server/${serverId}/worlds`)
+            .then(response => response.json())
+            .then(data => {
+                const hasWorlds = data.default || data.nether || data.end || (data.custom && data.custom.length > 0);
+                
+                if (!hasWorlds) {
+                    document.getElementById('worlds-empty').classList.remove('hidden');
+                    return;
+                }
+
+                const worldsList = document.getElementById('worlds-list');
+                worldsList.classList.remove('hidden');
+
+                // Populate default world section
+                const defaultWorldSection = document.getElementById('default-world');
+                defaultWorldSection.innerHTML = '';
+
+                if (data.default) {
+                    defaultWorldSection.appendChild(createWorldCard(data.default, true));
+                }
+                if (data.nether) {
+                    defaultWorldSection.appendChild(createWorldCard(data.nether, true));
+                }
+                if (data.end) {
+                    defaultWorldSection.appendChild(createWorldCard(data.end, true));
+                }
+
+                // Populate custom worlds section
+                const customWorldsSection = document.getElementById('custom-worlds');
+                customWorldsSection.innerHTML = '';
+
+                if (data.custom && data.custom.length > 0) {
+                    data.custom.forEach(world => {
+                        customWorldsSection.appendChild(createWorldCard(world, false));
+                    });
+                } else {
+                    customWorldsSection.innerHTML = `
+                        <div class="col-span-3 text-center py-8 bg-white/5 rounded-lg">
+                            <p class="text-gray-400">No custom worlds found</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading worlds:', error);
+                showNotification('Failed to load worlds', 'error');
+            })
+            .finally(() => {
+                document.getElementById('worlds-loading').classList.add('hidden');
+            });
+    }
+
+    function createWorldCard(world, isDefaultWorld) {
+        const div = document.createElement('div');
+        div.className = 'world-card bg-white/5 rounded-lg p-4';
+        
+        const worldType = world.attributes.name.includes('_nether') ? 'Nether' :
+                         world.attributes.name.includes('_the_end') ? 'The End' :
+                         'Overworld';
+
+        div.innerHTML = `
+            <div class="flex items-center justify-between mb-3">
+                <h4 class="text-white font-medium">${world.attributes.name}</h4>
+                ${isDefaultWorld ? `
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Default
+                    </span>
+                ` : `
+                    <button onclick="showDeleteConfirmation('${world.attributes.name}')" class="text-red-400 hover:text-red-300 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                `}
+            </div>
+            <div class="text-sm text-gray-400 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clip-rule="evenodd" />
+                </svg>
+                ${worldType}
+            </div>
+        `;
+        return div;
+    }
+
+    function showImportModal() {
+        document.getElementById('import-modal').classList.add('active');
+        document.getElementById('world-name').value = '';
+        document.getElementById('world-file').value = '';
+    }
+
+    function showDeleteConfirmation(worldName) {
+        worldToDelete = worldName;
+        document.getElementById('delete-message').textContent = `Are you sure you want to delete the world "${worldName}"? This action cannot be undone.`;
+        document.getElementById('delete-modal').classList.add('active');
+    }
+
+    function closeModals() {
+        document.getElementById('import-modal').classList.remove('active');
+        document.getElementById('delete-modal').classList.remove('active');
+        worldToDelete = null;
+        // Reset file selection UI
+        updateFileSelection(null);
+    }
+
+    // Update your importWorld function
+    async function importWorld() {
+        const worldName = document.getElementById('world-name').value.trim();
+        const worldFile = document.getElementById('world-file').files[0];
+
+        if (!worldName || !worldFile) {
+            showNotification('Please provide both world name and file', 'error');
+            return;
+        }
+
+        // Disable buttons during upload
+        const confirmButton = document.getElementById('confirm-import');
+        const cancelButton = document.getElementById('cancel-import');
+        confirmButton.disabled = true;
+        cancelButton.disabled = true;
+        confirmButton.classList.add('opacity-50');
+        cancelButton.classList.add('opacity-50');
+
+        try {
+            // Show progress UI
+            document.getElementById('upload-selected').classList.add('hidden');
+            document.getElementById('upload-progress').classList.remove('hidden');
+            updateProgress(0);
+
+            // Get upload URL
+            const response = await fetch(`/api/server/${serverId}/worlds/import`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ worldName })
+            });
+            const data = await response.json();
+
+            // Upload file with progress tracking
+            const formData = new FormData();
+            formData.append('files', worldFile);
+
+            const xhr = new XMLHttpRequest();
+            await new Promise((resolve, reject) => {
+                xhr.upload.addEventListener('progress', (event) => {
+                    if (event.lengthComputable) {
+                        const percent = (event.loaded / event.total) * 100;
+                        updateProgress(percent);
+                    }
+                });
+
+                xhr.addEventListener('load', resolve);
+                xhr.addEventListener('error', reject);
+                xhr.open('POST', data.url);
+                xhr.send(formData);
+            });
+
+            // Show processing state
+            updateProgress(100);
+            document.getElementById('progress-text').textContent = 'Processing...';
+
+            // Complete import
+            await fetch(`/api/server/${serverId}/worlds/import/complete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    worldName: data.worldName,
+                    fileName: worldFile.name
+                })
+            });
+
+            showNotification('World imported successfully', 'success');
+            closeModals();
+            loadWorlds();
+        } catch (error) {
+            console.error('Error importing world:', error);
+            showNotification('Failed to import world', 'error');
+        } finally {
+            // Re-enable buttons
+            confirmButton.disabled = false;
+            cancelButton.disabled = false;
+            confirmButton.classList.remove('opacity-50');
+            cancelButton.classList.remove('opacity-50');
+        }
+    }
+
+    async function deleteWorld() {
+        if (!worldToDelete) return;
+
+        try {
+            await fetch(`/api/server/${serverId}/worlds/${worldToDelete}`, {
+                method: 'DELETE'
+            });
+
+            showNotification('World deleted successfully', 'success');
+            closeModals();
+            loadWorlds();
+        } catch (error) {
+            console.error('Error deleting world:', error);
+            showNotification('Failed to delete world', 'error');
+        }
+    }
+
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg ${
+            type === 'success' ? 'bg-green-500' : 'bg-red-500'
+        } text-white z-50`;
+        notification.innerHTML = `
+            <div class="flex items-center">
+                ${type === 'success' ? `
+                    <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                ` : `
+                    <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                `}
+                ${message}
+            </div>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 5000);
+    }
+
+    // File upload handling
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('world-file');
+
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragging');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragging');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragging');
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+        }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            updateFileSelection(file);
+        }
+    });
+
+    document.getElementById('change-file').addEventListener('click', (e) => {
+        e.preventDefault();
+        fileInput.click();
+    });
+
+    // Event listeners
+    document.getElementById('import-world').addEventListener('click', showImportModal);
+    document.getElementById('cancel-import').addEventListener('click', closeModals);
+    document.getElementById('confirm-import').addEventListener('click', importWorld);
+    document.getElementById('cancel-delete').addEventListener('click', closeModals);
+    document.getElementById('confirm-delete').addEventListener('click', deleteWorld);
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', () => {
+        loadServerDetails();
+        loadWorlds();
+    });
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function updateFileSelection(file) {
+        if (file) {
+            document.getElementById('selected-filename').textContent = file.name;
+            document.getElementById('selected-filesize').textContent = formatFileSize(file.size);
+            document.getElementById('upload-initial').classList.add('hidden');
+            document.getElementById('upload-selected').classList.remove('hidden');
+            document.getElementById('upload-progress').classList.add('hidden');
+        } else {
+            document.getElementById('upload-initial').classList.remove('hidden');
+            document.getElementById('upload-selected').classList.add('hidden');
+            document.getElementById('upload-progress').classList.add('hidden');
+            document.getElementById('world-file').value = '';
+        }
+    }
+
+    function updateProgress(percent) {
+        document.getElementById('progress-bar').style.width = `${percent}%`;
+        document.getElementById('progress-text').textContent = `${Math.round(percent)}%`;
+    }
+</script>
+
+<%- include('../components/bottom') %>

@@ -1,0 +1,232 @@
+<%- include('./components/top') %>
+<!-- Main Content -->
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center w-full mx-auto pb-4">
+        <!-- Welcome text and subtext on the left -->
+        <div class="flex flex-col">
+            <h1 class="text-xl font-semibold mb-0.5 heavy">AFK Page</h1>
+            <p class="text-gray-400 text-md">Earn free rewards for keeping this page open.</p>
+        </div>
+
+        <!-- Breadcrumbs on the right -->
+        <nav aria-label="Breadcrumb" class="inline-flex py-2 px-4 rounded-xl bg-white/5 transition-colors duration-200">
+            <ol role="list" class="flex items-center space-x-2">
+                <li>
+                    <a href="/" class="text-sm flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-colors duration-200" aria-current="false">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler size-4 icons-tabler-outline icon-tabler-home">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+                            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
+                            <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
+                        </svg>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right size-4 text-zinc-400">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M9 6l6 6l-6 6"></path>
+                    </svg>
+                </li>
+                <li>
+                    <a href="#" class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200" aria-current="page">
+                        AFK Page
+                    </a>
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- AFK Page Content -->
+    <div class="mt-12 flex flex-col items-center space-y-8">
+        <!-- Status Card -->
+        <div id="statusCard" class="w-full max-w-md p-6 rounded-xl bg-white/5 border border-white/10">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-white">Connection Status</h2>
+                <span id="connectionStatus" class="px-3 py-1 rounded-full text-sm font-medium bg-zinc-700 text-zinc-300">
+                    Connecting...
+                </span>
+            </div>
+            <div id="errorMessage" class="hidden text-red-400 text-sm mt-2mb-4"></div>
+        </div>
+
+        <!-- Rewards Card -->
+        <div class="w-full max-w-md p-6 rounded-xl bg-white/5 border border-white/10">
+            <h2 class="text-lg font-semibold text-white mb-6">AFK Rewards</h2>
+            
+            <!-- Rate Display -->
+            <div class="flex items-center justify-between mb-4 p-4 rounded-lg bg-white/5">
+                <div class="flex items-center space-x-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                    </svg>
+                    <span class="text-sm text-zinc-300">Earning Rate</span>
+                </div>
+                <span id="earningRate" class="text-sm font-medium text-white">1.5 <%= settings.website.currency %>/min</span>
+            </div>
+
+            <!-- Timer -->
+            <div class="flex items-center justify-between p-4 rounded-lg bg-white/5">
+                <div class="flex items-center space-x-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span class="text-sm text-zinc-300">Next Reward</span>
+                </div>
+                <span id="countdown" class="text-sm font-medium text-white">-</span>
+            </div>
+        </div>
+
+        <!-- Statistics Card -->
+        <div class="w-full max-w-md p-6 rounded-xl bg-white/5 border border-white/10">
+            <h2 class="text-lg font-semibold text-white mb-6">Session Statistics</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <div class="p-4 rounded-lg bg-white/5">
+                    <div class="text-sm text-zinc-300 mb-1">Time Active</div>
+                    <div id="timeActive" class="text-lg font-medium text-white">0m 0s</div>
+                </div>
+                <div class="p-4 rounded-lg bg-white/5 hidden">
+                    <div class="text-sm text-zinc-300 mb-1">Total Earned</div>
+                    <div id="totalEarned" class="text-lg font-medium text-white">0 coins</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Add the script before closing body tag -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let ws;
+    let sessionStart = Date.now();
+    let totalEarned = 0;
+    let updateInterval;
+    let reconnectAttempts = 0;
+    const MAX_RECONNECT_ATTEMPTS = 5;
+    const RECONNECT_DELAY = 5000;
+
+    function formatTime(ms) {
+        const seconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}m ${remainingSeconds}s`;
+    }
+
+    function updateSessionStats() {
+        const timeActive = Date.now() - sessionStart;
+        document.getElementById('timeActive').textContent = formatTime(timeActive);
+        document.getElementById('totalEarned').textContent = `${totalEarned.toFixed(2)} coins`;
+    }
+
+    function updateConnectionStatus(status, isError = false) {
+        const statusElement = document.getElementById('connectionStatus');
+        const errorElement = document.getElementById('errorMessage');
+        
+        if (isError) {
+            statusElement.className = 'px-3 py-1 rounded-full text-sm font-medium bg-red-900/50 text-red-300';
+            statusElement.textContent = 'Disconnected';
+            errorElement.textContent = status;
+            errorElement.classList.remove('hidden');
+        } else {
+            statusElement.className = status === 'Connected' 
+                ? 'px-3 py-1 rounded-full text-sm font-medium bg-indigo-600/50 text-indigo-300'
+                : 'px-3 py-1 rounded-full text-sm font-medium bg-zinc-700 text-zinc-300';
+            statusElement.textContent = status;
+            errorElement.classList.add('hidden');
+        }
+    }
+
+    function connect() {
+        if (ws) {
+            ws.close();
+        }
+
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        ws = new WebSocket(`${protocol}//${window.location.host}/ws `);
+
+        ws.onopen = () => {
+            console.log('[AFK] Connected to server');
+            updateConnectionStatus('Connected');
+            reconnectAttempts = 0;
+            // Start session statistics update
+            setInterval(updateSessionStats, 1000);
+        };
+
+        ws.onclose = (event) => {
+            console.log(`[AFK] Disconnected from server: ${event.code}`);
+            
+            if (event.code === 4002) {
+                updateConnectionStatus('AFK page already open in another tab', true);
+            } else if (event.code === 4001) {
+                updateConnectionStatus('Session expired. Please refresh the page.', true);
+            } else {
+                updateConnectionStatus('Disconnected', true);
+                
+                // Attempt to reconnect
+                if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                    reconnectAttempts++;
+                    setTimeout(connect, RECONNECT_DELAY);
+                    updateConnectionStatus(`Reconnecting (Attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+                } else {
+                    updateConnectionStatus('Connection failed. Please refresh the page.', true);
+                }
+            }
+            
+            clearInterval(updateInterval);
+        };
+
+        ws.onerror = (error) => {
+            console.error('[AFK] WebSocket error:', error);
+        };
+
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.type === 'afk_state') {
+                    // Update earning rate
+                    document.getElementById('earningRate').textContent = 
+                        `${data.coinsPerMinute.toFixed(1)} <%= settings.website.currency %>/min`;
+
+                    // Update countdown
+                    if (updateInterval) clearInterval(updateInterval);
+                    
+                    function updateCountdown() {
+                        const remainingSeconds = Math.ceil(data.nextRewardIn / 1000);
+                        document.getElementById('countdown').textContent = 
+                            `${remainingSeconds}s`;
+                    }
+
+                    updateCountdown();
+                    updateInterval = setInterval(updateCountdown, 1000);
+
+                    // Update total earned (add coins every reward)
+                    if (data.nextRewardIn === 0) {
+                        totalEarned += data.coinsPerMinute;
+                        updateSessionStats();
+                    }
+                }
+            } catch (error) {
+                console.error('[AFK] Failed to parse message:', error);
+            }
+        };
+    }
+
+    // Start connection when page loads
+    connect();
+
+    // Handle page visibility changes
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            console.log('[AFK] Page hidden');
+        } else {
+            console.log('[AFK] Page visible, checking connection');
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                connect();
+            }
+        }
+    });
+});
+</script>
+
+<%- include('./components/bottom') %>

@@ -1,0 +1,502 @@
+<%- include('./components/top') %>
+<!-- Main Content -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.css" integrity="sha512-MpdEaY2YQ3EokN6lCD6bnWMl5Gwk7RjBbpKLovlrH6X+DRokrPRAF3zQJl1hZUiLXfo2e9MrOt+udOnHCAmi5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center w-full mx-auto pb-8">
+<a href="/servers" class="px-4 py-2 bg-white/10 hover:bg-white/15 rounded-lg rounded-br-2xl hover:scale-95 transition text-white/70 text-sm">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 mb-0.5 inline-flex mr-1.5">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+</svg>
+Back to server list
+</a>
+    </div>
+
+<style>
+/* Add selected state styling for image cards - mirrors location card selected state */
+.image-card.selected {
+    box-shadow: 0 0 0 2px #9fadf3; /* indigo-500, matching location cards */
+}
+
+/* Prevent scroll to top behavior */
+.image-card a {
+    scroll-behavior: auto;
+}
+</style>
+    <!-- Content -->
+
+    <!-- Error Messages -->
+    <% if (req.query.err) { %>
+    <div class="rounded-lg bg-red-800 p-4 mb-8">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-300">
+            Error Creating Server
+          </h3>
+          <div class="mt-2 text-sm text-red-200">
+            <p>
+              <%= (() => {
+                switch(req.query.err) {
+                  case "MISSINGVARIABLE":
+                    return "You have not filled out all of the server information.";
+                  case "ERRORONCREATE":
+                    return "Failed to create server! This is most likely an issue on XEH's end, not yours.";
+                  case "MISSINGEGG":
+                    return "The server type for this server is not registered as a valid server type, therefore your server's RAM, disk and/or CPU could not be changed.";
+                  case "TOOLITTLERAM":
+                  case "TOOLITTLEDISK":
+                  case "TOOLITTLECPU":
+                    return `You must make a server with at least <b>${req.query.num}</b> ${req.query.err.slice(-3) === "RAM" ? "MB RAM" : req.query.err.slice(-4) === "DISK" ? "MB disk" : "% CPU"} if you want to create a server with the server type you have selected.`;
+                  case "TOOMUCHRAM":
+                  case "TOOMUCHDISK":
+                  case "TOOMUCHCPU":
+                    return `With the selected server type, you can have a maximum of <b>${req.query.num}</b> ${req.query.err.slice(-3) === "RAM" ? "MB RAM" : req.query.err.slice(-4) === "DISK" ? "MB disk" : "% CPU"} on the server.`;
+                  case "EXCEEDRAM":
+                  case "EXCEEDDISK":
+                  case "EXCEEDCPU":
+                    return "The server could not be created because you have requested to create a server that exceeds your plan.";
+                  default:
+                    return "An unknown error occurred. Please try again or contact support if the issue persists.";
+                }
+              })() %>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% } %>
+
+    <div>
+        <div>
+            <form id="createServerForm">
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <div class="sm:col-span-3">
+                        <label for="name" class="block text-sm text-white/70">
+                            Server Name
+                        </label>
+                        <div class="mt-1">
+                            <input type="text" name="name" id="name" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500" placeholder="my-awesome-server">
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-6">
+                        <label class="block text-sm text-white/70 mb-4">
+                            Location
+                        </label>
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            <% const locations = Object.entries(settings.api.client.locations).map(([id, location]) => ({
+                                id,
+                                ...location
+                            })) %>
+                        <% locations.forEach(location => { %>
+<div class="location-card relative flex flex-col hover:scale-95 space-y-3 rounded-2xl border border-white/5 bg-white/5 px-6 py-5 shadow-sm transition hover:bg-white/10" data-location-id="<%= location.id %>">
+    <div class="flex items-center space-x-3">
+        <img class="h-8 w-8 rounded-full" src="<%= location.flag %>" alt="<%= location.country %> Flag">
+        <div class="flex-1">
+            <h3 class="text-sm font-medium text-white"><%= location.country %></h3>
+            <p class="text-xs text-gray-400"><%= location.name %></p>
+        </div>
+    </div>
+    <div class="space-y-2 pt-2">
+        <div class="flex items-center space-x-2 text-xs text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span><%= location.region %></span>
+        </div>
+        <div class="flex items-center space-x-2 text-xs text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+            </svg>
+            <span><%= location.nodes.join(', ') %></span>
+        </div>
+        <div class="flex items-center space-x-2 text-xs text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span><%= location.capacity %> server capacity</span>
+        </div>
+    </div>
+    <div class="<% if (location.zones) { %>mr-2<% } else { %> <% } %> absolute top-2 right-2 flex items-center space-x-2">
+        <% if (location.zones) { %>
+            <select id="zone-<%= location.id %>" name="zone-<%= location.id %>" class="zone-selector text-white text-xs rounded-full border-none focus:ring-1 focus:ring-indigo-500">
+                <% location.zones.forEach((zone) => { %>
+                    <option value="<%= zone.id %>"><%= zone.name %></option>
+                <% }) %>
+            </select>
+        <% } %>
+    <div class="hardware-info <% if (location.zones) { %> <% } else { %>mr-2<% } %>">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div class="hardware-info-tooltip backdrop-blur border border-black/5">
+            <div class="tooltip-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="tooltip-icon h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+                <span><%= location.cpu %></span>
+            </div>
+            <div class="tooltip-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="tooltip-icon h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <span><%= location.storage %></span>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+                            <% }) %>
+                        </div>
+                    </div>
+
+<div class="sm:col-span-6">
+  <label class="block text-sm text-white/70 mb-4">
+    Server Image
+  </label>
+  <div class="mb-4 flex items-center space-x-4">
+    <div class="relative flex-grow">
+      <input type="text" id="image-search" placeholder="Search images..." class="w-full py-2 px-4 text-sm rounded-lg rounded-l-xl bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500 placeholder-white/60 transition">
+      <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+    </div>
+    <div class="relative inline-block text-left">
+      <select id="category-select" class="appearance-none bg-white/5 border border-white/5 text-white py-2 px-4 pr-8 rounded-lg rounded-r-2xl focus:outline-none focus:ring-2 text-sm focus:ring-indigo-500 focus:border-transparent">
+        <option value="all">All Categories</option>
+        <option value="Game Servers">Game Servers</option>
+        <option value="Generic">Generic</option>
+      </select>
+    </div>
+  </div>
+  <div id="image-grid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 transition-all duration-300 ease-in-out">
+    <% const images = Object.entries(settings.api.client.eggs).map(([id, image]) => ({
+        id,
+        name: image.display,
+        ...image
+    })); %>
+    
+    <% images.forEach(image => { %>
+        <div class="image-card relative flex hover:scale-95 items-center space-x-3 rounded-xl border border-white/5 bg-white/5 px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-white/15 transition focus-within:ring-offset-0 hover:bg-white/10" 
+             data-category="<%= image.category %>" 
+             data-name="<%= image.display.toLowerCase() %>">
+            <div class="flex-shrink-0">
+                <img class="h-8 w-8 rounded-2xl" src="<%= image.logo %>" alt="">
+            </div>
+            <div class="min-w-0 flex-1">
+                <a href="#" class="focus:outline-none" onclick="selectImage('<%= image.id %>', '<%= image.display %>')">
+                    <span class="absolute inset-0" aria-hidden="true"></span>
+                    <p class="text-sm font-medium text-white">
+                        <%= image.display %>
+                        <% if (image.free) { %>
+                            <span class="ml-1.5 inline-flex items-center rounded-md bg-green-800/30 px-2 py-1 text-xs font-medium text-green-300 ring-1 ring-inset ring-green-600/20">Free</span>
+                        <% } %>
+                    </p>
+                    <p class="text-sm text-gray-400 truncate"><%= image.category %></p>
+                </a>
+            </div>
+        </div>
+    <% }) %>
+  </div>
+</div>
+
+<style>
+#image-grid {
+  transition: opacity 0.3s ease-in-out;
+}
+</style>
+
+                    <%
+                        let ram = 0;
+                        let disk = 0;
+                        let cpu = 0;
+                        let servers = pterodactyl.relationships.servers.data.length;
+                        for (let i = 0, len = pterodactyl.relationships.servers.data.length; i < len; i++) {
+                          ram = ram + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.memory == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.memory : 0);
+                          disk = disk + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.disk == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.disk : 0);
+                          cpu = cpu + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.cpu == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.cpu : 0);
+                        }
+                    %>
+
+                    <div class="sm:col-span-2">
+                        <label for="ram" class="block text-sm text-white/70">
+                            RAM (GB)
+                        </label>
+                        <div class="mt-1">
+                            <input type="number" name="ram" id="ram" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500" value="<%= ((packages ? packages.ram : 0)/1024 + extraresources.ram/1024 - ram/1024).toFixed(2) %>">
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label for="cpu" class="block text-sm text-white/70">
+                            CPU (%)
+                        </label>
+                        <div class="mt-1">
+                            <input type="number" name="cpu" id="cpu" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500" value="<%= (packages ? packages.cpu : 0) + extraresources.cpu - cpu %>">
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label for="disk" class="block text-sm text-white/70">
+                            Disk (GB)
+                        </label>
+                        <div class="mt-1">
+                            <input type="number" name="disk" id="disk" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500" value="<%= ((packages ? packages.disk : 0)/1024 + extraresources.disk/1024 - disk/1024).toFixed(2) %>">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <button onclick="submitForm()" class="hover:scale-95 transition ease-in-out mt-5 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-full mt-2 text-white bg-indigo-500 transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Create
+        </button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.js" integrity="sha512-eOUPKZXJTfgptSYQqVilRmxUNYm0XVHwcRHD4mdtCLWf/fC9XWe98IT8H1xzBkLL4Mo9GL0xWMSJtgS5te9rQA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+ let selectedLocation = "";
+let selectedZone = "";
+let selectedImage = "";
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Populate categories dynamically
+    const categorySelect = document.getElementById('category-select');
+    const images = <%- JSON.stringify(images) %>;
+    
+    // Get unique categories
+    const categories = [...new Set(images.map(img => img.category))];
+    
+    // Add categories to select
+    categorySelect.innerHTML = '<option value="all">All Categories</option>';
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+    });
+
+    // Image filtering functionality
+    const imageGrid = document.getElementById('image-grid');
+    const searchInput = document.getElementById('image-search');
+
+    // Image selection handling
+    const imageCards = document.querySelectorAll('.image-card');
+    imageCards.forEach(card => {
+        const link = card.querySelector('a');
+        link.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent default anchor behavior
+            
+            // Remove selected class from all cards
+            imageCards.forEach(c => c.classList.remove('selected'));
+            
+            // Add selected class to clicked card
+            card.classList.add('selected');
+            
+            // Extract image ID and name from the onclick attribute
+            const onclickAttr = link.getAttribute('onclick');
+            const matches = onclickAttr.match(/selectImage\('([^']+)',\s*'([^']+)'\)/);
+            if (matches) {
+                const [_, id, name] = matches;
+                selectImage(id, name);
+            }
+        });
+    });
+
+    // Location selection handling
+    const locationCards = document.querySelectorAll('.location-card');
+    locationCards.forEach(card => {
+        card.addEventListener('click', (event) => {
+            // Ignore clicks on the hardware info icon or select element
+            if (event.target.closest('.hardware-info') || event.target.tagName === 'SELECT') {
+                return;
+            }
+
+            const id = card.dataset.locationId;
+            const nameElement = card.querySelector('.flex-1 h3');
+            const countryElement = card.querySelector('.flex-1 p');
+            const name = nameElement ? nameElement.textContent : '';
+            const country = countryElement ? countryElement.textContent : '';
+            const zoneElement = card.querySelector('select');
+            
+            selectLocation(id, name, country, zoneElement);
+        });
+
+        const zoneSelect = card.querySelector('.zone-selector');
+        if (zoneSelect) {
+            zoneSelect.addEventListener('change', (event) => {
+                const id = card.dataset.locationId;
+                const nameElement = card.querySelector('.flex-1 h3');
+                const countryElement = card.querySelector('.flex-1 p');
+                const name = nameElement ? nameElement.textContent : '';
+                const country = countryElement ? countryElement.textContent : '';
+                selectLocation(id, name, country, event.target);
+            });
+        }
+    });
+
+    function filterImages() {
+        const searchTerm = searchInput.value.toLowerCase();
+
+        imageGrid.style.opacity = '0';
+        setTimeout(() => {
+            const imageCards = imageGrid.querySelectorAll('.image-card');
+            imageCards.forEach(card => {
+                const name = card.dataset.name;
+                const matchesSearch = name && name.includes(searchTerm);
+                card.style.display = matchesSearch ? 'flex' : 'none';
+            });
+            imageGrid.style.opacity = '1';
+        }, 300);
+    }
+
+    searchInput.addEventListener('input', filterImages);
+});
+
+function selectImage(id, name) {
+    selectedImage = id;
+}
+
+function selectLocation(id, name, country, zoneElement) {
+    const locationCards = document.querySelectorAll('.location-card');
+    locationCards.forEach(card => card.classList.remove('selected'));
+    
+    const card = document.querySelector(`[data-location-id="${id}"]`);
+    if (card) card.classList.add('selected');
+    
+    selectedLocation = id;
+    selectedZone = zoneElement ? zoneElement.value : "";
+    
+    let locationString = `${name}, ${country}`;
+    if (selectedZone) {
+        const selectedZoneOption = zoneElement.options[zoneElement.selectedIndex];
+        locationString += ` - ${selectedZoneOption.textContent}`;
+    }
+}
+
+async function submitForm() {
+    const form = document.getElementById('createServerForm');
+    const formData = new FormData(form);
+    
+    const name = encodeURIComponent(formData.get('name'));
+    const ram = encodeURIComponent(parseFloat(formData.get('ram')) * 1024);
+    const disk = encodeURIComponent(parseFloat(formData.get('disk')) * 1024);
+    const cpu = encodeURIComponent(formData.get('cpu'));
+    
+    if (!name || !ram || !disk || !cpu || !selectedLocation || !selectedImage) {
+        alertify.error('Please fill out all fields and select a location.');
+        return;
+    }
+
+    if (selectedLocation == 28 || selectedLocation == 29) {
+        if (ram > 6144) {
+            alertify.error('This location only allows up to 6GB RAM to be used due to low capacity.');
+            return;
+        }
+
+        if (cpu > 250) {
+            alertify.error('This location only allows up to 2.5 CPU cores to be used due to low capacity.');
+            return;
+        }
+    }
+
+    // Use the selected zone ID if available, otherwise use the selected location ID
+    let locationId = selectedZone || selectedLocation;
+
+    const url = `/create?name=${name}&egg=${selectedImage}&ram=${ram}&disk=${disk}&cpu=${cpu}&location=${locationId}`;
+    
+    window.location.href = url;
+}
+
+// Initialize Alertify
+alertify.set('notifier','position', 'top-right');
+    </script>
+
+<style>
+    /* Existing Alertify styles */
+    .alertify-notifier .ajs-message.ajs-success {
+        background: #2b303b;
+        color: white;
+        border-radius: 10px;
+    }
+    .alertify-notifier .ajs-message.ajs-error {
+        background: #4d1515;
+        color: #ff5c5c;
+        border-radius: 10px;
+    }
+    .alertify-notifier.ajs-right {
+        right: 10px;
+    }
+    .location-card {
+        position: relative;
+        cursor: pointer;
+    }
+    .location-card.selected {
+        box-shadow: 0 0 0 2px #9fadf3; /* indigo-500 */
+    }
+    .online-indicator {
+        height: 0.5rem;
+        width: 0.5rem;
+        border-radius: 9999px;
+        background-color: #4ade80; /* green-400 */
+    }
+    .hardware-info {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 9999px;
+        padding: 0.25rem;
+        cursor: help;
+    }
+    .zone-selector {
+        background-color: rgba(0, 0, 0, 0.5);
+        appearance: none;
+        padding: 0.25rem 1.5rem 0.25rem 0.5rem;
+    }
+    .zone-selector:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px #f97316; /* indigo-500 */
+    }
+    .hardware-info-tooltip {
+        visibility: hidden;
+        opacity: 0;
+        position: absolute;
+        right: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        text-align: left;
+        padding: 0.75rem;
+        border-radius: 0.475rem;
+        z-index: 1;
+        width: max-content;
+        max-width: 250px;
+        margin-right: 0.75rem;
+        transition: opacity 0.2s, visibility 0.2s;
+    }
+    .hardware-info:hover .hardware-info-tooltip {
+        visibility: visible;
+        opacity: 1;
+    }
+    .hardware-info-tooltip .tooltip-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    .hardware-info-tooltip .tooltip-item:last-child {
+        margin-bottom: 0;
+    }
+    .hardware-info-tooltip .tooltip-icon {
+        margin-right: 0.5rem;
+    }
+    .location-card select:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px #9fadf3; /* indigo-500 */
+        border-color: #9fadf3; /* indigo-500 */
+    }
+</style>
+</main>
+<%- include('./components/bottom') %>

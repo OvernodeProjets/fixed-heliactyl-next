@@ -1,0 +1,591 @@
+<%- include('../components/top') %>
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="mb-5 lg:flex lg:items-center lg:justify-between">
+            <div class="min-w-0 flex-1">
+              <h2 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight" id="server-name"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg></h2>
+              <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+                <div class="mt-2 flex items-center text-sm text-gray-300">
+                  <!-- Heroicon name: mini/briefcase -->
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                    <path fill-rule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z" clip-rule="evenodd" />
+                    <path fill-rule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Zm9.586 4.594a.75.75 0 0 0-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.116-.062l3-3.75Z" clip-rule="evenodd" />
+                  </svg>                    
+                  <span id="server-description"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg></span>
+                </div>
+                <div class="mt-2 flex items-center text-sm text-gray-300">
+                  <!-- Heroicon name: mini/map-pin -->
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                    <path d="M4.08 5.227A3 3 0 0 1 6.979 3H17.02a3 3 0 0 1 2.9 2.227l2.113 7.926A5.228 5.228 0 0 0 18.75 12H5.25a5.228 5.228 0 0 0-3.284 1.153L4.08 5.227Z" />
+                    <path fill-rule="evenodd" d="M5.25 13.5a3.75 3.75 0 1 0 0 7.5h13.5a3.75 3.75 0 1 0 0-7.5H5.25Zm10.5 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm3.75-.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" clip-rule="evenodd" />
+                  </svg>              
+                  Server <%= req.query.id %>
+                </div>
+                <div class="mt-2 flex items-center text-sm text-gray-300">
+                  <!-- Heroicon name: mini/currency-dollar -->
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                    <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 0 0 .374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 0 0-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08Zm3.094 8.016a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+                  </svg>              
+                  Volumetric Shield enabled
+                </div>
+                <div class="hidden mt-2 flex items-center text-sm text-gray-300">
+                  <!-- Heroicon name: mini/calendar -->
+                  <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clip-rule="evenodd" />
+                  </svg>
+                  <span id="server-name-breadcrumb"></span>
+                </div>
+              </div>
+            </div>
+            <div class="mt-5 flex lg:mt-0 lg:ml-4">
+              <span class="hidden sm:block">
+                <a href="/servers" class="inline-flex items-center rounded-xl border border-transparent bg-indigo-900/50 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-800">
+                  <!-- Heroicon name: mini/pencil -->
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
+                    <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                  </svg>                
+                  Back to server list
+                </a>
+              </span>
+            </div>
+          </div>   
+
+        <%- include('../components/server') %>
+
+            <div class="flex gap-8">
+                <div id="action-blocks" class="w-64 bg-white/5 p-6 rounded-2xl">
+                    <h3 class="text-xl font-semibold text-white mb-6">Available actions</h3>
+                    <div class="action-block p-4 bg-indigo-500 shadow-lg rounded-lg mb-4 text-white cursor-pointer transition-transform transform hover:scale-105"
+                        draggable="true" data-type="interval">
+                        <span class="font-medium">Interval</span>
+                        <select class="interval-select mt-2 bg-indigo-700 border border-white/5 text-white rounded-xl w-full p-2">
+                            <option value="0.5">Every 30 Minutes</option>
+                            <option value="1">1 Hour</option>
+                            <option value="2">2 Hours</option>
+                            <option value="3">3 Hours</option>
+                            <option value="4">4 Hours</option>
+                            <option value="5">5 Hours</option>
+                            <option value="7">7 Hours</option>
+                            <option value="9">9 Hours</option>
+                            <option value="13">13 Hours</option>
+                            <option value="15">15 Hours</option>
+                            <option value="17">17 Hours</option>
+                            <option value="24">Every Day</option>
+                            <option value="48">Every 2 Days</option>
+                            <option value="72">Every 3 Days</option>
+                            <option value="96">Every 4 Days</option>
+                            <option value="120">Every 5 Days</option>
+                            <option value="144">Every 6 Days</option>
+                            <option value="168">Every Week</option>
+
+                        </select>
+                    </div>
+                    <div class="action-block p-4 bg-emerald-600 shadow-lg rounded-xl mb-4 text-white cursor-pointer transition-transform transform hover:scale-105"
+                        draggable="true" data-type="power">
+                        <span class="font-medium">Power Action</span>
+                        <select class="power-action-select mt-2 bg-emerald-700 border border-white/5 text-white rounded-xl w-full p-2">
+                            <option value="start">Start</option>
+                            <option value="stop">Stop</option>
+                            <option value="restart">Restart</option>
+                            <option value="kill">Kill</option>
+                        </select>
+                    </div>
+                    <div class="action-block p-4 bg-indigo-500 shadow-lg border border-white/5 rounded-xl mb-4 text-white cursor-pointer transition-transform transform hover:scale-105"
+                        draggable="true" data-type="webhook">
+                        <span class="font-medium">Webhook</span>
+                        <input type="text" placeholder="Enter URL"
+                            class="mt-2 bg-indigo-700 placeholder-indigo-300 text-white rounded-xl border border-white/5 w-full p-2">
+                    </div>
+                </div>
+
+                <div id="workspace"
+                    class="flex-1 border border-white/5 p-8 rounded-2xl relative overflow-hidden" style="height: 600px; 
+      background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1.5px, transparent 1.5px),
+                        radial-gradient(circle, rgba(255, 255, 255, 0.05) 1.5px, transparent 1px);
+      background-size: 40px 40px; /* Erhöhte Größe für weniger Punkte */
+      background-position: 0 0, 20px 20px;">
+                    <h3 class="text-xl font-semibold text-white mb-2">Automations workflow</h3>
+                    <p id="workspace-placeholder" class="text-neutral-400 mb-4">Drag actions here to build your workflow.</p>
+                    <svg id="connectors" class="absolute inset-0 pointer-events-none" style="z-index: 0;"></svg>
+                </div>
+            </div>
+
+            <button id="save-button" type="button"
+                class="inline-flex items-center mt-4 px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
+                    </path>
+                </svg>
+                Save Workflow
+            </button>
+
+            <style>
+                .action-block,
+                .block-item {
+                    cursor: grab;
+                }
+
+                .action-block:active,
+                .block-item:active {
+                    cursor: grabbing;
+                }
+
+                .block-item {
+                    position: absolute;
+                    width: 200px;
+                    z-index: 10;
+                }
+
+                .connector {
+                    stroke: #e8570c;
+                    stroke-width: 2;
+                    fill: none;
+                    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
+                }
+
+                .connection-point {
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+                    background-color: #e8570c;
+                    position: absolute;
+                    cursor: crosshair;
+                    box-shadow: 0 0 0 2px white, 0 0 0 4px #e8570c, 0 0 5px 4px rgba(79, 70, 229, 0.5);
+                    z-index: 20;
+                    transition: transform 0.2s;
+                }
+
+                .connection-point:hover {
+                    transform: scale(1.2);
+                }
+
+                #connectors {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: none;
+                    z-index: 0;
+                }
+            </style>
+
+    </main>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal"
+        class="fixed inset-0 bg-black z-50 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-[#1a1c20] backdrop-blur rounded-xl p-6 max-w-md w-full">
+            <h3 class="text-xl font-semibold mb-4 text-white" id="modal-title"></h3>
+            <p class="text-gray-300 mb-4" id="modal-message"></p>
+            <div class="flex justify-end space-x-4">
+                <button id="modal-cancel"
+                    class="bg-zinc-600 hover:bg-zinc-700 text-white font-medium py-2 px-4 rounded-lg transition">Cancel</button>
+                <button id="modal-confirm"
+                    class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const serverId = new URLSearchParams(window.location.search).get('id');
+
+        // Load server details
+        fetch(`/api/server/${serverId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('server-name').textContent = data.attributes.name;
+                document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
+                document.getElementById('server-description').textContent = data.attributes.description || "Manage your server settings";
+            });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            let draggedElement = null;
+            let offset = { x: 0, y: 0 };
+            let currentConnection = null;
+            const actions = document.getElementById('action-blocks');
+            const workspace = document.getElementById('workspace');
+            const connectors = document.getElementById('connectors');
+            const saveButton = document.getElementById('save-button');
+            const placeholder = document.getElementById('workspace-placeholder');
+            let connections = [];
+            let blockIdCounter = 0;
+
+            workspace.addEventListener('contextmenu', showContextMenu);
+            document.addEventListener('click', hideContextMenu);
+
+let q;
+            async function getSavedWorkflows() {
+            const response = await fetch(`/api/server/${serverId}/workflow`);
+            
+            // Wait for the JSON data
+            const data = await response.json();
+
+            // Log the actual data
+            console.log(data);
+
+            return data;
+        }
+
+        // Await the async function to get the resolved data and then stringify it
+        getSavedWorkflows().then((savedWorkflow) => {
+            q = savedWorkflow;
+            loadSavedWorkflow(q)
+            const savedWorkflowString = JSON.stringify(savedWorkflow);
+            console.log(savedWorkflowString);
+        });
+
+
+
+            actions.addEventListener('dragstart', dragStart);
+            workspace.addEventListener('dragover', dragOver);
+            workspace.addEventListener('drop', drop);
+            workspace.addEventListener('mousedown', startDragging);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDragging);
+            saveButton.addEventListener('click', saveWorkflow);
+
+            function loadSavedWorkflow(data) {
+                workspace.querySelectorAll('.block-item').forEach(el => el.remove());
+                connectors.innerHTML = '';
+                connections = [];
+
+                const blockMap = new Map();
+
+                data.blocks.forEach(block => {
+                    const blockElement = createBlockElement(block.type);
+                    blockElement.style.left = `${block.x}px`;
+                    blockElement.style.top = `${block.y}px`;
+                    blockElement.dataset.id = block.id;
+                    workspace.appendChild(blockElement);
+                    createConnectionPoints(blockElement);
+
+                    const select = blockElement.querySelector('select');
+                    const input = blockElement.querySelector('input');
+
+                    if (select && block.meta.selectedValue) {
+                        select.value = block.meta.selectedValue;
+                    }
+                    if (input && block.meta.inputValue) {
+                        input.value = block.meta.inputValue;
+                    }
+
+                    blockMap.set(block.id, blockElement);
+                    blockIdCounter = Math.max(blockIdCounter, parseInt(block.id) + 1);
+                });
+
+                data.connections.forEach(connection => {
+                    const fromElement = blockMap.get(connection.from);
+                    const toElement = blockMap.get(connection.to);
+                    if (fromElement && toElement) {
+                        const fromPoint = fromElement.querySelector('.connection-point[data-position="right"]');
+                        const toPoint = toElement.querySelector('.connection-point[data-position="left"]');
+
+                        const connector = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        connector.setAttribute('class', 'connector');
+                        connectors.appendChild(connector);
+                        connections.push({ start: fromPoint, end: toPoint, connector: connector });
+                    }
+                });
+
+                updateConnections();
+                updatePlaceholder();
+            }
+
+            function showContextMenu(e) {
+                e.preventDefault();
+                hideContextMenu();
+
+                const contextMenu = document.createElement('div');
+                contextMenu.id = 'context-menu';
+                contextMenu.style.position = 'absolute';
+                contextMenu.style.left = `${e.clientX}px`;
+                contextMenu.style.top = `${e.clientY + 10}px`;
+                contextMenu.classList.add('bg-neutral-200', 'p-1', 'rounded-lg', 'shadow', 'z-10', 'w-40', 'text-sm', 'border', 'border-neutral-300/20');
+
+                const target = e.target.closest('.block-item, .connector');
+                if (target) {
+                    const deleteOption = document.createElement('div');
+                    deleteOption.textContent = 'Delete';
+                    deleteOption.style.cursor = 'pointer';
+                    deleteOption.classList.add('text-red-500', 'hover:text-neutral-200', 'transition-all', 'rounded-lg', 'px-2', 'py-1', 'hover:bg-red-600');
+
+                    deleteOption.addEventListener('click', () => {
+                        if (target.classList.contains('block-item')) {
+                            deleteBlock(target);
+                        } else if (target.classList.contains('connector')) {
+                            deleteConnection(target);
+                        }
+                        hideContextMenu();
+                    });
+
+                    contextMenu.appendChild(deleteOption);
+
+                    document.body.appendChild(contextMenu);
+                }
+            }
+
+            function hideContextMenu() {
+                const existingMenu = document.getElementById('context-menu');
+                if (existingMenu) {
+                    existingMenu.remove();
+                }
+            }
+
+            function deleteBlock(block) {
+                connections = connections.filter(conn => {
+                    if (conn.start.parentElement === block || conn.end.parentElement === block) {
+                        connectors.removeChild(conn.connector);
+                        return false;
+                    }
+                    return true;
+                });
+
+                workspace.removeChild(block);
+                updatePlaceholder();
+            }
+
+            function deleteConnection(connector) {
+                const index = connections.findIndex(conn => conn.connector === connector);
+                if (index !== -1) {
+                    connections.splice(index, 1);
+                    connectors.removeChild(connector);
+                }
+            }
+
+
+            function createBlockElement(type) {
+                const blockTemplate = actions.querySelector(`[data-type="${type}"]`);
+                const clone = blockTemplate.cloneNode(true);
+                clone.classList.add('block-item');
+                clone.dataset.type = type;
+                clone.dataset.id = blockIdCounter++;
+                return clone;
+            }
+
+            function dragStart(e) {
+                const clone = createBlockElement(e.target.dataset.type);
+                workspace.appendChild(clone);
+                draggedElement = clone;
+                offset.x = e.offsetX;
+                offset.y = e.offsetY;
+            }
+
+            function dragOver(e) {
+                e.preventDefault();
+                if (draggedElement) {
+                    const x = e.clientX - workspace.getBoundingClientRect().left - offset.x;
+                    const y = e.clientY - workspace.getBoundingClientRect().top - offset.y;
+                    draggedElement.style.left = `${x}px`;
+                    draggedElement.style.top = `${y}px`;
+                    updateConnections();
+                }
+            }
+
+            function drop(e) {
+                if (draggedElement) {
+                    createConnectionPoints(draggedElement);
+                    draggedElement = null;
+                }
+                updatePlaceholder();
+            }
+
+            function createConnectionPoints(block) {
+                ['left', 'right'].forEach(point => {
+                    const connectionPoint = document.createElement('div');
+                    connectionPoint.classList.add('connection-point');
+                    connectionPoint.dataset.position = point;
+
+                    if (point === 'left') {
+                        connectionPoint.style.left = '-6px';
+                    } else {
+                        connectionPoint.style.right = '-6px';
+                    }
+                    connectionPoint.style.top = '50%';
+                    block.appendChild(connectionPoint);
+
+                    connectionPoint.addEventListener('mousedown', handleConnectionPoint);
+                });
+            }
+
+            function handleConnectionPoint(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                const clickedPoint = e.target;
+                if (!currentConnection) {
+                    startNewConnection(clickedPoint);
+                } else {
+                    completeConnection(clickedPoint);
+                }
+            }
+
+            function startNewConnection(point) {
+                if (point.dataset.position === 'right') {
+                    const connector = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    connector.setAttribute('class', 'connector');
+                    connectors.appendChild(connector);
+                    currentConnection = { start: point, connector: connector };
+                    document.addEventListener('mousemove', updateCurrentConnection);
+                    document.addEventListener('mouseup', finishConnection);
+                }
+            }
+
+
+            function updateCurrentConnection(e) {
+                if (currentConnection) {
+                    const startPos = getConnectionPointPosition(currentConnection.start);
+                    const endPos = {
+                        x: e.clientX - workspace.getBoundingClientRect().left,
+                        y: e.clientY - workspace.getBoundingClientRect().top
+                    };
+                    drawConnection({ start: startPos, end: endPos }, currentConnection.connector);
+                }
+            }
+
+            function finishConnection(e) {
+                document.removeEventListener('mousemove', updateCurrentConnection);
+                document.removeEventListener('mouseup', finishConnection);
+                if (currentConnection && e.target.classList.contains('connection-point')) {
+                    completeConnection(e.target);
+                } else {
+                    connectors.removeChild(currentConnection.connector);
+                    currentConnection = null;
+                }
+            }
+
+            function completeConnection(point) {
+                if (point !== currentConnection.start) {
+                    const fromBlock = currentConnection.start.parentElement;
+                    const toBlock = point.parentElement;
+
+                    if (currentConnection.start.dataset.position === 'right' && point.dataset.position === 'left') {
+                        currentConnection.end = point;
+                        connections.push(currentConnection);
+                        updateConnections();
+                    } else {
+                        connectors.removeChild(currentConnection.connector);
+                    }
+                } else {
+                    connectors.removeChild(currentConnection.connector);
+                }
+                currentConnection = null;
+            }
+
+            function drawConnection(connection, connector) {
+                const startPos = connection.start;
+                const endPos = connection.end;
+                const midX = (startPos.x + endPos.x) / 2;
+                const d = `M ${startPos.x},${startPos.y} C ${midX},${startPos.y} ${midX},${endPos.y} ${endPos.x},${endPos.y}`;
+                connector.setAttribute('d', d);
+            }
+
+
+            function getConnectionPointPosition(point, side = 'right') {
+                const workspaceRect = workspace.getBoundingClientRect();
+                const rect = point.getBoundingClientRect();
+
+                if (side === 'right') {
+                    return {
+                        x: rect.right - workspaceRect.left,
+                        y: rect.top + rect.height / 2 - workspaceRect.top
+                    };
+                } else if (side === 'left') {
+                    return {
+                        x: rect.left - workspaceRect.left,
+                        y: rect.top + rect.height / 2 - workspaceRect.top
+                    };
+                }
+            }
+
+            function startDragging(e) {
+                const block = e.target.closest('.block-item');
+                if (block) {
+                    draggedElement = block;
+                    offset.x = e.clientX - block.getBoundingClientRect().left;
+                    offset.y = e.clientY - block.getBoundingClientRect().top;
+                }
+            }
+
+            function drag(e) {
+                if (draggedElement) {
+                    const x = e.clientX - workspace.offsetLeft - offset.x;
+                    const y = e.clientY - workspace.offsetTop - offset.y;
+                    draggedElement.style.left = `${x}px`;
+                    draggedElement.style.top = `${y}px`;
+                    updateConnections();
+                }
+            }
+
+            function stopDragging() {
+                draggedElement = null;
+            }
+
+            function updateConnections() {
+                connections.forEach(connection => {
+                    const startPos = getConnectionPointPosition(connection.start);
+                    const endPos = getConnectionPointPosition(connection.end);
+                    drawConnection({ start: startPos, end: endPos }, connection.connector);
+                });
+            }
+
+            function updatePlaceholder() {
+                const blocks = workspace.querySelectorAll('.block-item');
+                placeholder.style.display = blocks.length > 0 ? 'none' : 'block';
+            }
+
+            async function saveWorkflow() {
+                const blocks = Array.from(workspace.querySelectorAll('.block-item'));
+                const blockData = blocks.map(block => {
+                    let meta = {};
+                    const select = block.querySelector('select');
+                    const input = block.querySelector('input');
+
+                    if (select) {
+                        meta.selectedValue = select.value;
+                    }
+                    if (input) {
+                        meta.inputValue = input.value;
+                    }
+
+                    return {
+                        id: block.dataset.id,
+                        type: block.dataset.type,
+                        x: parseFloat(block.style.left),
+                        y: parseFloat(block.style.top),
+                        meta: meta
+                    };
+                });
+
+                const connectionData = connections.map(connection => ({
+                    from: connection.start.parentElement.dataset.id,
+                    to: connection.end.parentElement.dataset.id
+                }));
+
+                try {
+                    const response = await fetch(`/api/server/${serverId}/workflow/save-workflow`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ blocks: blockData, connections: connectionData })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert('Workflow saved successfully!');
+                    } else {
+                        throw new Error(result.message || 'Unknown error occurred');
+                    }
+                } catch (error) {
+                    console.error('Error saving workflow:', error);
+                    alert('Failed to save the workflow: ' + error.message);
+                }
+            }
+        });
+
+    </script>
+    <%- include('../components/bottom') %>

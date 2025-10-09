@@ -1,0 +1,129 @@
+<%- include('./components/top') %>
+
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center w-full mx-auto pb-4">
+        <!-- Welcome text and subtext on the left -->
+        <div class="flex flex-col">
+            <h1 class="text-xl font-semibold mb-0.5 heavy">Referrals</h1>
+            <p class="text-gray-400 text-md">Refer users to <%= settings.name %> for free rewards.</p>
+        </div>
+
+        <!-- Breadcrumbs on the right -->
+        <nav aria-label="Breadcrumb" class="inline-flex py-2 px-4 rounded-xl bg-white/5 transition-colors duration-200">
+            <ol role="list" class="flex items-center space-x-2">
+                <li>
+                    <a href="#_" class="text-sm flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-colors duration-200" aria-current="false">
+                        <svg
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon icon-tabler size-4 icons-tabler-outline icon-tabler-home"
+                        >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+                            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
+                            <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
+                        </svg>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="flex items-center">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right size-4 text-zinc-400"
+                    >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M9 6l6 6l-6 6"></path>
+                    </svg>
+                </li>
+                <li>
+                    <a href="#_" class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200" aria-current="page">
+                        Referrals
+                    </a>
+                </li>
+            </ol>
+        </nav>
+    </div>
+    <div class="max-w-4xl mx-auto mt-5">
+
+        <!-- Notification Messages -->
+        <% if (req.query.err) { %>
+        <div class="rounded-2xl <%= req.query.err === 'none' ? 'bg-green-800/50' : 'bg-red-800/50' %> p-4 mb-8">
+            <div class="flex items-center">
+                <svg class="h-5 w-5 <%= req.query.err === 'none' ? 'text-green-400' : 'text-red-400' %> mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+                <p class="text-sm <%= req.query.err === 'none' ? 'text-green-400' : 'text-red-400' %>">
+                    <% if (req.query.err === 'none') { %>
+                        Successfully created the referral code!
+                    <% } else if (req.query.err === 'ALREADYEXISTS') { %>
+                        The code you provided already exists.
+                    <% } else if (req.query.err === 'INVALIDCODE') { %>
+                        No code was provided or the one you provided was invalid.
+                    <% } %>
+                </p>
+            </div>
+        </div>
+        <% } %>
+
+        <div class="grid gap-8 md:grid-cols-2">
+            <!-- Create Referral Code -->
+            <div class="bg-white/5 rounded-2xl p-6">
+                <h2 class="text-xl font-semibold mb-4">Create a Referral Code</h2>
+                <form action="/generate" method="get" class="space-y-4">
+                    <div>
+                        <label for="code" class="block text-sm font-medium text-gray-400 mb-1">Your Referral Code</label>
+                        <input type="text" name="code" id="code" class="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-white placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter your custom code">
+                    </div>
+                    <button type="submit" class="w-full px-4 py-2 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        Create Code
+                    </button>
+                </form>
+            </div>
+
+            <!-- Claim Referral Code -->
+            <div class="bg-white/5 rounded-2xl p-6">
+                <h2 class="text-xl font-semibold mb-4">Claim a Referral Code</h2>
+                <form action="/claim" method="get" class="space-y-4">
+                    <div>
+                        <label for="claim-code" class="block text-sm font-medium text-gray-400 mb-1">Friend's Referral Code</label>
+                        <input type="text" name="code" id="claim-code" class="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-white placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter code to claim">
+                    </div>
+                    <button type="submit" class="w-full px-4 py-2 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        Claim Code
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Referral Benefits -->
+        <div class="mt-8 bg-white/5 rounded-2xl p-6">
+            <h2 class="text-xl font-semibold mb-4">Referral Benefits</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="rounded-2xl border-white/5 border p-6">
+                    <h3 class="text-lg font-medium mb-2">For You</h3>
+                    <p class="text-3xl font-bold text-indigo-400">80 <%= settings.website.currency %></p>
+                    <p class="text-gray-400 mt-2">For every friend who uses your code</p>
+                </div>
+                <div class="rounded-2xl border-white/5 border p-6">
+                    <h3 class="text-lg font-medium mb-2">For Your Friend</h3>
+                    <p class="text-3xl font-bold text-indigo-400">250 <%= settings.website.currency %></p>
+                    <p class="text-gray-400 mt-2">When they claim your referral code</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<%- include('./components/bottom') %>

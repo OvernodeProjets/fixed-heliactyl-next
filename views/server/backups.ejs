@@ -1,0 +1,404 @@
+<%- include('../components/top') %>
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-content {
+        background-color: #1a1c20;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        max-width: 90%;
+        max-height: 90%;
+        overflow: auto;
+        transform: scale(0.9);
+        opacity: 0;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    .modal-overlay.active .modal-content {
+        transform: scale(1);
+        opacity: 1;
+    }
+    .loader {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #f97316;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 8px;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .backup-list-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        border-radius: 0.375rem;
+        transition: background-color 0.2s ease;
+        cursor: pointer;
+    }
+    .backup-list-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    .backup-list-item .icon {
+        margin-right: 0.75rem;
+    }
+    .backup-list-item .name {
+        flex-grow: 1;
+    }
+    .backup-list {
+        display: block;
+    }
+</style>
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="mb-5 lg:flex lg:items-center lg:justify-between">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight" id="server-name"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg></h2>
+          <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/briefcase -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path fill-rule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Zm9.586 4.594a.75.75 0 0 0-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.116-.062l3-3.75Z" clip-rule="evenodd" />
+              </svg>                    
+              <span id="server-description"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg></span>
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/map-pin -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path d="M4.08 5.227A3 3 0 0 1 6.979 3H17.02a3 3 0 0 1 2.9 2.227l2.113 7.926A5.228 5.228 0 0 0 18.75 12H5.25a5.228 5.228 0 0 0-3.284 1.153L4.08 5.227Z" />
+                <path fill-rule="evenodd" d="M5.25 13.5a3.75 3.75 0 1 0 0 7.5h13.5a3.75 3.75 0 1 0 0-7.5H5.25Zm10.5 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm3.75-.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" clip-rule="evenodd" />
+              </svg>              
+              Server <%= req.query.id %>
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/currency-dollar -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 0 0 .374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 0 0-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08Zm3.094 8.016a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+              </svg>              
+              Volumetric Shield enabled
+            </div>
+            <div class="hidden mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/calendar -->
+              <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clip-rule="evenodd" />
+              </svg>
+              <span id="server-name-breadcrumb"></span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-5 flex lg:mt-0 lg:ml-4">
+          <span class="hidden sm:block">
+            <a href="/servers" class="inline-flex items-center rounded-xl border border-transparent bg-indigo-900/50 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-800">
+              <!-- Heroicon name: mini/pencil -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
+                <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+              </svg>                
+              Back to server list
+            </a>
+          </span>
+        </div>
+      </div>   
+
+    <%- include('../components/server') %>
+
+    <div class="bg-white/5 rounded-xl p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Backups</h2>
+            <button id="create-backup" class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-1.5 px-4 rounded-full hover:scale-95 transition">Create Backup</button>
+        </div>
+        <div id="backup-list" class="space-y-2">
+            <!-- Backup list will be populated here -->
+        </div>
+    </div>
+</main>
+
+<!-- Confirm Delete Modal -->
+<div id="confirm-delete-modal" class="modal-overlay z-50">
+    <div class="modal-content">
+        <h3 class="text-xl font-semibold mb-4">Confirm Delete</h3>
+        <p class="mb-4">Are you sure you want to delete this backup?</p>
+        <div class="flex justify-end">
+            <button id="cancel-delete" class="bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-2 px-4 rounded-lg transition mr-2">Cancel</button>
+            <button id="confirm-delete" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const serverId = new URLSearchParams(window.location.search).get('id');
+    let backupToDelete = null;
+
+    function showLoader(elementId) {
+        const element = document.getElementById(elementId);
+        element.innerHTML = `<svg class="animate-spin h-8 w-8 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>`;
+    }
+
+    function hideLoader(elementId) {
+        const element = document.getElementById(elementId);
+        element.innerHTML = '';
+    }
+
+    function loadBackupList() {
+        showLoader('backup-list');
+        fetch(`/api/server/${serverId}/backups`)
+            .then(response => response.json())
+            .then(data => {
+                const backupList = document.getElementById('backup-list');
+                backupList.innerHTML = '';
+                
+                if (!data.data || data.data.length === 0) {
+                    backupList.innerHTML = `
+                        <div class="text-center py-8">
+                            <div class="w-16 h-16 mx-auto mb-4 bg-indigo-900/50 rounded-full flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-indigo-300">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3.75h3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-medium text-white mb-2">No Backups Found</h3>
+                            <p class="text-indigo-200/60">Create your first backup to protect your server data</p>
+                        </div>
+                    `;
+                } else {
+                    data.data.forEach(backup => {
+                        const backupItem = createBackupItem(backup);
+                        backupList.appendChild(backupItem);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error loading backups:', error);
+                hideLoader('backup-list');
+                backupList.innerHTML = `
+                    <div class="text-center py-8">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto text-red-600 mb-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                        </svg>
+                        <h3 class="text-lg font-medium text-red-400 mb-2">Failed to Load Backups</h3>
+                        <p class="text-gray-500">Please try refreshing the page</p>
+                    </div>
+                `;
+            });
+    }
+
+    function createBackupItem(backup) {
+        console.log(JSON.stringify(backup))
+        const item = document.createElement('div');
+        item.className = 'backup-list-item';
+        const createdDate = new Date(backup.attributes.created_at).toLocaleString();
+        const completedDate = backup.attributes.completed_at ? new Date(backup.attributes.completed_at).toLocaleString() : 'In progress';
+
+        item.innerHTML = `
+            <div class="flex items-center space-x-2 w-full">
+                <div class="icon flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mb-0.5 inline-flex mr-1.5">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+</svg>
+                </div>
+                <span class="text-gray-200 flex-grow">${backup.attributes.name}</span>
+                <span class="text-gray-400 text-sm">${formatBytes(backup.attributes.bytes)}</span>
+                <span class="text-gray-400 text-sm">${createdDate}</span>
+                <span class="text-gray-400 text-sm mr-2">${completedDate}</span>
+                <button class="download-backup bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-1 px-4 rounded-full text-sm mr-2 hover:scale-95" data-uuid="${backup.attributes.uuid}">Download</button>
+                <button class="delete-backup bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-4 rounded-full text-sm hover:scale-95" data-uuid="${backup.attributes.uuid}">Delete</button>
+            </div>
+        `;
+
+        const downloadButton = item.querySelector('.download-backup');
+        downloadButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            downloadBackup(backup.attributes.uuid);
+        });
+
+        const deleteButton = item.querySelector('.delete-backup');
+        deleteButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showDeleteConfirmation(backup.attributes.uuid);
+        });
+
+        return item;
+    }
+
+    function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    function downloadBackup(backupUuid) {
+        fetch(`/api/server/${serverId}/backups/${backupUuid}/download`)
+            .then(response => response.json())
+            .then(data => {
+                window.open(data.attributes.url, '_blank');
+            })
+            .catch(error => {
+                console.error('Error downloading backup:', error);
+                alert('An error occurred while generating the download link. Please try again.');
+            });
+    }
+
+    function showDeleteConfirmation(backupUuid) {
+        backupToDelete = backupUuid;
+        document.getElementById('confirm-delete-modal').classList.add('active');
+    }
+
+    function deleteBackup() {
+        if (!backupToDelete) return;
+
+        fetch(`/api/server/${serverId}/backups/${backupToDelete}`, {
+            method: 'DELETE'
+        })
+        .then(() => {
+            loadBackupList();
+            closeModal('confirm-delete-modal');
+        })
+.catch(error => {
+            console.error('Error deleting backup:', error);
+            alert('An error occurred while deleting the backup. Please try again.');
+        })
+        .finally(() => {
+            backupToDelete = null;
+        });
+    }
+
+    function showModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.classList.add('active');
+    }
+
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.classList.remove('active');
+    }
+
+document.getElementById('create-backup').addEventListener('click', async () => {
+    const button = document.getElementById('create-backup');
+    const originalText = button.innerHTML;
+    
+    try {
+        // Disable button and show loading state
+        button.disabled = true;
+        button.innerHTML = `
+            <svg class="animate-spin h-5 w-5 inline mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Creating Backup...
+        `;
+
+        const response = await fetch(`/api/server/${serverId}/backups`, {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error('Backup creation failed');
+        }
+
+        // Show success message in a non-blocking way
+        const notification = document.createElement('div');
+        notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg fade-in';
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Backup creation started. This may take 5 seconds to 30 minutes depending on server size.
+            </div>
+        `;
+        document.body.appendChild(notification);
+
+        // Remove notification after 5 seconds
+        setTimeout(() => {
+            notification.classList.add('fade-out');
+            setTimeout(() => notification.remove(), 500);
+        }, 5000);
+
+        loadBackupList();
+        await response.json();
+
+    } catch (error) {
+        console.error('Error creating backup:', error);
+        
+        const errorMessage = error.message === 'Backup creation failed' 
+            ? 'Backup limit reached (max 2) or creating backups too quickly. Please try again later.'
+            : 'An error occurred while creating the backup. Please try again.';
+
+        // Show error message in a non-blocking way
+        const notification = document.createElement('div');
+        notification.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg fade-in';
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+                ${errorMessage}
+            </div>
+        `;
+        document.body.appendChild(notification);
+
+        // Remove notification after 5 seconds
+        setTimeout(() => {
+            notification.classList.add('fade-out');
+            setTimeout(() => notification.remove(), 500);
+        }, 5000);
+
+    } finally {
+        // Reset button state after 1 second
+        setTimeout(() => {
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }, 1000);
+    }
+});
+
+    document.getElementById('cancel-delete').addEventListener('click', () => {
+        closeModal('confirm-delete-modal');
+        backupToDelete = null;
+    });
+
+    document.getElementById('confirm-delete').addEventListener('click', deleteBackup);
+
+    // Load server details
+    fetch(`/api/server/${serverId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('server-name').textContent = data.attributes.name;
+            document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
+            document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
+        });
+
+    // Initial load
+    loadBackupList();
+</script>
+<%- include('../components/bottom') %>

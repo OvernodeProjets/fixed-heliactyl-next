@@ -1,0 +1,359 @@
+# ======================================================
+# Heliactyl Configuration File
+# ======================================================
+
+# ------------------------------------------------------
+# General information
+# ------------------------------------------------------
+name = "Heliactyl"
+icon = "../assets/favicon.png"
+timezone = "Europe/Paris"
+
+# ------------------------------------------------------
+# Versioning / Platform Information
+# ------------------------------------------------------
+platform_codename = "Avalanche 2" 
+platform_level = 74 
+version = "3.2.0"
+
+# ------------------------------------------------------
+# General Settings
+# ------------------------------------------------------
+clusters = 2
+database = "sqlite://heliactyl.db"
+
+# ------------------------------------------------------
+# External Services
+# ------------------------------------------------------
+[pterodactyl]
+domain = "https://panel.example.com"
+key = "ptla_aa000aaaaaaaaaaaaaaaaaaaaa00aaaaaaaaaaa0aa0a"
+client_key = "ptlc_aa000aaaaaaaaaaaaaaaaaaaaa00aaaaaaaaaaa0aa0a"
+
+[website]
+port = 3000
+secret = "random secret here"
+domain = "https://example.com"
+currency = "HCoins"
+discord = "https://discord.gg/"
+status = "https://status.example.com"
+
+# ======================================================
+# API / Client Configuration
+# ======================================================
+
+# Module settings (formerly API)
+[api.client]
+accountSwitcher = true
+
+# --- Client API ---
+  [api.client.api]
+  enabled = true
+  code = "Example Code"
+
+# ---  Plesk integration ---
+  [api.client.plesk]
+  enabled = false
+  PLESK_URL = "plesk.example.com"
+  PLESK_USERNAME = "root"
+  PLESK_PASSWORD = "password"
+  SERVER_IP = "0.0.0.0"
+
+# --- Join for Rewards (J4R) ---
+  [api.client.j4r]
+  enabled = true
+
+    [[api.client.j4r.ads]]
+    name = "Example server 1"
+    invite = "https://discord.gg/example"
+    id = "0000000000000000000"
+    coins = 100
+
+    [[api.client.j4r.ads]]
+    name = "Example server 2"
+    invite = "https://discord.gg/example"
+    id = "0000000000000000000"
+    coins = 200
+
+    [[api.client.j4r.ads]]
+    name = "Example server 3"
+    invite = "https://discord.gg/example"
+    id = "0000000000000000000"
+    coins = 300
+
+# --- Discord Bot ---
+  [api.client.bot]
+  token = "aaaaaaaaaaaaaaa0aaaaa0aaaaaa0.a0aaaa.aaaa_a0aaAaaAaaAaaaaAaAaAaA0aaA0aaaa"
+
+    [api.client.bot.joinguild]
+    _comment = "The Discord bot must be in these servers and have invite permissions. Automatic guild joining will not work unless role packages are configured correctly. You can always just set it to a random role & package so that only this works."
+    enabled = false
+    guildid = ["0000000000000000000"]
+
+    [api.client.bot.giverole]
+    _comment = "Auto-join must be enabled for this to work - or the user must already be in your Discord. This will give the user a role when they login."
+    enabled = false
+    guildid = "0000000000000000000"
+    roleid = "0000000000000000000"
+
+# --- Password Generator ---
+  [api.client.passwordgenerator]
+  signup = true
+  note = "Use this to disable registering on Heliactyl."
+  length = 24
+
+# --- Permissions / Allow List ---
+  [api.client.allow]
+  newusers = true
+  regen = true
+  overresourcessuspend = false
+
+    [api.client.allow.server]
+    create = true
+    modify = true
+    delete = true
+
+# --- OAuth2 Configuration ---
+  [api.client.oauth2]
+  _comment = "Go to https://discord.dev/ and create an application to set up OAuth2. This is required for Heliactyl to work. You must also set the redirect URL to the link below."
+  id = "0000000000000000000"
+  secret = "aaaaaaaaa0aa00aaaaaaaaaaaaaa0a_a"
+  link = "https://example.com"
+  callbackpath = "/auth/discord/callback"
+  prompt = true
+
+    [api.client.oauth2.google]
+    enable = false
+    id = "0000000000000-0aa00a00aaa0a0aa0aaaaa000aaaaaa0.aaaa.aaaaaaaaaaaaaaaaa.aaa"
+    secret = "aaaaaa-a0aaaaaa0a0aaaa0aaa0a0a_a0aa"
+    link = "https://example.com"
+    callbackpath = "/auth/google/callback"
+
+    [api.client.oauth2.github]
+    enable = false
+    id = "aa00aaa0aAaaaaaaasaA"
+    secret = "00aa00000a000000a0aada0000000000aa00000"
+    link = "https://example.com"
+    callbackpath = "/auth/github/callback"
+
+    [api.client.oauth2.ip]
+    "trust x-forwarded-for" = true
+    block = [ ]
+    "duplicate check" = false
+    _note = "Anti-alt checks will not work if you are proxying through Cloudflare. This is due to the fact that Cloudflare does not pass the real IP address through the headers. If you are using Cloudflare, please disable this feature."
+
+# --- Rate Limits ---
+  [api.client.ratelimits]
+  "/callback" = 2
+  "/create" = 1
+  "/delete" = 1
+  "/modify" = 1
+  "/updateinfo" = 1
+  "/setplan" = 2
+  "/admin" = 1
+  "/regen" = 1
+  "/renew" = 1
+  "/api/userinfo" = 1
+
+# --- Packages ---
+  [api.client.packages]
+  default = "default"
+
+    [api.client.packages.list.default]
+    ram = 2_048
+    disk = 3_072
+    cpu = 100
+    servers = 3
+
+    [api.client.packages.list.2]
+    ram = 6_144
+    disk = 30_720
+    cpu = 150
+    servers = 8
+
+    [api.client.packages.rolePackages]
+    note = "This allows you to set a different plan/package to people who have a specific role however this requires the Discord bot to be configured and functioning. This is mainly used for Boost rewards."
+    roleServer = "0000000000000000000"
+
+      [api.client.packages.rolePackages.roles]
+      "0000000000000000000" = "2"
+
+# --- Locations ---
+  [api.client.locations.2]
+  name = "France, FR"
+  country = "France"
+  flag = "https://cdn-icons-png.flaticon.com/512/197/197560.png"
+  region = "eu-west"
+  nodes = ["FR-1", "FR-2"]
+  capacity = 100
+  cpu = "Intel Xeon & AMD Ryzen"
+  storage = "1 TB SSD"
+  pro = false
+
+# --- Egg Templates ---
+[api.client.eggs.velocity]
+display = "Velocity"
+category = "Game Servers" 
+logo = "https://avatars.githubusercontent.com/u/41710604?s=200&v=4"
+free = true
+
+  [api.client.eggs.velocity.minimum]
+  ram = 512
+  disk = 512
+  cpu = 50
+
+  [api.client.eggs.velocity.maximum]
+  ram = 4096
+  disk = 10240
+  cpu = 200
+
+  [api.client.eggs.velocity.info]
+  egg = 34
+  docker_image = "ghcr.io/pterodactyl/yolks:java_21"
+  startup = "java -Xms128M -Xmx{{SERVER_MEMORY}}M {{JAVA_ARGUMENTS}} -jar {{SERVER_JARFILE}}"
+
+    [api.client.eggs.velocity.info.environment]
+    SERVER_JARFILE = "server.jar"
+    VELOCITY_VERSION = "latest"
+    JAVA_ARGUMENTS = "-XX:+UseG1GC -XX:G1HeapRegionSize=4M -XX:+UnlockExperimentalVMOptions -XX:+ParallelRefProcEnabled -XX:+AlwaysPreTouch -XX:MaxInlineLevel=15"
+    BUILD_NUMBER = "latest"
+
+    [api.client.eggs.velocity.info.feature_limits]
+    databases = 0
+    backups = 0
+
+[api.client.eggs.paper]
+display = "Minecraft - Paper"
+category = "Game Servers" 
+logo = "https://avatars.githubusercontent.com/u/7608950?s=200&v=4"
+free = true
+
+  [api.client.eggs.paper.minimum]
+  ram = 1024
+  disk = 1024
+  cpu = 100
+
+  [api.client.eggs.paper.maximum]
+  ram = 8192
+  disk = 20480
+  cpu = 300
+
+  [api.client.eggs.paper.info]
+  egg = 3
+  docker_image = "ghcr.io/pterodactyl/yolks:java_21"
+  startup = "java -Xms128M -Xmx{{SERVER_MEMORY}}M -Dterminal.jline=false -Dterminal.ansi=true -jar {{SERVER_JARFILE}}"
+
+    [api.client.eggs.paper.info.environment]
+    SERVER_JARFILE = "server.jar"
+    BUILD_NUMBER = "latest"
+
+    [api.client.eggs.paper.info.feature_limits]
+    databases = 0
+    backups = 0
+
+[api.client.eggs.forge]
+display = "Minecraft - Forge"
+category = "Game Servers" 
+logo = "https://avatars.githubusercontent.com/u/1034606?s=200&v=4"
+free = true
+
+  [api.client.eggs.forge.minimum]
+  ram = 1024
+  disk = 1024
+  cpu = 100
+
+  [api.client.eggs.forge.maximum]
+  ram = 8192
+  disk = 20480
+  cpu = 300
+
+  [api.client.eggs.forge.info]
+  egg = 1
+  docker_image = "ghcr.io/zenllc/java:21"
+  startup = 'java -Xms128M -Xmx{{SERVER_MEMORY}}M -Dterminal.jline=false -Dterminal.ansi=true $( [[  ! -f unix_args.txt ]] && printf %s "-jar {{SERVER_JARFILE}}" || printf %s "@unix_args.txt" )'
+
+    [api.client.eggs.forge.info.environment]
+    SERVER_JARFILE = "server.jar"
+    MC_VERSION = "latest"
+    BUILD_TYPE = "recommended"
+
+    [api.client.eggs.forge.info.feature_limits]
+    databases = 0
+    backups = 0
+
+# --- Coins / Store ---
+  [api.client.coins]
+  enabled = true
+
+    [api.client.coins.store]
+    enabled = true
+
+      [api.client.coins.store.ram]
+      cost = 300
+      per = 1_024
+
+      [api.client.coins.store.disk]
+      cost = 200
+      per = 5_120
+
+      [api.client.coins.store.cpu]
+      cost = 350
+      per = 100
+
+      [api.client.coins.store.servers]
+      cost = 100
+      per = 2
+
+# ======================================================
+# Secondary Modules
+# ======================================================
+
+[api.afk]
+enabled = true
+path = "ws"
+every = 60
+coins = 2.5
+_note = "This is the 2nd-generation version of Heliactyl's AFK system. Please report any bugs on the GitHub (github.com/heliactyloss/heliactyl). Thank you."
+
+
+[api.rdv]
+enabled = false
+
+[antivpn]
+status = false
+APIKey = "Proxycheck API Key"
+whitelistedIPs = ["IP address"]
+note = "For this to work, generate an API Key on https://proxycheck.io/. If you do not put a key, Heliactyl will automatically disable anti-VPN."
+
+[whitelist]
+status = false
+users = [ "User ID" ]
+note = "This allows only specific people to be able to login to the Heliactyl dashboard. This does not affect your Panel."
+
+# ======================================================
+# Logging System
+# ======================================================
+[logging]
+status = true
+public = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAaaA-aaaaaaaaa0aaa0aAa0aa0aa0aa0a0"
+private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAaaA-aaaaaaaaa0aaa0aAa0aa0aa0aa0a0"
+
+  [logging.actions.user]
+  "signup" = true
+  "create server" = true
+  "gifted coins" = true
+  "modify server" = true
+  "buy servers" = true
+  "buy ram" = true
+  "buy cpu" = true
+  "buy disk" = true
+
+  [logging.actions.admin]
+  "set coins" = true
+  "add coins" = true
+  "set resources" = true
+  "set plan" = true
+  "create coupon" = true
+  "revoke coupon" = true
+  "remove account" = true
+  "view ip" = true

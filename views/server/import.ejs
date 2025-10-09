@@ -1,0 +1,297 @@
+<%- include('../components/top') %>
+
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="mb-5 lg:flex lg:items-center lg:justify-between">
+        <div class="min-w-0 flex-1">
+            <h2 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight" id="server-name">
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </h2>
+            <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+                <div class="mt-2 flex items-center text-sm text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                        <path fill-rule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Z" clip-rule="evenodd" />
+                    </svg>
+                    <span id="server-description">
+                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </span>
+                </div>
+                <div class="mt-2 flex items-center text-sm text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                        <path d="M4.08 5.227A3 3 0 0 1 6.979 3H17.02a3 3 0 0 1 2.9 2.227l2.113 7.926A5.228 5.228 0 0 0 18.75 12H5.25a5.228 5.228 0 0 0-3.284 1.153L4.08 5.227Z" />
+                        <path fill-rule="evenodd" d="M5.25 13.5a3.75 3.75 0 1 0 0 7.5h13.5a3.75 3.75 0 1 0 0-7.5H5.25Zm10.5 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm3.75-.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" clip-rule="evenodd" />
+                    </svg>
+                    Server <%= req.query.id %>
+                </div>
+            </div>
+        </div>
+        <div class="mt-5 flex lg:mt-0 lg:ml-4">
+            <span class="hidden sm:block">
+                <a href="/servers" class="inline-flex items-center rounded-xl border border-transparent bg-indigo-900/50 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
+                        <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                    </svg>
+                    Back to server list
+                </a>
+            </span>
+        </div>
+    </div>
+
+    <%- include('../components/server') %>
+
+    <!-- Server Import Section -->
+    <div class="bg-white/5 rounded-xl p-6">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-xl font-semibold text-white">Server Import</h2>
+                <p class="text-gray-400 text-sm mt-1">Transfer files from another server using SFTP</p>
+            </div>
+        </div>
+
+        <!-- Import Status Card -->
+        <div id="import-status" class="hidden bg-white/5 rounded-lg p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-white">Import Status</h3>
+                <span id="status-badge" class="px-3 py-1 rounded-full text-xs font-medium"></span>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between text-sm text-gray-300 mb-2">
+                        <span>Overall Progress</span>
+                        <span id="progress-percentage">0%</span>
+                    </div>
+                    <div class="h-2 bg-white/10 rounded-full">
+                        <div id="progress-bar" class="h-full bg-indigo-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="bg-white/5 rounded-lg p-4">
+                        <div class="text-gray-400 mb-1">Current File</div>
+                        <div id="current-file" class="text-white font-medium truncate">-</div>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-4">
+                        <div class="text-gray-400 mb-1">Transfer Speed</div>
+                        <div id="transfer-speed" class="text-white font-medium">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import History -->
+        <div id="import-history" class="space-y-4">
+<!-- Import Modal -->
+<div id="import-modal" class="modal-overlay z-50">
+    <div class="modal-content w-full max-w-2xl">
+        <div class="space-y-6">
+            <!-- Connection Details -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Hostname</label>
+                    <input type="text" id="hostname" class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. server.example.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Port</label>
+                    <input type="text" id="port" class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" value="22">
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
+                    <input type="text" id="username" class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="SFTP username">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                    <input type="password" id="password" class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="SFTP password">
+                </div>
+            </div>
+
+            <!-- Size Warning -->
+            <div class="bg-yellow-900/30 border border-yellow-700/50 rounded-lg p-4">
+                <div class="flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    <div class="ml-3">
+                        <h4 class="text-sm font-medium text-yellow-500">Size Limit Notice</h4>
+                        <p class="mt-1 text-sm text-yellow-400/70">Server imports are limited to 5GB to prevent memory issues. Larger servers should be transferred manually.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-6">
+            <button id="confirm-import" class="px-4 py-2 bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition-all duration-200">
+                Start Import
+            </button>
+        </div>
+    </div>
+</div>
+            </div></div></div></main>
+
+<script>
+const serverId = new URLSearchParams(window.location.search).get('id');
+
+// Load server details
+function loadServerDetails() {
+    fetch(`/api/server/${serverId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('server-name').textContent = data.attributes.name;
+            document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Failed to load server details', 'error');
+        });
+}
+
+// Show/Hide Modal
+function showImportModal() {
+    document.getElementById('import-modal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('import-modal').classList.remove('active');
+}
+
+// Update progress UI
+function updateProgress(status) {
+    const statusElement = document.getElementById('import-status');
+    const progressBar = document.getElementById('progress-bar');
+    const progressPercentage = document.getElementById('progress-percentage');
+    const currentFile = document.getElementById('current-file');
+    const transferSpeed = document.getElementById('transfer-speed');
+    const statusBadge = document.getElementById('status-badge');
+
+    statusElement.classList.remove('hidden');
+    progressBar.style.width = `${status.progress}%`;
+    progressPercentage.textContent = `${Math.round(status.progress)}%`;
+    
+    if (status.currentFile) {
+        currentFile.textContent = status.currentFile;
+    }
+    
+    if (status.speed) {
+        transferSpeed.textContent = `${status.speed} MB/s`;
+    }
+
+    // Update status badge
+    statusBadge.className = 'px-3 py-1 rounded-full text-xs font-medium';
+    switch(status.state) {
+        case 'preparing':
+            statusBadge.classList.add('bg-yellow-500/20', 'text-yellow-300');
+            statusBadge.textContent = 'Preparing';
+            break;
+        case 'importing':
+            statusBadge.classList.add('bg-indigo-500/20', 'text-indigo-300');
+            statusBadge.textContent = 'Importing';
+            break;
+        case 'completed':
+            statusBadge.classList.add('bg-green-500/20', 'text-green-300');
+            statusBadge.textContent = 'Completed';
+            break;
+        case 'error':
+            statusBadge.classList.add('bg-red-500/20', 'text-red-300');
+            statusBadge.textContent = 'Error';
+            break;
+    }
+}
+
+// Start import process
+async function startImport() {
+    const importDetails = {
+        host: document.getElementById('hostname').value,
+        port: document.getElementById('port').value,
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value
+    };
+
+    // Basic validation
+    if (!importDetails.host || !importDetails.username || !importDetails.password) {
+        showNotification('Please fill in all required fields', 'error');
+        return;
+    }
+
+    closeModal();
+
+    try {
+        const response = await fetch(`/import/${serverId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(importDetails)
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) throw new Error(data.error || 'Import failed');
+
+        // Start polling for status updates
+        pollImportStatus(data.transferId);
+        
+    } catch (error) {
+        console.error('Import error:', error);
+        showNotification(error.message, 'error');
+    }
+}
+
+// Poll for import status
+function pollImportStatus(transferId) {
+    const pollInterval = setInterval(async () => {
+        try {
+            const response = await fetch(`/import/${transferId}/status`);
+            const status = await response.json();
+
+            updateProgress(status);
+
+            if (status.state === 'completed' || status.state === 'error') {
+                clearInterval(pollInterval);
+                showNotification(
+                    status.state === 'completed' 
+                        ? 'Server import completed successfully' 
+                        : `Import failed: ${status.error}`,
+                    status.state === 'completed' ? 'success' : 'error'
+                );
+            }
+        } catch (error) {
+            console.error('Status polling error:', error);
+            clearInterval(pollInterval);
+        }
+    }, 1000);
+}
+
+// Notification helper
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    } text-white z-50 flex items-center`;
+    
+    notification.innerHTML = `
+        ${type === 'success' 
+            ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>'
+            : '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>'
+        }
+        ${message}
+    `;
+    
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 5000);
+}
+
+// Event Listeners
+document.getElementById('confirm-import').addEventListener('click', startImport);
+
+// Initialize
+document.addEventListener('DOMContentLoaded', loadServerDetails);
+</script>
+
+<%- include('../components/bottom') %>

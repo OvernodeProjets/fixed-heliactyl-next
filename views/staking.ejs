@@ -1,0 +1,556 @@
+<%- include('./components/top') %>
+
+<style>
+    select option {
+        background-color: #1a1d21;
+        color: white;
+        padding: 12px;
+        margin: 4px 0;
+    }
+    
+    select option:hover {
+        background-color: rgba(99, 102, 241, 0.1);
+    }
+</style>
+
+<main class="flex-grow container mx-auto px-4 py-8">
+    <!-- Migration Alert -->
+    <div id="migration-alert" class="hidden mb-6">
+        <div class="bg-indigo-500/20 border border-indigo-500/50 rounded-2xl p-4 text-indigo-200">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-indigo-200">Staking System Upgrade</h3>
+                    <div class="mt-2 text-sm text-indigo-200">
+                        <p>We've upgraded our staking system with new features! Your existing stake has been automatically migrated. You now have access to:</p>
+                        <ul class="list-disc list-inside mt-2">
+                            <li>Multiple staking positions</li>
+                            <li>Higher rewards for longer lock periods</li>
+                            <li>Compound interest earnings</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-between items-center w-full mx-auto pb-4">
+        <div class="flex flex-col">
+            <h1 class="text-xl font-semibold mb-0.5 heavy">Staking</h1>
+            <p class="text-gray-400 text-md">Earn compound interest rewards by staking your <%= settings.website.currency %>.</p>
+        </div>
+
+        <nav aria-label="Breadcrumb" class="inline-flex py-2 px-4 rounded-xl bg-white/5 transition-colors duration-200">
+            <ol role="list" class="flex items-center space-x-2">
+                <li>
+                    <a href="#_" class="text-sm flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-colors duration-200" aria-current="false">
+                        <svg
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon icon-tabler size-4 icons-tabler-outline icon-tabler-home"
+                        >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+                            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
+                            <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
+                        </svg>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="flex items-center">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right size-4 text-zinc-400"
+                    >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M9 6l6 6l-6 6"></path>
+                    </svg>
+                </li>
+                <li>
+                    <a href="#_" class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200" aria-current="page">
+                        Staking
+                    </a>
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="max-w-4xl mx-auto mt-5">
+        <!-- Balance Overview -->
+        <div class="bg-white/5 rounded-2xl p-6 mb-8">
+            <div class="grid md:grid-cols-3 gap-6">
+                <div>
+                    <p class="text-gray-400 text-sm">Available Balance</p>
+                    <p class="text-3xl font-bold" id="available-balance">Loading...</p>
+                </div>
+                <div>
+                    <p class="text-gray-400 text-sm">Total Staked</p>
+                    <p class="text-3xl font-bold" id="total-staked">Loading...</p>
+                </div>
+                <div>
+                    <p class="text-gray-400 text-sm">Total Earnings</p>
+                    <p class="text-3xl font-bold" id="total-earnings">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staking Positions -->
+        <div class="bg-white/5 rounded-2xl p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold">Your Staking Positions</h2>
+                <button id="new-stake-btn" class="px-4 py-2 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-200">
+                    New Stake
+                </button>
+            </div>
+            <div id="staking-positions" class="space-y-4">
+                <!-- Positions will be populated here -->
+                <div class="text-center text-gray-400 py-8" id="no-positions-message">
+                    No active staking positions. Start earning rewards by creating a new stake!
+                </div>
+            </div>
+        </div>
+
+        <!-- APY Tiers -->
+        <div class="bg-white/5 rounded-2xl p-6">
+            <h2 class="text-xl font-semibold mb-6">Staking Tiers</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-medium">30 Days</h3>
+                        <span class="text-indigo-400">+20% APR</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Short-term staking with flexible rewards</p>
+                </div>
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-medium">90 Days</h3>
+                        <span class="text-indigo-400">+50% APR</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Medium-term staking with enhanced rewards</p>
+                </div>
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-medium">180 Days</h3>
+                        <span class="text-indigo-400">+100% APR</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Long-term staking with maximum rewards</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- New Stake Modal -->
+<div id="stake-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+    <div class="bg-[#191c20] rounded-2xl p-6 w-full max-w-md transform transition-all duration-300 scale-95">
+        <h3 class="text-xl font-semibold mb-6">Create New Stake</h3>
+        <form id="stake-form">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-400 mb-1">Amount</label>
+                <div class="relative">
+                    <input type="number" id="stake-amount" required min="10" step="0.01"
+                           class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-indigo-500 focus:border-indigo-500">
+                    <span class="absolute right-3 top-2 text-gray-400"><%= settings.website.currency %></span>
+                </div>
+                <p class="mt-1 text-sm text-gray-400">Minimum stake: 10 <%= settings.website.currency %></p>
+            </div>
+            <div class="mb-6 relative">
+                <label class="block text-sm font-medium text-gray-400 mb-1">Lock Period</label>
+                <select id="lock-period" required
+                        class="w-full px-4 py-3 bg-[#1a1d21] border border-indigo-500/20 rounded-xl text-white 
+                               appearance-none cursor-pointer hover:border-indigo-500/40 transition-colors duration-200
+                               focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/30 focus:outline-none">
+                    <option value="30d" class="py-3 px-4 hover:bg-indigo-500/10 transition-colors duration-200">
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium">30 Days</span>
+                            <span class="text-indigo-400">+20% APR</span>
+                        </div>
+                    </option>
+                    <option value="90d" class="py-3 px-4 hover:bg-indigo-500/10 transition-colors duration-200">
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium">90 Days</span>
+                            <span class="text-indigo-400">+50% APR</span>
+                        </div>
+                    </option>
+                    <option value="180d" class="py-3 px-4 hover:bg-indigo-500/10 transition-colors duration-200">
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium">180 Days</span>
+                            <span class="text-indigo-400">+100% APR</span>
+                        </div>
+                    </option>
+                </select>
+                <!-- Custom arrow icon -->
+                <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-400 mt-6">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="cancel-stake" class="px-4 py-2 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-colors duration-200">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-200">
+                    Confirm Stake
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Position Action Modal -->
+<div id="position-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+    <div class="bg-[#191c20] rounded-2xl p-6 w-full max-w-md transform transition-all duration-300 scale-95">
+        <h3 id="position-modal-title" class="text-xl font-semibold mb-6"></h3>
+        <div id="position-modal-content"></div>
+        <div class="flex justify-end space-x-3 mt-6">
+            <button type="button" class="close-position-modal px-4 py-2 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-colors duration-200">
+                Close
+            </button>
+            <button type="button" id="position-action-btn" class="px-4 py-2 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-200">
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const stakeModal = document.getElementById('stake-modal');
+const positionModal = document.getElementById('position-modal');
+const stakeForm = document.getElementById('stake-form');
+let currentPositionId = null;
+const userinfo = <%- JSON.stringify(req.session.userinfo) %>
+
+async function checkMigration() {
+    try {
+        const response = await fetch('/stake/positions');
+        const data = await response.json();
+        
+        if (data.message && data.message.includes('migrated')) {
+            document.getElementById('migration-alert').classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error('Error checking migration:', error);
+    }
+}
+
+async function fetchStakingData() {
+    try {
+        const [positionsResponse] = await Promise.all([
+            fetch('/stake/positions'),
+            fetch(`/coins-${userinfo.id}`)
+        ]);
+        
+        const positionsData = await positionsResponse.json();
+        
+        updateDashboard(positionsData);
+        renderStakingPositions(positionsData.positions);
+    } catch (error) {
+        console.error('Error fetching staking data:', error);
+        showError('Failed to load staking data');
+    }
+}
+
+function updateDashboard(positionsData) {
+    const totalStaked = positionsData.positions.reduce((sum, pos) => sum + pos.amount, 0);
+    const totalEarnings = positionsData.positions.reduce((sum, pos) => sum + pos.currentEarnings, 0);
+    
+    document.getElementById('available-balance').textContent = `<%= coins.toFixed(2) %> <%= settings.website.currency %>`;
+    document.getElementById('total-staked').textContent = `${totalStaked.toFixed(2)} <%= settings.website.currency %>`;
+    document.getElementById('total-earnings').textContent = `${totalEarnings.toFixed(2)} <%= settings.website.currency %>`;
+}
+
+function renderStakingPositions(positions) {
+    const container = document.getElementById('staking-positions');
+    const noPositionsMsg = document.getElementById('no-positions-message');
+    
+    // Guard clause for container
+    if (!container) {
+        console.warn('Staking positions container not found');
+        return;
+    }
+
+    // Handle no-positions message if element exists
+    if (noPositionsMsg) {
+        if (!positions || positions.length === 0) {
+            noPositionsMsg.classList.remove('hidden');
+        } else {
+            noPositionsMsg.classList.add('hidden');
+        }
+    }
+
+    // Only render if we have a valid container
+    if (!positions || positions.length === 0) {
+        container.innerHTML = noPositionsMsg ? '' : `
+            <div class="text-center text-gray-400 py-8">
+                No active staking positions. Start earning rewards by creating a new stake!
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = positions.map(position => `
+        <div class="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors duration-200">
+            <div class="grid md:grid-cols-4 gap-4">
+                <div>
+                    <p class="text-sm text-gray-400">Staked Amount</p>
+                    <p class="text-lg font-medium">${position.amount.toFixed(2)} <%= settings.website.currency %></p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-400">Lock Period</p>
+                    <p class="text-lg font-medium">${position.lockPeriod.replace('d', ' Days')}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-400">Current Earnings</p>
+                    <p class="text-lg font-medium text-indigo-400">+${position.currentEarnings.toFixed(2)} <%= settings.website.currency %></p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-400">Unlock Date</p>
+                    <p class="text-lg font-medium">${new Date(position.unlockTime).toLocaleDateString()}</p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-4">
+                <button onclick="showPositionActions('${position.positionId}')" 
+                        class="px-4 py-2 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-colors duration-200">
+                    Manage Position
+                </button>
+                ${position.currentEarnings > 0 ? `
+                    <button onclick="claimRewards('${position.positionId}')"
+                            class="px-4 py-2 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-200 hidden">
+                        Claim ${position.currentEarnings.toFixed(2)} <%= settings.website.currency %>
+                    </button>
+                ` : ''}
+            </div>
+            ${position.isLocked ? `
+                <div class="mt-4 text-sm text-indigo-400">
+                    <svg class="inline-block w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    Locked until ${new Date(position.unlockTime).toLocaleDateString()}
+                </div>
+            ` : ''}
+        </div>
+    `).join('');
+}
+
+async function showPositionActions(positionId) {
+    try {
+        const response = await fetch(`/stake/positions/${positionId}`);
+        const position = (await response.json()).position;
+        currentPositionId = positionId;
+        
+        const modalTitle = document.getElementById('position-modal-title');
+        const modalContent = document.getElementById('position-modal-content');
+        const actionBtn = document.getElementById('position-action-btn');
+        
+        modalTitle.textContent = 'Manage Staking Position';
+        modalContent.innerHTML = `
+            <div class="space-y-4">
+                <div class="bg-white/5 rounded-xl p-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-400">Staked Amount</p>
+                            <p class="text-lg font-medium">${position.amount.toFixed(2)} <%= settings.website.currency %></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Lock Period</p>
+                            <p class="text-lg font-medium">${position.lockPeriod.replace('d', ' Days')}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Current Earnings</p>
+                            <p class="text-lg font-medium text-indigo-400">+${position.currentEarnings.toFixed(2)} <%= settings.website.currency %></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">APR Bonus</p>
+                            <p class="text-lg font-medium">+${getAPRBonus(position.lockPeriod)}%</p>
+                        </div>
+                    </div>
+                </div>
+                ${position.isLocked ? `
+                    <div class="bg-indigo-500/20 border border-indigo-500/50 rounded-xl p-4">
+                        <p class="text-sm text-indigo-200">
+                            <strong>Early Withdrawal Warning:</strong> This position is still locked. Unstaking now will result in a 50% penalty on earned rewards.
+                        </p>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        
+        actionBtn.textContent = position.isLocked ? 'Unstake Early' : 'Unstake Position';
+        actionBtn.onclick = () => confirmUnstake(positionId, position.isLocked);
+        
+        showModal('position-modal');
+    } catch (error) {
+        console.error('Error fetching position details:', error);
+        showError('Failed to load position details');
+    }
+}
+
+function getAPRBonus(lockPeriod) {
+    const bonuses = {
+        '30d': 20,
+        '90d': 50,
+        '180d': 100
+    };
+    return bonuses[lockPeriod] || 0;
+}
+
+async function confirmUnstake(positionId, isLocked) {
+    const confirmMessage = isLocked ?
+        'Are you sure you want to unstake early? You will lose 50% of your earned rewards.' :
+        'Are you sure you want to unstake this position?';
+    
+    if (confirm(confirmMessage)) {
+        try {
+            const response = await fetch('/unstake', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ positionId })
+            });
+            
+            const data = await response.json();
+            if (response.ok) {
+                showSuccess(`Successfully unstaked ${data.returned.toFixed(2)} <%= settings.website.currency %>`);
+                hideModal('position-modal');
+                fetchStakingData();
+            } else {
+                showError(data.error);
+            }
+        } catch (error) {
+            console.error('Error unstaking position:', error);
+            showError('Failed to unstake position');
+        }
+    }
+}
+
+async function claimRewards(positionId) {
+    try {
+        const response = await fetch('/stake/claim', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ positionId })
+        });
+        
+        const data = await response.json();
+        if (response.ok) {
+            showSuccess(`Successfully claimed ${data.claimedAmount.toFixed(2)} <%= settings.website.currency %>`);
+            fetchStakingData();
+        } else {
+            showError(data.error);
+        }
+    } catch (error) {
+        console.error('Error claiming rewards:', error);
+        showError('Failed to claim rewards');
+    }
+}
+
+// Modal Controls
+function showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        modal.querySelector('.transform').classList.remove('scale-95');
+    }, 10);
+}
+
+function hideModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.add('opacity-0');
+    modal.querySelector('.transform').classList.add('scale-95');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+}
+
+// Notifications
+function showSuccess(message) {
+    // Implementation of toast notification
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 opacity-0 translate-y-2';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.remove('opacity-0', 'translate-y-2');
+    }, 10);
+    
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function showError(message) {
+    // Similar to showSuccess but with red styling
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 opacity-0 translate-y-2';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.remove('opacity-0', 'translate-y-2');
+    }, 10);
+    
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Event Listeners
+document.getElementById('new-stake-btn').addEventListener('click', () => showModal('stake-modal'));
+document.getElementById('cancel-stake').addEventListener('click', () => hideModal('stake-modal'));
+document.querySelectorAll('.close-position-modal').forEach(btn => {
+    btn.addEventListener('click', () => hideModal('position-modal'));
+});
+
+stakeForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const amount = parseFloat(document.getElementById('stake-amount').value);
+    const lockPeriod = document.getElementById('lock-period').value;
+    
+    try {
+        const response = await fetch('/stake', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount, lockPeriod })
+        });
+        
+        const data = await response.json();
+        if (response.ok) {
+            showSuccess(`Successfully staked ${amount.toFixed(2)} <%= settings.website.currency %>`);
+            hideModal('stake-modal');
+            stakeForm.reset();
+            fetchStakingData();
+        } else {
+            showError(data.error);
+        }
+    } catch (error) {
+        console.error('Error creating stake:', error);
+        showError('Failed to create stake');
+    }
+});
+
+// Initialize
+checkMigration();
+fetchStakingData();
+setInterval(fetchStakingData, 30000); // Refresh every 30 seconds
+</script>
+
+<%- include('./components/bottom') %>

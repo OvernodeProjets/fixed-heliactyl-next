@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 2px solid white;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin-left: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error-shake {
+            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+            transform: translate3d(0, 0, 0);
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            0% { transform: translateY(-20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <main class="flex-grow flex items-center justify-center p-8">
+        <div class="py-8 px-6 md:py-12 md:px-8 max-w-md w-full">
+            <div class="flex justify-center mb-8">
+                <img src="https://i.imgur.com/ML5w4qn.png" class="h-8">
+            </div>
+            <h2 class="text-center text-2xl tracking-tight font-semibold text-gray-800">Create an account</h2>
+            <p class="text-gray-600 text-center mt-1 text-sm">Welcome to the ecosystem!</p>
+            
+            <!-- Registration Form -->
+            <form id="registerForm" class="mt-8 space-y-4">
+                <div>
+                    <input type="text" id="username" name="username" class="transition w-full py-2 px-4 font-medium text-sm bg-gray-200 rounded-full border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500" placeholder="Username" required>
+                </div>
+                <div>
+                    <input type="email" id="email" name="email" class="transition w-full py-2 px-4 font-medium text-sm bg-gray-200 rounded-full border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500" placeholder="Email" required>
+                </div>
+                <div>
+                    <input type="password" id="password" name="password" class="transition w-full py-2 px-4 font-medium text-sm bg-gray-200 rounded-full border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500" placeholder="Password" required>
+                </div>
+                <div>
+                    <input type="password" id="confirmPassword" name="confirmPassword" class="transition w-full py-2 px-4 font-medium text-sm bg-gray-200 rounded-full border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500" placeholder="Confirm Password" required>
+                </div>
+                <div class="flex justify-center">
+                    <div class="g-recaptcha" data-sitekey="6LcpgpAqAAAAAGVhH7T0gaRx0AqS4jbw8NQlvk1x"></div>
+                </div>
+                <button style="box-shadow: inset 0px 4px 5px -3px rgba(55,65,81,1);" type="submit" class="hover:scale-95 w-full py-2.5 px-4 bg-gray-800 hover:bg-gray-700 transition text-white rounded-full transition font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center">
+                    Register
+                    <span class="spinner" id="registerSpinner"></span>
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center transition hover:scale-95">
+                <a href="../auth" id="loginLink" class="hover:bg-indigo-600/5 rounded-full px-4 py-1.5 transition hover:scale-95 text-sm text-indigo-600 hover:text-indigo-800 transition font-medium">Already have an account? Sign in</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed z-50 bottom-2 right-2 font-medium bg-red-500 text-white px-6 py-2.5 rounded-l-xl rounded-t-xl rounded-br-md shadow-lg transition-opacity duration-300 opacity-0 pointer-events-none">
+        Error message goes here
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const registerForm = document.getElementById('registerForm');
+        const registerSpinner = document.getElementById('registerSpinner');
+        const toast = document.getElementById('toast');
+        const loginLink = document.getElementById('loginLink');
+
+        function showToast(message, type = 'error') {
+            toast.textContent = message;
+            toast.classList.remove('bg-red-500', 'bg-green-500');
+            toast.classList.add(type === 'error' ? 'bg-red-500' : 'bg-green-500');
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100', 'slide-in');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'slide-in');
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            registerSpinner.style.display = 'inline-block';
+
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const recaptchaResponse = grecaptcha.getResponse();
+
+            if (!recaptchaResponse) {
+                showToast('Please complete the reCAPTCHA.');
+                registerSpinner.style.display = 'none';
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showToast('Passwords do not match.');
+                registerSpinner.style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch('/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        username, 
+                        email, 
+                        password,
+                        recaptchaResponse
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast('Registration successful!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    showToast(data.error || 'Registration failed. Please try again.');
+                    registerForm.classList.add('error-shake');
+                    setTimeout(() => registerForm.classList.remove('error-shake'), 1000);
+                }
+            } catch (error) {
+                showToast('An error occurred. Please try again later.');
+            } finally {
+                registerSpinner.style.display = 'none';
+                grecaptcha.reset();
+            }
+        });
+
+        loginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = '/auth';
+        });
+    });
+    </script>
+</body>
+</html>

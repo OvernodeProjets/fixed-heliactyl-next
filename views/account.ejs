@@ -1,0 +1,154 @@
+<%- include('./components/top') %>
+<!-- Main Content -->
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center w-full mx-auto pb-4">
+        <!-- Welcome text and subtext on the left -->
+        <div class="flex flex-col">
+            <h1 class="text-xl font-semibold mb-0.5 heavy">SFTP Credentials</h1>
+            <p class="text-gray-400 text-md">View and manage the credentials to your SFTP.</p>
+        </div>
+
+        <!-- Breadcrumbs on the right -->
+        <nav aria-label="Breadcrumb" class="inline-flex py-2 px-4 rounded-xl bg-white/5 transition-colors duration-200">
+            <ol role="list" class="flex items-center space-x-2">
+                <li>
+                    <a href="#_" class="text-sm flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-colors duration-200" aria-current="false">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler size-4 icons-tabler-outline icon-tabler-home">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+                            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
+                            <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
+                        </svg>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right size-4 text-zinc-400">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M9 6l6 6l-6 6"></path>
+                    </svg>
+                </li>
+                <li>
+                    <a href="#_" class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200" aria-current="page">
+                        User Credentials
+                    </a>
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Credentials Content -->
+    <div class="mt-12 flex justify-center">
+        <div class="text-center w-full max-w-md">
+            <div class="mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 bg-white/5 p-1.5 rounded-xl border border-white/10 mx-auto text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold mb-4">User Credentials</h2>
+            <p class="text-gray-400 mb-6">Use these credentials to access certain actions such as SFTP.</p>
+
+            <!-- Current Credentials -->
+            <div class="mb-8">
+                <div class="mb-4">
+                    <input value="<%= req.session.userinfo.email %>" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500" disabled>
+                </div>
+                <div class="mb-4 relative">
+                    <input id="current-password" value="<%= req.session.password ? req.session.password : 'No password available: passwords are only shown once.' %>" class="transition ease-in-out delay-100 shadow-sm block w-full placeholder-white/60 sm:text-sm rounded-lg bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500" disabled>
+                </div>
+            </div>
+
+            <!-- Password Change Section -->
+            <div class="border-t border-white/15 pt-8">
+                <h3 class="text-lg font-semibold mb-4">Set a new password</h3>
+                <form id="password-change-form" class="space-y-4">
+                    <div>
+                        <input type="password" id="new-password" placeholder="New Password" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 placeholder-white/60 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <input type="password" id="confirm-password" placeholder="Confirm New Password" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg placeholder-white/60 bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <p class="text-sm text-white/70 text-left py-2.5">
+                        Password must contain:
+                        <br>• At least 8 characters
+                        <br>• One uppercase letter
+                        <br>• One lowercase letter
+                        <br>• One number
+                    </p>
+                    <div class="flex justify-between gap-4 mt-6">
+                        <button type="button" onclick="window.location.href='../regen'" class="flex-1 font-medium bg-white/15 text-sm hover:scale-95 text-white px-4 py-2 rounded-xl hover:bg-white/20 transition">
+                            Generate Random
+                        </button>
+                        <button type="submit" class="flex-1 font-medium bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm hover:scale-95 hover:bg-indigo-600 transition">
+                            Set Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="status-message" class="mt-4 hidden">
+                <p class="text-sm font-medium rounded-full px-4 py-2"></p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    function copyPassword() {
+        const passwordInput = document.getElementById('current-password');
+        navigator.clipboard.writeText(passwordInput.value);
+        showStatus('Password copied to clipboard!', 'success');
+    }
+
+    function showStatus(message, type) {
+        const statusDiv = document.getElementById('status-message');
+        const statusText = statusDiv.querySelector('p');
+        statusDiv.classList.remove('hidden');
+        statusText.textContent = message;
+        
+        if (type === 'success') {
+            statusText.classList.add('bg-green-100', 'text-green-800');
+            statusText.classList.remove('bg-red-100', 'text-red-800');
+        } else {
+            statusText.classList.add('bg-red-100', 'text-red-800');
+            statusText.classList.remove('bg-green-100', 'text-green-800');
+        }
+
+        setTimeout(() => {
+            statusDiv.classList.add('hidden');
+        }, 3000);
+    }
+
+    document.getElementById('password-change-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        try {
+            const response = await fetch('/api/password/change', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    password: newPassword,
+                    confirmPassword: confirmPassword
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showStatus('Password updated successfully!', 'success');
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showStatus(data.error, 'error');
+            }
+        } catch (error) {
+            showStatus('An error occurred while updating the password.', 'error');
+        }
+    });
+</script>
+
+<%- include('./components/bottom') %>

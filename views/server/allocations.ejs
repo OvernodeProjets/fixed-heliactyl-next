@@ -1,0 +1,264 @@
+<%- include('../components/top') %>
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="mb-5 lg:flex lg:items-center lg:justify-between">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight" id="server-name"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg></h2>
+          <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/briefcase -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path fill-rule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Zm9.586 4.594a.75.75 0 0 0-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.116-.062l3-3.75Z" clip-rule="evenodd" />
+              </svg>                    
+              <span id="server-description"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg></span>
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/map-pin -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path d="M4.08 5.227A3 3 0 0 1 6.979 3H17.02a3 3 0 0 1 2.9 2.227l2.113 7.926A5.228 5.228 0 0 0 18.75 12H5.25a5.228 5.228 0 0 0-3.284 1.153L4.08 5.227Z" />
+                <path fill-rule="evenodd" d="M5.25 13.5a3.75 3.75 0 1 0 0 7.5h13.5a3.75 3.75 0 1 0 0-7.5H5.25Zm10.5 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm3.75-.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" clip-rule="evenodd" />
+              </svg>              
+              Server <%= req.query.id %>
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/currency-dollar -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 0 0 .374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 0 0-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08Zm3.094 8.016a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+              </svg>              
+              Volumetric Shield enabled
+            </div>
+            <div class="hidden mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/calendar -->
+              <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clip-rule="evenodd" />
+              </svg>
+              <span id="server-name-breadcrumb"></span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-5 flex lg:mt-0 lg:ml-4">
+          <span class="hidden sm:block">
+            <a href="/servers" class="inline-flex items-center rounded-xl border border-transparent bg-indigo-900/50 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-800">
+              <!-- Heroicon name: mini/pencil -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
+                <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+              </svg>                
+              Back to server list
+            </a>
+          </span>
+        </div>
+      </div>   
+
+    <%- include('../components/server') %>
+
+    <!-- Current Allocations -->
+    <div class="bg-white/5 rounded-xl p-6 mt-8">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-xl font-semibold text-white">Network Allocations</h2>
+                <p class="text-gray-400 text-sm mt-1">Manage your server's network interfaces and ports</p>
+            </div>
+            <div>
+                <button id="create-allocation" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 hover:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    Add Allocation
+                </button>
+            </div>
+        </div>
+
+        <!-- Alert for errors -->
+        <div id="allocation-error" class="hidden mb-4 p-4 text-red-400 bg-red-900/50 rounded-lg flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            <span></span>
+        </div>
+
+        <!-- Allocations list with loading state -->
+        <div id="allocations-loading" class="text-center py-12">
+            <svg class="animate-spin h-8 w-8 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+
+        <div id="allocations-list" class="hidden space-y-3">
+            <!-- Allocations will be populated here -->
+        </div>
+
+        <!-- Empty state -->
+        <div id="allocations-empty" class="hidden text-center py-12">
+        </div>
+    </div>
+</main>
+
+<script>
+    const serverId = new URLSearchParams(window.location.search).get('id');
+
+    // Function to load server details
+    function loadServerDetails() {
+        document.getElementById('allocations-loading').classList.remove('hidden');
+        document.getElementById('allocations-list').classList.add('hidden');
+        document.getElementById('allocations-empty').classList.add('hidden');
+
+        fetch(`/api/server/${serverId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('server-name').textContent = data.attributes.name;
+                document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
+                document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
+                updateAllocationsList(data.attributes.relationships.allocations.data);
+            })
+            .catch(error => {
+                console.error('Error fetching server details:', error);
+                showError('Failed to load server details. Please try again.');
+            })
+            .finally(() => {
+                document.getElementById('allocations-loading').classList.add('hidden');
+            });
+    }
+
+    // Function to update the allocations list
+    function updateAllocationsList(allocations) {
+        const allocationsList = document.getElementById('allocations-list');
+        const emptyState = document.getElementById('allocations-empty');
+
+        if (!allocations || allocations.length === 0) {
+            emptyState.classList.remove('hidden');
+            allocationsList.classList.add('hidden');
+            return;
+        }
+
+        allocationsList.classList.remove('hidden');
+        emptyState.classList.add('hidden');
+        allocationsList.innerHTML = '';
+
+        allocations.forEach(allocation => {
+            const allocationElement = document.createElement('div');
+            allocationElement.className = 'flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors duration-200';
+            
+            const ipInfo = document.createElement('div');
+            ipInfo.className = 'flex-grow space-y-1';
+            ipInfo.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <span class="text-white font-medium">${allocation.attributes.ip_alias}:${allocation.attributes.port}</span>
+                    ${allocation.attributes.is_default ? `
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Default
+                        </span>
+                    ` : ''}
+                </div>
+                <div class="text-sm text-gray-400">
+                    <span class="inline-flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                        Internal address ${allocation.attributes.ip || 'No direct IP'}, port ${allocation.attributes.port}
+                    </span>
+                </div>
+            `;
+
+            allocationElement.appendChild(ipInfo);
+
+            if (!allocation.attributes.is_default) {
+                const actions = document.createElement('div');
+                actions.className = 'mt-3 sm:mt-0 sm:ml-4';
+                actions.innerHTML = `
+                    <button onclick="deleteAllocation('${allocation.id}')" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-red-400 hover:text-red-300 hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                        Delete
+                    </button>
+                `;
+                allocationElement.appendChild(actions);
+            }
+
+            allocationsList.appendChild(allocationElement);
+        });
+    }
+
+    // Function to show error message
+    function showError(message) {
+        const errorDiv = document.getElementById('allocation-error');
+        errorDiv.querySelector('span').textContent = message;
+        errorDiv.classList.remove('hidden');
+        setTimeout(() => {
+            errorDiv.classList.add('hidden');
+        }, 5000);
+    }
+
+    // Function to create new allocation
+    document.getElementById('create-allocation').addEventListener('click', function() {
+        const button = this;
+        button.disabled = true;
+        button.innerHTML = `
+            <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Creating...
+        `;
+        
+        fetch(`/api/server/${serverId}/allocations`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to create allocation');
+            }
+            return response.json();
+        })
+        .then(data => {
+            loadServerDetails();
+        })
+        .catch(error => {
+            showError('You have reached the maximum number of allocations');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Add Allocation
+            `;
+        });
+    });
+
+    // Function to delete allocation
+    function deleteAllocation(allocationId) {
+        if (!confirm('Are you sure you want to delete this allocation?')) {
+            return;
+        }
+
+        fetch(`/api/server/${serverId}/allocations/${allocationId}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete allocation');
+            }
+            loadServerDetails();
+        })
+        .catch(error => {
+            showError('Failed to delete allocation. Please try again.');
+        });
+    }
+
+    // Load server details when the page loads
+    document.addEventListener('DOMContentLoaded', loadServerDetails);
+</script>
+
+<%- include('../components/bottom') %>

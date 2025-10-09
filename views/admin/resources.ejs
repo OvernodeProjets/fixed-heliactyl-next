@@ -1,0 +1,80 @@
+<%- include('../components/top') %>
+<!-- Main Content -->
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center w-full mx-auto pb-4">
+        <div class="flex flex-col">
+            <h1 class="text-xl font-semibold mb-0.5" style="font-family: 'Inter';">Admin: Manage Resources</h1>
+            <p class="text-gray-400 text-md">Set or add resources to user accounts.</p>
+        </div>
+    </div>
+
+    <% if (req.query.err === 'none') { %>
+        <div class="mb-8 p-4 bg-green-600 rounded-2xl">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span class="text-white font-semibold">Operation completed successfully!</span>
+            </div>
+        </div>
+    <% } %>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Set Resources Form -->
+        <div class="bg-white/5 p-6 rounded-2xl">
+            <h2 class="text-lg font-semibold text-white mb-4">Set Resources</h2>
+            <form action="/setresources" method="GET">
+                <div class="mb-4">
+                    <label for="setresources-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                    <input type="text" id="setresources-id" name="id" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="setresources-ram" class="block text-sm font-medium text-gray-300 mb-2">RAM (MB)</label>
+                    <input type="number" id="setresources-ram" name="ram" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="setresources-disk" class="block text-sm font-medium text-gray-300 mb-2">Disk (MB)</label>
+                    <input type="number" id="setresources-disk" name="disk" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="setresources-cpu" class="block text-sm font-medium text-gray-300 mb-2">CPU (%)</label>
+                    <input type="number" id="setresources-cpu" name="cpu" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="setresources-servers" class="block text-sm font-medium text-gray-300 mb-2">Servers</label>
+                    <input type="number" id="setresources-servers" name="servers" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <button type="submit" class="w-full bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">Set Resources</button>
+            </form>
+        </div>
+
+        <!-- Add Resources Form -->
+        <div class="bg-white/5 p-6 rounded-2xl">
+            <h2 class="text-lg font-semibold text-white mb-4">Add Resources</h2>
+            <form action="/addresources" method="GET">
+                <div class="mb-4">
+                    <label for="addresources-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                    <input type="text" id="addresources-id" name="id" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="addresources-ram" class="block text-sm font-medium text-gray-300 mb-2">RAM to Add (MB)</label>
+                    <input type="number" id="addresources-ram" name="ram" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="addresources-disk" class="block text-sm font-medium text-gray-300 mb-2">Disk to Add (MB)</label>
+                    <input type="number" id="addresources-disk" name="disk" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="addresources-cpu" class="block text-sm font-medium text-gray-300 mb-2">CPU to Add (%)</label>
+                    <input type="number" id="addresources-cpu" name="cpu" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="addresources-servers" class="block text-sm font-medium text-gray-300 mb-2">Servers to Add</label>
+                    <input type="number" id="addresources-servers" name="servers" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <button type="submit" class="w-full bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">Add Resources</button>
+            </form>
+        </div>
+    </div>
+</main>
+<%- include('../components/bottom') %>

@@ -1,0 +1,291 @@
+<%- include('../components/top') %>
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="mb-5 lg:flex lg:items-center lg:justify-between">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight" id="server-name"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg></h2>
+          <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path fill-rule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Zm9.586 4.594a.75.75 0 0 0-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.116-.062l3-3.75Z" clip-rule="evenodd" />
+              </svg>                    
+              <span id="server-description"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg></span>
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path d="M4.08 5.227A3 3 0 0 1 6.979 3H17.02a3 3 0 0 1 2.9 2.227l2.113 7.926A5.228 5.228 0 0 0 18.75 12H5.25a5.228 5.228 0 0 0-3.284 1.153L4.08 5.227Z" />
+                <path fill-rule="evenodd" d="M5.25 13.5a3.75 3.75 0 1 0 0 7.5h13.5a3.75 3.75 0 1 0 0-7.5H5.25Zm10.5 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm3.75-.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" clip-rule="evenodd" />
+              </svg>              
+              Server <%= req.query.id %>
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 0 0 .374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 0 0-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08Zm3.094 8.016a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+              </svg>              
+              Volumetric Shield enabled
+            </div>
+          </div>
+        </div>
+        <div class="mt-5 flex lg:mt-0 lg:ml-4">
+          <span class="hidden sm:block">
+            <a href="/servers" class="inline-flex items-center rounded-xl border border-transparent bg-indigo-900/50 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-800">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
+                <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+              </svg>                
+              Back to server list
+            </a>
+          </span>
+        </div>
+    </div>
+
+<%- include('../components/server') %>
+
+    <!-- Subdomains Section -->
+    <div class="bg-white/5 rounded-xl p-6">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-xl font-semibold text-white">Subdomains</h2>
+                <p class="text-gray-400 text-sm mt-1">Add custom domains to your server (Maximum 2)</p>
+            </div>
+            <button id="create-subdomain" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 hover:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Add Domain
+            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="subdomains-loading" class="text-center py-12">
+            <svg class="animate-spin h-8 w-8 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+
+        <!-- Subdomains List -->
+        <div id="subdomains-list" class="hidden space-y-4">
+            <!-- Subdomains will be populated here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="subdomains-empty" class="hidden text-center py-12">
+            <div class="mx-auto h-16 w-16 bg-white/5 flex items-center justify-center rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-gray-500">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                </svg>
+            </div>
+            <h3 class="mt-4 text-lg font-medium text-white">No domains configured</h3>
+            <p class="mt-2 text-gray-400">Add a custom domain to make your server easier to remember</p>
+        </div>
+    </div>
+</main>
+
+<!-- Create Subdomain Modal -->
+<div id="create-subdomain-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+    <div class="bg-[#1a1c20] rounded-xl p-6 w-full max-w-md">
+        <h3 class="text-xl font-semibold text-white mb-4">Add Custom Domain</h3>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Subdomain Name</label>
+                <div class="flex items-center">
+                    <input type="text" id="subdomain-input" class="flex-1 p-3 bg-black/20 text-white border border-transparent rounded-l-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition" placeholder="Enter subdomain">
+                    <span class="bg-black/30 text-gray-400 py-3 px-4 rounded-r-lg border-l border-white/10">.fractal.limited</span>
+                </div>
+                <p class="mt-2 text-sm text-gray-400">Only letters, numbers, and hyphens allowed</p>
+            </div>
+        </div>
+        <div class="mt-6 flex justify-end space-x-3">
+            <button id="cancel-create" class="px-4 py-2 bg-zinc-600 hover:bg-zinc-700 text-white rounded-lg transition">Cancel</button>
+<button id="confirm-create" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition">Create</button>
+        </div>
+    </div>
+</div>
+
+<!-- Error/Success Toast -->
+<div id="toast" class="fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg hidden"></div>
+
+<script>
+    const serverId = new URLSearchParams(window.location.search).get('id');
+    
+    // Load server details and subdomains
+    function loadServerDetails() {
+        fetch(`/api/server/${serverId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('server-name').textContent = data.attributes.name;
+                document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
+            })
+            .catch(error => {
+                console.error('Error fetching server details:', error);
+                showToast('Failed to load server details', 'error');
+            });
+    }
+
+    function loadSubdomains() {
+        document.getElementById('subdomains-loading').classList.remove('hidden');
+        document.getElementById('subdomains-list').classList.add('hidden');
+        document.getElementById('subdomains-empty').classList.add('hidden');
+
+        fetch(`/api/server/${serverId}/subdomains`)
+            .then(response => response.json())
+            .then(data => {
+                const subdomainsList = document.getElementById('subdomains-list');
+                subdomainsList.innerHTML = '';
+
+                if (!data.subdomains || data.subdomains.length === 0) {
+                    document.getElementById('subdomains-empty').classList.remove('hidden');
+                    return;
+                }
+
+                subdomainsList.classList.remove('hidden');
+                data.subdomains.forEach(subdomain => {
+                    const subdomainCard = createSubdomainCard(subdomain);
+                    subdomainsList.appendChild(subdomainCard);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading subdomains:', error);
+                showToast('Failed to load subdomains', 'error');
+            })
+            .finally(() => {
+                document.getElementById('subdomains-loading').classList.add('hidden');
+            });
+    }
+
+function createSubdomainCard(subdomain) {
+    const div = document.createElement('div');
+    div.className = 'bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors duration-200';
+    
+    div.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div class="space-y-1">
+                <div class="flex items-center space-x-2">
+                    <h3 class="text-white font-medium">${subdomain.name}.${subdomain.domain}</h3>
+                    <span class="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-300">Active</span>
+                </div>
+                <p class="text-sm text-gray-400 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                    </svg>
+                    Created: ${(new Date(subdomain.createdAt)).toDateString()}
+                </p>
+            </div>
+            <button onclick="deleteSubdomain('${subdomain.name}')" class="text-red-400 hover:text-red-300 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                </svg>
+            </button>
+        </div>
+    `;
+    return div;
+}
+
+    // Modal handling
+    const modal = document.getElementById('create-subdomain-modal');
+    const createBtn = document.getElementById('create-subdomain');
+    const cancelBtn = document.getElementById('cancel-create');
+    const confirmBtn = document.getElementById('confirm-create');
+
+    createBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        document.getElementById('subdomain-input').value = '';
+    });
+
+    confirmBtn.addEventListener('click', createSubdomain);
+
+    function createSubdomain() {
+        const subdomain = document.getElementById('subdomain-input').value.trim();
+        
+        if (!subdomain) {
+            showToast('Please enter a subdomain name', 'error');
+            return;
+        }
+
+        if (!/^[a-z0-9-]+$/i.test(subdomain)) {
+            showToast('Invalid subdomain format', 'error');
+            return;
+        }
+
+        fetch(`/api/server/${serverId}/subdomains`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ subdomain })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to create subdomain');
+            return response.json();
+        })
+        .then(data => {
+            modal.classList.add('hidden');
+            document.getElementById('subdomain-input').value = '';
+            showToast('Domain added successfully', 'success');
+            loadSubdomains();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast(error.message || 'Failed to create subdomain', 'error');
+        });
+    }
+
+function deleteSubdomain(subdomain) {
+    if (!confirm(`Are you sure you want to delete ${subdomain}.fractal.limited?`)) return;
+
+    fetch(`/api/server/${serverId}/subdomains/${subdomain}`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Failed to delete subdomain');
+        showToast('Domain deleted successfully', 'success');
+        loadSubdomains();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Failed to delete subdomain', 'error');
+    });
+}
+
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.className = `fixed bottom-4 right-4 px-6 py-3 z-50 rounded-lg shadow-lg ${
+            type === 'success' ? 'bg-green-500' : 'bg-red-500'
+        } text-white flex items-center space-x-2`;
+        
+        toast.innerHTML = `
+            ${type === 'success' ? `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+            ` : `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+            `}
+            <span>${message}</span>
+        `;
+        
+        toast.classList.remove('hidden');
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 3000);
+    }
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', () => {
+        loadServerDetails();
+        loadSubdomains();
+    });
+</script>
+<%- include('../components/bottom') %>

@@ -1,0 +1,245 @@
+<% if (!req.query.id || !req.query.numeric) { %>
+<meta http-equiv="refresh" content="0; url=/servers?err=INVALID">
+<% } %>
+
+<nav class="relative z-50 mb-6">
+    <!-- Mobile Menu Button -->
+    <div class="md:hidden">
+        <button id="mobile-menu-button" class="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <span>Menu</span>
+        </button>
+    </div>
+
+    <!-- Navigation Items -->
+    <div id="menu-items" class="hidden md:block">
+        <div class="rounded-full bg-white/5 backdrop-blur-xl p-1.5 inline-flex items-center">
+<% if (req.query.mode !== "rdp") { %>
+            <!-- Core Server Management -->
+            <a href="/server/manage?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+                Console
+            </a>
+<% if (req.query.mode !== "vm") { %>
+            <a href="/server/files?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+                Files
+            </a>
+<% } else { %>
+            <a href="/server/files?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+                Container
+            </a>
+<% } %>
+<% if (req.query.mode !== "vm") { %>
+            <a href="/server/backups?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+                Backups
+            </a>
+            
+            <!-- Server Content -->
+            <a href="/server/players?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+                Players
+            </a>
+            <a href="/server/worlds?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+                Worlds
+            </a>
+            <a href="/server/plugins?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+                Plugins
+            </a>
+            
+<% } %>
+<% if (req.query.mode !== "vm") { %>
+            <!-- Configuration -->
+            <a href="/server/allocations?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+                Allocations
+            </a>
+<% } else { %>
+            <a href="/server/allocations?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+                Networking
+            </a>
+<% } %>
+            <a href="/server/settings?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+                Settings
+            </a>
+            
+            <!-- More Dropdown -->
+            <div class="relative">
+                <button id="more-menu-button" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95 flex items-center space-x-1">
+                    <span>More</span>
+                    <svg class="w-4 h-4 transition-transform duration-200 group-data-[state=open]:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <div id="more-menu-content" class="backdrop-blur-xl hidden opacity-0 transform scale-95 absolute right-0 mt-2 w-56 transition-all duration-200">
+                    <div class="rounded-xl bg-[#0e0e10] backdrop-blur-xl border border-white/10 shadow-xl">
+                        <!-- Monitoring -->
+                        <div class="p-1.5">
+                            <div class="px-3 py-1.5 text-xs font-medium text-white/70 uppercase tracking-wider">
+                                Monitoring
+                            </div>
+                            <a href="/server/statistics?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link block rounded-lg px-3 py-1.5 text-sm text-gray-300 hover:text-indigo-300 hover:bg-indigo-500/20 transition-all duration-200">
+                                Statistics
+                            </a>
+                            <a href="/server/logs?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link block rounded-lg px-3 py-1.5 text-sm text-gray-300 hover:text-indigo-300 hover:bg-indigo-500/20 transition-all duration-200">
+                                Activity Logs
+                            </a>
+                        </div>
+
+                        <!-- Monitoring -->
+                        <div class="p-1.5 border-t border-white/10">
+                            <div class="px-3 py-1.5 text-xs font-medium text-white/70 uppercase tracking-wider">
+                                Network
+                            </div>
+                            <a href="/server/subdomains?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link block rounded-lg px-3 py-1.5 text-sm text-gray-300 hover:text-indigo-300 hover:bg-indigo-500/20 transition-all duration-200">
+                                Subdomains
+                            </a>
+                        </div>
+
+                        <% if (req.query.numeric !== '0') { %>
+                        <!-- User Management -->
+                        <div class="p-1.5 border-t border-white/10">
+                            <div class="px-3 py-1.5 text-xs font-medium text-white/70 uppercase tracking-wider">
+                                User Access
+                            </div>
+                            <a href="/server/subusers?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link block rounded-lg px-3 py-1.5 text-sm text-gray-300 hover:text-indigo-300 hover:bg-indigo-500/20 transition-all duration-200">
+                                Subusers
+                            </a>
+                        </div>
+                        <% } %>
+
+                        <!-- Advanced Management -->
+                        <div class="p-1.5 border-t border-white/10">
+                            <div class="px-3 py-1.5 text-xs font-medium text-white/70 uppercase tracking-wider">
+                                Management
+                            </div>
+                            <a href="/server/automations?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link block rounded-lg px-3 py-1.5 text-sm text-gray-300 hover:text-indigo-300 hover:bg-indigo-500/20 transition-all duration-200">
+                                Automations
+                            </a>
+                            <a href="/server/transfer?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link block rounded-lg px-3 py-1.5 text-sm text-gray-300 hover:text-indigo-300 hover:bg-indigo-500/20 transition-all duration-200">
+                                Transfer
+                            </a>
+                            <a href="/server/advanced?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link block rounded-lg px-3 py-1.5 text-sm text-gray-300 hover:text-indigo-300 hover:bg-indigo-500/20 transition-all duration-200">
+                                Advanced
+                            </a>
+                        </div>
+
+                        <!-- Import Tools -->
+                        <div class="p-1.5 border-t border-white/10">
+                            <div class="px-3 py-1.5 text-xs font-medium text-white/70 uppercase tracking-wider">
+                                Tools
+                            </div>
+                            <a href="/server/import?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link block rounded-lg px-3 py-1.5 text-sm text-gray-300 hover:text-indigo-300 hover:bg-indigo-500/20 transition-all duration-200">
+                                Import via SFTP
+                            </a>
+                        </div>
+
+                        <div class="p-1.5 border-t border-white/10">
+                            <div class="px-3 py-1.5 text-xs font-medium text-white/70 uppercase tracking-wider">
+                                Resources
+                            </div>
+                            <a href="/servers/edit?numeric=<%= req.query.numeric %>" class="srv-link block rounded-lg px-3 py-1.5 text-sm text-gray-300 hover:text-indigo-300 hover:bg-indigo-500/20 transition-all duration-200">
+                                Change RAM, CPU or disk
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<% } else { %>
+            <a href="/server/rdp?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "rdp" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+                VNC
+            </a>
+            <a href="/server/power?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "rdp" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+                Power Actions
+            </a>
+            <a href="/server/settings?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "rdp" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+                Settings
+            </a>
+<% } %>
+        </div>
+    </div>
+</nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const currentPath = window.location.pathname;
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const menuItems = document.getElementById('menu-items');
+    const moreMenuButton = document.getElementById('more-menu-button');
+    const moreMenuContent = document.getElementById('more-menu-content');
+    
+    // Active link highlighting
+    document.querySelectorAll('.srv-link').forEach(link => {
+        const href = link.getAttribute('href')?.split('?')[0];
+        if (href && currentPath.includes(href)) {
+            link.classList.add('bg-indigo-500/20', 'text-indigo-300');
+        }
+    });
+
+    // Mobile menu toggle
+    mobileMenuButton?.addEventListener('click', () => {
+        menuItems.classList.toggle('hidden');
+    });
+
+    // More menu handling
+    let isMoreMenuOpen = false;
+    let closeTimeout;
+
+    const openMoreMenu = () => {
+        isMoreMenuOpen = true;
+        moreMenuButton.setAttribute('data-state', 'open');
+        moreMenuContent.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            moreMenuContent.classList.remove('opacity-0', 'scale-95');
+            moreMenuContent.classList.add('opacity-100', 'scale-100');
+        });
+    };
+
+    const closeMoreMenu = () => {
+        isMoreMenuOpen = false;
+        moreMenuButton.setAttribute('data-state', 'closed');
+        moreMenuContent.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => {
+            if (!isMoreMenuOpen) {
+                moreMenuContent.classList.add('hidden');
+            }
+        }, 200);
+    };
+
+    moreMenuButton.addEventListener('mouseenter', () => {
+        clearTimeout(closeTimeout);
+        openMoreMenu();
+    });
+
+    moreMenuContent.addEventListener('mouseenter', () => {
+        clearTimeout(closeTimeout);
+        openMoreMenu();
+    });
+
+    moreMenuButton.addEventListener('mouseleave', (event) => {
+        if (!event.relatedTarget?.closest('#more-menu-content')) {
+            closeTimeout = setTimeout(closeMoreMenu, 200);
+        }
+    });
+
+    moreMenuContent.addEventListener('mouseleave', (event) => {
+        if (!event.relatedTarget?.closest('#more-menu-button')) {
+            closeTimeout = setTimeout(closeMoreMenu, 200);
+        }
+    });
+
+    // Close menus when clicking outside
+    document.addEventListener('click', (event) => {
+        const isClickInMoreMenu = event.target.closest('#more-menu-button, #more-menu-content');
+        const isClickInMobileMenu = event.target.closest('#mobile-menu-button, #menu-items');
+
+        if (!isClickInMoreMenu && isMoreMenuOpen) {
+            closeMoreMenu();
+        }
+
+        if (!isClickInMobileMenu && !menuItems.classList.contains('hidden') && window.innerWidth < 768) {
+            menuItems.classList.add('hidden');
+        }
+    });
+});
+</script>

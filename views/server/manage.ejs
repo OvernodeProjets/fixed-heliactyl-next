@@ -1,0 +1,1207 @@
+<%- include('../components/top') %>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+<% if (req.query.mode == "rdp") { %>
+<script>
+window.location.href = "/server/rdp?id=<%=req.query.id%>&numeric=<%=req.query.numeric%>&mode=rdp"
+</script>
+<% } %>
+<style>
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  #console-output {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.2;
+  }
+  .console-line {
+    padding: 4px 6px;
+    margin: 1px 0;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .console-line:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  .console-line-content {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .console-line-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+    font-size: 0.7rem;
+  }
+  .console-line:hover .console-line-info {
+    opacity: 1;
+  }
+  .copy-icon, .tick-icon {
+    cursor: pointer;
+display:none;
+    width: 12px;
+    height: 12px;
+  }
+  .internal-icon {
+    margin-right: 2px;
+    color: #fbbf24;
+    width: 12px;
+    height: 12px;
+  }
+  #console-output::-webkit-scrollbar {
+    width: 6px;
+  }
+  #console-output::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  #console-output::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .slide-in {
+    animation: slideIn 0.3s ease-out forwards;
+  }
+  .transition-all {
+    transition: all 0.3s ease;
+  }
+  .hover-scale {
+    transition: transform 0.2s ease;
+  }
+  .card {
+    background-color: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  .card:hover {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+  }
+  .loading-spinner {
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 3px solid #fff;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .fade-out {
+    animation: fadeOut 0.5s ease-out forwards;
+  }
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+</style>
+
+<main class="flex-grow container mx-auto px-4 py-8 transition-all">
+    <div class="mb-5 lg:flex lg:items-center lg:justify-between">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight" id="server-name"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg></h2>
+          <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/briefcase -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path fill-rule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Zm9.586 4.594a.75.75 0 0 0-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.116-.062l3-3.75Z" clip-rule="evenodd" />
+              </svg>                    
+              <span id="server-description"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg></span>
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/map-pin -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path d="M4.08 5.227A3 3 0 0 1 6.979 3H17.02a3 3 0 0 1 2.9 2.227l2.113 7.926A5.228 5.228 0 0 0 18.75 12H5.25a5.228 5.228 0 0 0-3.284 1.153L4.08 5.227Z" />
+                <path fill-rule="evenodd" d="M5.25 13.5a3.75 3.75 0 1 0 0 7.5h13.5a3.75 3.75 0 1 0 0-7.5H5.25Zm10.5 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm3.75-.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" clip-rule="evenodd" />
+              </svg>              
+              Server <%= req.query.id %>
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/currency-dollar -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 0 0 .374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 0 0-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08Zm3.094 8.016a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+              </svg>              
+              Volumetric Shield enabled
+            </div>
+            <div class="hidden mt-2 flex items-center text-sm text-gray-300">
+              <!-- Heroicon name: mini/calendar -->
+              <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clip-rule="evenodd" />
+              </svg>
+              <span id="server-name-breadcrumb"></span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-5 flex lg:mt-0 lg:ml-4">
+          <span class="hidden sm:block">
+            <a href="/servers" class="inline-flex items-center rounded-xl border border-transparent bg-indigo-900/50 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-800">
+              <!-- Heroicon name: mini/pencil -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
+                <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+              </svg>                
+              Back to server list
+            </a>
+          </span>
+        </div>
+      </div>      
+
+    <%- include('../components/server') %>
+
+<% if (req.query.mode == "vm") { %>
+
+<div class="bg-gradient-to-r from-indigo-500/10 to-indigo-600/15 border border-indigo-500/10 rounded-3xl p-6 pl-12 mb-8 container mx-auto mt-8">
+    <div class="flex items-center justify-between">
+        <div class="space-y-4">
+            <h2 class="text-2xl heavy font-semibold text-white">Fractal virtual machines</h2>
+            <p class="text-white/60">This is a beta experience and is not suitable for production environments. Please report any bugs or issues you find via our Discord. The administrator account's password will be <code class="font-mono">fractal</code>.</p>
+        </div>
+        <div class="hidden md:block">
+            <img src="https://i.imgur.com/NUDxhDy.png" alt="d" class="rounded-lg w-[300px] shadow-sm h-[190px] object-cover" />
+        </div>
+    </div>
+</div>
+
+<% } %>
+
+    <div id="alert-container" class="mb-4 space-y-2"></div>
+
+<div id="backup-warning" class="hidden" style="animation: slideDown 0.5s ease-out;">
+  <div class="bg-red-900/50 rounded-xl p-5 mb-4">
+    <div class="flex items-center">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-lg font-medium heavy text-red-300" id="countdown-text">
+          Critical: Backup Required
+        </h3>
+        <div class="text-sm text-red-200">
+          <p id="warning-message">
+            Your server is on an Singapore node scheduled for prolonged maintenance. Please backup all important data before 
+            <span id="local-time"></span>. Time remaining: <span id="countdown"></span>. You can temporarily move to a location such as Frankfurt, New York or similar until the location is available again.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div class="lg:col-span-3 space-y-6">
+            <div class="card rounded-xl p-6">
+                <h2 class="text-xl font-semibold heavy">Console</h2>
+                <span class="text-gray-300 text-sm mt-1 mb-4">Send commands to your server, view important logs and more.</span>
+<div class="border-t border-white/5 mt-4"></div>
+                <div style="height: 30rem;" id="console-output" class="bg-black/20 p-4 rounded-xl border border-white/5 shadow-sm scrollbar-hide mt-4 overflow-y-auto mb-4 font-mono text-sm">
+                </div>
+                <div class="flex border-t border-white/5 pt-4">
+                    <input type="text" id="console-input" class="flex-grow border-none bg-transparent text-white py-2 focus:border-white/5 focus:outline-none focus:ring-2 focus:ring-transparent transition placeholder-white/30" placeholder="container@fractal~">
+                    <button id="send-command" class="bg-indigo-500/15 hover:bg-indigo-500/20 text-indigo-200 font-medium py-2 px-4 rounded-xl transition duration-300">
+                        Send command <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mb-0.5 inline-flex ml-1">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+</svg>
+
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white/5 rounded-l-2xl rounded-lg p-6">
+                    <h3 class="text-sm font-semibold mb-2 text-white/60">CPU Usage</h3>
+                    <div class="flex items-center">
+                        <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
+                            <div class="bg-indigo-500 h-2 rounded-full transition-all" id="cpu-usage-bar" style="width: 0%"></div>
+                        </div>
+                        <span id="cpu-usage" class="text-sm font-medium">0%</span>
+                    </div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-6">
+                    <h3 class="text-sm font-semibold mb-2 text-white/60">Memory Usage</h3>
+                    <div class="flex items-center">
+                        <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
+                            <div class="bg-indigo-500 h-2 rounded-full transition-all" id="ram-usage-bar" style="width: 0%"></div>
+                        </div>
+                        <span id="ram-usage" class="text-sm font-medium">0MB</span>
+                    </div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-6">
+                    <h3 class="text-sm font-semibold mb-2 text-white/60">Disk Usage</h3>
+                    <div class="flex items-center">
+                        <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
+                            <div class="bg-indigo-500 h-2 rounded-full transition-all" id="disk-usage-bar" style="width: 0%"></div>
+                        </div>
+                        <span id="disk-usage" class="text-sm font-medium">0MB</span>
+                    </div>
+                </div>
+                <div class="bg-white/5 rounded-r-2xl rounded-lg p-6">
+                    <h3 class="text-sm font-semibold mb-2 text-white/60">Network (Outbound)</h3>
+                    <div class="flex items-center">
+                        <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
+                            <div class="bg-indigo-500 h-2 rounded-full transition-all" id="network-usage-bar" style="width: 0%"></div>
+                        </div>
+                        <span id="network-usage" class="text-sm font-medium">0B</span>
+                    </div>
+                </div>
+            </div>
+
+<div class="card rounded-xl p-6">
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h2 class="text-xl font-semibold heavy">Server Renewal</h2>
+            <span class="text-gray-300 text-sm mt-1">Your server needs to be renewed every 48 hours to prevent automatic shutdown</span>
+        </div>
+        <div id="renewal-badge" class="hidden px-3 py-1 rounded-full text-sm font-medium">
+        </div>
+    </div>
+
+    <div class="bg-white/5 rounded-xl p-4 mb-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/10 rounded-xl p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-300">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400">Next Renewal</div>
+                    <div id="renewal-time" class="text-lg font-medium">Loading...</div>
+                </div>
+            </div>
+            <button id="renew-server" disabled class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-xl transition duration-300 hover-scale hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline-block mr-1 mb-0.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+                Renew Now
+            </button>
+        </div>
+                <div class="mt-4">
+    <div class="w-full bg-white/10 rounded-2xl h-2">
+        <div id="renewal-progress-bar" class="bg-emerald-600 h-2 rounded-full transition-all" style="width: 100%"></div>
+    </div>
+</div>
+    </div>
+
+    <div class="text-sm text-gray-400">
+        <div class="flex items-center mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2 text-indigo-500">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+</svg>
+            Why do I need to renew my server?
+        </div>
+        <p class="ml-6">
+            To ensure optimal resource allocation and prevent inactive servers from consuming resources, all servers must be renewed every 48 hours. Servers that aren't renewed will be automatically stopped until renewed. This helps us maintain good performance for active users and reduce unnecessary resource usage.
+        </p>
+    </div>
+
+    <div class="text-sm text-gray-400 pt-3.5">
+        <div class="flex items-center mb-2">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2 text-indigo-500">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15.91 11.672a.375.375 0 0 1 0 .656l-5.603 3.113a.375.375 0 0 1-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112Z" />
+</svg>
+
+            When can I renew?
+        </div>
+        <p class="ml-6">
+            At the 24 hour mark you can renew your server (a button will pop up). It's as simple as just clicking "Renew Now" and that's it.
+        </p>
+    </div>
+</div>
+        </div>
+
+        <div>
+<div class="flex space-x-2 mb-4">
+    <button id="start-server" class="heavy h-12 w-12 hover:scale-95 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed" title="Start Server">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 mx-auto">
+            <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
+        </svg>
+    </button>
+    <button id="restart-server" class="heavy h-12 w-12 hover:scale-95 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed" title="Restart Server">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 mx-auto">
+            <path fill-rule="evenodd" d="M4.755 10.059a7.5 7.5 0 0 1 12.548-3.364l1.903 1.903h-3.183a.75.75 0 1 0 0 1.5h4.992a.75.75 0 0 0 .75-.75V4.356a.75.75 0 0 0-1.5 0v3.18l-1.9-1.9A9 9 0 0 0 3.306 9.67a.75.75 0 1 0 1.45.388Zm15.408 3.352a.75.75 0 0 0-.919.53 7.5 7.5 0 0 1-12.548 3.364l-1.902-1.903h3.183a.75.75 0 0 0 0-1.5H2.984a.75.75 0 0 0-.75.75v4.992a.75.75 0 0 0 1.5 0v-3.18l1.9 1.9a9 9 0 0 0 15.059-4.035.75.75 0 0 0-.53-.918Z" clip-rule="evenodd" />
+        </svg>
+    </button>
+    <button id="stop-server" class="heavy h-12 w-12 hover:scale-95 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed" title="Stop Server">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 mx-auto">
+            <path fill-rule="evenodd" d="M4.5 7.5a3 3 0 0 1 3-3h9a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3v-9Z" clip-rule="evenodd" />
+        </svg>
+    </button>
+    <div onclick="window.location.href='/server/settings?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>'" style="font-family: 'Inter'; width: 6.5rem;" class=" h-12 hover:bg-white/10 hover:scale-95 cursor-pointer bg-white/5 transition rounded-lg flex pt-4 justify-center p-1 text-xs">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 text-white/50 inline-flex mr-0.5">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0 0 15 0m-15 0a7.5 7.5 0 1 1 15 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077 1.41-.513m14.095-5.13 1.41-.513M5.106 17.785l1.15-.964m11.49-9.642 1.149-.964M7.501 19.795l.75-1.3m7.5-12.99.75-1.3m-6.063 16.658.26-1.477m2.605-14.772.26-1.477m0 17.726-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205 12 12m6.894 5.785-1.149-.964M6.256 7.178l-1.15-.964m15.352 8.864-1.41-.513M4.954 9.435l-1.41-.514M12.002 12l-3.75 6.495" />
+</svg>
+Settings
+    </div>
+</div>
+<div class="card rounded-xl p-6">
+    <div class="flex items-center justify-between mb-2">
+        <h2 class="text-lg font-semibold text-white heavy" id="server-name-card">Loading...</h2>
+        <span id="server-status" class="px-2 py-1 rounded-full text-xs font-medium">Loading...</span>
+    </div>
+    <div class="space-y-2 text-sm">
+        <div class="flex items-center text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+            </svg>
+            <span id="cpu-usage-card">0%</span>
+        </div>
+        <div class="flex items-center text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            <span id="ram-usage-card"><span id="ram-usage-card2">0 MB</span> / <span id="ram-limit-card">0 MB</span></span>
+        </div>
+        <div class="flex items-center text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <span id="disk-usage-card"><span id="disk-usage-card2">0 MB</span> / <span id="disk-limit-card">0 MB</span></span>
+        </div>
+<div class="flex items-center text-gray-400">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4 mr-2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z" />
+    </svg>
+    <span id="node">Unknown</span>
+    <a href="/server/transfer?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode %>" class="ml-2 p-1.5 rounded-lg bg-indigo-500/15 text-indigo-300 hover:bg-indigo-500/25 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+        </svg>
+    </a>
+</div>
+        <div class="flex items-center text-gray-400">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4 mr-2">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
+</svg>
+
+            <span id="ip">Unknown</span>
+        </div>
+    </div>
+</div>
+            <div id="players-card" class="card rounded-xl p-6 mt-4 hidden fade-in">
+                <h2 class="text-xl font-semibold mb-4 heavy">Players</h2>
+                <div id="players-list" class="space-y-4">
+                </div>
+<div id="no-players-message" class="text-center py-8 hidden">
+    <!-- Example player avatars with overlap -->
+    <div class="flex justify-center mb-6">
+        <div class="relative inline-flex items-center">
+            <div class="w-8 h-8 rounded-lg overflow-hidden border-2 border-white/10 transform hover:-translate-y-1 transition-all duration-200 relative z-30">
+                <img src="https://mc-heads.net/avatar/xSkay4" alt="Example player" class="w-full h-full" />
+            </div>
+            <div class="w-8 h-8 rounded-lg overflow-hidden border-2 border-white/10 transform hover:-translate-y-1 transition-all duration-200 -ml-4 relative z-20">
+                <img src="https://mc-heads.net/avatar/daiwsy" alt="Example player" class="w-full h-full" />
+            </div>
+            <div class="w-8 h-8 rounded-lg overflow-hidden border-2 border-white/10 transform hover:-translate-y-1 transition-all duration-200 -ml-4 relative z-10">
+                <img src="https://mc-heads.net/avatar/Atqr" alt="Example player" class="w-full h-full" />
+            </div>
+        </div>
+    </div>
+    
+    <!-- Welcome message -->
+    <h3 class="text-lg font-medium text-white mb-2 heavy">No players online!</h3>
+    <p class="text-gray-400 text-sm">Share your server address with friends to begin your adventure</p>
+</div>
+                <div id="player-count" class="text-gray-400 text-xs heavy mt-4 text-center">
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+const serverId = new URLSearchParams(window.location.search).get('id');
+let socket;
+let serverStatus = 'offline';
+let retryCount = 0;
+const maxRetries = 5;
+const retryDelay = 5000; 
+let isMinecraft = false;
+let randomId = () => Math.random().toString(36).substring(2, 8);
+
+function showLoading(elementId) {
+    const element = document.getElementById(elementId);
+    element.innerHTML = '<div class="loading-spinner mx-auto"></div>';
+}
+
+function hideLoading(elementId) {
+    const element = document.getElementById(elementId);
+    element.innerHTML = '';
+}
+
+function showAlert(type, title, message) {
+    const alertContainer = document.getElementById('alert-container');
+    const alertElement = document.createElement('div');
+    alertElement.className = `p-4 rounded-2xl ${type === 'error' ? 'bg-red-600 text-white' : 'bg-amber-600 text-white'} fade-in`;
+    alertElement.innerHTML = `
+        <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            <h3 class="text-lg font-medium">${title}</h3>
+        </div>
+        <p class="mt-2 text-sm">${message}</p>
+    `;
+    alertContainer.appendChild(alertElement);
+    setTimeout(() => {
+        alertElement.classList.add('fade-out');
+        setTimeout(() => alertContainer.removeChild(alertElement), 500);
+    }, 5000);
+}
+
+function fetchServerDetails() {
+    fetch(`/api/server/${serverId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('server-name').textContent = data.attributes.name;
+            document.getElementById('server-name-card').textContent = data.attributes.name;
+            document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
+            document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
+            document.getElementById('node').textContent = data.attributes.node;
+            //document.getElementById('cpu-limit-card').textContent = `${data.attributes.limits.cpu}%`;
+            document.getElementById('ram-limit-card').textContent = `${data.attributes.limits.memory/1024} GiB`;
+            document.getElementById('disk-limit-card').textContent = `${data.attributes.limits.disk/1024} GiB`;
+
+            const defaultAllocation = data.attributes.relationships.allocations.data.find(allocation => allocation.attributes.is_default);
+            if (defaultAllocation) {
+                document.getElementById('ip').textContent = `${defaultAllocation.attributes.ip_alias}:${defaultAllocation.attributes.port}`;
+            }
+
+            if (data.attributes.is_installing) {
+                showAlert('warning', 'Server Provisioning', 'This server is currently provisioning. Some features (such as the console) may be unavailable.');
+            }
+            if (data.attributes.is_suspended) {
+                showAlert('error', 'Server Suspended', 'Please contact Fractal support via the Discord server (discord.gg/frac) to resolve this!');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching server details:', error);
+            showAlert('error', 'Error', 'Failed to load server details. Please try refreshing the page.');
+        })
+        .finally(() => {
+        });
+}
+
+function connectWebSocket() {
+    fetch(`/api/server/${serverId}/websocket`)
+        .then(response => response.json())
+        .then(data => {
+            socket = new WebSocket(data.data.socket);
+
+            socket.onopen = () => {
+                console.log('WebSocket connected');
+                retryCount = 0;
+                socket.send(JSON.stringify({ event: 'auth', args: [data.data.token] }));
+                const alertContainer = document.getElementById('alert-container');
+                const connectionAlert = alertContainer.querySelector('.connection-alert');
+                if (connectionAlert) {
+                    alertContainer.removeChild(connectionAlert);
+                }
+            };
+
+            socket.onclose = (event) => {
+                console.log('WebSocket disconnected');
+                if (retryCount < maxRetries) {
+                    retryCount++;
+                    showAlert('warning', 'Connection Lost', `Attempting to reconnect... (${retryCount}/${maxRetries})`);
+                    setTimeout(connectWebSocket, retryDelay);
+                } else {
+                    showAlert('error', 'Connection Failed', 'Unable to connect after multiple attempts. Please refresh the page.');
+                }
+            };
+
+            socket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            socket.onmessage = handleWebSocketMessage;
+        })
+        .catch(error => {
+            console.error('Error fetching WebSocket credentials:', error);
+            showAlert('error', 'Connection Error', 'Failed to establish connection. Please try refreshing the page.');
+        });
+}
+
+function handleWebSocketMessage(event) {
+    const message = JSON.parse(event.data);
+    
+    switch (message.event) {
+        case 'auth success':
+            console.log('WebSocket authenticated successfully');
+            socket.send(JSON.stringify({ event: 'send logs', args: [null] }));
+            socket.send(JSON.stringify({ event: 'send stats', args: [null] }));
+            setTimeout(() => {
+                socket.send(JSON.stringify({ event: 'send command', args: ['list'] }));
+            }, 1000);
+            break;
+        case 'console output':
+            appendToConsole(message.args[0]);
+            handleMinecraftOutput(message.args[0]);
+      if (message.args[0].includes("You need to agree to the EULA")) {
+        showEulaPopup();
+      }
+if (message.args[0].includes("Ubuntu 22.04.3 LTS ubuntu ttyS0")) {
+socket.send(JSON.stringify({ event: 'send command', args: ['root'] }));
+showAlert('warning', 'Authenticated', 'The VM has been authenticated as user: root.');
+}
+            break;
+        case 'transfer logs':
+            appendToConsole(message.args[0]);
+            break;
+        case 'stats':
+            updateStats(JSON.parse(message.args[0]));
+            break;
+        case 'status':
+            updateServerStatus(message.args[0]);
+            displayStatusUpdate(message.args[0]);
+            break;
+        case 'daemon error':
+            showAlert('error', 'Daemon Error', message.args[0]);
+            break;
+    }
+}
+
+function displayStatusUpdate(status) {
+    let statusColor;
+    switch (status) {
+        case 'running':
+            statusColor = '#a1a1a1';
+            break;
+        case 'stopping':
+        case 'starting':
+            statusColor = '#a1a1a1';
+            break;
+        case 'offline':
+            statusColor = '#a1a1a1';
+            break;
+        default:
+            statusColor = '#a1a1a1';
+    }
+    
+    const statusMessage = `fracd Your server's status is now: ${(status.replace('offline', 'powered off')).replace('running', 'powered on')}`;
+    appendToConsole(statusMessage, true);
+}
+
+function appendToConsole(message, isInternal = false) {
+    const consoleOutput = document.getElementById('console-output');
+    
+    // Replace "Pterodactyl" with "Skyport" and "pterodactyl" with "skyport"
+    message = message.replace(/Pterodactyl/g, "Fractal").replace(/pterodactyl/g, "fractal.compute.edge_" + randomId());
+    message = message.replace('Transfer System', 'Fractal Transfer System')
+
+    // Replace specific messages with more friendly versions
+    const friendlyMessages = {
+        "Checking server disk space usage, this could take a few seconds...": 
+            "<span style=\"color: #a1a1a1\">> fracd</span> Performing container disk usage checks...",
+        "Updating process configuration files...": 
+            "<span style=\"color: #a1a1a1\">> fracd</span> Updating environment...",
+        "Ensuring file permissions are set correctly, this could take a few seconds...": 
+            "<span style=\"color: #a1a1a1\">> fracd</span> Performing file permission checks...",
+        "Pulling Docker container image, this could take a few minutes to complete...": 
+            "<span style=\"color: #a1a1a1\">> fracd</span> Fetching Docker image...",
+        "Finished pulling Docker container image": 
+            "<span style=\"color: #a1a1a1\">> fracd</span> Completed Docker image pull!"
+    };
+
+    // Check if the message matches any friendly replacements
+    for (let [original, friendly] of Object.entries(friendlyMessages)) {
+        if (message.includes(original)) {
+            message = friendly;
+            break;
+        }
+    }
+
+    // Append the transformed message to the console
+    const logElement = createConsoleLogElement(message, isInternal);
+    consoleOutput.appendChild(logElement);
+    
+    // If Docker image pull is complete, append the Skyport Daemon message
+    if (message === "> skyportd Completed Docker image pull!") {
+        const skyportDaemonMessage = "> skyportd Skyport Daemon 0.3.0 (Desiro City)";
+        const daemonLogElement = createConsoleLogElement(skyportDaemonMessage, isInternal);
+        consoleOutput.appendChild(daemonLogElement);
+    }
+
+    smoothScrollConsole();
+}
+
+function createConsoleLogElement(message, isInternal = false) {
+    const now = new Date();
+    const timestamp = now.toLocaleTimeString();
+    
+    const logElement = document.createElement('div');
+    logElement.className = 'console-line slide-in';
+    
+    const contentElement = document.createElement('span');
+    contentElement.className = 'console-line-content';
+    contentElement.innerHTML = formatConsoleOutput(message);
+    
+    const infoElement = document.createElement('span');
+    infoElement.className = 'console-line-info';
+    infoElement.innerHTML = `
+        ${isInternal ? '<svg class="internal-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>' : ''}
+        <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+        </svg>
+        <span class="timestamp">${timestamp}</span>
+    `;
+    
+    logElement.appendChild(contentElement);
+    logElement.appendChild(infoElement);
+    
+    return logElement;
+}
+
+function formatConsoleOutput(text) {
+    // Special ANSI sequence handlers
+    text = text.replace(/\[(\?2004)[hl]/g, ''); // Remove [?2004h/l sequences
+    
+    const colorCodes = {
+        '0': 'all: unset;', // Reset all styles
+        '1': 'font-weight: bold;',
+        '2': 'opacity: 0.8;',
+        '3': 'font-style: italic;',
+        '4': 'text-decoration: underline;',
+        '9': 'text-decoration: line-through;',
+        '30': 'color: #7f8c8d;',  // Softer gray
+        '31': 'color: #e8a09a;',  // Muted red
+        '32': 'color: #a8d3aa;',  // Softer green
+        '33': 'color: #f7e3a0;',  // Warmer yellow
+        '34': 'color: #95c6e8;',  // Lighter blue
+        '35': 'color: #d4b7d5;',  // Softer purple
+        '36': 'color: #a0e3e9;',  // Lighter cyan
+        '37': 'color: #f0f0f0;',  // Warmer white
+        '39': 'color: inherit;',   // Default foreground color
+        '90': 'color: #bdc3c7;',  // Lighter gray
+        '91': 'color: #e0908c;',  // Lighter red
+        '92': 'color: #9ed0a1;',  // Muted green
+        '93': 'color: #f3db94;',  // Muted yellow
+        '94': 'color: #89bfe2;',  // Muted blue
+        '95': 'color: #c9acd0;',  // Muted purple
+        '96': 'color: #8fd9e2;',  // Muted cyan
+        '97': 'color: #ffffff;',  // Pure white
+    };
+
+    // Handle combined codes like [0;1;39m
+    text = text.replace(/\u001b\[(\d+(?:;\d+)*?)m/g, (match, codes) => {
+        const styleArray = codes.split(';')
+            .map(code => colorCodes[code] || '')
+            .filter(style => style !== '');
+            
+        if (styleArray.length === 0) return '</span><span>';
+        return `</span><span style="${styleArray.join(' ')}">`;
+    });
+
+    // Replace [m with reset
+    text = text.replace(/\[m/g, '</span><span>');
+
+    // Handle command formatting
+    const commandRegex = /^(\w+)(\s+.*)?$/;
+    text = text.replace(commandRegex, (match, command, args) => {
+        return `<span style="color: #a1a1a1;">> ${command}</span>${args || ''}`;
+    });
+
+    // Wrap in span to ensure proper closing
+    return `<span>${text}</span>`;
+}
+
+function smoothScrollConsole() {
+    const consoleOutput = document.getElementById('console-output');
+    consoleOutput.scrollTo({
+        top: consoleOutput.scrollHeight,
+        behavior: 'smooth'
+    });
+}
+
+function updateStats(stats) {
+    const cpuUsage = (stats.cpu_absolute / 100).toFixed(2);
+    const ramUsage = (stats.memory_bytes / 1024 / 1024).toFixed(2);
+    const diskUsage = (stats.disk_bytes / 1024 / 1024).toFixed(2);
+    const networkUsage = (stats.network.tx_bytes / 1024).toFixed(2);
+
+    document.getElementById('cpu-usage-card').textContent = `${cpuUsage}%`;
+    document.getElementById('ram-usage-card2').textContent = `${ramUsage} MB`;
+    document.getElementById('disk-usage-card2').textContent = `${diskUsage} MB`;
+
+    updateUsageBar('cpu', cpuUsage, '%');
+    updateUsageBar('ram', ramUsage, 'MB', stats.memory_limit_bytes / 1024 / 1024);
+    updateUsageBar('disk', diskUsage, 'MB', stats.disk_limit_bytes / 1024 / 1024);
+    updateUsageBar('network', networkUsage, 'KB', networkUsage*100);
+}
+
+function updateUsageBar(type, value, unit, max = 100) {
+    const barElement = document.getElementById(`${type}-usage-bar`);
+    const textElement = document.getElementById(`${type}-usage`);
+    
+    const percentage = Math.min((value / max) * 100, 100);
+    barElement.style.width = `${percentage}%`;
+    
+    let displayValue = value;
+    let displayUnit = unit;
+    
+    if (unit === 'MB' && value > 1024) {
+        displayValue = (value / 1024).toFixed(2);
+        displayUnit = 'GiB';
+    } else if (unit === 'KB' && value > 1024) {
+        displayValue = (value / 1024).toFixed(2);
+        displayUnit = 'MiB';
+    }
+    
+    textElement.textContent = `${displayValue}${displayUnit}`;
+
+    // Add color coding based on usage
+    if (percentage > 90) {
+        barElement.classList.add('bg-red-600');
+        barElement.classList.remove('bg-indigo-500', 'bg-emerald-600');
+    } else if (percentage > 75) {
+        barElement.classList.add('bg-indigo-500');
+        barElement.classList.remove('bg-red-600', 'bg-emerald-600');
+    } else {
+        barElement.classList.add('bg-emerald-600');
+        barElement.classList.remove('bg-red-600', 'bg-indigo-500');
+    }
+}
+
+function updateServerStatus(status) {
+    serverStatus = status.replace('offline', 'powered off');
+    const statusElement = document.getElementById('server-status');
+    statusElement.textContent = ((status.charAt(0).toUpperCase() + status.slice(1)).replace('Offline', 'Powered off')).replace('Running', 'Powered on');
+
+    const startButton = document.getElementById('start-server');
+    const stopButton = document.getElementById('stop-server');
+    const restartButton = document.getElementById('restart-server');
+    
+switch (status) {
+    case 'running':
+        startButton.disabled = true;
+        stopButton.disabled = false;
+        restartButton.disabled = false;
+        statusElement.classList.add('text-emerald-500', 'bg-emerald-500/15');
+        statusElement.classList.remove(
+            'text-red-500', 'text-yellow-500',
+            'bg-red-500/15', 'bg-yellow-500/15'
+        );
+        break;
+    case 'offline':
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        restartButton.disabled = true;
+        statusElement.classList.add('text-red-500', 'bg-red-500/15');
+        statusElement.classList.remove(
+            'text-emerald-500', 'text-yellow-500',
+            'bg-emerald-500/15', 'bg-yellow-500/15'
+        );
+        break;
+    case 'starting':
+    case 'stopping':
+        startButton.disabled = true;
+        stopButton.disabled = false;
+        restartButton.disabled = true;
+        statusElement.classList.add('text-yellow-500', 'bg-yellow-500/15');
+        statusElement.classList.remove(
+            'text-emerald-500', 'text-red-500',
+            'bg-emerald-500/15', 'bg-red-500/15'
+        );
+        break;
+    default:
+        startButton.disabled = true;
+        stopButton.disabled = true;
+        restartButton.disabled = true;
+        statusElement.classList.add('text-yellow-500', 'bg-yellow-500/15');
+        statusElement.classList.remove(
+            'text-emerald-500', 'text-red-500',
+            'bg-emerald-500/15', 'bg-red-500/15'
+        );
+}
+}
+
+function handleMinecraftOutput(output) {
+    if (output.includes('There are') && output.includes('players online:')) {
+        isMinecraft = true;
+        const playersCard = document.getElementById('players-card');
+        playersCard.style.display = 'block';
+
+        const playerInfoMatch = output.match(/There are (\d+) of a max of (\d+) players online:(.*)/);
+        if (playerInfoMatch) {
+            const currentPlayers = parseInt(playerInfoMatch[1]);
+            const maxPlayers = parseInt(playerInfoMatch[2]);
+            const playerNamesString = playerInfoMatch[3].trim();
+            const playerNames = currentPlayers > 0 ? 
+                playerNamesString.split(/,\s*/).map(name => name.replace(/^\*|\*$/g, '').trim()) : 
+                [];
+            updatePlayersList(playerNames, maxPlayers);
+        } else {
+            updatePlayersList([], 0);
+        }
+    }
+}
+
+function updatePlayersList(players, maxPlayers) {
+    const playersList = document.getElementById('players-list');
+    const noPlayersMessage = document.getElementById('no-players-message');
+    const playerCount = document.getElementById('player-count');
+    
+    playersList.innerHTML = '';
+    
+    if (players.length === 0) {
+        playersList.style.display = 'none';
+        noPlayersMessage.style.display = 'block';
+    } else {
+        playersList.style.display = 'block';
+        noPlayersMessage.style.display = 'none';
+        
+        players.forEach(player => {
+            const playerItem = document.createElement('div');
+            playerItem.className = 'flex items-center justify-between bg-white/10 rounded-lg p-2 transition-all hover:bg-white/20';
+            playerItem.innerHTML = `
+                <div class="flex items-center">
+                    <img src="https://mc-heads.net/avatar/${encodeURIComponent(player)}" alt="${player}" class="w-8 h-8 rounded-sm mr-2">
+                    <span>${player}</span>
+                </div>
+                <div>
+                    <button onclick="sendPlayerCommand('kick', '${player}')" class="bg-yellow-600 hover:bg-yellow-700 text-white text-xs py-1 px-2 rounded mr-1 transition-colors">Kick</button>
+                    <button onclick="sendPlayerCommand('op', '${player}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-1 px-2 rounded mr-1 transition-colors">Op</button>
+                    <button onclick="sendPlayerCommand('ban', '${player}')" class="bg-red-600 hover:bg-red-700 text-white text-xs py-1 px-2 rounded transition-colors">Ban</button>
+                </div>
+            `;
+            playersList.appendChild(playerItem);
+        });
+    }
+    
+    playerCount.textContent = `${players.length}/${maxPlayers} PLAYERS ONLINE`;
+}
+
+function sendPlayerCommand(action, player) {
+    let command = '';
+    switch (action) {
+        case 'kick':
+            command = `kick ${player}`;
+            break;
+        case 'op':
+            command = `op ${player}`;
+            break;
+        case 'ban':
+            command = `ban ${player}`;
+            break;
+    }
+    if (command && socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ event: 'send command', args: [command] }));
+        console.log(`${action} command sent for player ${player}`);
+    }
+}
+
+// Server control buttons
+document.getElementById('start-server').addEventListener('click', () => sendPowerAction('start'));
+document.getElementById('stop-server').addEventListener('click', () => {
+    if (serverStatus === 'starting' || serverStatus === 'stopping') {
+        sendPowerAction('kill');
+    } else {
+        sendPowerAction('stop');
+    }
+});
+document.getElementById('restart-server').addEventListener('click', () => sendPowerAction('restart'));
+
+function sendPowerAction(action) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ event: 'set state', args: [action] }));
+        console.log(`Server ${action} command sent via WebSocket`);
+    } else {
+        console.error('WebSocket is not connected');
+        showAlert('error', 'Connection Error', 'Unable to send command. Please check your connection.');
+    }
+}
+
+// Console input
+document.getElementById('send-command').addEventListener('click', sendCommand);
+document.getElementById('console-input').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        sendCommand();
+    }
+});
+
+function sendCommand() {
+    const input = document.getElementById('console-input');
+    const command = input.value.trim();
+    if (command && socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ event: 'send command', args: [command] }));
+        console.log('Command sent via WebSocket');
+        input.value = '';
+    } else if (!socket || socket.readyState !== WebSocket.OPEN) {
+        console.error('WebSocket is not connected');
+        showAlert('error', 'Connection Error', 'Unable to send command. Please check your connection.');
+    }
+}
+
+// Periodically update player list for Minecraft servers
+setInterval(() => {
+    if (socket && socket.readyState === WebSocket.OPEN && isMinecraft) {
+        socket.send(JSON.stringify({ event: 'send command', args: ['list'] }));
+    }
+}, 30000);
+
+const eulaPopupHTML = `
+<div id="eula-popup" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-[#1b1d21] p-10 rounded-2xl shadow-xl max-w-md w-full">
+    <h2 class="text-xl font-bold mb-4 text-white heavy">Minecraft EULA Agreement</h2>
+    <p class="text-gray-300 mb-6">You need to agree to the Minecraft End User License Agreement (EULA) to run this server.</p>
+    <div class="flex justify-end space-x-2.5">
+      <button id="decline-eula" class="px-4 py-2 bg-red-600 text-white rounded-l-xl rounded-r-lg hover:bg-red-700 transition-colors">Decline</button>
+      <button id="accept-eula" class="px-4 py-2 bg-emerald-600 text-white rounded-r-xl rounded-l-lg hover:bg-emerald-700 transition-colors">Accept</button>
+    </div>
+  </div>
+</div>
+`;
+
+// Append the EULA popup HTML to the body
+document.body.insertAdjacentHTML('beforeend', eulaPopupHTML);
+
+// Function to show the EULA popup
+function showEulaPopup() {
+  const popup = document.getElementById('eula-popup');
+  popup.classList.remove('hidden');
+  popup.classList.add('flex');
+}
+
+// Function to hide the EULA popup
+function hideEulaPopup() {
+  const popup = document.getElementById('eula-popup');
+  popup.classList.add('hidden');
+  popup.classList.remove('flex');
+}
+
+// Function to accept the EULA
+async function acceptEula() {
+  try {
+    // Write eula=true to /eula.txt
+    await fetch(`/api/server/${serverId}/files/write?file=/eula.txt`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain',
+      },
+      body: 'eula=true',
+    });
+
+    // Reboot the server
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ event: 'set state', args: ['restart'] }));
+      console.log('Server start command sent via WebSocket');
+    } else {
+      console.error('WebSocket is not connected');
+      showAlert('error', 'Connection Error', 'Unable to restart server. Please check your connection.');
+    }
+
+    hideEulaPopup();
+    showAlert('success', 'EULA Accepted', 'The Minecraft EULA has been accepted, and the server is restarting.');
+  } catch (error) {
+    console.error('Error accepting EULA:', error);
+    showAlert('error', 'EULA Acceptance Failed', 'An error occurred while accepting the EULA. Please try again.');
+  }
+}
+
+// Event listeners for EULA popup buttons
+document.getElementById('accept-eula').addEventListener('click', acceptEula);
+document.getElementById('decline-eula').addEventListener('click', hideEulaPopup);
+
+// Add this to your existing functions
+async function checkRenewalStatus() {
+    try {
+        const response = await fetch(`/api/server/${serverId}/renewal/status`);
+        const data = await response.json();
+        
+        const renewalBadge = document.getElementById('renewal-badge');
+        const renewalTime = document.getElementById('renewal-time');
+        const renewButton = document.getElementById('renew-server');
+        
+        // Update time remaining
+        if (data.timeRemaining.hours <= 0 && data.timeRemaining.minutes <= 0) {
+            renewalTime.innerHTML = `<span class="text-red-500">Expired</span>`;
+        } else {
+            renewalTime.textContent = `${data.timeRemaining.hours}h ${data.timeRemaining.minutes}m remaining`;
+        }
+        
+        // Show/hide renew button and update status
+        // Show renewal button if 24 hours or less remaining
+        if (data.timeRemaining.hours <= 23) {
+            renewButton.classList.remove('hidden');
+            renewButton.disabled = false;
+            renewalBadge.classList.remove('hidden');
+            
+            if (data.isExpired) {
+                renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-red-600 text-white';
+                renewalBadge.textContent = 'Expired';
+            } else if (data.timeRemaining.hours <= 6) {
+                renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-yellow-600 text-white';
+                renewalBadge.textContent = 'Renewal Required Soon';
+            } else {
+                renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-indigo-500 text-white';
+                renewalBadge.textContent = 'Renewal Available';
+            }
+            } else if (data.timeRemaining.hours >= 50) {
+                renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-emerald-600 text-white';
+                renewalBadge.textContent = 'Renewal Bypass';
+        } else {
+            renewButton.classList.add('hidden');
+            renewalBadge.classList.add('hidden');
+        }
+
+        // Add a progress indicator
+        const totalHours = 48;
+        const remainingPercentage = (data.timeRemaining.hours + (data.timeRemaining.minutes / 60)) / totalHours * 100;
+        const progressBar = document.querySelector('#renewal-progress-bar');
+            if (data.timeRemaining.hours < 50) {
+        if (progressBar) {
+            progressBar.style.width = `${remainingPercentage}%`;
+            
+            // Update progress bar color based on time remaining
+            if (data.timeRemaining.hours <= 6) {
+                progressBar.className = 'bg-red-600 h-2 rounded-full transition-all';
+            } else if (data.timeRemaining.hours <= 24) {
+                progressBar.className = 'bg-yellow-600 h-2 rounded-full transition-all';
+            } else {
+                progressBar.className = 'bg-emerald-600 h-2 rounded-full transition-all';
+            }
+        }
+}
+        
+    } catch (error) {
+        console.error('Error checking renewal status:', error);
+    }
+}
+
+// Add click handler for renew button
+document.getElementById('renew-server').addEventListener('click', async () => {
+    try {
+        const button = document.getElementById('renew-server');
+        button.disabled = true;
+        button.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Renewing...
+        `;
+        
+        const response = await fetch(`/api/server/${serverId}/renewal/renew`, {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            showAlert('success', 'Server Renewed', 'Your server has been successfully renewed for another 48 hours.');
+            await checkRenewalStatus();
+        } else {
+            const data = await response.json();
+            showAlert('error', 'Renewal Failed', data.error || 'Failed to renew server. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error renewing server:', error);
+        showAlert('error', 'Renewal Failed', 'An error occurred while renewing the server.');
+    } finally {
+        const button = document.getElementById('renew-server');
+        button.disabled = false;
+        button.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline-block mr-1 mb-0.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            Renew Now
+        `;
+    }
+});
+
+
+// Add to your initPage function
+function initPage() {
+    fetchServerDetails();
+    connectWebSocket();
+    checkRenewalStatus();  // Initial check
+    
+    // Check renewal status every minute
+    setInterval(checkRenewalStatus, 60000);
+}
+
+document.addEventListener('DOMContentLoaded', initPage);
+</script>
+
+<script>
+(function() {
+  // Initialize the observer
+  const observer = new MutationObserver(() => {
+    const node = document.getElementById('node')?.textContent || '';
+    if (!node.includes('SG')) return;
+    
+    const warningElement = document.getElementById('backup-warning');
+    warningElement.classList.remove('hidden');
+    
+    const targetDate = new Date('2024-11-13T12:00:00Z');
+    const localTimeStr = targetDate.toLocaleString();
+    document.getElementById('local-time').textContent = localTimeStr;
+    
+    function updateCountdown() {
+      const now = new Date();
+      const diff = targetDate - now;
+      
+      if (diff <= 0) {
+        document.getElementById('countdown').textContent = 'IMMEDIATE ACTION REQUIRED';
+        document.getElementById('countdown-text').textContent = 'CRITICAL: BACKUP REQUIRED IMMEDIATELY';
+        return;
+      }
+      
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      document.getElementById('countdown').textContent = 
+        `${hours}h ${minutes}m`;
+    }
+    
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  });
+
+  // Start observing the node for changes
+  const targetNode = document.getElementById('node');
+  if (targetNode) {
+    observer.observe(targetNode, {
+      characterData: true,
+      childList: true,
+      subtree: true
+    });
+  }
+})();
+</script>
+
+<%- include('../components/bottom') %>

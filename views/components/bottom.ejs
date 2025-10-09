@@ -1,0 +1,172 @@
+
+    </div>
+
+<style>
+#CV {
+    border-radius: 4px;
+}
+
+    <script>
+        // Function to highlight the active tab
+        function setActiveTab() {
+            const currentPath = window.location.pathname;
+            const tabs = document.querySelectorAll('#tabs a');
+            tabs.forEach(tab => {
+                if (tab.getAttribute('href') === currentPath) {
+                    tab.classList.add('border-indigo-500', 'text-indigo-500', 'font-medium');
+                    tab.classList.remove('border-transparent', 'hover:border-gray-300', 'hover:text-white');
+                } else {
+                    tab.classList.remove('border-indigo-500', 'text-indigo-500', 'font-medium');
+                    tab.classList.add('border-transparent', 'hover:border-gray-300', 'hover:text-white');
+                }
+            });
+        }
+
+        // Set active tab on page load
+        setActiveTab();
+
+        // For demonstration purposes, simulate changing routes when clicking tabs
+        document.querySelectorAll('#tabs a').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                const href = e.currentTarget.getAttribute('href');
+                history.pushState(null, '', href);
+                window.location.href = href;
+                setActiveTab();
+            });
+        });
+
+        // Listen for popstate events (back/forward browser navigation)
+        window.addEventListener('popstate', setActiveTab);
+    </script>
+</body>
+</html>
+<script>
+    var options = {
+      classname: 'loadingbar',
+      id: 'loadingbar'
+    };
+    var nanobar = new Nanobar(options);
+    function simulateLoading() {
+      nanobar.go(10); // Change this value to control the loading speed
+      setTimeout(function() {
+        nanobar.go(50);
+      }, 190); // Delay the progress update
+      setTimeout(function() {
+        nanobar.go(100);
+      }, 400); // Another delay
+    }
+    simulateLoading();
+  </script>
+  <style>
+    .loadingbar .bar {
+      background: #fb923c;
+      -webkit-box-shadow: 0px 4px 38px -15px #fb923c;
+      -moz-box-shadow: 0px 4px 38px -15px #fb923c;
+      box-shadow: 0px 4px 38px -15px #fb923c;
+      height: 1.85px;
+    }
+  </style>
+<script>
+(() => {
+    // Immediately inject initial style to hide content
+    const initialStyle = document.createElement('style');
+    initialStyle.textContent = `
+        #application {
+            opacity: 0 !important;
+        }
+    `;
+    document.head.appendChild(initialStyle);
+
+    // Create and inject spinner styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .page-loading-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            background-color: rgb(0 0 0 / 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+        }
+        .loading-logo {
+            width: 4rem;
+            height: 4rem;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .7;
+            }
+        }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Create and inject loading overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'page-loading-overlay';
+    overlay.innerHTML = `
+<div class="flex justify-center">
+<img src="https://i.imgur.com/ML5w4qn.png" class="h-6 w-auto invert">
+</div>
+        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+    `;
+    document.body.appendChild(overlay);
+
+    // Wait for DOM to be interactive
+    const ready = () => {
+        const app = document.getElementById('application');
+        if (!app) return;
+
+        // Remove hidden class and ensure flex display
+        app.classList.remove('hidden');
+        app.style.display = 'flex';
+
+        // Wait additional time for loading effect
+        setTimeout(() => {
+            // Fade out overlay
+            overlay.style.transition = 'opacity 0.2s ease-out';
+            overlay.style.opacity = '0';
+
+            // Remove the initial style that was hiding the content
+            initialStyle.remove();
+
+            // Animate in content
+            app.style.animation = 'fadeUp 0.3s ease-out forwards';
+
+            // Clean up
+            setTimeout(() => {
+                overlay.remove();
+                style.remove();
+            }, 600);
+        }, 620);
+    };
+
+    // Handle different document ready states
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', ready);
+    } else {
+        ready();
+    }
+})();
+</script>

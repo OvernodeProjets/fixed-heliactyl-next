@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 2px solid white;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin-left: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error-shake {
+            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+            transform: translate3d(0, 0, 0);
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            0% { transform: translateY(-20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .modal {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            transition: all 0.3s ease;
+            transform: scale(0.7);
+            opacity: 0;
+        }
+        .modal.show .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <main class="flex-grow flex items-center justify-center p-8">
+        <div class="py-8 px-6 md:py-12 md:px-8 max-w-md w-full">
+            <div class="flex justify-center mb-8">
+                <img src="https://i.imgur.com/ML5w4qn.png" class="h-8">
+            </div>
+            <h2 class="text-center text-2xl tracking-tight font-semibold text-gray-800">Welcome back!</h2>
+            <p class="text-gray-600 text-center mt-1 text-sm">Sign in to your account.</p>
+            
+            <!-- User/Password Login Form -->
+            <form id="loginForm" class="mt-8 space-y-4">
+                <div>
+                    <input type="email" id="email" name="email" class="transition w-full py-2 px-4 font-medium text-sm bg-gray-200 rounded-full border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500" placeholder="Email" required>
+                </div>
+                <div>
+                    <input type="password" id="password" name="password" class="transition w-full py-2 px-4 font-medium text-sm bg-gray-200 rounded-full border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500" placeholder="Password" required>
+                </div>
+                <button style="box-shadow: inset 0px 4px 5px -3px rgba(55,65,81,1);" type="submit" class="hover:scale-95 w-full py-2.5 px-4 bg-gray-800 hover:bg-gray-700 transition text-white rounded-full transition font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center">
+                    Sign in
+                    <span class="spinner" id="loginSpinner"></span>
+                </button>
+                <button id="magicLinkBtn" type="button" class="hover:scale-95 w-full py-2.5 px-4 text-sm bg-transparent text-gray-700 hover:bg-gray-200 text-center font-medium rounded-full flex items-center justify-center transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                    </svg>
+                    Send a Magic Link
+                    <span class="spinner" id="magicLinkSpinner"></span>
+                </button>
+                <a href="/login" type="button" class="hover:scale-95 w-full py-2.5 px-4 text-sm bg-transparent text-gray-700 hover:bg-gray-200 text-center font-medium rounded-full flex items-center justify-center transition"></button>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="w-5 h-5 mr-2" viewBox="0 0 16 16">
+                        <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
+                    </svg>
+                    Sign in with Discord
+                </a>
+            </form>
+
+            <div class="mt-6 flex items-center justify-center">
+                <span class="border-b border-gray-300 flex-grow"></span>
+                <span class="px-4 text-sm text-gray-500">or</span>
+                <span class="border-b border-gray-300 flex-grow"></span>
+            </div>
+            
+            <div class="mt-6 text-center transition hover:scale-95">
+                <a href="../register" id="registerLink" class="hover:bg-indigo-600/5 rounded-full px-4 py-1.5 transition hover:scale-95 text-sm text-indigo-600 hover:text-indigo-800 transition font-medium">Create an account</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed z-50 bottom-2 right-2 font-medium bg-red-500 text-white px-6 py-2.5 rounded-l-xl rounded-t-xl rounded-br-md shadow-lg transition-opacity duration-300 opacity-0 pointer-events-none">
+        Error message goes here
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal fixed inset-0 bg-black bg-opacity-50 backdrop-blur flex items-center justify-center z-50">
+        <div class="modal-content bg-white p-6 rounded-2xl shadow-sm max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-gray-800 text-lg font-semibold">-... . . .--. / -... --- --- .--. / -... . . .--.</h2>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="recaptcha-container" class="mb-4"></div>
+            <button id="submitRecaptcha" class="w-full py-2 px-4 bg-indigo-600 font-medium hover:scale-95 text-white rounded-full transition font-medium hover:bg-indigo-800 hover:text-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                I'm not a robot or AI language model.
+            </button>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const loginForm = document.getElementById('loginForm');
+        const loginSpinner = document.getElementById('loginSpinner');
+        const magicLinkBtn = document.getElementById('magicLinkBtn');
+        const magicLinkSpinner = document.getElementById('magicLinkSpinner');
+        const toast = document.getElementById('toast');
+        const forgotPasswordLink = document.getElementById('forgotPassword');
+        const registerLink = document.getElementById('registerLink');
+        const modal = document.getElementById('modal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const submitRecaptchaBtn = document.getElementById('submitRecaptcha');
+
+        let currentAction = '';
+
+        function showToast(message, type = 'error') {
+            toast.textContent = message;
+            toast.classList.remove('bg-red-500', 'bg-emerald-500');
+            toast.classList.add(type === 'error' ? 'bg-red-500' : 'bg-emerald-500');
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100', 'slide-in');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'slide-in');
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+
+        function showModal() {
+            modal.classList.add('show');
+            grecaptcha.render('recaptcha-container', {
+                'sitekey': '6LcpgpAqAAAAAGVhH7T0gaRx0AqS4jbw8NQlvk1x'
+            });
+        }
+
+        function hideModal() {
+            modal.classList.remove('show');
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginSpinner.style.display = 'inline-block';
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast('success: Welcome back!', 'success');
+                    window.location.href = '/dashboard';
+                } else {
+                    showToast(data.error || 'error: Login failed. Please try again.');
+                    loginForm.classList.add('error-shake');
+                    setTimeout(() => loginForm.classList.remove('error-shake'), 1000);
+                }
+            } catch (error) {
+                showToast('error: An error occurred. Please try again later.');
+            } finally {
+                loginSpinner.style.display = 'none';
+            }
+        });
+
+        magicLinkBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentAction = 'magicLink';
+            showModal();
+        });
+
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentAction = 'resetPassword';
+            showModal();
+        });
+
+        closeModalBtn.addEventListener('click', hideModal);
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                hideModal();
+            }
+        });
+
+        submitRecaptchaBtn.addEventListener('click', async () => {
+            const recaptchaResponse = grecaptcha.getResponse();
+            if (!recaptchaResponse) {
+                showToast('error: Please complete the reCAPTCHA');
+                return;
+            }
+
+            const email = document.getElementById('email').value;
+            if (!email) {
+                showToast('error: Please enter your email address.');
+                return;
+            }
+
+            hideModal();
+
+            try {
+                let response;
+                if (currentAction === 'magicLink') {
+                    response = await fetch('/auth/magic-link', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, recaptchaResponse }),
+                    });
+                } else if (currentAction === 'resetPassword') {
+                    response = await fetch('/auth/reset-password-request', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, recaptchaResponse }),
+                    });
+                }
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast(currentAction === 'magicLink' ? 'success: Magic link sent! Check your email.' : 'success: Password reset link sent! Check your email.', 'success');
+                } else {
+                    showToast(data.error || 'error: Failed to process request. Please try again.');
+                }
+            } catch (error) {
+                showToast('error: An error occurred. Please try again later.');
+            }
+        });
+
+        registerLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = '/register';
+        });
+    });
+    </script>
+</body>
+</html>

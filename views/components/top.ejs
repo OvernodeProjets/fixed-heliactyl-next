@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= settings.name %> - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link 
+    rel="preload" 
+    href="/assets/Ndot-55.otf" 
+    as="font" 
+    type="font/otf" 
+    crossorigin="anonymous"
+>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        .text-3xl {
+            color: white;
+        }
+
+        .text-2xl {
+            color: white;
+        }
+
+        .text-xl {
+            color: white;
+        }
+
+        .text-lg {
+            color: white;
+        }
+
+        h3 {
+            color: white;
+        }
+
+        h2 {
+            color: white
+        }
+
+        h3 {
+            color: white
+        }
+
+        /* Loading bar animation */
+        @keyframes loading {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* Spinner animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            background: linear-gradient(to right, #4f46e5, #818cf8);
+            animation: loading 0.1s ease-in-out;
+            z-index: 1000;
+        }
+
+        .spinner {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            animation: spin 0.1s linear infinite;
+            z-index: 1000;
+        }
+
+        /* Sidebar transition for mobile */
+        .sidebar-transition {
+            transition: transform 0.1s ease-in-out;
+        }
+
+.font-mono {
+font-family: 'JetBrains Mono' !important;
+}
+    </style>
+<style>
+@font-face {
+    font-family: 'Ndot-55';
+    src: url('/assets/Ndot-55.otf') format('opentype');
+    font-weight: normal;
+    font-display: swap;
+    font-style: normal;
+    unicode-range: U+000-5FF; /* Latin glyphs */
+    font-synthesis: none;
+}
+
+.heavy {
+    font-family: 'Ndot-55', sans-serif;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+
+#server-name {
+    font-family: 'Ndot-55', sans-serif;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+
+.extra-bold {
+    font-family: 'Ndot-55', sans-serif;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+</style>
+    <!-- SEO - Meta Tags -->
+    <meta name="description"
+        content="Experience seamless deployment with <%= settings.name %>'s powerful dashboard. Free serverless hosting for web projects, game servers, and containerized applications with automated scaling, monitoring, and zero maintenance.">
+
+    <meta name="keywords"
+        content="container management, serverless hosting, cloud platform, container orchestration, <%= settings.name %> dashboard, free hosting, game server hosting, Docker containers, cloud deployment, DevOps platform, container scaling, microservices management, cloud infrastructure, container monitoring, <%= settings.name %> cloud">
+
+    <meta name="author" content="SRYDEN, Inc.">
+
+    <!-- Additional recommended meta tags -->
+    <meta property="og:title" content="<%= settings.name %>">
+    <meta property="og:description"
+        content="We're <%= settings.name %>, a free hosting platform for your projects, game servers, and more. Built for cloud-native and serverless projects by design.">
+    <meta property="og:type" content="website">
+
+    <!-- Recommended additional tag for mobile optimization -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body class="bg-[#010103] text-gray-300" style="font-family: 'Inter'" x-data="{ sidebarOpen: false }" @keydown.escape="sidebarOpen = false">
+    <!-- Loading bar -->
+    <div class="loading-bar"></div>
+    <!-- Spinner -->
+    <div class="spinner">
+        <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+    </div>
+    <nav class="bg-gradient-to-r from-indigo-900/15 to-white/5 pr-4 pl-2 py-2 border-b border-white/5 flex items-center justify-between">
+        <!-- Mobile menu button -->
+        <button @click="sidebarOpen = true"
+            class="md:hidden text-gray-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+        <!-- Left side -->
+        <div class="flex items-center space-x-2 hover:bg-white/5 rounded-md px-2 py-1 transition duration-200 hover:scale-95 cursor-pointer"
+            onclick="window.location.href='/dashboard'">
+            <img src="https://i.imgur.com/qwJaJGP.png" alt="<%= settings.name %> Logo" class="w-auto h-8">
+        </div>
+
+        <!-- Right side -->
+        <div class="flex items-center space-x-2 text-sm">
+            <a href="<%= settings.website.domain %>"
+                class="text-white/70 hover:text-white transition hover:scale-95 group bg-white/5 px-4 pb-1.5 pt-2 text-xs rounded-lg rounded-l-2xl shadow-sm">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 inline-flex mr-1 text-white/50 mb-0.5 group-hover:text-white/70 transition">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
+</svg>
+                Website
+            </a>
+            <a href="/wallet"
+                class="text-white/70 hover:text-white transition hover:scale-95 group bg-white/5 px-4 pb-1.5 pt-2 text-xs rounded-lg rounded-r-2xl shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor"
+                    class="size-5 inline-flex mr-1 text-white/50 mb-0.5 group-hover:text-white/70 transition">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 9m18 0V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v3" />
+                </svg>
+                <%= coins.toFixed(2) %> <%= settings.website.currency %>
+            </a>
+        </div>
+    </nav>
+    <div class="flex min-h-screen">
+        <!-- Overlay for mobile sidebar -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" x-show="sidebarOpen" @click="sidebarOpen = false"
+            x-transition:enter="transition-opacity ease-linear duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-50"
+            x-transition:leave="transition-opacity ease-linear duration-300"
+            x-transition:leave-start="opacity-50"
+            x-transition:leave-end="opacity-0"></div>
+
+        <!-- Sidebar -->
+        <aside class="backdrop-blur-lg fixed inset-0 z-40 transform md:translate-x-0 md:static md:inset-auto md:h-screen md:w-64 border-r border-b rounded-br-3xl border-white/5 bg-indigo-900/10 sidebar-transition"
+            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
+            <div class="flex flex-col h-full relative">
+                <!-- Close button for mobile -->
+                <button @click="sidebarOpen = false"
+                    class="md:hidden absolute top-4 right-4 text-gray-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+
+                <!-- Header -->
+                <div class="flex items-center mt-2 mb-4 py-2 mx-2 border-b border-white/5">
+                    <button
+                        onclick="window.location.href='/'"
+                        class="flex items-center gap-1.5 w-full px-3 py-1.5 text-zinc-400 cursor-pointer hover:bg-white/5 transition rounded-md">
+                        <div class="flex items-center gap-1.5">
+                            <div
+                                class="w-6 h-6 bg-indigo-950 rounded-md flex items-center justify-center text-indigo-300 pt-0.5 text-xs">
+                                <%= req.session.userinfo.username.charAt(0).toUpperCase() %>
+                            </div>
+                            <span class="ml-1 text-sm">
+                                <%= req.session.userinfo.username %>
+                            </span>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 ml-auto">
+                            <path fill-rule="evenodd" d="M16.5 3.75a1.5 1.5 0 0 1 1.5 1.5v13.5a1.5 1.5 0 0 1-1.5 1.5h-6a1.5 1.5 0 0 1-1.5-1.5V15a.75.75 0 0 0-1.5 0v3.75a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V5.25a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3V9A.75.75 0 1 0 9 9V5.25a1.5 1.5 0 0 1 1.5-1.5h6ZM5.78 8.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 0 0 0 1.06l3 3a.75.75 0 0 0 1.06-1.06l-1.72-1.72H15a.75.75 0 0 0 0-1.5H4.06l1.72-1.72a.75.75 0 0 0 0-1.06Z" clip-rule="evenodd" />
+                          </svg>                          
+                    </button>
+                </div>
+
+<!-- Server Info Section (Only shown on server pages) -->
+<div class="px-2 mb-4" id="server-sidebar-section" style="display: none;">
+    <div class="bg-white/5 rounded-xl p-4">
+        <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full" id="sidebar-status-indicator"></div>
+                <span class="text-sm font-medium text-white heavy" id="sidebar-server-name">Loading...</span>
+            </div>
+            <div class="relative">
+                <button onclick="toggleDropdown()" class="p-1 hover:bg-white/10 rounded-lg transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-white/70">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
+                    </svg>
+                </button>
+                <div id="server-dropdown" class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-[#101017] backdrop-blur-xl border border-white/5 shadow-lg py-1 z-50">
+                    <button onclick="sendPowerAction('start')" id="dropdown-start" class="flex items-center w-full px-4 py-2 text-sm text-white/70 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+                        </svg>
+                        Start
+                    </button>
+                    <button onclick="sendPowerAction('restart')" id="dropdown-restart" class="flex items-center w-full px-4 py-2 text-sm text-white/70 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                        </svg>
+                        Restart
+                    </button>
+                    <button onclick="sendPowerAction('stop')" id="dropdown-stop" class="flex items-center w-full px-4 py-2 text-sm text-white/70 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z" />
+                        </svg>
+                        Stop
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="text-xs text-white/50 mb-3">Server ID: <span id="sidebar-server-id"></span></div>
+        <a href="/servers" class="flex items-center justify-center gap-2 px-3 py-2 text-sm text-white/70 bg-white/5 hover:bg-white/10 transition rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+            </svg>
+            Back to server list
+        </a>
+    </div>
+</div>
+
+<script>
+let sidebarSocket;
+let currentServerStatus = 'offline';
+
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const serverId = urlParams.get('id');
+    const serverSection = document.getElementById('server-sidebar-section');
+    
+    if (window.location.pathname.includes('/server/') && serverId) {
+        serverSection.style.display = 'block';
+        document.getElementById('sidebar-server-id').textContent = serverId;
+        initializeSidebarWebSocket(serverId);
+        
+        // Fetch initial server details
+        fetch(`/api/server/${serverId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('sidebar-server-name').textContent = data.attributes.name;
+            })
+            .catch(error => console.error('Error fetching server details:', error));
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('server-dropdown');
+        const dropdownButton = event.target.closest('button');
+        if (!dropdownButton && dropdown) {
+            dropdown.classList.add('hidden');
+        }
+    });
+});
+
+function initializeSidebarWebSocket(serverId) {
+    fetch(`/api/server/${serverId}/websocket`)
+        .then(response => response.json())
+        .then(data => {
+            sidebarSocket = new WebSocket(data.data.socket);
+
+            sidebarSocket.onopen = () => {
+                console.log('Sidebar WebSocket connected');
+                sidebarSocket.send(JSON.stringify({ event: 'auth', args: [data.data.token] }));
+            };
+
+            sidebarSocket.onmessage = handleSidebarWebSocketMessage;
+
+            sidebarSocket.onclose = () => {
+                console.log('Sidebar WebSocket disconnected');
+                setTimeout(() => initializeSidebarWebSocket(serverId), 5000);
+            };
+        })
+        .catch(error => console.error('Error fetching WebSocket credentials:', error));
+}
+
+function handleSidebarWebSocketMessage(event) {
+    const message = JSON.parse(event.data);
+    
+    switch (message.event) {
+        case 'auth success':
+            console.log('Sidebar WebSocket authenticated');
+            break;
+        case 'status':
+            updateSidebarServerStatus(message.args[0]);
+            break;
+    }
+}
+
+function updateSidebarServerStatus(status) {
+    currentServerStatus = status;
+    const indicator = document.getElementById('sidebar-status-indicator');
+    const startButton = document.getElementById('dropdown-start');
+    const stopButton = document.getElementById('dropdown-stop');
+    const restartButton = document.getElementById('dropdown-restart');
+    
+    switch(status) {
+        case 'running':
+            indicator.style.backgroundColor = '#10b981';
+            startButton.disabled = true;
+            stopButton.disabled = false;
+            restartButton.disabled = false;
+            break;
+        case 'offline':
+            indicator.style.backgroundColor = '#ef4444';
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            restartButton.disabled = true;
+            break;
+        default:
+            indicator.style.backgroundColor = '#f59e0b';
+            startButton.disabled = true;
+            stopButton.disabled = false;
+            restartButton.disabled = true;
+    }
+}
+
+function toggleDropdown() {
+    const dropdown = document.getElementById('server-dropdown');
+    dropdown.classList.toggle('hidden');
+    
+    if (!dropdown.classList.contains('hidden')) {
+        dropdown.style.animation = 'slideIn 0.2s ease-out forwards';
+    }
+}
+
+function sendPowerAction(action) {
+    if (sidebarSocket && sidebarSocket.readyState === WebSocket.OPEN) {
+        if (action === 'stop' && (currentServerStatus === 'starting' || currentServerStatus === 'stopping')) {
+            action = 'kill';
+        }
+        sidebarSocket.send(JSON.stringify({ event: 'set state', args: [action] }));
+        document.getElementById('server-dropdown').classList.add('hidden');
+    }
+}
+
+// Add this to your existing styles
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
+    <script>
+        const isServerPage = window.location.pathname.includes('/server/');
+        const serverSection = document.getElementById('server-sidebar-section');
+        
+        if (!isServerPage) {
+serverSection.style.display = 'block';
+            serverSection.innerHTML = `
+                <div class="bg-transparent border border-white/5 border-dashed rounded-xl p-4">
+                    <div class="flex flex-col items-center justify-center gap-3">
+                     
+                        <div class="text-center">
+                            <h3 class="text-sm font-medium text-white/90 mb-1 heavy">                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                viewBox="0 0 24 24" class="w-3 h-3 mr-1.5 mb-0.5 inline-flex" color="currentColor">
+                                <path fill="currentColor" fill-rule="evenodd"
+                                    d="M5.161 7h7.678c.527 0 .981 0 1.356.03.395.033.789.104 1.167.297a3 3 0 011.311 1.311c.193.378.264.772.296 1.167.031.375.031.83.031 1.356v7.678c0 .527 0 .982-.03 1.356-.033.395-.104.789-.297 1.167a3 3 0 01-1.311 1.311c-.378.193-.772.264-1.167.296-.375.031-.83.031-1.356.031H5.16c-.527 0-.981 0-1.356-.03-.395-.033-.789-.104-1.167-.297a3 3 0 01-1.311-1.311c-.193-.378-.264-.772-.296-1.167C1 19.82 1 19.365 1 18.838v-7.677c0-.527 0-.981.03-1.356.033-.395.104-.789.297-1.167a3 3 0 011.311-1.311c.378-.193.772-.264 1.167-.296C4.18 7 4.635 7 5.161 7z"
+                                    clip-rule="evenodd"></path>
+                                <path fill="currentColor"
+                                    d="M18.838 1h-7.677c-.527 0-.981 0-1.356.03-.395.033-.789.104-1.167.297a3 3 0 00-1.311 1.311c-.193.378-.264.772-.296 1.167C7.003 4.141 7 4.541 7 5h5.88c.49 0 1.02 0 1.478.037.519.043 1.205.148 1.912.508a5 5 0 012.185 2.185c.36.707.465 1.393.508 1.912.037.459.037.989.037 1.477V17c.459 0 .86-.003 1.195-.03.395-.033.789-.104 1.167-.297a3 3 0 001.311-1.311c.193-.378.264-.772.296-1.167.031-.375.031-.83.031-1.356V5.16c0-.527 0-.981-.03-1.356-.033-.395-.104-.789-.297-1.167a3 3 0 00-1.311-1.311c-.378-.193-.772-.264-1.167-.296C19.82 1 19.365 1 18.838 1z">
+                                </path>
+                            </svg>Manage a server</h3>
+                            <p class="text-xs text-white/60 mb-3">Select one of your servers below.</p>
+                        </div>
+
+                        <div class="relative w-full">
+                            <button onclick="toggleServerDropdown()" class="w-full text-sm flex items-center justify-between px-4 py-2 text-sm text-white/70 bg-white/5 hover:bg-white/10 transition rounded-lg">
+                                <span id="selected-server-text text-sm">Select a server...</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 ml-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </button>
+                            <div id="server-dropdown-menu" class="hidden absolute left-0 right-0 mt-2 rounded-xl bg-[#101017] backdrop-blur-xl border border-white/5 shadow-lg py-1 z-50 max-h-60 overflow-y-auto">
+                                <% pterodactyl.relationships.servers.data.forEach(server => { %>
+                                    <a
+    class="flex cursor-pointer items-center w-full px-4 py-2 text-sm text-white/70 hover:bg-white/5" 
+    onclick="window.location.href='/server/manage?id=<%= server.attributes.identifier%>&numeric=<%= server.attributes.id%>&mode=' + ((<%=server.attributes.egg%> === 18 || <%=server.attributes.egg%> === 19) ? 'vm' : (<%=server.attributes.node%> === 42 || <%=server.attributes.node%> === 51 ? 'rdp' : 'server'))">
+    <%= server.attributes.name %>
+</a>
+                                <% }); %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add click outside listener to close dropdown
+            document.addEventListener('click', function(event) {
+                const dropdown = document.getElementById('server-dropdown-menu');
+                const button = event.target.closest('button');
+                if (!button && dropdown && !dropdown.contains(event.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        function toggleServerDropdown() {
+            const dropdown = document.getElementById('server-dropdown-menu');
+            dropdown.classList.toggle('hidden');
+            
+            if (!dropdown.classList.contains('hidden')) {
+                dropdown.style.animation = 'slideIn 0.2s ease-out forwards';
+            }
+        }
+    </script>
+    <style>
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Custom scrollbar for the dropdown */
+        #server-dropdown-menu::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #server-dropdown-menu::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        #server-dropdown-menu::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        #server-dropdown-menu::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+    </style>
+                <!-- Navigation -->
+                <div class="px-2 overflow-y-auto">
+                    <a href="../dashboard"
+                        class="flex items-center gap-2 px-4 py-2 text-white/70 hover:bg-white/5 transition rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
+                            class="w-4 h-4" color="currentColor">
+                            <path fill="currentColor" fill-rule="evenodd"
+                                d="M12.523 1.336a2 2 0 00-1.046 0c-.397.108-.732.37-.999.58l-.074.059-6.86 5.335c-.377.292-.709.55-.956.884a3 3 0 00-.477.975c-.112.4-.112.82-.111 1.298v7.371c0 .528 0 .982.03 1.357.033.395.104.789.297 1.167a3 3 0 001.311 1.311c.378.193.772.264 1.167.296.375.031.83.031 1.356.031H17.84c.527 0 .981 0 1.356-.03.395-.033.789-.104 1.167-.297a3 3 0 001.311-1.311c.193-.378.264-.772.296-1.167.031-.375.031-.83.031-1.356v-7.372c0-.477.001-.897-.111-1.298a2.999 2.999 0 00-.477-.975c-.247-.334-.58-.592-.956-.884l-6.86-5.335-.074-.059c-.267-.21-.602-.472-1-.58zM8 16a1 1 0 100 2h8a1 1 0 100-2H8z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm">Home</span>
+                    </a>
+                    <% if (settings.api.client.plesk.enabled) { %>
+                    <a href="../webhosting"
+                        class="flex items-center gap-2 px-4 py-2 text-white/70 hover:bg-white/5 transition rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                              <path d="M1 12.5A4.5 4.5 0 0 0 5.5 17H15a4 4 0 0 0 1.866-7.539 3.504 3.504 0 0 0-4.504-4.272A4.5 4.5 0 0 0 4.06 8.235 4.502 4.502 0 0 0 1 12.5Z" />
+                            </svg>
+                        <span class="text-sm">Web Hosting</span>
+                    </a>
+                    <% } %>
+                    <!-- Project Section -->
+                    <div class="mt-4">
+                        <div class="px-3 py-1.5 text-xs text-white/50 font-mono uppercase">Hosting</div>
+                        <a href="../servers"
+                            class="flex items-center gap-2 px-4 py-2 text-white/70 hover:bg-white/5 transition rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                viewBox="0 0 24 24" class="w-4 h-4" color="currentColor">
+                                <path fill="currentColor" fill-rule="evenodd"
+                                    d="M5.161 7h7.678c.527 0 .981 0 1.356.03.395.033.789.104 1.167.297a3 3 0 011.311 1.311c.193.378.264.772.296 1.167.031.375.031.83.031 1.356v7.678c0 .527 0 .982-.03 1.356-.033.395-.104.789-.297 1.167a3 3 0 01-1.311 1.311c-.378.193-.772.264-1.167.296-.375.031-.83.031-1.356.031H5.16c-.527 0-.981 0-1.356-.03-.395-.033-.789-.104-1.167-.297a3 3 0 01-1.311-1.311c-.193-.378-.264-.772-.296-1.167C1 19.82 1 19.365 1 18.838v-7.677c0-.527 0-.981.03-1.356.033-.395.104-.789.297-1.167a3 3 0 011.311-1.311c.378-.193.772-.264 1.167-.296C4.18 7 4.635 7 5.161 7z"
+                                    clip-rule="evenodd"></path>
+                                <path fill="currentColor"
+                                    d="M18.838 1h-7.677c-.527 0-.981 0-1.356.03-.395.033-.789.104-1.167.297a3 3 0 00-1.311 1.311c-.193.378-.264.772-.296 1.167C7.003 4.141 7 4.541 7 5h5.88c.49 0 1.02 0 1.478.037.519.043 1.205.148 1.912.508a5 5 0 012.185 2.185c.36.707.465 1.393.508 1.912.037.459.037.989.037 1.477V17c.459 0 .86-.003 1.195-.03.395-.033.789-.104 1.167-.297a3 3 0 001.311-1.311c.193-.378.264-.772.296-1.167.031-.375.031-.83.031-1.356V5.16c0-.527 0-.981-.03-1.356-.033-.395-.104-.789-.297-1.167a3 3 0 00-1.311-1.311c-.378-.193-.772-.264-1.167-.296C19.82 1 19.365 1 18.838 1z">
+                                </path>
+                            </svg>
+                            <span class="text-sm">Servers</span>
+                        </a>
+                        <a href="../account"
+                            class="flex items-center gap-2 px-4 py-2 text-white/70 hover:bg-white/5 transition rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="size-4">
+                                <path fill-rule="evenodd"
+                                    d="M15.75 1.5a6.75 6.75 0 0 0-6.651 7.906c.067.39-.032.717-.221.906l-6.5 6.499a3 3 0 0 0-.878 2.121v2.818c0 .414.336.75.75.75H6a.75.75 0 0 0 .75-.75v-1.5h1.5A.75.75 0 0 0 9 19.5V18h1.5a.75.75 0 0 0 .53-.22l2.658-2.658c.19-.189.517-.288.906-.22A6.75 6.75 0 1 0 15.75 1.5Zm0 3a.75.75 0 0 0 0 1.5A2.25 2.25 0 0 1 18 8.25a.75.75 0 0 0 1.5 0 3.75 3.75 0 0 0-3.75-3.75Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span class="text-sm">SFTP</span>
+                        </a>
+                        <!-- more items -->
+                    </div>
+
+                    <!-- Economy -->
+                    <div class="mt-4">
+                        <div class="px-3 py-1.5 text-xs text-white/50 font-mono uppercase">Economy</div>
+                        <a href="../wallet"
+                            class="flex items-center gap-2 px-4 py-2 text-white/70 hover:bg-white/5 transition rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="size-4">
+                                <path d="M4.5 3.75a3 3 0 0 0-3 3v.75h21v-.75a3 3 0 0 0-3-3h-15Z" />
+                                <path fill-rule="evenodd"
+                                    d="M22.5 9.75h-21v7.5a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3v-7.5Zm-18 3.75a.75.75 0 0 1 .75-.75h6a.75.75 0 0 1 0 1.5h-6a.75.75 0 0 1-.75-.75Zm.75 2.25a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5h-3Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span class="text-sm">Wallet</span>
+                        </a>
+                        <a href="../afk"
+                            class="flex items-center gap-2 px-4 py-2 text-white/70 hover:bg-white/5 transition rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="size-4">
+                                <path fill-rule="evenodd"
+                                    d="M17.303 5.197A7.5 7.5 0 0 0 6.697 15.803a.75.75 0 0 1-1.061 1.061A9 9 0 1 1 21 10.5a.75.75 0 0 1-1.5 0c0-1.92-.732-3.839-2.197-5.303Zm-2.121 2.121a4.5 4.5 0 0 0-6.364 6.364.75.75 0 1 1-1.06 1.06A6 6 0 1 1 18 10.5a.75.75 0 0 1-1.5 0c0-1.153-.44-2.303-1.318-3.182Zm-3.634 1.314a.75.75 0 0 1 .82.311l5.228 7.917a.75.75 0 0 1-.777 1.148l-2.097-.43 1.045 3.9a.75.75 0 0 1-1.45.388l-1.044-3.899-1.601 1.42a.75.75 0 0 1-1.247-.606l.569-9.47a.75.75 0 0 1 .554-.68Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+
+                            <span class="text-sm">AFK Page</span>
+                        </a>
+                        <a href="../referrals"
+                            class="flex items-center gap-2 px-4 py-2 text-white/70 hover:bg-white/5 transition rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="size-4">
+                                <path
+                                    d="M4.5 6.375a4.125 4.125 0 1 1 8.25 0 4.125 4.125 0 0 1-8.25 0ZM14.25 8.625a3.375 3.375 0 1 1 6.75 0 3.375 3.375 0 0 1-6.75 0ZM1.5 19.125a7.125 7.125 0 0 1 14.25 0v.003l-.001.119a.75.75 0 0 1-.363.63 13.067 13.067 0 0 1-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 0 1-.364-.63l-.001-.122ZM17.25 19.128l-.001.144a2.25 2.25 0 0 1-.233.96 10.088 10.088 0 0 0 5.06-1.01.75.75 0 0 0 .42-.643 4.875 4.875 0 0 0-6.957-4.611 8.586 8.586 0 0 1 1.71 5.157v.003Z" />
+                            </svg>
+
+                            <span class="text-sm">Referrals</span>
+                        </a>
+                        <a href="../store"
+                            class="flex items-center gap-2 px-4 py-2 text-white/70 hover:bg-white/5 transition rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="size-4">
+                                <path
+                                    d="M5.223 2.25c-.497 0-.974.198-1.325.55l-1.3 1.298A3.75 3.75 0 0 0 7.5 9.75c.627.47 1.406.75 2.25.75.844 0 1.624-.28 2.25-.75.626.47 1.406.75 2.25.75.844 0 1.623-.28 2.25-.75a3.75 3.75 0 0 0 4.902-5.652l-1.3-1.299a1.875 1.875 0 0 0-1.325-.549H5.223Z" />
+                                <path fill-rule="evenodd"
+                                    d="M3 20.25v-8.755c1.42.674 3.08.673 4.5 0A5.234 5.234 0 0 0 9.75 12c.804 0 1.568-.182 2.25-.506a5.234 5.234 0 0 0 2.25.506c.804 0 1.567-.182 2.25-.506 1.42.674 3.08.675 4.5.001v8.755h.75a.75.75 0 0 1 0 1.5H2.25a.75.75 0 0 1 0-1.5H3Zm3-6a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75v-3Zm8.25-.75a.75.75 0 0 0-.75.75v5.25c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-5.25a.75.75 0 0 0-.75-.75h-3Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span class="text-sm">Store</span>
+                        </a>
+                        <a href="../staking"
+                            class="flex items-center gap-2 px-4 py-2 text-white/70 hover:bg-white/5 transition rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="size-4">
+                                <path fill-rule="evenodd"
+                                    d="M2.25 13.5a8.25 8.25 0 0 1 8.25-8.25.75.75 0 0 1 .75.75v6.75H18a.75.75 0 0 1 .75.75 8.25 8.25 0 0 1-16.5 0Z"
+                                    clip-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M12.75 3a.75.75 0 0 1 .75-.75 8.25 8.25 0 0 1 8.25 8.25.75.75 0 0 1-.75.75h-7.5a.75.75 0 0 1-.75-.75V3Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span class="text-sm">Staking</span>
+                        </a>
+                        <!-- more items -->
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1">
+            <div class="flex flex-col min-h-screen">
+                <!-- Content -->
+                <script>
+                    // Get the current URL path
+                    const cPath = window.location.pathname;
+            
+                    // Get all navigation links in the sidebar
+                    const sidebarLinks = document.querySelectorAll('aside a');
+            
+                    // Function to normalize paths (remove trailing slash and query params)
+                    const normalizePath = (path) => path.replace(/\/$/, '').split('?')[0];
+            
+                    // Normalize current path
+                    const normalizedCurrentPath = normalizePath(cPath);
+            
+                    // Loop through each link
+                    sidebarLinks.forEach(link => {
+                        // Get the href attribute
+                        const href = link.getAttribute('href');
+                        if (!href) return;
+            
+                        // Remove any '../' from href and normalize
+                        const normalizedHref = normalizePath(href.replace(/^\.\./, ''));
+            
+                        // Check if the current path matches the link's href
+                        if (normalizedCurrentPath === normalizedHref) {
+                            // Add active classes to the link
+                            link.classList.add('bg-white/10');
+                            link.classList.add('text-white');
+            
+                            // Find and update the SVG within the active link
+                            const svg = link.querySelector('svg');
+                            if (svg) {
+                                svg.classList.add('text-indigo-300');
+                            }
+                        }
+                    });
+                </script>
+
+<script>
+// Add this script tag at the end of your page body
+const snowfallScript = document.createElement('script');
+snowfallScript.textContent = `
+// Create and inject the CSS
+const snowStyle = document.createElement('style');
+snowStyle.textContent = \`
+  #snowflakeContainer {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    pointer-events: none;
+  }
+  .snowflake {
+    position: fixed;
+    background-color: #FFFFFF;
+    user-select: none;
+    z-index: 1000;
+    pointer-events: none;
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    opacity: 0;
+  }
+  .snowflake.template {
+    display: none;
+  }
+  #snowToggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 7px 16px;
+    border-radius: 800px;
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    z-index: 1001;
+    transition: background-color 0.3s ease;
+ font-family: 'Ndot-55', sans-serif;
+ font-weight: 800;
+ text-transform: uppercase;
+  }
+  #snowToggle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+\`;
+document.head.appendChild(snowStyle);
+
+// Create and inject the snowflake container
+const container = document.createElement('div');
+container.id = 'snowflakeContainer';
+container.innerHTML = '<span class="snowflake template"></span>';
+document.body.appendChild(container);
+
+// Create and inject the toggle button
+const toggleBtn = document.createElement('button');
+toggleBtn.id = 'snowToggle';
+toggleBtn.textContent = 'Snow: On';
+document.body.appendChild(toggleBtn);
+
+// Cookie functions
+function setCookie(name, value, days) {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = name + '=' + value + ';expires=' + expires.toUTCString() + ';path=/';
+}
+
+function getCookie(name) {
+  const nameEQ = name + '=';
+  const ca = document.cookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+  }
+  return null;
+}
+
+// Snowfall logic
+let snowflakes = [];
+let browserWidth;
+let browserHeight;
+let numberOfSnowflakes = 50;
+let resetPosition = false;
+let enableAnimations = false;
+let reduceMotionQuery = matchMedia("(prefers-reduced-motion)");
+let isSnowing = true; // Set to true by default
+
+function setAccessibilityState() {
+  enableAnimations = !reduceMotionQuery.matches;
+}
+setAccessibilityState();
+reduceMotionQuery.addListener(setAccessibilityState);
+
+class Snowflake {
+  constructor(element, speed, xPos, yPos) {
+    this.element = element;
+    this.speed = speed;
+    this.xPos = xPos;
+    this.yPos = yPos;
+    this.scale = 1;
+    this.counter = 0;
+    this.sign = Math.random() < 0.5 ? 1 : -1;
+    this.element.style.opacity = (0.1 + Math.random()) / 3;
+  }
+
+  update(delta) {
+    this.counter += (this.speed / 5000) * delta;
+    this.xPos += (this.sign * delta * this.speed * Math.cos(this.counter)) / 40;
+    this.yPos += Math.sin(this.counter) / 40 + (this.speed * delta) / 30;
+    this.scale = 0.5 + Math.abs((10 * Math.cos(this.counter)) / 20);
+
+    setTransform(
+      Math.round(this.xPos),
+      Math.round(this.yPos),
+      this.scale,
+      this.element
+    );
+
+    if (this.yPos > browserHeight) {
+      this.yPos = -50;
+    }
+  }
+}
+
+function setTransform(xPos, yPos, scale, el) {
+  el.style.transform = \`translate3d(\${xPos}px, \${yPos}px, 0) scale(\${scale}, \${scale})\`;
+}
+
+function getPosition(offset, size) {
+  return Math.round(-1 * offset + Math.random() * (size + 2 * offset));
+}
+
+function generateSnowflakes() {
+  const originalSnowflake = document.querySelector(".snowflake.template");
+  const snowflakeContainer = originalSnowflake.parentNode;
+
+  browserWidth = document.documentElement.clientWidth;
+  browserHeight = document.documentElement.clientHeight;
+
+  for (let i = 0; i < numberOfSnowflakes; i++) {
+    const snowflakeClone = originalSnowflake.cloneNode(true);
+    snowflakeClone.classList.remove('template');
+    snowflakeContainer.appendChild(snowflakeClone);
+
+    const initialXPos = getPosition(50, browserWidth);
+    const initialYPos = getPosition(50, browserHeight);
+    const speed = (5 + Math.random() * 40) * delta;
+
+    const snowflakeObject = new Snowflake(
+      snowflakeClone,
+      speed,
+      initialXPos,
+      initialYPos
+    );
+    snowflakes.push(snowflakeObject);
+  }
+
+  requestAnimationFrame(moveSnowflakes);
+}
+
+let frames_per_second = 60;
+let frame_interval = 1000 / frames_per_second;
+let previousTime = performance.now();
+let delta = 1;
+
+function moveSnowflakes(currentTime) {
+  delta = (currentTime - previousTime) / frame_interval;
+
+  if (enableAnimations && isSnowing) {
+    for (let i = 0; i < snowflakes.length; i++) {
+      snowflakes[i].update(delta);
+    }
+  }
+
+  previousTime = currentTime;
+
+  if (resetPosition) {
+    browserWidth = document.documentElement.clientWidth;
+    browserHeight = document.documentElement.clientHeight;
+
+    for (let i = 0; i < snowflakes.length; i++) {
+      let snowflake = snowflakes[i];
+      snowflake.xPos = getPosition(50, browserWidth);
+      snowflake.yPos = getPosition(50, browserHeight);
+    }
+
+    resetPosition = false;
+  }
+
+  requestAnimationFrame(moveSnowflakes);
+}
+
+function setResetFlag() {
+  resetPosition = true;
+}
+
+function toggleSnow() {
+  isSnowing = !isSnowing;
+  const snowflakeContainer = document.getElementById('snowflakeContainer');
+  const snowflakes = snowflakeContainer.querySelectorAll('.snowflake:not(.template)');
+  
+  if (isSnowing) {
+    snowflakes.forEach(flake => flake.style.opacity = ''); // Reset to original random opacity
+    toggleBtn.textContent = 'Snow: On';
+  } else {
+    snowflakes.forEach(flake => flake.style.opacity = '0');
+    toggleBtn.textContent = 'Snow: Off';
+  }
+  
+  setCookie('snowEnabled', isSnowing ? '1' : '0', 365);
+}
+
+// Setup
+if (enableAnimations) {
+  window.addEventListener("DOMContentLoaded", () => {
+    generateSnowflakes();
+    
+    // Check cookie and set initial state
+    const snowEnabled = getCookie('snowEnabled');
+    if (snowEnabled === '0') {
+      isSnowing = false;
+      const snowflakes = document.querySelectorAll('.snowflake:not(.template)');
+      snowflakes.forEach(flake => flake.style.opacity = '0');
+      toggleBtn.textContent = 'Snow: Off';
+    }
+  }, false);
+  
+  window.addEventListener("resize", setResetFlag, false);
+  toggleBtn.addEventListener("click", toggleSnow, false);
+}
+`;
+
+document.body.appendChild(snowfallScript);
+</script>
+            
+                <script>
+                    // Remove loading elements after animation
+                    setTimeout(() => {
+                        document.querySelector('.loading-bar').style.display = 'none';
+                        document.querySelector('.spinner').style.display = 'none';
+                    }, 500);
+                </script>
+                <div class="px-10 mt-4">
+                    <div id="application" class="hidden min-h-[490px] flex justify-center">

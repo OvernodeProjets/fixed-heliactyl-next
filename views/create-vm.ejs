@@ -1,0 +1,41 @@
+<%- include('./components/top') %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.css" integrity="sha512-MpdEaY2YQ3EokN6lCD6bnWMl5Gwk7RjBbpKLovlrH6X+DRokrPRAF3zQJl1hZUiLXfo2e9MrOt+udOnHCAmi5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center w-full mx-auto pb-8">
+        <a href="/servers" class="px-4 py-2 bg-white/10 hover:bg-white/15 rounded-lg rounded-br-2xl hover:scale-95 transition text-white/70 text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 mb-0.5 inline-flex mr-1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>
+            Back to server list
+        </a>
+    </div>
+
+    <!-- Maintenance Notice -->
+    <div class="max-w-4xl mx-auto text-center">
+        <div class="rounded-xl border border-red-500/20 bg-red-900/20 p-8 mb-8">
+            <div class="flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h2 class="text-xl font-semibold text-white mb-4">Virtual Machines & RDPs Temporarily Unavailable</h2>
+            <p class="text-white/70 text-lg mb-4">We are currently working on expanding our infrastructure capacity and improving our VM/RDP deployment system.</p>
+            <p class="text-white/70 mb-6">During this maintenance period, new VM and RDP deployments are temporarily on hold. We appreciate your patience as we work to provide you with an enhanced and more reliable service.</p>
+            <div class="inline-flex items-center text-sm text-white/50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Please check back later for updates
+            </div>
+        </div>
+        
+        <a href="/servers" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-indigo-500 hover:bg-indigo-700 transition hover:scale-95">
+            Return to Dashboard
+        </a>
+    </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.js" integrity="sha512-eOUPKZXJTfgptSYQqVilRmxUNYm0XVHwcRHD4mdtCLWf/fC9XWe98IT8H1xzBkLL4Mo9GL0xWMSJtgS5te9rQA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<%- include('./components/bottom') %>

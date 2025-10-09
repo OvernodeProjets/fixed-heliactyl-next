@@ -1,0 +1,98 @@
+<%- include('../components/top') %>
+<!-- Main Content -->
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center w-full mx-auto pb-4">
+        <div class="flex flex-col">
+            <h1 class="text-xl font-semibold mb-0.5" style="font-family: 'Inter';">Admin: Other</h1>
+            <p class="text-gray-400 text-md">Manage plans, coupons, and user accounts.</p>
+        </div>
+    </div>
+
+    <% if (req.query.err === 'none') { %>
+        <div class="mb-8 p-4 bg-green-600 rounded-2xl">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span class="text-white font-semibold">Operation completed successfully!</span>
+            </div>
+        </div>
+    <% } %>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Set Plan Form -->
+        <div class="bg-white/5 p-6 rounded-2xl">
+            <h2 class="text-lg font-semibold text-white mb-4">Set User Plan</h2>
+            <form action="/setplan" method="GET">
+                <div class="mb-4">
+                    <label for="setplan-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                    <input type="text" id="setplan-id" name="id" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="setplan-package" class="block text-sm font-medium text-gray-300 mb-2">Package Name</label>
+                    <input type="text" id="setplan-package" name="package" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <button type="submit" class="w-full bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">Set Plan</button>
+            </form>
+        </div>
+
+        <!-- Create Coupon Form -->
+        <div class="bg-white/5 p-6 rounded-2xl">
+            <h2 class="text-lg font-semibold text-white mb-4">Create Coupon</h2>
+            <form action="/create_coupon" method="GET">
+                <div class="mb-4">
+                    <label for="coupon-code" class="block text-sm font-medium text-gray-300 mb-2">Coupon Code</label>
+                    <input type="text" id="coupon-code" name="code" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="coupon-coins" class="block text-sm font-medium text-gray-300 mb-2">Coins</label>
+                    <input type="number" id="coupon-coins" name="coins" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="coupon-ram" class="block text-sm font-medium text-gray-300 mb-2">RAM (MB)</label>
+                    <input type="number" id="coupon-ram" name="ram" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="coupon-disk" class="block text-sm font-medium text-gray-300 mb-2">Disk (MB)</label>
+                    <input type="number" id="coupon-disk" name="disk" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="coupon-cpu" class="block text-sm font-medium text-gray-300 mb-2">CPU (%)</label>
+                    <input type="number" id="coupon-cpu" name="cpu" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="coupon-servers" class="block text-sm font-medium text-gray-300 mb-2">Servers</label>
+                    <input type="number" id="coupon-servers" name="servers" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <button type="submit" class="w-full bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">Create Coupon</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Revoke Coupon Form -->
+        <div class="bg-white/5 p-6 rounded-2xl">
+            <h2 class="text-lg font-semibold text-white mb-4">Revoke Coupon</h2>
+            <form action="/revoke_coupon" method="GET">
+                <div class="mb-4">
+                    <label for="revoke-coupon-code" class="block text-sm font-medium text-gray-300 mb-2">Coupon Code</label>
+                    <input type="text" id="revoke-coupon-code" name="code" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <button type="submit" class="w-full bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">Revoke Coupon</button>
+            </form>
+        </div>
+
+        <!-- Remove Account Form -->
+        <div class="bg-white/5 p-6 rounded-2xl">
+            <h2 class="text-lg font-semibold text-white mb-4">Remove Account</h2>
+            <form action="/remove_account" method="GET">
+                <div class="mb-4">
+                    <label for="remove-account-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                    <input type="text" id="remove-account-id" name="id" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
+                </div>
+                <button type="submit" class="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">Remove Account</button>
+            </form>
+        </div>
+    </div>
+</main>
+<%- include('../components/bottom') %>

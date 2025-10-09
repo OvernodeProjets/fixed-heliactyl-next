@@ -1,0 +1,388 @@
+<%- include('./components/top') %>
+<% if (!settings.api.client.plesk.enabled) { %>
+    <div class="flex flex-col items-center justify-center mt-32">
+        <h3 class="text-3xl font-bold text-white heavy mb-3">Web Hosting is not enabled</h3>
+        <p class="text-neutral-400 text-lg mb-6 max-w-md mx-auto">Back to <a href="/dashboard">dashboard</a>.</p>
+    </div>
+<% } else { %>
+<!-- Main Content -->
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center w-full mx-auto pb-4">
+        <div class="flex flex-col">
+            <h1 class="text-xl font-semibold mb-0.5 heavy">Web Hosting</h1>
+            <p class="text-neutral-400 text-md">Manage your web hosting services.</p>
+        </div>
+
+        <nav aria-label="Breadcrumb" class="inline-flex py-2 px-4 rounded-xl bg-white/5 transition-colors duration-200">
+            <ol role="list" class="flex items-center space-x-2">
+                <li>
+                    <a href="/" class="text-sm flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler size-4">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+                            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
+                            <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
+                        </svg>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler size-4 text-zinc-400">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M9 6l6 6l-6 6"></path>
+                    </svg>
+                </li>
+                <li>
+                    <span class="text-sm flex items-center gap-2 font-medium text-white/80">Web Hosting</span>
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Activation Status -->
+    <div id="activation-section" class="flex flex-col items-center justify-center mt-32">
+        <div id="not-activated" style="display: none;" class="text-center">
+            <div class="bg-indigo-500/10 p-4 rounded-full inline-flex mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 text-indigo-400">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
+                </svg>              
+            </div>
+            <h3 class="text-3xl font-bold text-white heavy mb-3">Welcome to <%= settings.name %> Web Hosting!</h3>
+            <p class="text-neutral-400 text-lg mb-6 max-w-md mx-auto">Activate your account on our Plesk panel to start creating amazing websites on <%= settings.name %>.</p>
+            <button onclick="activateHosting()" class="transition hover:scale-95 bg-indigo-500 text-white px-6 py-3 rounded-xl hover:bg-indigo-600 flex items-center gap-2 mx-auto font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                  </svg>                             
+                Activate now for free
+            </button>
+        </div>
+    </div>
+
+    <!-- Websites Section -->
+    <div id="websites-section" class="mt-8" style="display: none;">
+        <% if (plesk) { %>
+            <div class="relative w-full mb-6">
+                <h3 class="text-md font-semibold leading-6 text-white" style="font-family: 'Inter'">Access Plesk (our Web Hosting panel)</h3>
+                <span class="text-sm mt-1 text-gray-300">Username: <%= plesk.login %></span><br>
+                <span class="text-sm mt-1 text-gray-300">Password: <%= plesk.password %></span><br>
+                <span class="text-sm mt-1 text-gray-300">URL: <a class="text-indigo-300" href="https://inspiring-goldwasser.109-228-48-107.plesk.page:8443">Click here</a></span>
+            </div>
+        <% } %>
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
+            <div class="relative w-full">
+                <h3 class="text-md font-semibold leading-6 text-white" style="font-family: 'Inter'">Your Websites</h3>
+            </div>
+            <div class="sm:ml-auto sm:flex-none">
+                <button onclick="showCreateWebsiteModal()" class="hover:scale-95 flex items-center justify-center h-11 gap-2 px-5 text-sm font-medium text-white transition-all duration-200 rounded-full shadow bg-indigo-500 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-800 focus:ring-offset-2 ring-offset-neutral-200 hover:shadow-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    New Website
+                </button>
+            </div>
+        </div>
+
+        <div id="websites-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Websites will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- Create Website Modal -->
+    <div id="create-website-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" style="display: none;">
+        <div class="bg-[#1a1c20] rounded-2xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-lg font-semibold text-white mb-4">Create New Website</h3>
+            <form onsubmit="createWebsite(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-neutral-300 mb-1">What's your domain?</label>
+                    <input type="text" id="domain-input" required placeholder="example.com" class="w-full px-3 py-2 bg-white/5 rounded-xl text-white border border-white/5 focus:border-white/5 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="hideCreateWebsiteModal()" class="px-4 py-2 text-sm text-neutral-300 hover:text-white transition-colors duration-200">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-500 text-white rounded-xl hover:bg-indigo-700 transition-colors duration-200">
+                        Create Website
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" style="display: none;">
+        <div class="bg-[#1a1c20] rounded-2xl p-6 flex items-center gap-3">
+            <svg class="animate-spin size-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="text-white font-medium">Processing...</span>
+        </div>
+    </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        // Initialize
+        checkActivationStatus();
+        
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        function showCreateWebsiteModal() {
+            document.getElementById('create-website-modal').style.display = 'flex';
+        }
+
+        function hideCreateWebsiteModal() {
+            document.getElementById('create-website-modal').style.display = 'none';
+            document.getElementById('domain-input').value = '';
+        }
+
+        async function checkActivationStatus() {
+            try {
+                const response = await fetch('/plesk/account');
+                if (response.ok) {
+                    document.getElementById('activation-section').style.display = 'none';
+                    document.getElementById('websites-section').style.display = 'block';
+                    loadWebsites();
+                } else {
+                    document.getElementById('not-activated').style.display = 'block';
+                    document.getElementById('websites-section').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error checking activation status:', error);
+            }
+        }
+
+        async function activateHosting() {
+            try {
+                showLoading();
+                const response = await fetch('/plesk/activate', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    // Show success toast
+                    window.location.reload()
+                    checkActivationStatus();
+                } else {
+                    const error = await response.json();
+                    window.location.reload()
+                    toastr.error(error.error || 'Failed to activate hosting');
+                }
+            } catch (error) {
+                toastr.error('An error occurred while activating hosting');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function loadWebsites() {
+            try {
+                const response = await fetch('/plesk/websites');
+                if (response.ok) {
+                    const websites = await response.json();
+                    const websitesList = document.getElementById('websites-list');
+                    websitesList.innerHTML = '';
+
+                    if (websites.length === 0) {
+                        websitesList.innerHTML = `
+                            <p class="text-neutral-400 text-sm col-span-full">
+                                You don't have any websites yet. Create one to get started!
+                            </p>
+                        `;
+                        return;
+                    }
+
+                    websites.forEach(website => {
+                        websitesList.innerHTML += `
+                            <div class="bg-white/5 rounded-2xl overflow-hidden shadow-none hover:shadow-lg transition-shadow duration-300">
+                                <div class="p-6">
+                                    <h4 class="text-lg font-semibold text-white mb-1">${website.name}</h4>
+                                    <div class="text-xs text-neutral-300 mb-4 flex items-center gap-2">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full ${website.status === 'active' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}">
+                                            <span class="size-1.5 rounded-full ${website.status === 'active' ? 'bg-green-400' : 'bg-yellow-400'} mr-1.5"></span>
+                                            ${website.status === 'active' ? 'Active' : 'Setting up...'}
+                                        </span>
+                                    </div>
+                                    <div class="flex flex-col gap-2">
+                                        <a href="http://${website.name}" target="_blank" 
+                                           class="transition hover:scale-95 text-center bg-indigo-500 hover:bg-indigo-700 text-white text-sm font-medium py-2 px-4 rounded-xl">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-4 inline-flex mr-1 mb-0.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                            </svg>
+                                            Open Domain
+                                        </a>
+                                        <button onclick="deleteWebsite('${website.id}')" 
+                                                class="transition hover:scale-95 text-center bg-white/10 hover:bg-white/15 text-white text-sm font-medium py-2 px-4 rounded-xl">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-4 inline-flex mr-1 mb-0.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                            </svg>
+                                            Delete Website
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading websites:', error);
+                toastr.error('Failed to load websites');
+            }
+        }
+
+        async function createWebsite(event) {
+            event.preventDefault();
+            const domain = document.getElementById('domain-input').value;
+
+            try {
+                showLoading();
+const response = await fetch('/plesk/websites', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ domain })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    window.location.reload()
+                    hideCreateWebsiteModal();
+                    toastr.success('Website created successfully');
+                    
+                    // Show credentials if provided
+                    if (data.credentials) {
+                        const credentialMessage = `
+                            Plesk Login Details:<br>
+                            URL: ${data.pleskUrl}<br>
+                            Username: ${data.credentials.username}<br>
+                            Password: ${data.credentials.password}
+                        `;
+                        toastr.info(credentialMessage, 'Save these credentials', { 
+                            timeOut: 0,
+                            extendedTimeOut: 0,
+                            closeButton: true
+                        });
+                    }
+                    
+                    loadWebsites();
+                } else {
+                    const error = await response.json();
+                                        window.location.reload()
+                    toastr.error(error.error || 'Failed to create website');
+                }
+            } catch (error) {
+                console.error('Error creating website:', error);
+                toastr.error('An error occurred while creating the website');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function deleteWebsite(websiteId) {
+            if (!confirm('Are you sure you want to delete this website? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                showLoading();
+                const response = await fetch(`/plesk/websites/${websiteId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    toastr.success('Website deleted successfully');
+                    loadWebsites();
+                } else {
+                    const error = await response.json();
+                    toastr.error(error.error || 'Failed to delete website');
+                }
+            } catch (error) {
+                console.error('Error deleting website:', error);
+                toastr.error('An error occurred while deleting the website');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Configure toastr notifications
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            positionClass: "toast-bottom-right",
+            timeOut: 5000,
+            extendedTimeOut: 2000,
+            showEasing: "swing",
+            hideEasing: "linear",
+            showMethod: "fadeIn",
+            hideMethod: "fadeOut"
+        };
+    </script>
+
+    <!-- Error Alert Template -->
+    <template id="error-alert">
+        <div class="bg-red-900/50 border border-red-500/50 rounded-xl p-4 mb-4">
+            <div class="flex items-center">
+                <svg class="size-5 text-red-400 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span class="text-red-400 text-sm error-message"></span>
+            </div>
+        </div>
+    </template>
+
+    <!-- Success Alert Template -->
+    <template id="success-alert">
+        <div class="bg-green-900/50 border border-green-500/50 rounded-xl p-4 mb-4">
+            <div class="flex items-center">
+                <svg class="size-5 text-green-400 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-green-400 text-sm success-message"></span>
+            </div>
+        </div>
+    </template>
+
+    <!-- Credentials Modal Template -->
+    <template id="credentials-modal">
+        <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+            <div class="bg-neutral-900 rounded-2xl p-6 w-full max-w-md mx-4">
+                <h3 class="text-lg font-semibold text-white mb-4">Save Your Credentials</h3>
+                <div class="space-y-3 mb-6">
+                    <div class="bg-white/5 rounded-lg p-3">
+                        <div class="text-sm text-neutral-300 mb-1">Plesk URL</div>
+                        <div class="text-white font-mono text-sm plesk-url"></div>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-3">
+                        <div class="text-sm text-neutral-300 mb-1">Username</div>
+                        <div class="text-white font-mono text-sm username"></div>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-3">
+                        <div class="text-sm text-neutral-300 mb-1">Password</div>
+                        <div class="text-white font-mono text-sm password"></div>
+                    </div>
+                </div>
+                <div class="text-neutral-300 text-sm mb-6">
+                    <svg class="size-5 text-yellow-400 inline mr-2 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Make sure to save these credentials. You won't be able to see them again!
+                </div>
+                <div class="flex justify-end">
+                    <button onclick="closeCredentialsModal(this.closest('.fixed'))" class="px-4 py-2 bg-indigo-500 text-white rounded-xl hover:bg-indigo-700 transition-colors duration-200">
+                        I've Saved Them
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+</main>
+<% } %>
+<%- include('./components/bottom') %>

@@ -1,0 +1,602 @@
+<%- include('./components/top') %>
+
+<main class="flex-grow container mx-auto px-4 py-8" x-data="storeBilling()">
+    <!-- Header Section -->
+    <div class="flex justify-between items-center w-full mx-auto pb-4">
+        <div class="flex flex-col">
+            <h1 class="text-xl font-semibold mb-0.5 heavy">Store</h1>
+            <p class="text-gray-400 text-md">Manage your resources and subscriptions with <%= settings.website.currency %></p>
+        </div>
+
+        <nav aria-label="Breadcrumb" class="inline-flex py-2 px-4 rounded-xl bg-white/5 transition-colors duration-200">
+            <ol role="list" class="flex items-center space-x-2">
+                <li>
+                    <a href="/" class="text-sm flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-colors duration-200">
+                        <!-- Home Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                            <path d="M3 9.75L12 3l9 6.75v11.25a1.5 1.5 0 01-1.5 1.5h-6v-7.5a1.5 1.5 0 00-1.5-1.5h-3a1.5 1.5 0 00-1.5 1.5v7.5h-6A1.5 1.5 0 013 21v-11.25z"/>
+                        </svg>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-zinc-400">
+                        <path d="M9 6l6 6-6 6"></path>
+                    </svg>
+                </li>
+                <li>
+                    <a href="#" class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200">
+                        Store
+                    </a>
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Tabs -->
+    <div class="border-b border-white/5 mt-4">
+        <nav class="flex space-x-8">
+            <button @click="activeTab = 'store'" :class="{'border-indigo-500 text-white': activeTab === 'store', 'border-transparent text-gray-400 hover:text-white': activeTab !== 'store'}" class="border-b-2 py-4 px-1 text-sm font-medium transition-colors duration-200">
+                Store
+            </button>
+            <button @click="activeTab = 'history'" :class="{'border-indigo-500 text-white': activeTab === 'history', 'border-transparent text-gray-400 hover:text-white': activeTab !== 'history'}" class="border-b-2 py-4 px-1 text-sm font-medium transition-colors duration-200">
+                History
+            </button>
+        </nav>
+    </div>
+
+    <!-- Store Tab -->
+    <div x-show="activeTab === 'store'" x-cloak>
+        <!-- Alert for successful purchase -->
+        <div x-show="showSuccess" class="mt-4 p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-green-400 flex items-center justify-between">
+            <span x-text="successMessage"></span>
+            <button @click="showSuccess = false" class="text-green-400 hover:text-green-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Alert for errors -->
+        <div x-show="showError" class="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 flex items-center justify-between">
+            <span x-text="errorMessage"></span>
+            <button @click="showError = false" class="text-red-400 hover:text-red-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mt-4">
+            <!-- RAM Card -->
+            <div class="bg-white/5 rounded-2xl p-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold">RAM</h3>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-medium">600 <%= settings.website.currency %> / GB</span>
+                    <div class="flex items-center">
+                        <button @click="decrement('ram')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-l transition">-</button>
+                        <input x-model.number="ram" type="number" min="1" max="32" class="bg-black text-white w-16 text-center px-2 py-1 border-t border-b border-white/5">
+                        <button @click="increment('ram')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-r transition">+</button>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-400 mb-4">
+                    Total cost: <span x-text="formatCost(ram * 600)"></span> <%= settings.website.currency %>
+                </p>
+                <button @click="purchaseResource('ram')" :disabled="isLoading" class="w-full bg-indigo-500 font-medium text-white py-2 rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center">
+                    <svg x-show="isLoading" class="animate-spin w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span x-text="isLoading ? 'Processing...' : 'Purchase RAM'"></span>
+                </button>
+            </div>
+
+            <!-- Disk Card -->
+            <div class="bg-white/5 rounded-2xl p-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold">Disk</h3>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-medium">50 <%= settings.website.currency %> / 5GB</span>
+                    <div class="flex items-center">
+                        <button @click="decrement('disk')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-l transition">-</button>
+                        <input x-model.number="disk" type="number" min="1" max="200" class="bg-black text-white w-16 text-center px-2 py-1 border-t border-b border-white/5">
+                        <button @click="increment('disk')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-r transition">+</button>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-400 mb-4">
+                    Total cost: <span x-text="formatCost(disk * 50)"></span> <%= settings.website.currency %>
+                </p>
+                <button @click="purchaseResource('disk')" :disabled="isLoading" class="w-full bg-indigo-500 font-medium text-white py-2 rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center">
+                    <svg x-show="isLoading" class="animate-spin w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span x-text="isLoading ? 'Processing...' : 'Purchase Disk'"></span>
+                </button>
+            </div>
+
+            <!-- CPU Card -->
+            <div class="bg-white/5 rounded-2xl p-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold">CPU</h3>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-medium">500 <%= settings.website.currency %> / Core</span>
+                    <div class="flex items-center">
+                        <button @click="decrement('cpu')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-l transition">-</button>
+                        <input x-model.number="cpu" type="number" min="1" max="10" class="bg-black text-white w-16 text-center px-2 py-1 border-t border-b border-white/5">
+                        <button @click="increment('cpu')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-r transition">+</button>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-400 mb-4">
+                    Total cost: <span x-text="formatCost(cpu * 500)"></span> <%= settings.website.currency %>
+                </p>
+                <button @click="purchaseResource('cpu')" :disabled="isLoading" class="w-full bg-indigo-500 font-medium text-white py-2 rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center">
+                    <svg x-show="isLoading" class="animate-spin w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span x-text="isLoading ? 'Processing...' : 'Purchase CPU'"></span>
+                </button>
+            </div>
+
+            <!-- Servers Card -->
+            <div class="bg-white/5 rounded-2xl p-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold">Servers</h3>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-medium">200 <%= settings.website.currency %> / Server</span>
+                    <div class="flex items-center">
+                        <button @click="decrement('servers')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-l transition">-</button>
+                        <input x-model.number="servers" type="number" min="1" max="20" class="bg-black text-white w-16 text-center px-2 py-1 border-t border-b border-white/5">
+                        <button @click="increment('servers')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-r transition">+</button>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-400 mb-4">
+                    Total cost: <span x-text="formatCost(servers * 200)"></span> <%= settings.website.currency %>
+                </p>
+                <button @click="purchaseResource('servers')" :disabled="isLoading" class="w-full bg-indigo-500 font-medium text-white py-2 rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center">
+                    <svg x-show="isLoading" class="animate-spin w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span x-text="isLoading ? 'Processing...' : 'Purchase Servers'"></span>
+                </button>
+            </div>
+        </div>
+    <!-- Renewal Bypass Promo Section -->
+    <div class="bg-white/5 rounded-2xl p-6 mb-8 mt-5">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold text-white/90">Special Offer</h2>
+            <button 
+                @click="purchaseRenewalBypass()" 
+                :disabled="!renewalBypassStatus.canAfford || isLoading || renewalBypassStatus.hasRenewalBypass"
+                class="bg-white/5 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                </svg>
+                <span x-text="isLoading ? 'Processing...' : renewalBypassStatus.hasRenewalBypass ? 'Already Purchased' : `Purchase (${renewalBypassStatus.price} coins)`"></span>
+            </button>
+        </div>
+        
+        <div class="grid grid-cols-1 gap-4">
+            <div class="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-6 border border-purple-500/20">
+                <div class="flex items-start gap-4">
+                    <div class="bg-purple-500/20 p-3 rounded-xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M6.625 2.655A9 9 0 0119 11a1 1 0 11-2 0 7 7 0 00-9.625-6.492 1 1 0 11-.75-1.853zM4.662 4.959A1 1 0 014.75 6.37 6.97 6.97 0 003 11a1 1 0 11-2 0 8.97 8.97 0 012.25-5.953 1 1 0 011.412-.088z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M5 11a5 5 0 1110 0 1 1 0 11-2 0 3 3 0 10-6 0c0 1.677-.345 3.276-.968 4.729a1 1 0 11-1.838-.789A9.964 9.964 0 005 11zm8.921 2.012a1 1 0 01.831 1.145 19.86 19.86 0 01-.545 2.436 1 1 0 11-1.92-.558c.207-.713.371-1.445.49-2.192a1 1 0 011.144-.831z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-2">Renewal Bypass</h3>
+                        <p class="text-white/80 text-sm mb-4">Never worry about weekly store renewals or renewing your server every 48 hours again. Purchase our Renewal Bypass for <span x-text="renewalBypassStatus.price"></span> coins and keep your resources and servers forever.</p>
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl font-bold text-white" x-text="`${renewalBypassStatus.price} coins`"></span>
+                            <span class="bg-purple-500/20 text-purple-400 px-3 py-1 rounded-lg text-sm">One-time purchase</span>
+                        </div>
+                        <div x-show="!renewalBypassStatus.canAfford && !renewalBypassStatus.hasRenewalBypass" class="mt-3 text-red-400 text-sm">
+                            You need <span x-text="renewalBypassStatus.price - renewalBypassStatus.currentBalance"></span> more coins to purchase this.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Usage History Tab -->
+    <div x-show="activeTab === 'usage'" x-cloak>
+        <div class="mt-4 space-y-4">
+            <div class="bg-white/5 rounded-2xl p-6">
+                <h3 class="text-lg font-medium mb-4">Resources</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <template x-for="(data, type) in currentUsage" :key="type">
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium" x-text="formatResourceTitle(type)"></span>
+                                <span class="text-sm text-gray-400" x-text="formatResourceAmount({resourceType: type, amount: data})"></span>
+                            </div>
+                            <div class="h-2 bg-white/5 rounded-full">
+                                <div class="h-2 bg-indigo-500 rounded-full" :style="`width: ${calculateUsagePercentage(type, data)}%`"></div>
+                            </div>
+                            <div class="text-xs text-gray-400 mt-2" x-text="formatUsageLimit(type)"></div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <div class="bg-white/5 rounded-2xl p-6 hidden">
+                <div class="flex items-center justify-between mb-4 hidden">
+                    <h3 class="text-lg font-medium">Usage History</h3>
+                    <select x-model="usageDays" @change="fetchUsageHistory()" class="bg-white/5 text-sm hidden rounded-lg px-3 py-2 border border-white/10">
+                        <option value="7">Last 7 days</option>
+                        <option value="14">Last 14 days</option>
+                        <option value="30">Last 30 days</option>
+                    </select>
+                </div>
+                <div class="space-y-4">
+                    <template x-for="usage in usageHistory" :key="usage.timestamp">
+                        <div class="p-4 bg-white/5 rounded-xl">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium" x-text="formatDate(usage.timestamp)"></span>
+                            </div>
+                            <div class="grid grid-cols-4 gap-4">
+                                <div class="text-sm">
+                                    <span class="text-gray-400">RAM:</span>
+                                    <span x-text="formatBytes(usage.resources.ram)"></span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-400">Disk:</span>
+                                    <span x-text="formatBytes(usage.resources.disk)"></span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-400">CPU:</span>
+                                    <span x-text="usage.resources.cpu + '%'"></span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-400">Servers:</span>
+                                    <span x-text="usage.resources.servers"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Billing History Tab -->
+    <div x-show="activeTab === 'history'" x-cloak>
+        <div class="mt-4">
+            <div class="bg-white/5 rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium">Transaction History</h3>
+                    <select x-model="historyDays" @change="fetchBillingHistory()" class="bg-white/5 text-sm rounded-lg px-3 py-2 border border-white/10">
+                        <option value="7">Last 7 days</option>
+                        <option value="14">Last 14 days</option>
+                        <option value="30">Last 30 days</option>
+                    </select>
+                </div>
+                <div class="space-y-4">
+                    <template x-if="billingHistoryIsEmpty">
+                        <div class="text-center py-8">
+                            <div class="bg-white/5 inline-flex p-3 rounded-full mb-4">
+                                <!-- No History Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 5L5 19M5 5l14 14"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-medium">No Transaction History</h3>
+                            <p class="text-gray-400 mt-2">Your billing history will appear here.</p>
+                        </div>
+                    </template>
+
+                    <template x-for="transaction in billingHistory" :key="transaction.id">
+                        <div class="p-4 bg-white/5 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div :class="transaction.recurring ? 'bg-purple-600/10' : 'bg-indigo-500/10'" class="p-2 rounded-lg">
+                                    <svg x-show="transaction.recurring" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" :class="transaction.recurring ? 'text-purple-400' : 'text-indigo-400'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    <svg x-show="!transaction.recurring" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" :class="transaction.recurring ? 'text-purple-400' : 'text-indigo-400'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 11H8a2 2 0 01-2-2V6a2 2 0 012-2h6m4 0v14a2 2 0 01-2 2H8a2 2 0 01-2-2v-3"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-medium" x-text="formatTransactionTitle(transaction)"></div>
+                                    <div class="text-sm text-gray-400" x-text="formatDate(transaction.timestamp)"></div>
+                                </div>
+                            </div>
+                            <div :class="transaction.recurring ? 'text-purple-400' : 'text-indigo-400'" class="font-medium" x-text="formatCost(transaction.amount)"></div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+function storeBilling() {
+    return {
+        renewalBypassStatus: {
+            hasRenewalBypass: false,
+            price: 3500,
+            canAfford: false,
+            currentBalance: 0
+        },
+        activeTab: 'store',
+        ram: 1,
+        disk: 1,
+        cpu: 1,
+        servers: 1,
+        isLoading: false,
+        billingHistoryIsEmpty: true,
+        showSuccess: false,
+        showError: false,
+        successMessage: '',
+        errorMessage: '',
+        usageHistory: [],
+        billingHistory: [],
+        usageDays: '7',
+        historyDays: '7',
+        currentUsage: {
+            ram: 0,
+            disk: 0,
+            cpu: 0,
+            servers: 0
+        },
+
+        async init() {
+            await this.fetchResources();
+            await this.fetchUsageHistory();
+            await this.fetchBillingHistory();
+            await this.fetchRenewalBypassStatus()
+            // Set up auto-refresh every 5 minutes
+            setInterval(() => {
+                this.fetchUsageHistory();
+                this.fetchRenewalBypassStatus()
+            }, 300000);
+        },
+
+        async fetchRenewalBypassStatus() {
+            try {
+                const response = await fetch('/api/store/renewal-bypass');
+                if (!response.ok) throw new Error('Failed to fetch renewal bypass status');
+                this.renewalBypassStatus = await response.json();
+            } catch (error) {
+                console.error('Failed to fetch renewal bypass status:', error);
+            }
+        },
+
+        async purchaseRenewalBypass() {
+            if (this.isLoading) return;
+            this.isLoading = true;
+            this.showError = false;
+            this.showSuccess = false;
+
+            try {
+                const response = await fetch('/api/store/renewal-bypass', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) throw new Error(data.error);
+
+                this.showSuccess = true;
+                this.successMessage = 'Successfully purchased renewal bypass!';
+
+                // Refresh status after purchase
+                await Promise.all([
+                    this.fetchRenewalBypassStatus(),
+                    this.fetchBillingHistory()
+                ]);
+            } catch (error) {
+                this.showError = true;
+                this.errorMessage = error.message || 'An unexpected error occurred.';
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        increment(resource) {
+            const limits = {
+                ram: 32,
+                disk: 200,
+                cpu: 10,
+                servers: 20
+            };
+            if (this[resource] < limits[resource]) {
+                this[resource]++;
+            }
+        },
+
+        decrement(resource) {
+            if (this[resource] > 1) {
+                this[resource]--;
+            }
+        },
+
+        async purchaseResource(type) {
+            if (this.isLoading) return;
+            this.isLoading = true;
+            this.showError = false;
+            this.showSuccess = false;
+
+            try {
+                let amount;
+                if (type === 'disk') {
+                    amount = this.disk;
+                } else if (type === 'ram') {
+                    amount = this.ram;
+                } else if (type === 'cpu') {
+                    amount = this.cpu;
+                } else if (type === 'servers') {
+                    amount = this.servers;
+                }
+
+                const response = await fetch('/api/store/buy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resourceType: type, amount })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) throw new Error(data.error);
+
+                this.showSuccess = true;
+                this.successMessage = `Successfully purchased ${amount}x of resource ${type.toUpperCase()}!`;
+
+                // Refresh resources and histories after purchase
+                await Promise.all([
+                    this.fetchResources(),
+                    this.fetchUsageHistory(),
+                    this.fetchBillingHistory()
+                ]);
+            } catch (error) {
+                this.showError = true;
+                this.errorMessage = error.message || 'An unexpected error occurred.';
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        async fetchResources() {
+            try {
+                const response = await fetch('/api/store/resources');
+                if (!response.ok) throw new Error('Failed to fetch resources');
+                const data = await response.json();
+                this.currentUsage = data;
+            } catch (error) {
+                console.error('Failed to fetch resources:', error);
+                this.showError = true;
+                this.errorMessage = 'Failed to load resources';
+            }
+        },
+
+        async fetchUsageHistory() {
+            try {
+                const response = await fetch(`/api/store/usage?days=${this.usageDays}`);
+                if (!response.ok) throw new Error('Failed to fetch usage history');
+                const data = await response.json();
+
+                // Ensure we have at least one usage record
+                if (data.length > 0) {
+                    this.usageHistory = data;
+                    // Update current usage from the most recent record
+                    this.currentUsage = data[data.length - 1].resources;
+                } else {
+                    // If no usage data, fallback to fetched resources
+                    await this.fetchResources();
+                }
+            } catch (error) {
+                console.error('Failed to fetch usage history:', error);
+                // Fallback to fetched resources
+                await this.fetchResources();
+            }
+        },
+
+        async fetchBillingHistory() {
+            try {
+                const response = await fetch(`/api/store/history`);
+                if (!response.ok) throw new Error('Failed to fetch billing history');
+                const data = await response.json();
+
+                // Sort history by timestamp (newest first)
+                this.billingHistory = data.sort((a, b) => b.timestamp - a.timestamp);
+                this.billingHistoryIsEmpty = data.length = 0;
+            } catch (error) {
+                console.error('Failed to fetch billing history:', error);
+                this.showError = true;
+                this.errorMessage = 'Failed to load billing history';
+            }
+        },
+
+        formatResourceTitle(type) {
+            const titles = {
+                ram: 'Memory (RAM)',
+                disk: 'Storage (Disk)',
+                cpu: 'Processor (CPU)',
+                servers: 'Server Slots'
+            };
+            return titles[type] || type.toUpperCase();
+        },
+
+        formatResourceAmount(subscription) {
+            if (!subscription) return '';
+
+            const amounts = {
+                ram: amount => `${amount} GB RAM`,
+                disk: amount => `${amount * 5} GB Storage`,
+                cpu: amount => `${amount} Core${amount > 1 ? 's' : ''}`,
+                servers: amount => `${amount} Server${amount > 1 ? 's' : ''}`
+            };
+
+            return amounts[subscription.resourceType]?.(subscription.amount) ||
+                   `${subscription.amount} ${subscription.resourceType}`;
+        },
+
+        calculateUsagePercentage(type, amount) {
+            const limits = {
+                ram: 32,
+                disk: 1000, // 200 * 5GB
+                cpu: 1000,    // 10 * 100%
+                servers: 20
+            };
+            const limit = limits[type] || 100;
+            const percentage = (amount / limit) * 100;
+            return Math.min(percentage, 100).toFixed(1);
+        },
+
+        formatDate(timestamp) {
+            return new Intl.DateTimeFormat('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }).format(new Date(timestamp));
+        },
+
+        formatCost(amount) {
+            return `${amount.toLocaleString()}`;
+        },
+
+        formatBytes(bytes) {
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            if (bytes === 0) return '0 Bytes';
+            const i = Math.floor(Math.log(bytes) / Math.log(1024));
+            return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
+        },
+
+        formatTransactionTitle(transaction) {
+            const titles = {
+                ram: 'RAM Purchase',
+                disk: 'Disk Purchase',
+                cpu: 'CPU Purchase',
+                servers: 'Servers Purchase'
+            };
+            return titles[transaction.resourceType] || 'Resource Purchase';
+        },
+
+        formatUsageLimit(type) {
+            const limits = {
+                ram: 'Max 32 GB',
+                disk: 'Max 1000 GB',
+                cpu: 'Max 1000%',
+                servers: 'Max 20 Servers'
+            };
+            return limits[type] || 'No Limit';
+        }
+    };
+}
+</script>
+
+<%- include('./components/bottom') %>

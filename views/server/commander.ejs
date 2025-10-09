@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Commander</title>
+
+    <!-- Tailwind CSS (from your existing setup) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Monaco Editor (for file editing) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js" integrity="sha512-6bIYsGqvLpAiEBXPdRQeFf5cueeBECtAKJjIHer3BhBZNTV3WLcLA8Tm3pDfxUwTMIS+kAZwTUvJ1IrMdX8C5w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Split.js for resizable panels -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.min.js" integrity="sha512-lNjb0qWDVvt1zfcJqH9y16ZBVhzL9P8oAp/+vH4oJQQoZNUKhThUyZZobG5MYaka3/vRvx5RaR9TMIK5sUDnA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <style>
+        .commander-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 1px;
+            height: calc(100vh - 200px);
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .commander-sidebar {
+            background: rgba(30,32,35,0.7);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .commander-main {
+            background: rgba(30,32,35,0.7);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .tree-view {
+            padding: 0.5rem;
+        }
+
+        .tree-item {
+            display: flex;
+            align-items: center;
+            padding: 0.25rem;
+            cursor: pointer;
+            border-radius: 4px;
+            user-select: none;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+        }
+
+        .tree-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tree-item.selected {
+            background: rgba(99,102,241,0.2);
+        }
+
+        .tree-item-indent {
+            margin-left: 1.25rem;
+        }
+
+        .tree-toggle {
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 4px;
+            opacity: 0.7;
+        }
+
+        .tree-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+            opacity: 0.7;
+        }
+
+        .commander-toolbar {
+            padding: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(20,22,25,0.7);
+        }
+
+        .commander-toolbar button {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.8);
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .commander-toolbar button:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .commander-breadcrumb {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            background: rgba(20,22,25,0.7);
+        }
+
+        .breadcrumb-item {
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .breadcrumb-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .breadcrumb-separator {
+            margin: 0 0.25rem;
+            opacity: 0.5;
+        }
+
+        .commander-files {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-list-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .file-list-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .file-list-item.selected {
+            background: rgba(99,102,241,0.2);
+        }
+
+        .file-list-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .file-list-name {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .file-list-meta {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+            margin-left: 1rem;
+        }
+
+        .commander-statusbar {
+            padding: 0.25rem 0.5rem;
+            background: rgba(20,22,25,0.7);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .rename-input {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(99,102,241,0.5);
+            border-radius: 4px;
+            color: white;
+            padding: 0.25rem;
+            margin: -0.25rem;
+            width: calc(100% - 120px);
+            font-size: 0.9rem;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .context-menu {
+            position: fixed;
+            background: rgba(30,32,35,0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 0.25rem;
+            min-width: 160px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .context-menu-item {
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+        }
+
+        .context-menu-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .search-box {
+            padding: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(20,22,25,0.7);
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            color: white;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .drop-zone {
+            position: absolute;
+            inset: 0;
+            background: rgba(99,102,241,0.2);
+            border: 2px dashed rgba(99,102,241,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 50;
+        }
+
+        .drop-zone.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="commander-layout">
+        <!-- Sidebar with tree view -->
+        <div class="commander-sidebar">
+            <div class="commander-toolbar">
+                <button id="refresh-tree">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12a9 9 0 11-9-9c2.52 0 4.85.99 6.57 2.57L21 8"></path>
+                        <path d="M21 3v5h-5"></path>
+                    </svg>
+                    Refresh
+                </button>
+                <button id="collapse-all">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="4 14 10 14 10 20"></polyline>
+                        <polyline points="20 10 14 10 14 4"></polyline>
+                        <line x1="14" y1="10" x2="21" y2="3"></line>
+                        <line x1="3" y1="21" x2="10" y2="14"></line>
+                    </svg>
+                    Collapse All
+                </button>
+            </div>
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Search files..." id="tree-search">
+            </div>
+            <div class="tree-view" id="file-tree"></div>
+        </div>
+
+        <!-- Main content area -->
+        <div class="commander-main">
+            <div class="commander-toolbar">
+                <button id="upload-file">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    Upload
+                </button>
+                <button id="new-file">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                    New File
+                </button>
+                <button id="new-folder">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"></path>
+                        <line x1="12" y1="11" x2="12" y2="17"></line>
+                        <line x1="9" y1="14" x2="15" y2="14"></line>
+                    </svg>
+                    New Folder
+                </button>
+            </div>
+            <div class="commander-breadcrumb" id="path-breadcrumb"></div>
+            <div class="commander-files" id="file-list"></div>
+            <div class="commander-statusbar">
+                <span id="selection-status">No items selected</span>
+                <span id="item-count"></span>
+            </div>
+            <div class="drop-zone" id="drop-zone">
+                <div class="drop-zone-content">
+                    Drop files here to upload
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preserve all your existing modals -->
+<!-- File Edit Modal -->
+<div id="file-edit-modal" class="modal-overlay z-50">
+    <div class="modal-content w-3/4 h-3/4 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold" id="modal-title">Edit File</h3>
+            <button id="close-modal" class="text-gray-500 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div id="monaco-editor" class="flex-grow"></div>
+        <div class="mt-4 flex justify-end">
+            <button id="save-file" class="action-button bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- Create Folder Modal -->
+<div id="create-folder-modal" class="modal-overlay z-50">
+    <div class="modal-content">
+        <h3 class="text-xl font-semibold mb-4">Create New Folder</h3>
+        <input type="text" id="new-folder-name" class="w-full p-2 mb-4 bg-white/5 border border-white/5 focus:ring-2 focus:ring-indigo-500 focus:border-white/5 text-white rounded-lg" placeholder="Folder Name">
+        <div class="flex justify-end">
+            <button id="create-folder-cancel" class="action-button bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-2 px-4 rounded-xl transition mr-2">Cancel</button>
+            <button id="create-folder-confirm" class="action-button bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-xl transition">Create</button>
+        </div>
+    </div>
+</div>
+    
+<!-- New File Modal -->
+<div id="new-file-modal" class="modal-overlay z-50">
+    <div class="modal-content">
+        <h3 class="text-xl font-semibold mb-4">Create New File</h3>
+        <input type="text" id="new-file-name" class="w-full p-2 mb-4 bg-white/5 border border-white/5 focus:ring-2 focus:ring-indigo-500 focus:border-white/5 text-white rounded-lg" placeholder="File Name">
+        <div class="flex justify-end">
+            <button id="new-file-cancel" class="action-button bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-2 px-4 rounded-xl transition mr-2">Cancel</button>
+            <button id="new-file-confirm" class="action-button bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-xl transition">Create</button>
+        </div>
+    </div>
+</div>
+
+<div id="upload-progress-modal" class="modal-overlay backdrop-blur z-50">
+    <div class="modal-content w-96">
+        <h3 class="text-xl font-semibold mb-4">Uploading Files</h3>
+        <div id="upload-progress-container" class="space-y-4">
+            <!-- Progress bars will be added here dynamically -->
+        </div>
+    </div>
+</div>
+
+    <div id="context-menu" class="context-menu" style="display: none;">
+    <div class="context-menu-item hover:bg-white/5" id="context-menu-edit">Edit</div>
+    <div class="context-menu-item hover:bg-white/5" id="context-menu-delete">Delete</div>
+    <div class="context-menu-item hover:bg-white/5" id="context-menu-rename">Rename</div>
+    <div class="context-menu-item hover:bg-white/5" id="context-menu-download">Download</div>
+    <div class="context-menu-item hover:bg-white/5" id="context-menu-clone">Clone</div>
+    <div class="context-menu-item hover:bg-white/5" id="context-menu-decompress">Unarchive</div>
+    </div>
+
+    <script>
+        // Initialize the commander view
+        let treeData = [];
+        let selectedItems = new Set();
+        let expandedNodes = new Set(['/home/container']);
+        
+        // Main initialization
+        async function initializeCommander() {
+            await loadTreeData('/home/container');
+            setupEventListeners();
+            updateBreadcrumb();
+        }
+
+        // Load tree data recursively
+        async function loadTreeData(path) {
+            showLoading();
+            try {
+                const response = await fetch(`/api/server/${serverId}/files/list?directory=${encodeURIComponent(path)}`);
+                const data = await response.json();
+                
+                treeData = data.data;
+                renderTree();
+                renderFileList();
+                
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading tree data:', error);
+                hideLoading();
+            }
+        }
+
+        // Render file tree
+        function renderTree() {
+            const treeView = document.getElementById('file-tree');
+            treeView.innerHTML = buildTreeHTML(treeData, 0);
+        }
+
+        function buildTreeHTML(items, depth) {
+            let html = '';
+            items.forEach(item => {
+                const isFolder = !item.attributes.is_file;
+                const isExpanded = expandedNodes.has(item.attributes.path);
+                
+                html += `
+                    <div class="tree-item${depth ? ' tree-item-indent' : ''}" data-path="${item.attributes.path}">
+                        <span class="tree-toggle">
+${isFolder ? (isExpanded ? 
+                                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>' : 
+                                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>'
+                            ) : ''}
+                        </span>
+                        <span class="tree-icon">
+                            ${isFolder ? 
+                                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"></path></svg>' : 
+                                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"></path></svg>'
+                            }
+                        </span>
+                        <span class="tree-label">${item.attributes.name}</span>
+                    </div>
+                    ${isFolder && isExpanded ? buildTreeHTML(item.children || [], depth + 1) : ''}
+                `;
+            });
+            return html;
+        }
+
+        // Render file list
+        function renderFileList() {
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = treeData.map(item => `
+                <div class="file-list-item${selectedItems.has(item.attributes.path) ? ' selected' : ''}" 
+                     data-path="${item.attributes.path}">
+                    <span class="file-list-icon">
+                        ${item.attributes.is_file ? 
+                            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"></path></svg>' : 
+                            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"></path></svg>'
+                        }
+                    </span>
+                    <span class="file-list-name">${item.attributes.name}</span>
+                    <span class="file-list-meta">
+                        ${item.attributes.is_file ? formatFileSize(item.attributes.size) : ''}
+                    </span>
+                </div>
+            `).join('');
+            
+            updateStatusBar();
+        }
+
+        // Update breadcrumb
+        function updateBreadcrumb() {
+            const parts = currentPath.split('/').filter(Boolean);
+            const breadcrumb = document.getElementById('path-breadcrumb');
+            
+            breadcrumb.innerHTML = `
+                <span class="breadcrumb-item" data-path="/">/</span>
+                ${parts.map((part, index) => `
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-item" data-path="/${parts.slice(0, index + 1).join('/')}">${part}</span>
+                `).join('')}
+            `;
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Tree view events
+            document.getElementById('file-tree').addEventListener('click', e => {
+                const treeItem = e.target.closest('.tree-item');
+                if (!treeItem) return;
+                
+                const path = treeItem.dataset.path;
+                if (e.target.closest('.tree-toggle')) {
+                    if (expandedNodes.has(path)) {
+                        expandedNodes.delete(path);
+                    } else {
+                        expandedNodes.add(path);
+                    }
+                    renderTree();
+                } else {
+                    currentPath = path;
+                    loadTreeData(path);
+                    updateBreadcrumb();
+                }
+            });
+
+            // File list selection
+            document.getElementById('file-list').addEventListener('click', e => {
+                const fileItem = e.target.closest('.file-list-item');
+                if (!fileItem) return;
+                
+                const path = fileItem.dataset.path;
+                if (e.ctrlKey || e.metaKey) {
+                    if (selectedItems.has(path)) {
+                        selectedItems.delete(path);
+                    } else {
+                        selectedItems.add(path);
+                    }
+                } else {
+                    selectedItems.clear();
+                    selectedItems.add(path);
+                }
+                
+                renderFileList();
+            });
+
+            // Breadcrumb navigation
+            document.getElementById('path-breadcrumb').addEventListener('click', e => {
+                const breadcrumbItem = e.target.closest('.breadcrumb-item');
+                if (breadcrumbItem) {
+                    currentPath = breadcrumbItem.dataset.path;
+                    loadTreeData(currentPath);
+                    updateBreadcrumb();
+                }
+            });
+
+            // Search functionality
+            let searchTimeout;
+            document.getElementById('tree-search').addEventListener('input', e => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    filterTree(searchTerm);
+                }, 300);
+            });
+
+            // Toolbar actions
+            document.getElementById('refresh-tree').addEventListener('click', () => {
+                loadTreeData(currentPath);
+            });
+
+            document.getElementById('collapse-all').addEventListener('click', () => {
+                expandedNodes.clear();
+                expandedNodes.add('/home/container');
+                renderTree();
+            });
+
+            // Preserve existing event listeners
+            setupExistingEventListeners();
+        }
+
+        // Filter tree based on search
+        function filterTree(searchTerm) {
+            if (!searchTerm) {
+                renderTree();
+                return;
+            }
+
+            const filteredItems = treeData.filter(item => 
+                item.attributes.name.toLowerCase().includes(searchTerm)
+            );
+            
+            treeData = filteredItems;
+            renderTree();
+        }
+
+        // Update status bar
+        function updateStatusBar() {
+            const statusBar = document.getElementById('selection-status');
+            const itemCount = document.getElementById('item-count');
+            
+            if (selectedItems.size > 0) {
+                statusBar.textContent = `${selectedItems.size} item(s) selected`;
+            } else {
+                statusBar.textContent = 'No items selected';
+            }
+            
+            itemCount.textContent = `${treeData.length} items`;
+        }
+
+        // Preserve and integrate existing functionality
+        function setupExistingEventListeners() {
+            // Preserve all your existing event listeners and functionality
+            // This ensures compatibility with your current file manager features
+            
+            // Example of integrating existing upload functionality:
+            document.getElementById('upload-file').addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.multiple = true;
+                input.onchange = e => {
+                    uploadFiles(e.target.files);
+                };
+                input.click();
+            });
+
+            // Integrate existing drag and drop
+            const dropZone = document.getElementById('drop-zone');
+            
+            document.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('active');
+            });
+
+            document.addEventListener('dragleave', (e) => {
+                if (!e.relatedTarget || !document.getElementById('commander-layout').contains(e.relatedTarget)) {
+                    dropZone.classList.remove('active');
+                }
+            });
+
+            document.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('active');
+                uploadFiles(e.dataTransfer.files);
+            });
+        }
+
+        // Initialize the commander view
+        initializeCommander();
+    </script>

@@ -1,0 +1,422 @@
+<%- include('./components/top') %>
+<!-- Main Content -->
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center w-full mx-auto pb-4">
+        <!-- Welcome text and subtext -->
+        <div class="flex flex-col">
+            <h1 class="text-xl font-semibold mb-0.5 heavy">My Servers</h1>
+            <p class="text-gray-400 text-md">Overview of your servers on <%= settings.name %>.</p>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-3">
+            <!-- New Server Button -->
+<div class="relative inline-block" x-data="{ open: false }">
+  <button 
+    @click="open = !open"
+    class="hover:scale-95 flex items-center justify-center h-11 gap-2 px-5 text-sm font-medium text-white transition-all duration-200 rounded-full shadow bg-indigo-500 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-800 focus:ring-offset-2 ring-offset-gray-200 hover:shadow-none"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-4">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+    <span>New</span>
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      class="size-4 transition-transform duration-200"
+      :class="open ? 'rotate-180' : ''"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+    </svg>
+  </button>
+
+  <div 
+    x-show="open"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+    x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
+    @click.outside="open = false"
+    class="absolute right-0 mt-2 w-48 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg"
+    style="display: none;"
+  >
+    <div class="py-2">
+      <a href="/servers/new" class="flex items-center gap-2 px-4 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-colors">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-4">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 17.25v-.228a4.5 4.5 0 0 0-.12-1.03l-2.268-9.64a3.375 3.375 0 0 0-3.285-2.602H7.923a3.375 3.375 0 0 0-3.285 2.602l-2.268 9.64a4.5 4.5 0 0 0-.12 1.03v.228m19.5 0a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3m19.5 0a3 3 0 0 0-3-3H5.25a3 3 0 0 0-3 3m16.5 0h.008v.008h-.008v-.008Zm-3 0h.008v.008h-.008v-.008Z" />
+</svg>
+        Game server
+      </a>
+      <% if (settings.api.rdv.enabled) { %>
+      <a href="/vms/new" class="flex items-center gap-2 px-4 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+        </svg>
+        Virtual machine
+      </a>
+      <% } %>
+    </div>
+  </div>
+</div>
+        </div>
+    </div>
+
+    <% if (settings.api.rdv.enabled) { %>
+        <div class="bg-gradient-to-r from-indigo-500/10 to-indigo-600/15 border border-indigo-500/10 rounded-3xl p-6 pl-12 mb-8 container mx-auto mt-8">
+            <div class="flex items-center justify-between">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300">
+                            <span class="size-2 rounded-full bg-indigo-400 mr-2"></span>
+                            VMs, RDPs are available right now.
+                        </div>
+                    </div>
+                    <h2 class="text-2xl heavy font-semibold text-white">Need a windows machine? We've got it.</h2>
+                    <p class="text-white/60">Windows RDPs and Linux VMs are on hold temporarily. We're working on getting more capacity and upgrading how deployment works.</p>
+                    <a href="/vms/new" class="inline-flex opacity-50 items-center justify-center h-11 gap-2 px-6 text-sm font-medium text-white transition-all duration-200 rounded-full shadow bg-indigo-500 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-800 focus:ring-offset-2 ring-offset-gray-200 hover:shadow-none" disabled>
+                        Deploy Now
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                        </svg>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <img src="https://i.imgur.com/NUDxhDy.png" alt="BHS Data Center" class="rounded-lg w-[400px] h-[250px] object-cover" />
+                </div>
+                </div>
+            </div>
+    <% } %>
+
+    <!-- Servers List Header -->
+    <div class="px-6 py-3 mt-6 grid grid-cols-12 gap-4 items-center text-sm font-medium text-white/50">
+        <div class="col-span-2">Server</div>
+        <div class="col-span-2">Status</div>
+        <div class="col-span-2">Memory</div>
+        <div class="col-span-2">CPU</div>
+        <div class="col-span-3 ml-4">IP Address</div>
+    </div>
+
+    <% pterodactyl.data = pterodactyl.relationships.servers.data %>
+    <!-- Servers List -->
+    <div class="divide-y divide-white/5" id="servers-list">
+        <% if (pterodactyl.data.length === 0) { %>
+            <div class="px-6 py-8 text-center text-white/60">
+                <p class="text-lg mb-2">No servers found</p>
+                <p class="text-sm">Get started by creating your first server</p>
+            </div>
+        <% } else { %>
+            <% pterodactyl.data.forEach(server => { %>
+<div class="server-row mb-4 bg-white/5 rounded-2xl hover:bg-white/10 border-2 border-dashed border-transparent hover:border-white/5 transition px-6 py-4 grid grid-cols-12 gap-4 items-center cursor-pointer"
+     data-server-id="<%= server.attributes.identifier %>"
+     data-server-numeric="<%= server.attributes.id %>"
+     data-egg="<%= server.attributes.egg %>"
+     onclick="window.location.href='/server/manage?id=<%= server.attributes.identifier%>&numeric=<%= server.attributes.id%>&mode=' + ((<%=server.attributes.egg%> === 18 || <%=server.attributes.egg%> === 19 || <%=server.attributes.egg%> === 18) ? 'vm' : (<%=server.attributes.node%> === 42 || <%=server.attributes.node%> === 51 ? 'rdp' : 'server'))">
+                    
+                    <!-- Server Name & Node -->
+                    <div class="col-span-2">
+                        <div class="font-medium text-white"><%= server.attributes.name %></div>
+                    </div>
+
+                    <!-- Status -->
+<% if (server.attributes.node == "42") { %>                    <div class="col-span-2">                <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300">
+                    RDP (Beta)
+                </div></div><% } %>
+                    <div class="col-span-2 <% if (server.attributes.node == "42") { %>hidden<% } %>">
+                        <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-zinc-500/20 text-zinc-300">
+                            <div class="size-2 rounded-full bg-zinc-400 mr-2 status-indicator"></div>
+                            <span class="status-text">Connecting...</span>
+                        </div>
+                    </div>
+
+                    <!-- Memory Usage -->
+                    <div class="col-span-2">
+                        <div class="flex <% if (server.attributes.node == "42") { %>hidden<% } %> items-center gap-2">
+                            <div class="w-full bg-white/10 rounded-full h-1.5">
+                                <div class="memory-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span class="text-xs memory-text">0/<%= server.attributes.limits.memory %>MiB</span>
+                        </div>
+                    </div>
+
+                    <!-- CPU Usage -->
+                    <div class="col-span-2">
+                        <div class="flex <% if (server.attributes.node == "42") { %>hidden<% } %> items-center gap-2">
+                            <div class="w-full bg-white/10 rounded-full h-1.5">
+                                <div class="cpu-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span class="text-xs cpu-text">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Server Details -->
+                    <div class="col-span-3 ml-4">
+                        <div class="text-xs <% if (server.attributes.node == "42") { %>hidden<% } %> font-mono text-white/70 bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg shadow-sm">
+                            <span class="server-address">Fetching...</span>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        <% } %>
+    </div>
+
+    <!-- Shared Servers Section -->
+    <div class="mt-8 hidden" id="shared-servers-section">
+        <h2 class="text-xl font-semibold mb-4 heavy">Shared Servers</h2>
+        <div class="rounded-t-xl px-6 py-3 grid grid-cols-12 gap-4 items-center text-sm font-medium text-gray-400">
+        <div class="col-span-2">Server</div>
+        <div class="col-span-2">Status</div>
+        <div class="col-span-2">Memory</div>
+        <div class="col-span-2">CPU</div>
+        <div class="col-span-3 ml-4">IP Address</div>
+        </div>
+        <div class="divide-y divide-white/5" id="shared-servers-list"></div>
+    </div>
+</main>
+
+<script>
+const serverConnections = new Map();
+const serverDetails = new Map();
+
+async function fetchServerDetails(serverId) {
+    try {
+        const response = await fetch(`/api/server/${serverId}`);
+        const data = await response.json();
+        serverDetails.set(serverId, data);
+        
+        const serverRow = document.querySelector(`[data-server-id="${serverId}"]`);
+        if (serverRow) {
+            const addressElement = serverRow.querySelector('.server-address');
+            const defaultAllocation = data.attributes.relationships.allocations.data.find(
+                allocation => allocation.attributes.is_default
+            );
+            
+            if (defaultAllocation) {
+                addressElement.textContent = `${defaultAllocation.attributes.ip_alias}:${defaultAllocation.attributes.port}`;
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching server details:', error);
+    }
+}
+
+function connectToServer(serverId, numericId) {
+    fetch(`/api/server/${serverId}/websocket`)
+        .then(response => response.json())
+        .then(data => {
+            const socket = new WebSocket(data.data.socket);
+            const serverRow = document.querySelector(`[data-server-id="${serverId}"]`);
+            
+            socket.onopen = () => {
+                socket.send(JSON.stringify({ event: 'auth', args: [data.data.token] }));
+            };
+
+            socket.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                
+                switch (message.event) {
+                    case 'auth success':
+                        socket.send(JSON.stringify({ event: 'send stats', args: [null] }));
+                        fetchServerDetails(serverId);
+                        break;
+                    
+                    case 'stats':
+                        const stats = JSON.parse(message.args[0]);
+                        updateServerStats(serverRow, stats);
+                        break;
+                    
+                    case 'status':
+                        updateServerStatus(serverRow, message.args[0]);
+                        break;
+                }
+            };
+
+            serverConnections.set(serverId, socket);
+        })
+        .catch(error => console.error('Error connecting to server:', error));
+}
+
+
+function updateServerStats(serverRow, stats) {
+    if (!serverRow) return;
+
+    // Update Memory
+    const memoryUsage = (stats.memory_bytes / 1024 / 1024).toFixed(0);
+    const memoryLimit = (stats.memory_limit_bytes / 1024 / 1024).toFixed(0);
+    const memoryPercent = (stats.memory_bytes / stats.memory_limit_bytes * 100).toFixed(0);
+    
+    const memoryBar = serverRow.querySelector('.memory-bar');
+    const memoryText = serverRow.querySelector('.memory-text');
+    
+    memoryBar.style.width = `${memoryPercent}%`;
+    memoryText.textContent = `${memoryUsage}MiB`;
+
+    // Update CPU
+    const cpuPercent = (stats.cpu_absolute / 100).toFixed(0);
+    const cpuBar = serverRow.querySelector('.cpu-bar');
+    const cpuText = serverRow.querySelector('.cpu-text');
+    
+    cpuBar.style.width = `${cpuPercent}%`;
+    cpuText.textContent = `${cpuPercent}%`;
+
+    // Update colors based on usage
+    updateResourceColors(memoryBar, memoryPercent);
+    updateResourceColors(cpuBar, cpuPercent);
+}
+
+function updateResourceColors(bar, percent) {
+    bar.classList.remove('bg-emerald-500', 'bg-yellow-500', 'bg-red-500', 'bg-indigo-500');
+    if (percent > 90) {
+        bar.classList.add('bg-red-500');
+    } else if (percent > 70) {
+        bar.classList.add('bg-yellow-500');
+    } else if (percent > 0) {
+        bar.classList.add('bg-emerald-500');
+    } else {
+        bar.classList.add('bg-indigo-500');
+    }
+}
+
+function updateServerStatus(serverRow, status) {
+    if (!serverRow) return;
+
+    const statusIndicator = serverRow.querySelector('.status-indicator');
+    const statusText = serverRow.querySelector('.status-text');
+    const statusContainer = statusIndicator.parentElement;
+
+    statusIndicator.classList.remove('bg-emerald-400', 'bg-red-400', 'bg-yellow-400', 'bg-zinc-400');
+    statusContainer.classList.remove('bg-emerald-500/20', 'bg-red-500/20', 'bg-yellow-500/20', 'bg-zinc-500/20');
+    statusContainer.classList.remove('text-emerald-300', 'text-red-300', 'text-yellow-300', 'text-zinc-300');
+
+    switch (status) {
+        case 'running':
+            statusIndicator.classList.add('bg-emerald-400');
+            statusContainer.classList.add('bg-emerald-500/20', 'text-emerald-300');
+            statusText.textContent = 'Powered on';
+            break;
+        case 'offline':
+            statusIndicator.classList.add('bg-red-400');
+            statusContainer.classList.add('bg-red-500/20', 'text-red-300');
+            statusText.textContent = 'Powered off';
+            break;
+        case 'starting':
+            statusIndicator.classList.add('bg-yellow-400');
+            statusContainer.classList.add('bg-yellow-500/20', 'text-yellow-300');
+            statusText.textContent = 'Starting';
+            break;
+        case 'stopping':
+            statusIndicator.classList.add('bg-yellow-400');
+            statusContainer.classList.add('bg-yellow-500/20', 'text-yellow-300');
+            statusText.textContent = 'Stopping';
+            break;
+        default:
+            statusIndicator.classList.add('bg-zinc-400');
+            statusContainer.classList.add('bg-zinc-500/20', 'text-zinc-300');
+            statusText.textContent = 'Unknown';
+    }
+}
+
+// Initialize server connections
+document.querySelectorAll('.server-row').forEach(row => {
+    const serverId = row.dataset.serverId;
+    const numericId = row.dataset.serverNumeric;
+    connectToServer(serverId, numericId);
+});
+
+// Fetch and display shared servers
+fetch('/api/subuser-servers')
+    .then(response => response.json())
+    .then(servers => {
+        if (servers.length > 0) {
+            document.getElementById('shared-servers-section').classList.remove('hidden');
+            const sharedServersList = document.getElementById('shared-servers-list');
+            
+            servers.forEach(server => {
+                const serverRow = document.createElement('div');
+                serverRow.className = 'server-row mb-4 bg-white/5 rounded-2xl hover:bg-white/10 border-2 border-dashed border-transparent hover:border-white/5 transition px-6 py-4 grid grid-cols-12 gap-4 items-center cursor-pointer';
+                serverRow.setAttribute('data-server-id', server.id);
+                serverRow.onclick = () => window.location.href = `/server/manage?id=${server.id}&numeric=0`;
+                
+                serverRow.innerHTML = `
+                    <!-- Server Name & Node -->
+                    <div class="col-span-2">
+                        <div class="font-medium text-white">${server.name}</div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="col-span-2">
+                        <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-zinc-500/20 text-zinc-300">
+                            <div class="size-2 rounded-full bg-zinc-400 mr-2 status-indicator"></div>
+                            <span class="status-text">Connecting...</span>
+                        </div>
+                    </div>
+
+                    <!-- Memory Usage -->
+                    <div class="col-span-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-full bg-white/10 rounded-full h-1.5">
+                                <div class="memory-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span class="text-xs memory-text">0MiB</span>
+                        </div>
+                    </div>
+
+                    <!-- CPU Usage -->
+                    <div class="col-span-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-full bg-white/10 rounded-full h-1.5">
+                                <div class="cpu-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span class="text-xs cpu-text">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Server Details -->
+                    <div class="col-span-3 ml-4">
+                        <div class="text-xs font-mono text-white/70 bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg shadow-sm">
+                            <span class="server-address">Fetching...</span>
+                        </div>
+                    </div>
+                `;
+                
+                sharedServersList.appendChild(serverRow);
+                connectToServer(server.id, 0);
+            });
+        }
+    })
+    .catch(error => console.error('Error fetching shared servers:', error));
+
+// Cleanup WebSocket connections when leaving the page
+window.addEventListener('beforeunload', () => {
+    serverConnections.forEach(socket => {
+        if (socket.readyState === WebSocket.OPEN) {
+            socket.close();
+        }
+    });
+});
+
+// Optional: Reconnect WebSocket when tab becomes visible again
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        serverConnections.forEach((socket, serverId) => {
+            if (socket.readyState !== WebSocket.OPEN) {
+                connectToServer(serverId);
+            }
+        });
+    }
+});
+
+// Refresh stats periodically
+setInterval(() => {
+    serverConnections.forEach(socket => {
+        if (socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ event: 'send stats', args: [null] }));
+        }
+    });
+}, 10000);
+</script>
+
+<%- include('./components/bottom') %>

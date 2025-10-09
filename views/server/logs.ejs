@@ -1,0 +1,265 @@
+<%- include('../components/top') %>
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="mb-5 lg:flex lg:items-center lg:justify-between">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight" id="server-name">
+            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </h2>
+          <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path fill-rule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Zm9.586 4.594a.75.75 0 0 0-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.116-.062l3-3.75Z" clip-rule="evenodd" />
+              </svg>                    
+              <span id="server-description"></span>
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-300">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                <path d="M4.08 5.227A3 3 0 0 1 6.979 3H17.02a3 3 0 0 1 2.9 2.227l2.113 7.926A5.228 5.228 0 0 0 18.75 12H5.25a5.228 5.228 0 0 0-3.284 1.153L4.08 5.227Z" />
+                <path fill-rule="evenodd" d="M5.25 13.5a3.75 3.75 0 1 0 0 7.5h13.5a3.75 3.75 0 1 0 0-7.5H5.25Zm10.5 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm3.75-.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" clip-rule="evenodd" />
+              </svg>              
+              Server <%= req.query.id %>
+            </div>
+          </div>
+        </div>
+        <div class="mt-5 flex lg:mt-0 lg:ml-4">
+          <span class="hidden sm:block">
+            <a href="/servers" class="inline-flex items-center rounded-xl border border-transparent bg-indigo-900/50 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-800">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
+                <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+              </svg>                
+              Back to server list
+            </a>
+          </span>
+        </div>
+    </div>      
+
+    <%- include('../components/server') %>
+
+    <div class="bg-white/5 rounded-xl p-6 mt-6">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-xl font-semibold text-white">Activity Logs</h2>
+                <p class="text-gray-400 text-sm mt-1">Track all actions performed on your server</p>
+            </div>
+            <div class="flex space-x-2">
+                <select id="page-size" class="bg-white/5 border-none text-sm text-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+                    <option value="10">10 per page</option>
+                    <option value="20" selected>20 per page</option>
+                    <option value="50">50 per page</option>
+                    <option value="100">100 per page</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center py-12">
+            <svg class="animate-spin h-8 w-8 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+
+        <!-- Activity List -->
+        <div id="activity-list" class="hidden space-y-3">
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-12 text-gray-400">
+            No activity logs found
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination" class="hidden mt-6 flex justify-between items-center">
+            <div class="text-sm text-gray-400">
+                Showing <span id="showing-range">0-0</span> of <span id="total-items">0</span> items
+            </div>
+            <div class="flex space-x-2">
+                <button id="prev-page" class="bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    Previous
+                </button>
+                <button id="next-page" class="bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    Next
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+const serverId = new URLSearchParams(window.location.search).get('id');
+let currentPage = 1;
+let pageSize = 20;
+
+// Load server details
+function loadServerDetails() {
+    fetch(`/api/server/${serverId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('server-name').textContent = data.attributes.name;
+            document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
+        })
+        .catch(error => console.error('Error loading server details:', error));
+}
+
+// Function to format timestamp
+function formatDate(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleString();
+}
+
+// Function to get activity icon based on action
+function getActionIcon(action) {
+    const icons = {
+        'Import World': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>`,
+        'Delete World': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`,
+        'Write File': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>`,
+        'Delete File': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`,
+        'Server Renewal': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>`,
+        'Renewal Warning': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`,
+        'Server Expired': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+        'Ban Player': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>`,
+        'Kick Player': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+        'Save Workflow': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>`
+    };
+    
+    return icons[action] || `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+}
+
+// Function to get background color based on action
+function getActionColor(action) {
+    const colors = {
+        'Import World': 'bg-green-500/10 text-green-400',
+        'Delete World': 'bg-red-500/10 text-red-400',
+        'Write File': 'bg-blue-500/10 text-blue-400',
+        'Delete File': 'bg-red-500/10 text-red-400',
+        'Server Renewal': 'bg-purple-500/10 text-purple-400',
+        'Renewal Warning': 'bg-yellow-500/10 text-yellow-400',
+        'Server Expired': 'bg-red-500/10 text-red-400',
+        'Ban Player': 'bg-red-500/10 text-red-400',
+        'Kick Player': 'bg-yellow-500/10 text-yellow-400',
+        'Save Workflow': 'bg-blue-500/10 text-blue-400'
+    };
+    
+    return colors[action] || 'bg-gray-500/10 text-gray-400';
+}
+
+// Function to create activity item
+function createActivityItem(activity) {
+    const item = document.createElement('div');
+    item.className = 'bg-white/5 rounded-lg p-4 transition hover:bg-white/10';
+    
+    const actionColor = getActionColor(activity.action);
+    const actionIcon = getActionIcon(activity.action);
+    
+    item.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="${actionColor} p-2 rounded-lg">
+                    ${actionIcon}
+                </div>
+                <div>
+                    <h3 class="text-white font-medium">${activity.action}</h3>
+                    <p class="text-sm text-gray-400">${formatDate(activity.timestamp)}</p>
+                </div>
+            </div>
+            <button class="details-button bg-white/5 hover:bg-white/10 text-sm text-gray-400 px-3 py-1 rounded-lg transition">
+                Details
+            </button>
+        </div>
+        <div class="activity-details hidden mt-4 ml-14 text-sm text-gray-400 bg-black/20 p-3 rounded-lg">
+            <pre class="whitespace-pre-wrap">${JSON.stringify(activity.details, null, 2)}</pre>
+        </div>
+    `;
+
+    // Add click handler for details button
+    const detailsButton = item.querySelector('.details-button');
+    const detailsSection = item.querySelector('.activity-details');
+    detailsButton.addEventListener('click', () => {
+        detailsSection.classList.toggle('hidden');
+        detailsButton.textContent = detailsSection.classList.contains('hidden') ? 'Details' : 'Hide';
+    });
+
+    return item;
+}
+
+// Function to load activity logs
+function loadActivityLogs() {
+    const loadingState = document.getElementById('loading-state');
+    const activityList = document.getElementById('activity-list');
+    const emptyState = document.getElementById('empty-state');
+    const pagination = document.getElementById('pagination');
+
+    loadingState.classList.remove('hidden');
+    activityList.classList.add('hidden');
+    emptyState.classList.add('hidden');
+    pagination.classList.add('hidden');
+
+    fetch(`/api/server/${serverId}/logs?page=${currentPage}&limit=${pageSize}`)
+        .then(response => response.json())
+        .then(data => {
+            activityList.innerHTML = '';
+
+            if (data.data.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                activityList.classList.remove('hidden');
+                data.data.forEach(activity => {
+                    activityList.appendChild(createActivityItem(activity));
+                });
+            }
+
+            // Update pagination
+            if (data.pagination) {
+                pagination.classList.remove('hidden');
+                document.getElementById('showing-range').textContent = 
+                    `${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, data.pagination.total_items)}`;
+                document.getElementById('total-items').textContent = data.pagination.total_items;
+                
+                const prevButton = document.getElementById('prev-page');
+                const nextButton = document.getElementById('next-page');
+                
+                prevButton.disabled = currentPage === 1;
+                nextButton.disabled = currentPage === data.pagination.total_pages;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading activity logs:', error);
+            emptyState.textContent = 'Error loading activity logs';
+            emptyState.classList.remove('hidden');
+        })
+        .finally(() => {
+            loadingState.classList.add('hidden');
+        });
+}
+
+// Event Listeners
+document.getElementById('prev-page').addEventListener('click', () => {
+    if (currentPage > 1) {
+        currentPage--;
+        loadActivityLogs();
+    }
+});
+
+document.getElementById('next-page').addEventListener('click', () => {
+    currentPage++;
+    loadActivityLogs();
+});
+
+document.getElementById('page-size').addEventListener('change', (e) => {
+    pageSize = parseInt(e.target.value);
+    currentPage = 1;
+    loadActivityLogs();
+});
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', () => {
+    loadServerDetails();
+    loadActivityLogs();
+});
+</script>
+
+<%- include('../components/bottom') %>

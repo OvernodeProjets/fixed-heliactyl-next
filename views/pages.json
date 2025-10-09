@@ -1,0 +1,184 @@
+{
+    "index": "website.ejs",
+    "notfound": "404.ejs",
+    "redirect": {
+        "callback": "/dashboard",
+        "failedcallback": "/",
+        "logout": "/",
+        "deleteserver": "/dashboard",
+        "updateservers": "/dashboard",
+        "createserver": "/dashboard",
+        "failedcreateserver": "/servers/new",
+        "modifyserver": "/change",
+        "failedmodifyserver": "/servers/edit",
+        "setplan": "/admin",
+        "failedsetplan": "/admin",
+        "getip": "/admin",
+        "failedgetip": "/admin",
+        "createserverdisabled": "/servers?err=disabled",
+        "modifyserverdisabled": "/servers?err=disabled",
+        "deleteserverdisabled": "/servers?err=disabled",
+        "regenpassword": "/creds",
+        "setresources": "/admin",
+        "failedsetresources": "/admin",
+        "renewserver": "/servers",
+        "failedrenewserver": "/servers",
+        "setcoins": "/admin",
+        "failedsetcoins": "/admin",
+        "purchaseram": "/store",
+        "failedpurchaseram": "/store",
+        "purchasedisk": "/store",
+        "failedpurchasedisk": "/store",
+        "purchasecpu": "/store",
+        "failedpurchasecpu": "/store",
+        "purchaseservers": "/store",
+        "failedpurchaseservers": "/store",
+        "arcioerror": "/earn",
+        "missingorinvalidcouponcode": "/redeem",
+        "successfullyredeemedcoupon": "/redeem",
+        "couponcreationfailed": "/admin",
+        "couponcreationsuccess": "/admin",
+        "couponrevokefailed": "/admin",
+        "couponrevokesuccess": "/admin",
+        "removeaccountfailed": "/admin",
+        "removeaccountsuccess": "/admin"
+    },
+    "pages": {
+        "auth": "auth.ejs",
+        "test2": "test.ejs",
+        "auth/reset-password": "passwordreset.ejs",
+        "server/manage": "server/manage.ejs",
+        "server/allocations": "server/allocations.ejs",
+        "server/commander": "server/commander.ejs",
+        "server/backups": "server/backups.ejs",
+        "server/plugins": "server/plugins.ejs",
+        "server/properties": "server/properties.ejs",
+        "server/files": "server/files.ejs",
+        "server/subusers": "server/subusers.ejs",
+        "server/settings": "server/settings.ejs",
+        "server/transfer": "server/transfer.ejs",
+        "server/automations": "server/automations.ejs",
+        "server/subdomains": "server/subdomains.ejs",
+        "server/statistics": "server/statistics.ejs",
+        "server/advanced": "server/advanced.ejs",
+        "server/players": "server/players.ejs",
+        "server/worlds": "server/worlds.ejs",
+        "server/import": "server/import.ejs",
+        "server/logs": "server/logs.ejs",
+        "server/rdp": "server/rdp.ejs",
+        "server/power": "server/power.ejs",
+        "wallet": "wallet.ejs",
+        "webhosting": "webhosting.ejs",
+        "storage": "storage.ejs",
+        "advent": "advent.ejs",
+        "banned": "banned.ejs",
+        "relink": "relink.ejs",
+        "j4r": "j4r.ejs",
+        "staking": "staking.ejs",
+        "teams": "teams.ejs",
+        "upgrade": "upgrade.ejs",
+        "dashboard2": "dashboard2.ejs",
+        "dashboard": "dashboard.ejs",
+        "change": "change.ejs",
+        "inventory": "inventory.ejs",
+        "marketplace": "marketplace.ejs",
+        "servers": "servers.ejs",
+        "servers/new": "create.ejs",
+        "vms/new": "create-vm.ejs",
+        "servers/new2": "createtest.ejs",
+        "servers/edit": "edit.ejs",
+        "admin": "admin.ejs",
+        "store": "store.ejs",
+        "shield": "shield.ejs",
+        "afk": "arcio.ejs",
+        "daily": "dashboard.ejs",
+        "referrals": "referrals.ejs",
+        "trivia": "trivia.ejs",
+        "transfer": "transfer.ejs",
+        "antialt": "antialt.ejs",
+        "account": "account.ejs",
+        "website": "website.ejs",
+        "register": "register.ejs",
+        "admin/coins": "admin/coins.ejs",
+        "admin/resources": "admin/resources.ejs",
+        "admin/other": "admin/other.ejs",
+        "support": "support.ejs",
+        "vote": "vote.ejs"
+    },
+    "mustbeloggedin": [
+        "/dashboard",
+        "/change",
+        "/servers",
+        "/servers/new",
+        "/servers/edit",
+        "/admin",
+        "/store",
+        "/earn",
+        "/daily",
+        "/referrals",
+        "/trivia",
+        "/transfer",
+        "/account",
+        "/afk",
+        "/staking",
+        "/wallet",
+        "/shield",
+        "/support",
+        "/j4r"
+    ],
+    "mustbeadmin": [
+        "/admin"
+    ],
+    "generateafktoken": [
+        "/earn"
+    ],
+    "variables": {
+        "footerad": true,
+        "faviconlink": "https://camo.githubusercontent.com/d2e9b4ddcf7618efa123961ae270f7eaa83362f8/68747470733a2f2f6d656469612e646973636f72646170702e6e65742f6174746163686d656e74732f3730363937303631373437313330333736312f3736383630363132323134373730383936382f707465726f64616374796c2d70616e656c2e706e67",
+        "home": {
+            "title": "Home - Dashactyl",
+            "buttontext": {
+                "loggedin": {
+                    "text": "Dashboard",
+                    "link": "/dashboard"
+                },
+                "loggedout": {
+                    "_note": "This below supports HTML encoding.",
+
+                    "text": "<img src=\"https://i.imgur.com/EYGXn9D.png\" width=\"25\" /> Login with Discord",
+                    "link": "/login"
+                }
+            }
+        },
+        "dashboard": {
+            "title": "Dashboard - Dashactyl"
+        },
+        "servers": {
+            "title": {
+                "list": "Servers - Dashactyl",
+                "create": "Create Server - Dashactyl",
+                "modify": "Modify Server - Dashactyl"
+            }
+        },
+        "error": {
+            "title": "404 - Dashactyl"
+        },
+        "admin": {
+            "title": {
+                "default": "Admin - Dashactyl"
+            }
+        },
+        "store": {
+            "title": "Store - Dashactyl"
+        },
+        "arcio": {
+            "title": "AFK Page - Dashactyl"
+        },
+        "maintenance": {
+            "title": "Maintenance - Dashactyl"
+        },
+        "redeem": {
+            "title": "Redeem - Dashactyl"
+        }
+    }
+}
