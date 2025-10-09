@@ -23,7 +23,6 @@ const WEEK_IN_MS = 604800000;
 const MAX_HISTORY_DAYS = 30;
 
 const WebSocket = require('ws');
-const url = require('url');
 const cookie = require('cookie');
 
 class BillingError extends Error {
