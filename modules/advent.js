@@ -1,16 +1,26 @@
+/**
+ *      __         ___            __        __
+ *     / /_  ___  / (_)___ ______/ /___  __/ /
+ *    / __ \/ _ \/ / / __ `/ ___/ __/ / / / / 
+ *   / / / /  __/ / / /_/ / /__/ /_/ /_/ / /  
+ *  /_/ /_/\___/_/_/\__,_/\___/\__/\__, /_/   
+ *                               /____/      
+ * 
+ *     Heliactyl Next 3.2.0 (Avalanche)
+ * 
+ */
+
+const heliactylModule = {
+  "name": "Advent Calendar Module",
+  "target_platform": "3.2.0"
+};
+
+module.exports.heliactylModule = heliactylModule;
+
 const crypto = require('crypto');
 const requireAuth = require('../handlers/requireAuth');
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
-
-/* Ensure platform release target is met */
-const heliactylModule = {
-  "name": "AdventCalendar",
-  "api_level": 2,
-  "target_platform": "19.1.1"
-};
-
-module.exports.heliactylModule = heliactylModule;
 
 // Define reward types and their possible values
 const REWARD_TYPES = {

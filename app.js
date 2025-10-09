@@ -126,29 +126,57 @@ if (cluster.isMaster) {
     console.log(chalk.gray("Graphene 1.1.0"));
     let modulesTable = [];
 
+    const compatibility = require('./handlers/compatibility');
+
     moduleFiles.forEach(file => {
-      const module = require('./modules/' + file);
-      if (!module.load || !module.heliactylModule) {
-        console.log(chalk.yellowBright("Module \"" + file + `" has an error: No module manifest or load function was specified in the file.`));
-        modulesTable.push({ File: file, Status: 'No module information', 'API Level': 0, 'Target Platform': 'Unknown' });
-        return;
-      }
+      let moduleState = 'Initializing';
+      try {
+        const module = require('./modules/' + file);
+        if (!module.heliactylModule) {
+          console.log(chalk.red("Module \"" + file + "\" has an error: No module manifest was found in the file."));
+          modulesTable.push({ File: file, Status: '❌ No module manifest', State: 'Error', 'Target Platform': 'N/A' });
+          return;
+        }
     
-      const { name, api_level, target_platform } = module.heliactylModule;
-  
-      if (target_platform !== settingsVersion) {
-        console.log(chalk.yellowBright("Module \"" + name + `" has an error: Target platform mismatch (expected: ${settingsVersion}, found: ${target_platform}`));
-        modulesTable.push({ File: file, Name: name, Status: `Error: Target platform mismatch (expected: ${settingsVersion}, found: ${target_platform})`, 'API Level': api_level, 'Target Platform': target_platform });
+        const { name, target_platform } = module.heliactylModule;
+        moduleState = 'Loaded';
+
+      // Check version compatibility
+      const versionCheck = compatibility.isCompatible(target_platform, settingsVersion);
+      if (!versionCheck.compatible) {
+        moduleState = 'Version Mismatch';
+        if (versionCheck.details.majorMismatch) {
+          console.log(chalk.red("Module \"" + name + `" has an error: Major version mismatch (expected: ${settingsVersion}, found: ${target_platform})`));
+          modulesTable.push({ File: file, Name: name, Status: `❌ Major version mismatch`, State: moduleState, 'Target Platform': target_platform });
+        } else if (versionCheck.details.newerMinor) {
+          console.log(chalk.red("Module \"" + name + `" has an error: Module requires a newer platform version (module: ${target_platform}, platform: ${settingsVersion})`));
+          modulesTable.push({ File: file, Name: name, Status: `❌ Newer version required`, State: moduleState, 'Target Platform': target_platform });
+        }
         return;
       }
-  
-      modulesTable.push({ File: file, Name: name, Status: 'Module loaded!', 'API Level': api_level, 'Target Platform': target_platform });
+
+      // Version is compatible but different 
+      if (target_platform !== settingsVersion) {
+        moduleState = 'Compatible';
+        console.log(chalk.yellow("Module \"" + name + `" notice: Different but compatible version (platform: ${settingsVersion}, module: ${target_platform})`));
+        modulesTable.push({ File: file, Name: name, Status: '⚠️ Module loaded (different version)', State: moduleState, 'Target Platform': target_platform });
+        return;
+      }
+
+      moduleState = 'Active';
+      modulesTable.push({ File: file, Name: name, Status: '✓ Module loaded!', State: moduleState, 'Target Platform': target_platform });
+      console.log(chalk.green("Module \"" + name + "\" loaded successfully (" + target_platform + ")."));
+      } catch (error) {
+        moduleState = 'Error';
+        console.log(chalk.red("Module \"" + file + "\" failed to load: " + error.message));
+        modulesTable.push({ File: file, Status: `❌ Module load failed`, State: moduleState, 'Target Platform': 'N/A' });
+      }
     });
 
-    //console.table(modulesTable);
+    //console.table( modulesTable);
   
     const numCPUs = parseInt(settings.clusters) - 1;
-    console.log(chalk.gray('Starting workers on Heliactyl ' + settings.version + ' (' + settings.platform_codename + ')'));
+    console.log(chalk.gray('Starting workers on Heliactyl Next ' + settings.version + ' (' + settings.platform_codename + ')'));
     console.log(chalk.gray(`Master ${process.pid} is running`));
     console.log(chalk.gray(`Forking ${numCPUs} workers...`));
   
@@ -201,8 +229,8 @@ if (cluster.isMaster) {
   process.on('message', (msg) => {
     if (msg.type === 'FIRST_WORKER') {
       isFirstWorker = true;
-      console.log(`Worker ${process.pid} is designated as the first worker.`);
-      console.log(`Graphene's webserver is now listening on port ` + settings.website.port);
+      console.log(chalk.gray(`Worker ${process.pid} is designated as the first worker.`));
+      console.log(chalk.gray(`Heliactyl Next ${settings.version} (${settings.platform_codename}) - webserver is now listening on port ` + settings.website.port));
     }
   });
 

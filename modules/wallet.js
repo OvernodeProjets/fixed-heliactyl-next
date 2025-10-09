@@ -1,12 +1,28 @@
+/**
+ *      __         ___            __        __
+ *     / /_  ___  / (_)___ ______/ /___  __/ /
+ *    / __ \/ _ \/ / / __ `/ ___/ __/ / / / / 
+ *   / / / /  __/ / / /_/ / /__/ /_/ /_/ / /  
+ *  /_/ /_/\___/_/_/\__,_/\___/\__/\__, /_/   
+ *                               /____/      
+ * 
+ *     Heliactyl Next 3.2.0 (Avalanche)
+ * 
+ */
+
+const heliactylModule = {
+  "name": "Wallet Module",
+  "target_platform": "3.2.0"
+};
+
+module.exports.heliactylModule = heliactylModule;
+
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const crypto = require('crypto');
 const { Readable, Transform } = require('stream');
 
-const heliactylModule = { "name": "Wallet", "api_level": 1, "target_platform": "19.1.1" };
-
-module.exports.heliactylModule = heliactylModule;
 module.exports.load = async function (app, db) {
   const router = express.Router();
 

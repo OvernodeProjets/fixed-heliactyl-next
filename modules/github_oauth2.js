@@ -6,11 +6,16 @@
  *  /_/ /_/\___/_/_/\__,_/\___/\__/\__, /_/   
  *                               /____/      
  * 
- *     Heliactyl 19.0.0 (Bristol Ridge) - GitHub OAuth Module
+ *     Heliactyl Next 3.2.0 (Avalanche)
  * 
  */
 
-"use strict";
+const heliactylModule = {
+  "name": "GitHub OAuth2 Module",
+  "target_platform": "3.2.0"
+};
+
+module.exports.heliactylModule = heliactylModule;
 
 const crypto = require('crypto');
 const loadConfig = require("../handlers/config.js");
@@ -19,20 +24,6 @@ const settings = loadConfig("./config.toml");
 const fetch = require("node-fetch");
 const indexjs = require("../app.js");
 const log = require("../handlers/log");
-
-const fs = require("fs");
-const { renderFile } = require("ejs");
-
-/* Ensure platform release target is met */
-const heliactylModule = { "name": "GitHub OAuth2", "api_level": 3, "target_platform": "19.1.1" };
-
-if (heliactylModule.target_platform !== settings.version) {
-  console.log('Module ' + heliactylModule.name + ' does not support this platform release of Heliactyl. The module was built for platform ' + heliactylModule.target_platform + ' but is attempting to run on version ' + settings.version + '.')
-  process.exit()
-}
-
-/* Module */
-module.exports.heliactylModule = heliactylModule;
 module.exports.load = async function (app, db) {
   app.get("/github/login", (req, res) => {
     if (req.query.redirect) req.session.redirect = "/" + req.query.redirect;

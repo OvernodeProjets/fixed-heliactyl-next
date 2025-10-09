@@ -1,19 +1,29 @@
+/**
+ *      __         ___            __        __
+ *     / /_  ___  / (_)___ ______/ /___  __/ /
+ *    / __ \/ _ \/ / / __ `/ ___/ __/ / / / / 
+ *   / / / /  __/ / / /_/ / /__/ /_/ /_/ / /  
+ *  /_/ /_/\___/_/_/\__,_/\___/\__/\__, /_/   
+ *                               /____/      
+ * 
+ *     Heliactyl Next 3.2.0 (Avalanche)
+ * 
+ */
+
+const heliactylModule = {
+  "name": "Halloween Event Module",
+  "target_platform": "3.2.0"
+};
+
+module.exports.heliactylModule = heliactylModule;
+
 const indexjs = require("../app.js");
 const adminjs = require("./admin.js");
 const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 const log = require("../handlers/log.js");
 
-const heliactylModule = {
-    "name": "Halloween Event",
-    "api_level": 3,
-    "target_platform": "19.1.1"
-};
 
-if (heliactylModule.target_platform !== settings.version) {
-    console.log('Module ' + heliactylModule.name + ' does not support this platform release of Heliactyl. The module was built for platform ' + heliactylModule.target_platform + ' but is attempting to run on version ' + settings.version + '.')
-    process.exit()
-}
 
 const HALLOWEEN_EVENT_DURATION = 7 * 24 * 60 * 60 * 1000; // 1 week
 const EVENT_START_TIME = new Date('2024-10-03T12:30:22+00:00').getTime();
@@ -57,7 +67,6 @@ const CANDY_TYPES = [
     { name: "Zombie Brain Jelly Bean", points: 30 }
 ];
 
-module.exports.heliactylModule = heliactylModule;
 module.exports.load = async function(app, db) {
     // Initialize or get event data
     async function getOrInitEventData(userId) {

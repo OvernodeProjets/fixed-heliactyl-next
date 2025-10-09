@@ -1,3 +1,22 @@
+/**
+ *      __         ___            __        __
+ *     / /_  ___  / (_)___ ______/ /___  __/ /
+ *    / __ \/ _ \/ / / __ `/ ___/ __/ / / / / 
+ *   / / / /  __/ / / /_/ / /__/ /_/ /_/ / /  
+ *  /_/ /_/\___/_/_/\__,_/\___/\__/\__, /_/   
+ *                               /____/      
+ * 
+ *     Heliactyl Next 3.2.0 (Avalanche)
+ * 
+ */
+
+const heliactylModule = {
+  "name": "Pterodactyl Import Module",
+  "target_platform": "3.2.0"
+};
+
+module.exports.heliactylModule = heliactylModule;
+
 const express = require('express');
 const router = express.Router();
 const Client = require('ssh2-sftp-client');
@@ -9,29 +28,6 @@ const { pipeline } = require('stream/promises');
 const { PassThrough } = require('stream');
 const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
-
-/* Ensure platform release target is met */
-const heliactylModule = {
-  name: "Pterodactyl Client",
-  api_level: 3,
-  target_platform: "19.1.1",
-};
-
-if (heliactylModule.target_platform !== settings.version) {
-  console.log(
-    "Module " +
-      heliactylModule.name +
-      " does not support this platform release of Heliactyl. The module was built for platform " +
-      heliactylModule.target_platform +
-      " but is attempting to run on version " +
-      settings.version +
-      "."
-  );
-  process.exit();
-}
-
-/* Module */
-module.exports.heliactylModule = heliactylModule;
 module.exports.load = async function (app, db) {
 // Constants
 const MAX_SIZE_BYTES = 5 * 1024 * 1024 * 1024; // 5GB in bytes

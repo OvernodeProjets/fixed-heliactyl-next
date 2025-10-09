@@ -1,3 +1,22 @@
+/**
+ *      __         ___            __        __
+ *     / /_  ___  / (_)___ ______/ /___  __/ /
+ *    / __ \/ _ \/ / / __ `/ ___/ __/ / / / / 
+ *   / / / /  __/ / / /_/ / /__/ /_/ /_/ / /  
+ *  /_/ /_/\___/_/_/\__,_/\___/\__/\__, /_/   
+ *                               /____/      
+ * 
+ *     Heliactyl Next 3.2.0 (Avalanche)
+ * 
+ */
+
+const heliactylModule = {
+  "name": "Auth Module",
+  "target_platform": "3.2.0"
+};
+
+module.exports.heliactylModule = heliactylModule;
+
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
@@ -12,14 +31,7 @@ const { renderFile } = require("ejs");
 // Add Resend API key to your settings
 const RESEND_API_KEY = 're_GqVR7va3_8z8QuYyECBEDYKYdvrf9iqbb';
 
-const heliactylModule = { "name": "User/Password Auth with Email", "api_level": 3, "target_platform": "19.1.1" };
 
-if (heliactylModule.target_platform !== settings.version) {
-  console.log('Module ' + heliactylModule.name + ' does not support this platform release of Heliactyl. The module was built for platform ' + heliactylModule.target_platform + ' but is attempting to run on version ' + settings.version + '.')
-  process.exit()
-}
-
-module.exports.heliactylModule = heliactylModule;
 module.exports.load = async function (app, db) {
   const rateLimit = (req, res, next) => {
     if (!req.session.lastAuthAttempt) {

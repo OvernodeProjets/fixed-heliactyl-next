@@ -1,3 +1,22 @@
+/**
+ *      __         ___            __        __
+ *     / /_  ___  / (_)___ ______/ /___  __/ /
+ *    / __ \/ _ \/ / / __ `/ ___/ __/ / / / / 
+ *   / / / /  __/ / / /_/ / /__/ /_/ /_/ / /  
+ *  /_/ /_/\___/_/_/\__,_/\___/\__/\__, /_/   
+ *                               /____/      
+ * 
+ *     Heliactyl Next 3.2.0 (Avalanche)
+ * 
+ */
+
+const heliactylModule = {
+  "name": "Store Module",
+  "target_platform": "3.2.0"
+};
+
+module.exports.heliactylModule = heliactylModule;
+
 const indexjs = require("../app.js");
 const adminjs = require("./admin.js");
 const fs = require("fs");
@@ -7,16 +26,6 @@ const mysql = require('mysql2/promise');
 const PaymentProcessor = require("../handlers/payments.js");
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
-
-/* Ensure platform release target is met */
-const heliactylModule = { 
-  "name": "Store", 
-  "api_level": 2, // Increment API level for breaking changes
-  "target_platform": "19.1.1" 
-};
-
-/* Module */
-module.exports.heliactylModule = heliactylModule;
 
 const HOUR_IN_MS = 3600000;
 const WEEK_IN_MS = 604800000;

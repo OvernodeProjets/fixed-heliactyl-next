@@ -1,23 +1,28 @@
+/**
+ *      __         ___            __        __
+ *     / /_  ___  / (_)___ ______/ /___  __/ /
+ *    / __ \/ _ \/ / / __ `/ ___/ __/ / / / / 
+ *   / / / /  __/ / / /_/ / /__/ /_/ /_/ / /  
+ *  /_/ /_/\___/_/_/\__,_/\___/\__/\__, /_/   
+ *                               /____/      
+ * 
+ *     Heliactyl Next 3.2.0 (Avalanche)
+ * 
+ */
+
+const heliactylModule = {
+  "name": "Pterodactyl Settings Module",
+  "target_platform": "3.2.0"
+};
+
+module.exports.heliactylModule = heliactylModule;
+
 const express = require('express');
 const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 const WebSocket = require('ws');
 const axios = require('axios');
 
-/* Ensure platform release target is met */
-const heliactylModule = {
-    "name": "Pterodactyl Client - Settings",
-    "api_level": 3,
-    "target_platform": "19.1.1"
-};
-
-if (heliactylModule.target_platform !== settings.version) {
-    console.log('Module ' + heliactylModule.name + ' does not support this platform release of Heliactyl. The module was built for platform ' + heliactylModule.target_platform + ' but is attempting to run on version ' + settings.version + '.')
-    process.exit()
-}
-
-/* Module */
-module.exports.heliactylModule = heliactylModule;
 module.exports.load = async function(app, db) {
     const router = express.Router();
 
@@ -86,5 +91,5 @@ module.exports.load = async function(app, db) {
     // Use the router with the '/api' prefix
     app.use('/api', router);
 
-    console.log('Pterodactyl API module loaded');
+    //console.log('Pterodactyl API module loaded');
 };

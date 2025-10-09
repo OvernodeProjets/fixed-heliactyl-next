@@ -6,9 +6,16 @@
  *  /_/ /_/\___/_/_/\__,_/\___/\__/\__, /_/   
  *                               /____/      
  * 
- *     Heliactyl 19.1.1 (Excavator)
+ *     Heliactyl Next 3.2.0 (Avalanche)
  * 
  */
+
+const heliactylModule = {
+  "name": "Admin Module",
+  "target_platform": "3.2.0"
+};
+
+module.exports.heliactylModule = heliactylModule;
 
 const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
@@ -27,16 +34,7 @@ const ejs = require("ejs");
 const log = require("../handlers/log.js");
 const arciotext = require('../handlers/afk.js')
 
-/* Ensure platform release target is met */
-const heliactylModule = { "name": "Admin", "api_level": 3, "target_platform": "19.1.1" };
 
-if (heliactylModule.target_platform !== settings.version) {
-  console.log('Module ' + heliactylModule.name + ' does not support this platform release of Heliactyl. The module was built for platform ' + heliactylModule.target_platform + ' but is attempting to run on version ' + settings.version + '.')
-  process.exit()
-}
-
-/* Module */
-module.exports.heliactylModule = heliactylModule;
 module.exports.load = async function (app, db) {
   app.get("/setcoins", async (req, res) => {
     let theme = indexjs.get(req);

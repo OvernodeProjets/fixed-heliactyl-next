@@ -6,9 +6,16 @@
  *  /_/ /_/\___/_/_/\__,_/\___/\__/\__, /_/   
  *                               /____/      
  * 
- *     Heliactyl 19.0.0 (Bristol Ridge)
+ *     Heliactyl Next 3.2.0 (Avalanche)
  * 
  */
+
+const heliactylModule = {
+  "name": "Extras Module",
+  "target_platform": "3.2.0"
+};
+
+module.exports.heliactylModule = heliactylModule;
 
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
@@ -17,16 +24,6 @@ const indexjs = require("../app.js");
 const fetch = require("node-fetch");
 const Queue = require("../handlers/Queue.js");
 
-/* Ensure platform release target is met */
-const heliactylModule = { "name": "Extra Features", "api_level": 3, "target_platform": "19.1.1" };
-
-if (heliactylModule.target_platform !== settings.version) {
-  console.log('Module ' + heliactylModule.name + ' does not support this platform release of Heliactyl. The module was built for platform ' + heliactylModule.target_platform + ' but is attempting to run on version ' + settings.version + '.')
-  process.exit()
-}
-
-/* Module */
-module.exports.heliactylModule = heliactylModule;
 module.exports.load = async function(app, db) {
   app.get(`/api/password`, async (req, res) => {
     if (!req.session.userinfo.id) return res.redirect("/login");

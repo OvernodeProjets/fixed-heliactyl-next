@@ -1,3 +1,22 @@
+/**
+ *      __         ___            __        __
+ *     / /_  ___  / (_)___ ______/ /___  __/ /
+ *    / __ \/ _ \/ / / __ `/ ___/ __/ / / / / 
+ *   / / / /  __/ / / /_/ / /__/ /_/ /_/ / /  
+ *  /_/ /_/\___/_/_/\__,_/\___/\__/\__, /_/   
+ *                               /____/      
+ * 
+ *     Heliactyl Next 3.2.0 (Avalanche)
+ * 
+ */
+
+const heliactylModule = {
+  "name": "Nextcloud Integration Module",
+  "target_platform": "3.2.0"
+};
+
+module.exports.heliactylModule = heliactylModule;
+
 const fetch = require("node-fetch");
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
@@ -8,16 +27,6 @@ const NEXTCLOUD_URL = 'http://77.68.90.37';  // Replace with your Nextcloud URL
 const ADMIN_USERNAME = 'admin';  // Replace with your Nextcloud admin username
 const ADMIN_PASSWORD = '18YJ05@nq6';  // Replace with your admin password
 
-const heliactylModule = {
-  "name": "Nextcloud Integration Module",
-  "api_level": 3,
-  "target_platform": "19.1.1"
-};
-
-if (heliactylModule.target_platform !== settings.version) {
-  console.log('Module ' + heliactylModule.name + ' does not support this platform release of Heliactyl. The module was built for platform ' + heliactylModule.target_platform + ' but is attempting to run on version ' + settings.version + '.')
-  process.exit()
-}
 
 async function parseResponse(responseText, contentType) {
   try {
@@ -110,7 +119,6 @@ function formatQuota(quota) {
   return quota === 'unlimited' ? '1152921504606846976' : quota;
 }
 
-module.exports.heliactylModule = heliactylModule;
 module.exports.load = async function (app, db) {
   app.post("/nextcloud/activate", async (req, res) => {
     try {

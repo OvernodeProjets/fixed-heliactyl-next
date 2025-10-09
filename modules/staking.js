@@ -1,18 +1,22 @@
-const indexjs = require("../app.js");
-const adminjs = require("./admin.js");
-const fs = require("fs");
-const ejs = require("ejs");
-const fetch = require('node-fetch');
+/**
+ *      __         ___            __        __
+ *     / /_  ___  / (_)___ ______/ /___  __/ /
+ *    / __ \/ _ \/ / / __ `/ ___/ __/ / / / / 
+ *   / / / /  __/ / / /_/ / /__/ /_/ /_/ / /  
+ *  /_/ /_/\___/_/_/\__,_/\___/\__/\__, /_/   
+ *                               /____/      
+ * 
+ *     Heliactyl Next 3.2.0 (Avalanche)
+ * 
+ */
 
-/* Ensure platform release target is met */
-const heliactylModule = { 
-  "name": "Staking", 
-  "api_level": 2, // Increment API level for breaking changes
-  "target_platform": "19.1.1" 
+const heliactylModule = {
+  "name": "Staking Module",
+  "target_platform": "3.2.0"
 };
 
-/* Module */
 module.exports.heliactylModule = heliactylModule;
+
 module.exports.load = async function (app, db) {
   // Configuration
   const DAILY_INTEREST_RATE = 0.05; // 5% daily interest
