@@ -38,6 +38,7 @@ module.exports.load = async function (app, db) {
   });
 };
 
+// don't use that, it a big security issue
 // <?php
 // 
 // namespace Pterodactyl\Http\Controllers\Auth;
@@ -51,7 +52,7 @@ module.exports.load = async function (app, db) {
 // 
 // class AutoLoginController extends Controller
 // {
-//     private $secretKey = "FractalSecretKey__NIGGER__Login";
+//     private $secretKey = "=-=";
 // 
 //     public function callback(Request $request, $token)
 //     {

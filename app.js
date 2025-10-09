@@ -94,25 +94,9 @@ module.exports.db = db;
 let isFirstWorker = false;
 
 if (cluster.isMaster) {
-// Read the ASCII art
-const asciiArt = fs.readFileSync('./handlers/ascii.txt', 'utf8');
-
-// Split the ASCII art into lines
-const lines = asciiArt.split('\n');
-
-// Calculate the step for each line to create a gradient
-const step = 1 / (lines.length - 1);
-
-// Function to interpolate between two colors
-function interpolateColor(color1, color2, factor) {
-  const result = color1.map((channel, index) => {
-    return Math.round(channel + factor * (color2[index] - channel));
-  });
-  return result;
-}
-
-// Display the ASCII art with gradient
-console.log('\n'); // Add a newline before the ASCII art
+  // Display ASCII art and loading spinner
+  const asciiArt = fs.readFileSync('./handlers/ascii.txt', 'utf8');
+  console.log('\n' + asciiArt + '\n');
 
   let spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
   let currentFrame = 0;
@@ -126,8 +110,9 @@ console.log('\n'); // Add a newline before the ASCII art
   
   setTimeout(() => {
     clearInterval(spinner);
+    process.stdout.write('\r');
     startApp();
-  }, 1);
+  }, 2000);
 
   function startApp() {
     // Create tree view of modules in /modules/
@@ -146,7 +131,6 @@ console.log('\n'); // Add a newline before the ASCII art
       if (!module.load || !module.heliactylModule) {
         console.log(chalk.yellowBright("Module \"" + file + `" has an error: No module manifest or load function was specified in the file.`));
         modulesTable.push({ File: file, Status: 'No module information', 'API Level': 0, 'Target Platform': 'Unknown' });
-        process.exit()
         return;
       }
     
@@ -155,7 +139,6 @@ console.log('\n'); // Add a newline before the ASCII art
       if (target_platform !== settingsVersion) {
         console.log(chalk.yellowBright("Module \"" + name + `" has an error: Target platform mismatch (expected: ${settingsVersion}, found: ${target_platform}`));
         modulesTable.push({ File: file, Name: name, Status: `Error: Target platform mismatch (expected: ${settingsVersion}, found: ${target_platform})`, 'API Level': api_level, 'Target Platform': target_platform });
-        process.exit()
         return;
       }
   
@@ -165,7 +148,7 @@ console.log('\n'); // Add a newline before the ASCII art
     //console.table(modulesTable);
   
     const numCPUs = parseInt(settings.clusters) - 1;
-    console.log(chalk.gray('Starting workers...'));
+    console.log(chalk.gray('Starting workers on Heliactyl ' + settings.version + ' (' + settings.platform_codename + ')'));
     console.log(chalk.gray(`Master ${process.pid} is running`));
     console.log(chalk.gray(`Forking ${numCPUs} workers...`));
   
@@ -332,6 +315,7 @@ app.use(async (req, res, next) => {
     );
   });
 
+  // todo: replace with express-rate-limit
   var cache = false;
   app.use(function (req, res, next) {
     let manager = loadConfig("./config.toml").api
@@ -388,7 +372,6 @@ app.use(async (req, res, next) => {
     apifile.load(app, db);
   });
 
-      
     // After loading each module, collect and log its routes
     const routes = collectRoutes(app);
     routes.forEach(route => {
