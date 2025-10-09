@@ -50,9 +50,8 @@ const defaultthemesettings = {
  * @param {Object} theme - The theme object.
  * @returns {Promise<Object>} The rendered data.
  */
-async function renderdataeval(req, theme) {
+async function renderData(req, theme) {
   const JavaScriptObfuscator = require('javascript-obfuscator');
-  let newsettings = loadConfig("./config.toml");
   let userinfo = req.session.userinfo;
   let userId = userinfo ? userinfo.id : null;
   let packageId = userId ? await db.get("package-" + userId) || settings.api.client.packages.default : null;
@@ -62,8 +61,8 @@ async function renderdataeval(req, theme) {
 
   let renderdata = {
     req,
-    settings: newsettings,
-    userinfo: userinfo,
+    settings,
+    userinfo,
     packagename: packageId,
     extraresources,
     packages: userId ? settings.api.client.packages.list[packageId] : null,
@@ -85,7 +84,7 @@ async function renderdataeval(req, theme) {
   return renderdata;
 }
 
-module.exports.renderdataeval = renderdataeval;
+module.exports.renderdataeval = renderData;
 
 // Load database
 const Database = require("./db.js");
@@ -253,11 +252,6 @@ console.log('\n'); // Add a newline before the ASCII art
   app.use(cookieParser());
   app.use(express.text());
 
-  app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    next();
-  });
-
   // Load express addons.
   const session = require("express-session");
   const SessionStore = require("./handlers/session");
@@ -268,6 +262,7 @@ console.log('\n'); // Add a newline before the ASCII art
 
   app.use(nocache());
   app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader("X-Powered-By", `13rd Gen Heliactyl Next (${settings.platform_codename})`);
     res.setHeader("X-Heliactyl", `Heliactyl Next v${settings.version} - "${settings.platform_codename}"`);
     next();
@@ -295,14 +290,6 @@ console.log('\n'); // Add a newline before the ASCII art
     })
   );
 
-  app.use((req, res, next) => {
-    if (req.ws) {
-      // Skip session handling for WebSocket connections
-      return next();
-    }
-    next();
-  });
-
   app.use(
     express.json({
       inflate: true,
@@ -317,9 +304,12 @@ console.log('\n'); // Add a newline before the ASCII art
 
 app.set('trust proxy', true);
 
-
-  // Add this middleware right after setting up your session middleware
 app.use(async (req, res, next) => {
+  if (req.ws) {
+    // Skip session handling for WebSocket connections
+    return next();
+  }
+
   // Check if user is logged in and not accessing the /banned route
   if (req.session.userinfo?.id) {
     const userId = req.session.userinfo.id;
@@ -330,7 +320,7 @@ app.use(async (req, res, next) => {
     }
   }
   
-  next(); // Proceed to the next middleware
+  next();
 });
 
 
@@ -421,11 +411,11 @@ app.use(async (req, res, next) => {
           "/auth"
         );
     if (theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
-      const renderData = await renderdataeval(req, theme);
+      const renderData = await renderData(req, theme);
       res.render(theme.settings.notfound, renderData);
       return;
     }
-    const data = await renderdataeval(req, theme);
+    const data = await renderData(req, theme);
     res.render(theme.settings.pages[req._parsedUrl.pathname.slice(1)] || theme.settings.notfound, data);
   });
 

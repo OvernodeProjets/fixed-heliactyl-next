@@ -621,8 +621,7 @@ app.get("/clear-queue", async (req, res) => {
     
         let theme = indexjs.get(req);
     
-        let newsettings = loadConfig('./config.toml')
-        if (newsettings.api.client.allow.server.modify == true) {
+        if (settings.api.client.allow.server.modify == true) {
           if (!req.query.id) return res.send("Missing server id.");
     
           const cacheaccount = await getPteroUser(
@@ -663,12 +662,11 @@ app.get("/clear-queue", async (req, res) => {
             : undefined;
     
           if (ram || disk || cpu) {
-            let newsettings = loadConfig('./config.toml')
     
             let packagename = await db.get("package-" + req.session.userinfo.id);
             let package =
-              newsettings.api.client.packages.list[
-                packagename ? packagename : newsettings.api.client.packages.default
+              settings.api.client.packages.list[
+                packagename ? packagename : settings.api.client.packages.default
               ];
     
             let pterorelationshipsserverdata =
@@ -693,9 +691,9 @@ app.get("/clear-queue", async (req, res) => {
             let attemptegg = null;
             //let attemptname = null;
     
-            for (let [name, value] of Object.entries(newsettings.api.client.eggs)) {
+            for (let [name, value] of Object.entries(settings.api.client.eggs)) {
               if (value.info.egg == checkexist[0].attributes.egg) {
-                attemptegg = newsettings.api.client.eggs[name];
+                attemptegg = settings.api.client.eggs[name];
                 //attemptname = name;
               }
             }
@@ -832,8 +830,7 @@ app.get("/delete", async (req, res) => {
 
   let theme = indexjs.get(req);
 
-  let newsettings = loadConfig('./config.toml')
-  if (newsettings.api.client.allow.server.delete == true) {
+  if (settings.api.client.allow.server.delete == true) {
     if (
       req.session.pterodactyl.relationships.servers.data.filter(
         (server) => server.attributes.id == req.query.id
