@@ -5,10 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= settings.name %> - Dashboard</title>
-    <link rel="stylesheet" href="assets/tailwind.css">
+
+    <%
+      const segments = req.url.split('/').filter(Boolean);
+    %>
+
+    <% if (segments[0] === 'servers' && segments.length > 1) { %>
+      <link rel="stylesheet" href="../assets/tailwind.css">
+    <% } else { %>
+      <link rel="stylesheet" href="assets/tailwind.css">
+    <% } %>
+
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
     <link 
         rel="preload" 
         href="/assets/Ndot-55.otf" 
@@ -16,11 +28,26 @@
         type="font/otf" 
         crossorigin="anonymous"
     >
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
         rel="stylesheet">
 
+    <!-- SEO - Meta Tags -->
+    <meta name="description"
+        content="Experience seamless deployment with <%= settings.name %>'s powerful dashboard. Free serverless hosting for web projects, game servers, and containerized applications with automated scaling, monitoring, and zero maintenance.">
+
+    <meta name="keywords"
+        content="container management, serverless hosting, cloud platform, container orchestration, <%= settings.name %> dashboard, free hosting, game server hosting, Docker containers, cloud deployment, DevOps platform, container scaling, microservices management, cloud infrastructure, container monitoring, <%= settings.name %> cloud">
+
+    <meta name="author" content="SRYDEN, Inc.">
+
+    <meta property="og:title" content="<%= settings.name %>">
+    <meta property="og:description"
+        content="We're <%= settings.name %>, a free hosting platform for your projects, game servers, and more. Built for cloud-native and serverless projects by design.">
+    <meta property="og:type" content="website">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         .text-3xl {
             color: white;
@@ -85,56 +112,38 @@
             transition: transform 0.1s ease-in-out;
         }
 
-.font-mono {
-font-family: 'JetBrains Mono' !important;
-}
+        .font-mono {
+            font-family: 'JetBrains Mono' !important;
+        }
+
+        @font-face {
+            font-family: 'Ndot-55';
+            src: url('/assets/Ndot-55.otf') format('opentype');
+            font-weight: normal;
+            font-display: swap;
+            font-style: normal;
+            unicode-range: U+000-5FF; /* Latin glyphs */
+            font-synthesis: none;
+        }
+
+        .heavy {
+            font-family: 'Ndot-55', sans-serif;
+            font-weight: normal;
+            text-transform: uppercase;
+        }
+
+        #server-name {
+            font-family: 'Ndot-55', sans-serif;
+            font-weight: normal;
+            text-transform: uppercase;
+        }
+
+        .extra-bold {
+            font-family: 'Ndot-55', sans-serif;
+            font-weight: normal;
+            text-transform: uppercase;
+        }
     </style>
-<style>
-@font-face {
-    font-family: 'Ndot-55';
-    src: url('/assets/Ndot-55.otf') format('opentype');
-    font-weight: normal;
-    font-display: swap;
-    font-style: normal;
-    unicode-range: U+000-5FF; /* Latin glyphs */
-    font-synthesis: none;
-}
-
-.heavy {
-    font-family: 'Ndot-55', sans-serif;
-    font-weight: normal;
-    text-transform: uppercase;
-}
-
-#server-name {
-    font-family: 'Ndot-55', sans-serif;
-    font-weight: normal;
-    text-transform: uppercase;
-}
-
-.extra-bold {
-    font-family: 'Ndot-55', sans-serif;
-    font-weight: normal;
-    text-transform: uppercase;
-}
-</style>
-    <!-- SEO - Meta Tags -->
-    <meta name="description"
-        content="Experience seamless deployment with <%= settings.name %>'s powerful dashboard. Free serverless hosting for web projects, game servers, and containerized applications with automated scaling, monitoring, and zero maintenance.">
-
-    <meta name="keywords"
-        content="container management, serverless hosting, cloud platform, container orchestration, <%= settings.name %> dashboard, free hosting, game server hosting, Docker containers, cloud deployment, DevOps platform, container scaling, microservices management, cloud infrastructure, container monitoring, <%= settings.name %> cloud">
-
-    <meta name="author" content="SRYDEN, Inc.">
-
-    <!-- Additional recommended meta tags -->
-    <meta property="og:title" content="<%= settings.name %>">
-    <meta property="og:description"
-        content="We're <%= settings.name %>, a free hosting platform for your projects, game servers, and more. Built for cloud-native and serverless projects by design.">
-    <meta property="og:type" content="website">
-
-    <!-- Recommended additional tag for mobile optimization -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body class="bg-[#010103] text-gray-300" style="font-family: 'Inter'" x-data="{ sidebarOpen: false }" @keydown.escape="sidebarOpen = false">
