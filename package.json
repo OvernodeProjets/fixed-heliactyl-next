@@ -6,7 +6,7 @@
   "author": "Matt James",
   "dependencies": {
     "@iarna/toml": "^2.2.5",
-    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/cli": "^4.1.14",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "chalk": "^4.1.0",
@@ -33,6 +33,7 @@
     "node-schedule": "^2.1.1",
     "sqlite3": "^5.1.7",
     "ssh2-sftp-client": "^11.0.0",
+    "tailwindcss": "^4.1.14",
     "uuid": "^10.0.0",
     "winston": "^3.14.2",
     "ws": "^8.18.3",
@@ -40,10 +41,12 @@
   },
   "scripts": {
     "start": "node --no-deprecation app.js",
-    "build": "npx tailwindcss -i ./assets/tw.conf -o ./assets/tailwind.css --watch"
+    "build:css": "npx @tailwindcss/cli -i ./assets/tw.conf -o ./assets/tailwind.css --watch"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "@tailwindcss/oxide",
       "bcrypt",
       "cpu-features",
       "javascript-obfuscator",

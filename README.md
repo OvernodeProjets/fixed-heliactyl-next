@@ -59,7 +59,7 @@ server {
 These commands are available:
 ```
 npm run start - starts Heliactyl
-npm run build - builds TailwindCSS, required for making changes to the UI
+npm run build:css - builds TailwindCSS, required for making changes to the UI
 ```
 
 ## Heliactyl API v2
