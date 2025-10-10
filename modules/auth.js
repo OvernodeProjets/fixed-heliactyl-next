@@ -33,6 +33,24 @@ const RESEND_API_KEY = 're_GqVR7va3_8z8QuYyECBEDYKYdvrf9iqbb';
 
 
 module.exports.load = async function (app, db) {
+  const verifyCaptcha = async (recaptchaResponse) => {
+    if (!settings.security.enableCaptcha) return true;
+    if (!recaptchaResponse) return false;
+
+    try {
+        const recaptchaVerification = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `secret=${settings.security.recaptchaSiteKey}&response=${recaptchaResponse}`
+        });
+        const data = await recaptchaVerification.json();
+        return data.success;
+    } catch (error) {
+      console.error('Error verifying reCAPTCHA:', error);
+      return false;
+    }
+  };
+
   const rateLimit = (req, res, next) => {
     if (!req.session.lastAuthAttempt) {
       req.session.lastAuthAttempt = Date.now();
@@ -67,19 +85,12 @@ module.exports.load = async function (app, db) {
       throw new Error('Failed to send email');
     }
   };
-
-  app.get("/test", async (req, res) => {
-    const userId = req.session.userinfo.id;
-    res.status(200).json({ 
-        userId
-    });
-  });
   
   // Registration route
   app.post("/auth/register", rateLimit, async (req, res) => {
     const { username, email, password, recaptchaResponse } = req.body;
 
-    if (!username || !email || !password || !recaptchaResponse) {
+    if (!username || !email || !password) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -107,15 +118,9 @@ module.exports.load = async function (app, db) {
     }
 
     // Verify reCAPTCHA
-    const recaptchaVerification = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `secret=6LcpgpAqAAAAAAFJShlONIXX8RZB4_Ru1BUl6WFi&response=${recaptchaResponse}`
-    });
+    const recaptchaResult = await verifyCaptcha(recaptchaResponse);
 
-    const recaptchaResult = await recaptchaVerification.json();
-
-    if (!recaptchaResult.success) {
+    if (!recaptchaResult) {
         return res.status(400).json({ error: "reCAPTCHA verification failed" });
     }
 
@@ -140,7 +145,7 @@ module.exports.load = async function (app, db) {
 
     // Create Pterodactyl account
     let genpassword = makeid(settings.api.client.passwordgenerator.length);
-    let accountjson = await fetch(
+    let accountData = await fetch(
       settings.pterodactyl.domain + "/api/application/users",
       {
         method: "post",
@@ -158,20 +163,43 @@ module.exports.load = async function (app, db) {
       }
     );
 
-    if ((await accountjson.status) == 201) {
-      let accountinfo = JSON.parse(await accountjson.text());
-      let userids = (await db.get("users")) ? await db.get("users") : [];
-      userids.push(accountinfo.attributes.id);
-      await db.set("users", userids);
-      await db.set("users-" + userId, accountinfo.attributes.id);
+    if ((await accountData.status) == 201) {
+      const userData = JSON.parse(await accountData.text());
+      const userDataID = userData.attributes.id;
+      const user = (await db.get("users")) || [];
+      user.push(userDataID);
+      await db.set("users", user);
+      await db.set(`users-${userId}`, userDataID);
     } else {
-      return res.status(500).json({ error: "Failed to create Pterodactyl account" });
+      //return res.status(500).json({ error: "Failed to create Pterodactyl account" });
+      const accountListResponse = await fetch(`${settings.pterodactyl.domain}/api/application/users?include=servers&filter[email]=${encodeURIComponent(email)}`, {
+          method: "GET",
+          headers: {
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${settings.pterodactyl.key}`
+          }
+      });
+      if (!accountListResponse.ok) return res.send("An error has occurred when attempting to create your account.");
+
+      const accountList = await accountListResponse.json();
+      const user = accountList.data.find(acc => acc.attributes.email === email);
+
+      if (user) {
+          let userDB = await db.get("users") || [];
+          let userDataID = accountList.data.find(acc => acc.attributes.email === email).attributes.id;
+          if (!userDB.includes(userDataID)) {
+            userDB.push(userDataID);
+            await db.set("users", userDataID);
+            await db.set(`users-${userId}`, userDataID);
+          } else {
+            return res.send("We have detected an account with your Discord email on it but the user id has already been claimed on another Discord account.");
+          }
+        } else {
+          return res.send("An error has occurred when attempting to create your account.");
+        }
     }
 
     res.status(201).json({ message: "User registered successfully" });
-    setTimeout(() => {
-      res.redirect('/auth');
-    }, 5000);
   });
 
   // Login route
@@ -237,20 +265,14 @@ module.exports.load = async function (app, db) {
   app.post("/auth/reset-password-request", async (req, res) => {
     const { email, recaptchaResponse } = req.body;
 
-    if (!email || !recaptchaResponse) {
-      return res.status(400).json({ error: "Email and reCAPTCHA response are required" });
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
     }
 
     // Verify reCAPTCHA
-    const recaptchaVerification = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `secret=6LcpgpAqAAAAAAFJShlONIXX8RZB4_Ru1BUl6WFi&response=${recaptchaResponse}`
-    });
+    const recaptchaResult = await verifyCaptcha(recaptchaResponse);
 
-    const recaptchaResult = await recaptchaVerification.json();
-
-    if (!recaptchaResult.success) {
+    if (!recaptchaResult) {
         return res.status(400).json({ error: "reCAPTCHA verification failed" });
     }
 
@@ -326,20 +348,14 @@ module.exports.load = async function (app, db) {
   app.post("/auth/magic-link", rateLimit, async (req, res) => {
     const { email, recaptchaResponse } = req.body;
 
-    if (!email || !recaptchaResponse) {
-      return res.status(400).json({ error: "Email and reCAPTCHA response are required" });
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
     }
 
     // Verify reCAPTCHA
-    const recaptchaVerification = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `secret=6LcpgpAqAAAAAAFJShlONIXX8RZB4_Ru1BUl6WFi&response=${recaptchaResponse}`
-    });
+    const recaptchaResult = await verifyCaptcha(recaptchaResponse);
 
-    const recaptchaResult = await recaptchaVerification.json();
-
-    if (!recaptchaResult.success) {
+    if (!recaptchaResult) {
         return res.status(400).json({ error: "reCAPTCHA verification failed" });
     }
 

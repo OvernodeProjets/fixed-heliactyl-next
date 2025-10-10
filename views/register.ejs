@@ -74,9 +74,11 @@
                 <div>
                     <input type="password" id="confirmPassword" name="confirmPassword" class="transition w-full py-2 px-4 font-medium text-sm bg-gray-200 rounded-full border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500" placeholder="Confirm Password" required>
                 </div>
+                <% if(settings.security.enableCaptcha) { %>
                 <div class="flex justify-center">
-                    <div class="g-recaptcha" data-sitekey="6LcpgpAqAAAAAGVhH7T0gaRx0AqS4jbw8NQlvk1x"></div>
+                    <div class="g-recaptcha" data-sitekey="<%= settings.security.captchaSiteKey %>"></div>
                 </div>
+                <% } %>
                 <button style="box-shadow: inset 0px 4px 5px -3px rgba(55,65,81,1);" type="submit" class="hover:scale-95 w-full py-2.5 px-4 bg-gray-800 hover:bg-gray-700 transition text-white rounded-full transition font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center">
                     Register
                     <span class="spinner" id="registerSpinner"></span>
@@ -121,12 +123,15 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+            const captchaEnabled = <%= settings.security.enableCaptcha %>;
+            if (captchaEnabled) {
             const recaptchaResponse = grecaptcha.getResponse();
 
             if (!recaptchaResponse) {
                 showToast('Please complete the reCAPTCHA.');
                 registerSpinner.style.display = 'none';
                 return;
+            }
             }
 
             if (password !== confirmPassword) {
@@ -145,7 +150,7 @@
                         username, 
                         email, 
                         password,
-                        recaptchaResponse
+                        recaptchaResponse: captchaEnabled ? grecaptcha.getResponse() : null
                     }),
                 });
 
@@ -154,7 +159,7 @@
                 if (response.ok) {
                     showToast('Registration successful!', 'success');
                     setTimeout(() => {
-                        window.location.href = '/';
+                        window.location.href = '/auth';
                     }, 2000);
                 } else {
                     showToast(data.error || 'Registration failed. Please try again.');
@@ -165,7 +170,7 @@
                 showToast('An error occurred. Please try again later.');
             } finally {
                 registerSpinner.style.display = 'none';
-                grecaptcha.reset();
+                if (captchaEnabled) grecaptcha.reset();
             }
         });
 

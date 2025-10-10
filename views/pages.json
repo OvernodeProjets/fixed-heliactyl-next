@@ -45,7 +45,6 @@
     },
     "pages": {
         "auth": "auth.ejs",
-        "test2": "test.ejs",
         "auth/reset-password": "passwordreset.ejs",
         "server/manage": "server/manage.ejs",
         "server/allocations": "server/allocations.ejs",
