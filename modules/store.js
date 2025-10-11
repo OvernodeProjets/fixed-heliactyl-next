@@ -23,7 +23,6 @@ const fs = require("fs");
 const ejs = require("ejs");
 const fetch = require('node-fetch');
 const mysql = require('mysql2/promise');
-const PaymentProcessor = require("../handlers/payments.js");
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
 
@@ -587,7 +586,6 @@ class Store {
 module.exports.load = function(app, db) {
     
       const billingManager = new BillingManager(db);
-      const paymentProcessor = new PaymentProcessor(db, settings);
     
   const afkManager = new AFKRewardsManager(db);
   const clusterId = process.env.CLUSTER_ID || `cluster-${Math.random().toString(36).substring(7)}`;
