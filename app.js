@@ -343,36 +343,11 @@ app.use(async (req, res, next) => {
     );
   });
 
-  // todo: replace with express-rate-limit
-  var cache = false;
-  app.use(function (req, res, next) {
-    let manager = loadConfig("./config.toml").api
-      .client.ratelimits;
-    if (manager[req._parsedUrl.pathname]) {
-      if (cache == true) {
-        setTimeout(async () => {
-          let allqueries = Object.entries(req.query);
-          let querystring = "";
-          for (let query of allqueries) {
-            querystring = querystring + "&" + query[0] + "=" + query[1];
-          }
-          querystring = "?" + querystring.slice(1);
-          res.redirect(
-            (req._parsedUrl.pathname.slice(0, 1) == "/"
-              ? req._parsedUrl.pathname
-              : "/" + req._parsedUrl.pathname) + querystring
-          );
-        }, 1000);
-        return;
-      } else {
-        cache = true;
-        setTimeout(async () => {
-          cache = false;
-        }, 1000 * manager[req._parsedUrl.pathname]);
-      }
-    }
-    next();
-  });
+  const createRateLimiter = require('./handlers/rateLimit.js');
+  const rateLimiters = createRateLimiter();
+  
+  app.use(rateLimiters.global);
+  app.use(rateLimiters.specific);
 
   // Add this new function to collect routes
   function collectRoutes(app) {
