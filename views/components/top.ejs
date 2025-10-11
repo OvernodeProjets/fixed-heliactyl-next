@@ -6,15 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= settings.name %> - Dashboard</title>
 
-    <%
-      const segments = req.url.split('/').filter(Boolean);
-    %>
+    <link rel="stylesheet" href="/assets/tailwind.css">
 
-    <% if (segments[0] === 'servers' && segments.length > 1) { %>
-      <link rel="stylesheet" href="../assets/tailwind.css">
-    <% } else { %>
-      <link rel="stylesheet" href="assets/tailwind.css">
-    <% } %>
 
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 

@@ -24,6 +24,7 @@ const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 const fetch = require("node-fetch");
 const arciotext = require("../handlers/afk.js");
+const path = require("path");
 
 module.exports.load = async function (app, db) {
   app.all("/", async (req, res) => {
@@ -70,6 +71,6 @@ module.exports.load = async function (app, db) {
       res.status(500).render("500.ejs", { err });
     }
   });
-
-  app.use("/assets", express.static("./assets"));
+  
+  app.use('/assets', express.static(path.join(__dirname, '../assets')));
 };
