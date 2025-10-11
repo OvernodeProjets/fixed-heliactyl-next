@@ -112,16 +112,14 @@ if (cluster.isMaster) {
   }, 2000);
 
   function startApp() {
-    // Create tree view of modules in /modules/
-    let moduleFiles = fs.readdirSync("./modules").filter((file) => file.endsWith(".js"));
-
+    const moduleFiles = fs.readdirSync("./modules").filter((file) => file.endsWith(".js"));
+    const compatibility = require('./handlers/compatibility');
     const runtime = typeof Bun !== 'undefined' ? 'Bun' : 'Node.js';
+
     console.log(chalk.gray(`Running under a ${runtime} runtime environment`));
-  
     console.log(chalk.gray("Loading modules tree..."));
     console.log(chalk.gray("Graphene 1.1.0"));
 
-    const compatibility = require('./handlers/compatibility');
 
     const modulesTable = [];
 
@@ -197,33 +195,27 @@ if (cluster.isMaster) {
       console.log(chalk.red(`Worker ${worker.process.pid} died. Forking a new worker...`));
       cluster.fork();
     });
-    
-    // Watch for file changes and reboot workers
-    const watcher = chokidar.watch('./modules');
-    watcher.on('change', (path) => {
-      console.log(chalk.yellow(`File changed: ${path}. Rebooting workers...`));
-      for (const id in cluster.workers) {
-        cluster.workers[id].kill();
-      }
-    });
 
-    // Watch for file changes and reboot workers
-    const watcher2 = chokidar.watch('./handlers');
-    watcher2.on('change', (path) => {
-      console.log(chalk.yellow(`File changed: ${path}. Rebooting workers...`));
-      for (const id in cluster.workers) {
-        cluster.workers[id].kill();
-      }
+    cluster.on('online', (worker) => {
+      const workerTree = Object.values(cluster.workers).map(w => ({
+        id: w.id,
+        pid: w.process.pid,
+        state: w.state,
+      }));
+    });
+    
+    const watchDirs = ['./modules', './handlers'];
+    
+    watchDirs.forEach(dir => {
+      const watcher = chokidar.watch(dir);
+      watcher.on('change', (path) => {
+        console.log(chalk.yellow(`File changed: ${path}. Rebooting workers...`));
+        for (const id in cluster.workers) {
+          cluster.workers[id].kill();
+        }
+      });
     });
   }
-  
-  cluster.on('online', (worker) => {
-    const workerTree = Object.values(cluster.workers).map(worker => ({
-      id: worker.id,
-      pid: worker.process.pid,
-      state: worker.state,
-    }));
-  });
 
 } else {
   // Worker process
@@ -255,24 +247,26 @@ if (cluster.isMaster) {
 
   // Load websites.
   const express = require("express");
+  const cookieParser = require('cookie-parser');
   const nocache = require('nocache');
   const app = express();
-  app.set('view engine', 'ejs');
   require("express-ws")(app);
 
-  const cookieParser = require('cookie-parser');
+  // Load the website.
+  module.exports.app = app;
+
+  app.set('view engine', 'ejs');
+  app.set('trust proxy', true);
+
   app.use(cookieParser());
   app.use(express.text());
+  app.use(nocache());
 
   // Load express addons.
   const session = require("express-session");
   const SessionStore = require("./handlers/session");
   const indexjs = require("./app.js");
 
-  // Load the website.
-  module.exports.app = app;
-
-  app.use(nocache());
   app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader("X-Powered-By", `13rd Gen Heliactyl Next (${settings.platform_codename})`);
@@ -313,9 +307,6 @@ if (cluster.isMaster) {
     })
   );
 
-
-app.set('trust proxy', true);
-
 app.use(async (req, res, next) => {
   if (req.ws) {
     // Skip session handling for WebSocket connections
@@ -349,6 +340,16 @@ app.use(async (req, res, next) => {
   
   app.use(rateLimiters.global);
   app.use(rateLimiters.specific);
+  
+  const APIFiles = fs.readdirSync("./modules").filter((file) => file.endsWith(".js"));
+
+    APIFiles.forEach((file) => {
+      const APIFile = require(`./modules/${file}`);
+      APIFile.load(app, db);
+  });
+
+  collectRoutes(app);
+
 
   // Add this new function to collect routes
   function collectRoutes(app) {
@@ -366,22 +367,6 @@ app.use(async (req, res, next) => {
     });
     return routes;
   }
-
-  // Modify the API loading section
-  //console.log(chalk.gray("Loading API routes:"));
-  let apifiles = fs.readdirSync("./modules").filter((file) => file.endsWith(".js"));
-
-  apifiles.forEach((file) => {
-    let apifile = require(`./modules/${file}`);
-    apifile.load(app, db);
-  });
-
-    // After loading each module, collect and log its routes
-    const routes = collectRoutes(app);
-    routes.forEach(route => {
-      //console.log(chalk.green(`${route}`));
-    });
-
   app.all("*", async (req, res) => {
     if (req.session.pterodactyl)
       if (
