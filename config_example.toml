@@ -188,7 +188,6 @@ accountSwitcher = true
   capacity = 100
   cpu = "Intel Xeon & AMD Ryzen"
   storage = "1 TB SSD"
-  pro = false
 
 # --- Egg Templates ---
 [api.client.eggs.velocity]
