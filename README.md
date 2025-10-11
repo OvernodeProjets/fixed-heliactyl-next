@@ -1,6 +1,6 @@
 # Heliactyl
 
-![GitHub commit](https://img.shields.io/github/last-commit/heliactyloss/heliactyl) ![GitHub Release](https://img.shields.io/github/v/release/heliactyloss/heliactyl)
+![GitHub commit](https://img.shields.io/github/last-commit/OvernodeProjets/fixed-heliactyl-next) ![GitHub Release](https://img.shields.io/github/v/release/OvernodeProjets/fixed-heliactyl-next) ![GitHub issues](https://img.shields.io/github/issues/OvernodeProjets/fixed-heliactyl-next) ![GitHub license](https://img.shields.io/github/license/OvernodeProjets/fixed-heliactyl-next)
 
 > [!WARNING]  
 > Heliactyl 19 is not compatible with `settings.json` files. You can keep the same `database.sqlite / heliactyl.db` though without having any issues.
@@ -11,8 +11,8 @@ Heliactyl is a high-performance client area for the Pterodactyl Panel. It allows
 
 You can get started straight away by following these steps:
 
-1. Clone the repo: Run `git clone https://github.com/heliactyloss/heliactyl` on your machine
-2. Enter the directory and configure the `settings.json` file - most are optional except the Pterodactyl and OAuth2 settings which **must** be configured
+1. Clone the repo: Run `git clone https://github.com/OvernodeProjets/fixed-heliactyl-next.git` on your machine
+2. Enter the directory and configure the `config_example.toml` file - most are optional except the Pterodactyl API
 3. Check everything out and make sure you've configured Heliactyl correctly
 4. Create SSL certificates for your target domain and set up the NGINX reverse proxy
 
@@ -65,3 +65,4 @@ npm run build:css - builds TailwindCSS, required for making changes to the UI
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 Copyright (c) 2017 - 2025 Altare Technologies Inc
+Copyright (c) 2022 - 2025 Overnode
