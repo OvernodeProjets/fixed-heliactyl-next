@@ -1,4 +1,4 @@
-# Heliactyl
+# Heliactyl • The modern client panel for Pterodactyl
 
 ![GitHub commit](https://img.shields.io/github/last-commit/OvernodeProjets/fixed-heliactyl-next) ![GitHub Release](https://img.shields.io/github/v/release/OvernodeProjets/fixed-heliactyl-next) ![GitHub issues](https://img.shields.io/github/issues/OvernodeProjets/fixed-heliactyl-next) ![GitHub license](https://img.shields.io/github/license/OvernodeProjets/fixed-heliactyl-next)
 
