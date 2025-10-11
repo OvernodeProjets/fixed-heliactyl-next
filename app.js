@@ -15,18 +15,15 @@ const chalk = require("chalk");
 const arciotext = require("./handlers/afk.js");
 const cluster = require("cluster");
 const chokidar = require('chokidar');
+
 global.Buffer = global.Buffer || require("buffer").Buffer;
 process.emitWarning = function() {};
 
 if (typeof btoa === "undefined") {
-  global.btoa = function (str) {
-    return Buffer.from(str, "binary").toString("base64");
-  };
+  global.btoa = (str) => Buffer.from(str, "binary").toString("base64");
 }
 if (typeof atob === "undefined") {
-  global.atob = function (b64Encoded) {
-    return Buffer.from(b64Encoded, "base64").toString("binary");
-  };
+  global.atob = (b64Encoded) => Buffer.from(b64Encoded, "base64").toString("binary");
 }
 
 // Load settings.
@@ -89,8 +86,8 @@ module.exports.renderdataeval = renderData;
 // Load database
 const Database = require("./db.js");
 const db = new Database(settings.database);
-
 module.exports.db = db;
+
 let isFirstWorker = false;
 
 if (cluster.isMaster) {
@@ -98,9 +95,9 @@ if (cluster.isMaster) {
   const asciiArt = fs.readFileSync('./handlers/ascii.txt', 'utf8');
   console.log('\n' + asciiArt + '\n');
 
-  let spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+  const spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
   let currentFrame = 0;
-  const workerId = cluster.isWorker ? `worker` : "master";
+  const workerId = cluster.isWorker ? "worker" : "master";
   const prefix = chalk.gray.bold(`${workerId}   │   `);
   
   const spinner = setInterval(() => {
@@ -117,72 +114,76 @@ if (cluster.isMaster) {
   function startApp() {
     // Create tree view of modules in /modules/
     let moduleFiles = fs.readdirSync("./modules").filter((file) => file.endsWith(".js"));
-    const settingsVersion = settings.version;
 
     const runtime = typeof Bun !== 'undefined' ? 'Bun' : 'Node.js';
     console.log(chalk.gray(`Running under a ${runtime} runtime environment`));
   
     console.log(chalk.gray("Loading modules tree..."));
     console.log(chalk.gray("Graphene 1.1.0"));
-    let modulesTable = [];
 
     const compatibility = require('./handlers/compatibility');
 
+    const modulesTable = [];
+
     moduleFiles.forEach(file => {
       let moduleState = 'Initializing';
+      
       try {
         const module = require('./modules/' + file);
+        
         if (!module.heliactylModule) {
-          console.log(chalk.red("Module \"" + file + "\" has an error: No module manifest was found in the file."));
+          console.log(chalk.red(`Module "${file}" has an error: No module manifest was found in the file.`));
           modulesTable.push({ File: file, Status: '❌ No module manifest', State: 'Error', 'Target Platform': 'N/A' });
           return;
         }
-    
+
         const { name, target_platform } = module.heliactylModule;
         moduleState = 'Loaded';
 
-      // Check version compatibility
-      const versionCheck = compatibility.isCompatible(target_platform, settingsVersion);
-      if (!versionCheck.compatible) {
-        moduleState = 'Version Mismatch';
-        if (versionCheck.details.majorMismatch) {
-          console.log(chalk.red("Module \"" + name + `" has an error: Major version mismatch (expected: ${settingsVersion}, found: ${target_platform})`));
-          modulesTable.push({ File: file, Name: name, Status: `❌ Major version mismatch`, State: moduleState, 'Target Platform': target_platform });
-        } else if (versionCheck.details.newerMinor) {
-          console.log(chalk.red("Module \"" + name + `" has an error: Module requires a newer platform version (module: ${target_platform}, platform: ${settingsVersion})`));
-          modulesTable.push({ File: file, Name: name, Status: `❌ Newer version required`, State: moduleState, 'Target Platform': target_platform });
+        // Check version compatibility
+        const versionCheck = compatibility.isCompatible(target_platform, settings.version);
+        
+        if (!versionCheck.compatible) {
+           moduleState = 'Version Mismatch';
+          if (versionCheck.details.majorMismatch) {
+            console.log(chalk.red(`Module "${name}" has an error: Major version mismatch (expected: ${settings.version}, found: ${target_platform})`));
+            modulesTable.push({ File: file, Name: name, Status: '❌ Major version mismatch', State: moduleState, 'Target Platform': target_platform });
+          } else if (versionCheck.details.newerMinor) {
+            console.log(chalk.red(`Module "${name}" has an error: Module requires a newer platform version (module: ${target_platform}, platform: ${settings.version})`));
+            modulesTable.push({ File: file, Name: name, Status: '❌ Newer version required', State: moduleState, 'Target Platform': target_platform });
+          }
+          return;
         }
-        return;
-      }
 
-      // Version is compatible but different 
-      if (target_platform !== settingsVersion) {
-        moduleState = 'Compatible';
-        console.log(chalk.yellow("Module \"" + name + `" notice: Different but compatible version (platform: ${settingsVersion}, module: ${target_platform})`));
-        modulesTable.push({ File: file, Name: name, Status: '⚠️ Module loaded (different version)', State: moduleState, 'Target Platform': target_platform });
-        return;
-      }
+        // Version is compatible but different
+        if (target_platform !== settings.version) {
+          moduleState = 'Compatible';
+          console.log(chalk.yellow(`Module "${name}" notice: Different but compatible version (platform: ${settings.version}, module: ${target_platform})`));
+          modulesTable.push({ File: file, Name: name, Status: '⚠️ Module loaded (different version)', State: moduleState, 'Target Platform': target_platform });
+          return;
+        }
 
-      moduleState = 'Active';
-      modulesTable.push({ File: file, Name: name, Status: '✓ Module loaded!', State: moduleState, 'Target Platform': target_platform });
-      console.log(chalk.green("Module \"" + name + "\" loaded successfully (" + target_platform + ")."));
+        moduleState = 'Active';
+        modulesTable.push({ File: file, Name: name, Status: '✓ Module loaded!', State: moduleState, 'Target Platform': target_platform });
+        console.log(chalk.green(`Module "${name}" loaded successfully (${target_platform}).`));
+        
       } catch (error) {
         moduleState = 'Error';
-        console.log(chalk.red("Module \"" + file + "\" failed to load: " + error.message));
-        modulesTable.push({ File: file, Status: `❌ Module load failed`, State: moduleState, 'Target Platform': 'N/A' });
+        console.log(chalk.red(`Module "${file}" failed to load: ${error.message}`));
+        modulesTable.push({ File: file, Status: '❌ Module load failed', State: moduleState, 'Target Platform': 'N/A' });
       }
     });
 
     //console.table( modulesTable);
   
     const numCPUs = parseInt(settings.clusters) - 1;
-    console.log(chalk.gray('Starting workers on Heliactyl Next ' + settings.version + ' (' + settings.platform_codename + ')'));
+    console.log(chalk.gray(`Starting workers on Heliactyl Next ${settings.version} (${settings.platform_codename})`));
     console.log(chalk.gray(`Master ${process.pid} is running`));
     console.log(chalk.gray(`Forking ${numCPUs} workers...`));
   
     if (numCPUs > 130 || numCPUs < 1) {
-      console.log(chalk.red('Error: Clusters amount was either below 1, or above 128.'))
-      process.exit()
+      console.log(chalk.red('Error: Clusters amount was either below 1, or above 128.'));
+      process.exit();
     }
 
     for (let i = 0; i < numCPUs; i++) {
@@ -230,7 +231,7 @@ if (cluster.isMaster) {
     if (msg.type === 'FIRST_WORKER') {
       isFirstWorker = true;
       console.log(chalk.gray(`Worker ${process.pid} is designated as the first worker.`));
-      console.log(chalk.gray(`Heliactyl Next ${settings.version} (${settings.platform_codename}) - webserver is now listening on port ` + settings.website.port));
+      console.log(chalk.gray(`Heliactyl Next ${settings.version} (${settings.platform_codename}) - webserver is now listening on port ${settings.website.port}`));
     }
   });
 
@@ -352,12 +353,12 @@ app.use(async (req, res, next) => {
   // Add this new function to collect routes
   function collectRoutes(app) {
     const routes = [];
-    app._router.stack.forEach(function(middleware){
-      if(middleware.route){ // routes registered directly on the app
+    app._router.stack.forEach((middleware) => {
+      if (middleware.route) {
         routes.push(middleware.route.path);
-      } else if(middleware.name === 'router'){ // router middleware 
-        middleware.handle.stack.forEach(function(handler){
-          if(handler.route){
+      } else if (middleware.name === 'router') {
+        middleware.handle.stack.forEach((handler) => {
+          if (handler.route) {
             routes.push(handler.route.path);
           }
         });
@@ -418,18 +419,16 @@ app.use(async (req, res, next) => {
   };
 
   module.exports.ratelimits = async function (length) {
+    const indexjs = require("./app.js");
     if (cache == true) return setTimeout(indexjs.ratelimits, 1);
     cache = true;
-    setTimeout(async function () {
+    setTimeout(async () => {
       cache = false;
     }, length * 1000);
   };
+};
 
-  process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
-  });
-
-const shimPromiseWithStackCapture = () => {
+function shimPromiseWithStackCapture() {
   const originalPromise = global.Promise;
   const captureStack = () => new Error().stack;
 
@@ -461,14 +460,15 @@ const shimPromiseWithStackCapture = () => {
   global.Promise = PromiseWithStack;
 };
 
-// Apply the shim
 shimPromiseWithStackCapture();
 
-// Set up the unhandled rejection handler
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+});
+
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:');
   console.error(promise);
   console.error('Reason:');
   console.error(reason);
 });
-}
