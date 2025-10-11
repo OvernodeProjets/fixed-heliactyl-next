@@ -25,16 +25,21 @@ const fetch = require("node-fetch");
 const indexjs = require("../app.js");
 const log = require("../handlers/log");
 
-const fs = require("fs");
-const { renderFile } = require("ejs");
-const { google } = require('googleapis');
+let google;
+let oauth2Client;
 
 module.exports.load = async function (app, db) {
-  const oauth2Client = new google.auth.OAuth2(
-    settings.api.client.oauth2.google.id,
-    settings.api.client.oauth2.google.secret,
-    settings.api.client.oauth2.google.link + settings.api.client.oauth2.google.callbackpath
-  );
+  if (!google) {
+    google = require('googleapis').google;
+  }
+  
+  if (!oauth2Client) {
+    oauth2Client = new google.auth.OAuth2(
+      settings.api.client.oauth2.google.id,
+      settings.api.client.oauth2.google.secret,
+      settings.api.client.oauth2.google.link + settings.api.client.oauth2.google.callbackpath
+   );
+  }
 
   app.get("/google/login", (req, res) => {
     if (req.query.redirect) req.session.redirect = "/" + req.query.redirect;
@@ -42,7 +47,7 @@ module.exports.load = async function (app, db) {
     const loginAttemptId = crypto.randomBytes(16).toString('hex');
     res.cookie('loginAttempt', loginAttemptId, { httpOnly: true, maxAge: 5 * 60 * 1000 });
 
-    if (settings.api.client.oauth2.google.enable == false) return res.redirect("/login");
+    if (settings.api.client.oauth2.google.enable == false) return res.redirect("/auth");
     
     const url = oauth2Client.generateAuthUrl({
       access_type: 'offline',
@@ -52,10 +57,9 @@ module.exports.load = async function (app, db) {
   });
 
   app.get(settings.api.client.oauth2.google.callbackpath, async (req, res) => {
-    if (!req.query.code) return res.redirect(`/login`);
+    if (!req.query.code) return res.redirect(`/auth?error=missing_code`);
 
-    if (settings.api.client.oauth2.google.enable == false) return res.redirect("/login");
-    const loginAttemptId = req.cookies.loginAttempt;
+    if (settings.api.client.oauth2.google.enable == false) return res.redirect("/auth");
 
     res.clearCookie('loginAttempt');
 
@@ -85,12 +89,21 @@ module.exports.load = async function (app, db) {
       res.cookie('userId', userinfo.data.id, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
 
       if (!(await db.get("users-" + userinfo.data.id))) {
-        if (settings.api.client.allow.newusers == true) {
-          let genpassword = null;
-          if (settings.api.client.passwordgenerator.signup == true)
-            genpassword = makeid(settings.api.client.passwordgenerator["length"]);
-          
-          let accountjson = await fetch(
+        if (!settings.api.client.allow.newusers) {
+          return res.send("New users cannot signup currently.");
+        }
+
+        let genpassword = null;
+        if (settings.api.client.passwordgenerator.signup) {
+          genpassword = makeid(settings.api.client.passwordgenerator["length"]);
+        }
+        
+        const username = `user_${userinfo.data.id.substring(0, 10)}`;
+        console.log(`Attempting to create Pterodactyl account for: ${username} (${userinfo.data.email})`);
+        
+        try {
+          // Try to create new user
+          const createResponse = await fetch(
             settings.pterodactyl.domain + "/api/application/users",
             {
               method: "post",
@@ -99,26 +112,40 @@ module.exports.load = async function (app, db) {
                 Authorization: `Bearer ${settings.pterodactyl.key}`,
               },
               body: JSON.stringify({
-                username: userinfo.data.id,
+                username: username,
                 email: userinfo.data.email,
-                first_name: userinfo.data.given_name,
-                last_name: userinfo.data.family_name,
-                password: genpassword,
+                first_name: userinfo.data.given_name || "User",
+                last_name: userinfo.data.family_name || userinfo.data.id.substring(0, 5),
+                password: genpassword || makeid(16),
               }),
             }
           );
 
-          if ((await accountjson.status) == 201) {
-            let accountinfo = JSON.parse(await accountjson.text());
-            let userids = (await db.get("users")) ? await db.get("users") : [];
+          console.log(`Pterodactyl API response status: ${createResponse.status}`);
+          
+          if (createResponse.status === 201) {
+            const accountinfo = await createResponse.json();
+            let userids = await db.get("users");
+            if (!Array.isArray(userids)) {
+              userids = [];
+            }
             userids.push(accountinfo.attributes.id);
             await db.set("users", userids);
             await db.set("users-" + userinfo.data.id, accountinfo.attributes.id);
             req.session.newaccount = true;
             req.session.password = genpassword;
+
+            // Send signup notification
+            let notifications = [{
+              action: "user:signup",
+              name: "User registration",
+              timestamp: new Date().toISOString()
+            }];
+            await db.set('notifications-' + userinfo.data.id, notifications);
+            log("signup", `${userinfo.data.name} logged in to the dashboard for the first time!`);
           } else {
-            // Handle error or existing account
-            let accountlistjson = await fetch(
+            // If creation fails, check if user exists
+            const accountListResponse = await fetch(
               settings.pterodactyl.domain + "/api/application/users?include=servers&filter[email]=" + encodeURIComponent(userinfo.data.email),
               {
                 method: "get",
@@ -128,38 +155,36 @@ module.exports.load = async function (app, db) {
                 },
               }
             );
-            let accountlist = await accountlistjson.json();
-            let user = accountlist.data.filter((acc) => acc.attributes.email == userinfo.data.email);
-            if (user.length == 1) {
-              let userid = user[0].attributes.id;
-              let userids = (await db.get("users")) ? await db.get("users") : [];
-              if (userids.filter((id) => id == userid).length == 0) {
-                userids.push(userid);
-                await db.set("users", userids);
-                await db.set("users-" + userinfo.data.id, userid);
-                req.session.pterodactyl = user[0].attributes;
-              } else {
-                return res.send("An account with your Google email already exists but is associated with a different Google account.");
-              }
+
+            if (accountListResponse.status !== 200) {
+              throw new Error('Failed to verify existing account');
+            }
+
+            const accountList = await accountListResponse.json();
+            const existingUser = accountList.data.find(acc => acc.attributes.email === userinfo.data.email);
+
+            if (!existingUser) {
+              return res.redirect('/auth?error=account_creation_failed');
+            }
+
+            const userid = existingUser.attributes.id;
+            let userids = await db.get("users");
+            if (!Array.isArray(userids)) {
+              userids = [];
+            }
+
+            if (!userids.includes(userid)) {
+              userids.push(userid);
+              await db.set("users", userids);
+              await db.set("users-" + userinfo.data.id, userid);
+              req.session.pterodactyl = existingUser.attributes;
             } else {
-              return res.send("An error has occurred when attempting to create your account. Please try a different authentication method.");
+              return res.send("This email is already registered. Please login with your existing account.");
             }
           }
-
-          // Signup notification
-          let notifications = await db.get('notifications-' + userinfo.data.id) || [];
-          let notification = {
-            "action": "user:signup",
-            "name": "User registration",
-            "timestamp": new Date().toISOString()
-          }
-
-          notifications.push(notification)
-          await db.set('notifications-' + userinfo.data.id, notifications)
-          
-          log("signup", `${userinfo.data.name} logged in to the dashboard for the first time!`);
-        } else {
-          return res.send("New users cannot signup currently.");
+        } catch (error) {
+          console.error('Error during account creation/verification:', error);
+          return res.redirect('/auth?error=server_error');
         }
       }
 
@@ -180,6 +205,9 @@ module.exports.load = async function (app, db) {
       let cacheaccountinfo = JSON.parse(await cacheaccount.text());
       req.session.pterodactyl = cacheaccountinfo.attributes;
 
+      //console.log(JSON.stringify(userinfo.data))
+      userinfo.data.username = userinfo.data.name.replace(/[^a-zA-Z0-9_\-\.]/g, '').substring(0, 20);
+      console.log(JSON.stringify(userinfo.data))
       req.session.userinfo = userinfo.data;
       let theme = indexjs.get(req);
 
@@ -200,7 +228,7 @@ module.exports.load = async function (app, db) {
       return res.redirect(theme.settings.redirect.callback ? theme.settings.redirect.callback : "/");
     } catch (error) {
       console.error('Error during Google OAuth:', error);
-      res.redirect('/login');
+      res.redirect('/auth');
     }
   });
 };
