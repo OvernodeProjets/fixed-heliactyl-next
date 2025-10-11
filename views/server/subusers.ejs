@@ -184,23 +184,6 @@
         element.innerHTML = '';
     }
 
-    function loadSubuserList() {
-        showLoader('subuser-list');
-        fetch(`/api/server/${serverId}/users`)
-            .then(response => response.json())
-            .then(data => {
-                const subuserList = document.getElementById('subuser-list');
-                subuserList.innerHTML = '';
-                data.data.forEach(subuser => {
-                    const subuserItem = createSubuserItem(subuser);
-                    subuserList.appendChild(subuserItem);
-                });
-            })
-            .catch(error => {
-                console.error('Error loading subusers:', error);
-                hideLoader('subuser-list');
-            });
-    }
 
     function createSubuserItem(subuser) {
         const item = document.createElement('div');
@@ -441,10 +424,18 @@ document.getElementById('confirm-delete').addEventListener('click', deleteSubuse
             .then(data => {
                 const subuserList = document.getElementById('subuser-list');
                 subuserList.innerHTML = '';
-                data.data.forEach(subuser => {
-                    const subuserItem = createSubuserItem(subuser);
-                    subuserList.appendChild(subuserItem);
-                });
+                if (!data.data || data.data.length === 0) {
+                    subuserList.innerHTML = `
+                        <div class="text-center py-4 text-gray-400">
+                            <p>No subusers found. Add a subuser to get started!</p>
+                        </div>
+                    `;
+                } else {
+                    data.data.forEach(subuser => {
+                        const subuserItem = createSubuserItem(subuser);
+                        subuserList.appendChild(subuserItem);
+                    });
+                }
                 onSubuserListUpdated();
             })
             .catch(error => {

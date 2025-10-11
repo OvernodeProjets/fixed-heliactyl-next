@@ -188,8 +188,8 @@ display:none;
 <div class="bg-gradient-to-r from-indigo-500/10 to-indigo-600/15 border border-indigo-500/10 rounded-3xl p-6 pl-12 mb-8 container mx-auto mt-8">
     <div class="flex items-center justify-between">
         <div class="space-y-4">
-            <h2 class="text-2xl heavy font-semibold text-white">Fractal virtual machines</h2>
-            <p class="text-white/60">This is a beta experience and is not suitable for production environments. Please report any bugs or issues you find via our Discord. The administrator account's password will be <code class="font-mono">fractal</code>.</p>
+            <h2 class="text-2xl heavy font-semibold text-white">Virtual machines</h2>
+            <p class="text-white/60">This is a beta experience and is not suitable for production environments. Please report any bugs or issues you find via our Discord. The administrator account's password will be <code class="font-mono"><%= settings.name %></code>.</p>
         </div>
         <div class="hidden md:block">
             <img src="https://i.imgur.com/NUDxhDy.png" alt="d" class="rounded-lg w-[300px] shadow-sm h-[190px] object-cover" />
@@ -232,7 +232,7 @@ display:none;
                 <div style="height: 30rem;" id="console-output" class="bg-black/20 p-4 rounded-xl border border-white/5 shadow-sm scrollbar-hide mt-4 overflow-y-auto mb-4 font-mono text-sm">
                 </div>
                 <div class="flex border-t border-white/5 pt-4">
-                    <input type="text" id="console-input" class="flex-grow border-none bg-transparent text-white py-2 focus:border-white/5 focus:outline-none focus:ring-2 focus:ring-transparent transition placeholder-white/30" placeholder="container@fractal~">
+                    <input type="text" id="console-input" class="flex-grow border-none bg-transparent text-white py-2 focus:border-white/5 focus:outline-none focus:ring-2 focus:ring-transparent transition placeholder-white/30" placeholder="container@<%= settings.name %>~">
                     <button id="send-command" class="bg-indigo-500/15 hover:bg-indigo-500/20 text-indigo-200 font-medium py-2 px-4 rounded-xl transition duration-300">
                         Send command <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mb-0.5 inline-flex ml-1">
   <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
@@ -507,7 +507,7 @@ function fetchServerDetails() {
                 showAlert('warning', 'Server Provisioning', 'This server is currently provisioning. Some features (such as the console) may be unavailable.');
             }
             if (data.attributes.is_suspended) {
-                showAlert('error', 'Server Suspended', 'Please contact Fractal support via the Discord server (discord.gg/frac) to resolve this!');
+                showAlert('error', 'Server Suspended', `Please contact ${settings.name} support via the Discord server (discord.gg/${settings.discord}) to resolve this!`);
             }
         })
         .catch(error => {
@@ -613,30 +613,29 @@ function displayStatusUpdate(status) {
         default:
             statusColor = '#a1a1a1';
     }
-    
-    const statusMessage = `fracd Your server's status is now: ${(status.replace('offline', 'powered off')).replace('running', 'powered on')}`;
+
+    const statusMessage = `<%= settings.name %> Your server's status is now: ${(status.replace('offline', 'powered off')).replace('running', 'powered on')}`;
     appendToConsole(statusMessage, true);
 }
 
 function appendToConsole(message, isInternal = false) {
     const consoleOutput = document.getElementById('console-output');
     
-    // Replace "Pterodactyl" with "Skyport" and "pterodactyl" with "skyport"
-    message = message.replace(/Pterodactyl/g, "Fractal").replace(/pterodactyl/g, "fractal.compute.edge_" + randomId());
-    message = message.replace('Transfer System', 'Fractal Transfer System')
+    message = message.replace(/Pterodactyl/g, "<%= settings.name %>").replace(/pterodactyl/g, "fractal.compute.edge_" + randomId());
+    message = message.replace('Transfer System', '<%= settings.name %> Transfer System')
 
     // Replace specific messages with more friendly versions
     const friendlyMessages = {
         "Checking server disk space usage, this could take a few seconds...": 
-            "<span style=\"color: #a1a1a1\">> fracd</span> Performing container disk usage checks...",
+            "<span style=\"color: #a1a1a1\">> <%= settings.name %></span> Performing container disk usage checks...",
         "Updating process configuration files...": 
-            "<span style=\"color: #a1a1a1\">> fracd</span> Updating environment...",
+            "<span style=\"color: #a1a1a1\">> <%= settings.name %></span> Updating environment...",
         "Ensuring file permissions are set correctly, this could take a few seconds...": 
-            "<span style=\"color: #a1a1a1\">> fracd</span> Performing file permission checks...",
+            "<span style=\"color: #a1a1a1\">> <%= settings.name %></span> Performing file permission checks...",
         "Pulling Docker container image, this could take a few minutes to complete...": 
-            "<span style=\"color: #a1a1a1\">> fracd</span> Fetching Docker image...",
+            "<span style=\"color: #a1a1a1\">> <%= settings.name %></span> Fetching Docker image...",
         "Finished pulling Docker container image": 
-            "<span style=\"color: #a1a1a1\">> fracd</span> Completed Docker image pull!"
+            "<span style=\"color: #a1a1a1\">> <%= settings.name %></span> Completed Docker image pull!"
     };
 
     // Check if the message matches any friendly replacements
@@ -650,13 +649,6 @@ function appendToConsole(message, isInternal = false) {
     // Append the transformed message to the console
     const logElement = createConsoleLogElement(message, isInternal);
     consoleOutput.appendChild(logElement);
-    
-    // If Docker image pull is complete, append the Skyport Daemon message
-    if (message === "> skyportd Completed Docker image pull!") {
-        const skyportDaemonMessage = "> skyportd Skyport Daemon 0.3.0 (Desiro City)";
-        const daemonLogElement = createConsoleLogElement(skyportDaemonMessage, isInternal);
-        consoleOutput.appendChild(daemonLogElement);
-    }
 
     smoothScrollConsole();
 }

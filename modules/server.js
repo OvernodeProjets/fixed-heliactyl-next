@@ -1186,6 +1186,9 @@ router.get('/server/:id/players', isAuthenticated, ownsServer, async (req, res) 
     const consoleLines = await sendCommandAndGetResponse(serverId, 'list');
     
     // Parse player list from console output
+    if (!consoleLines || consoleLines.length === 0) {
+      return res.json({ players: [] });
+    }
     const playerListLine = consoleLines.find(line => line.includes('players online:'));
     let players = [];
     
@@ -1293,6 +1296,10 @@ router.get('/server/:id/players/banned', isAuthenticated, ownsServer, async (req
     // Parse banned players from console output
     const bannedPlayers = [];
     let collectingBans = false;
+
+    if(!consoleLines || consoleLines.length === 0) {
+      return res.json({ bannedPlayers: [] });
+    }
     
     for (const line of consoleLines) {
       if (line.includes('Banned players:')) {
