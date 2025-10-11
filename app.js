@@ -391,7 +391,7 @@ app.all("*", async (req, res) => {
     // Validate session
     if (req.session.pterodactyl && req.session.pterodactyl.id !==
         (await db.get("users-" + req.session.userinfo.id))) {
-        return res.redirect("/login?prompt=none");
+        return res.redirect("/auth?prompt=none");
     }
 
     const theme = indexjs.get(req);

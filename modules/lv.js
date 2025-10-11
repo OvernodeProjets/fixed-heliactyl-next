@@ -42,7 +42,7 @@ module.exports.load = async function(app, db) {
 
   // Open Savings Account endpoint
   app.post("/xrs/savings/open", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
     
     const userId = req.session.userinfo.id;
     const { depositAmount } = req.body;
@@ -78,7 +78,7 @@ module.exports.load = async function(app, db) {
 
   // Deposit to Savings Account endpoint
   app.post("/xrs/savings/deposit", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
     
     const userId = req.session.userinfo.id;
     const { depositAmount } = req.body;
@@ -117,7 +117,7 @@ module.exports.load = async function(app, db) {
 
   // Withdraw from Savings Account endpoint
   app.post("/xrs/savings/withdraw", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
     
     const userId = req.session.userinfo.id;
     const { withdrawAmount } = req.body;
@@ -158,7 +158,7 @@ module.exports.load = async function(app, db) {
 
   // Get Savings Account Info endpoint
   app.get("/xrs/savings/info", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
 
     const userId = req.session.userinfo.id;
     const account = await getUserSavingsAccount(userId);
@@ -232,7 +232,7 @@ module.exports.load = async function(app, db) {
 
   // Governance Info endpoint
   app.get("/governance/info", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
 
     res.status(200).json({
       proposalCreationThreshold: PROPOSAL_CREATION_THRESHOLD,
@@ -244,7 +244,7 @@ module.exports.load = async function(app, db) {
 
   // User Governance Info endpoint
   app.get("/governance/user-info", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
 
     const userId = req.session.userinfo.id;
     const userXRSBalance = await getUserXRSBalance(userId);
@@ -259,7 +259,7 @@ module.exports.load = async function(app, db) {
   
   // Create Proposal endpoint
   app.post("/governance/create-proposal", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
     
     const userId = req.session.userinfo.id;
     const { title, description, actions } = req.body;
@@ -296,7 +296,7 @@ module.exports.load = async function(app, db) {
 
   // Vote on Proposal endpoint
   app.post("/governance/vote", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
     
     const userId = req.session.userinfo.id;
     const { proposalId, vote } = req.body;
@@ -341,7 +341,7 @@ module.exports.load = async function(app, db) {
 
   // Get Proposals endpoint
   app.get("/governance/proposals", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
 
     const proposals = await getAllProposals();
     res.status(200).json(proposals);
@@ -349,7 +349,7 @@ module.exports.load = async function(app, db) {
 
   // Get Single Proposal endpoint
   app.get("/governance/proposal/:id", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
 
     const proposalId = parseInt(req.params.id);
     const proposals = await getAllProposals();
@@ -364,7 +364,7 @@ module.exports.load = async function(app, db) {
 
   // Execute Proposal endpoint
   app.post("/governance/execute/:id", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
 
     const proposalId = parseInt(req.params.id);
     const proposals = await getAllProposals();
@@ -445,7 +445,7 @@ module.exports.load = async function(app, db) {
   const dailyLimits = {}
 
   app.get(`/lv/gen`, async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect("/login");
+    if (!req.session.pterodactyl) return res.redirect("/auth");
 
     // Check for the presence of specific cookies
     const requiredCookies = ["x5385", "x4634", "g9745", "h2843"];

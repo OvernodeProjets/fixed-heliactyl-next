@@ -26,7 +26,7 @@ const Queue = require("../handlers/Queue.js");
 
 module.exports.load = async function(app, db) {
   app.get(`/api/password`, async (req, res) => {
-    if (!req.session.userinfo.id) return res.redirect("/login");
+    if (!req.session.userinfo.id) return res.redirect("/auth");
 
     let checkPassword = await db.get("password-" + req.session.userinfo.id);
 
@@ -63,7 +63,7 @@ module.exports.load = async function(app, db) {
   });
 
   app.get("/notifications", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect("/login");
+    if (!req.session.pterodactyl) return res.redirect("/auth");
 
     let notifications = await db.get('notifications-' + req.session.userinfo.id) || [];
 
@@ -72,7 +72,7 @@ module.exports.load = async function(app, db) {
 
   // Existing /regen endpoint remains for compatibility
   app.get("/regen", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect("/login");
+    if (!req.session.pterodactyl) return res.redirect("/auth");
     if (settings.api.client.allow.regen !== true) return res.send("You cannot regenerate your password currently.");
 
     let newpassword = makeid(settings.api.client.passwordgenerator["length"]);

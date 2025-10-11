@@ -109,7 +109,7 @@ app.get("/stats", async (req, res) => {
 });
 
   app.get(`/api/dailystatus`, async (req, res) => {
-    if (!req.session.userinfo.id) return res.redirect("/login");
+    if (!req.session.userinfo.id) return res.redirect("/auth");
   
     let lastClaim = new Date(await db.get("dailycoins12-" + req.session.userinfo.id));
   
@@ -126,7 +126,7 @@ app.get("/stats", async (req, res) => {
   
   app.get('/daily-coins', async (req, res) => {
     // Check if user is logged in
-    if (!req.session.userinfo.id) return res.redirect("/login");
+    if (!req.session.userinfo.id) return res.redirect("/auth");
     const userId = req.session.userinfo.id
     
     // Get the date of the user's last coin claim

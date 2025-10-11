@@ -19,8 +19,8 @@ module.exports.heliactylModule = heliactylModule;
 
 module.exports.load = async function (app, db) {
 app.get('/generate', async (req, res) => {
-  if (!req.session) return res.redirect("/login");
-  if (!req.session.pterodactyl) return res.redirect("/login");
+  if (!req.session) return res.redirect("/auth");
+  if (!req.session.pterodactyl) return res.redirect("/auth");
 
   if (!req.query.code) {
     return res.redirect('../account?err=INVALIDCODE')
@@ -46,8 +46,8 @@ app.get('/generate', async (req, res) => {
 });
 
 app.get('/claim', async (req, res) => {
-  if (!req.session) return res.redirect("/login");
-  if (!req.session.pterodactyl) return res.redirect("/login");
+  if (!req.session) return res.redirect("/auth");
+  if (!req.session.pterodactyl) return res.redirect("/auth");
 
   // Get the referral code from the request body
   if (!req.query.code) {

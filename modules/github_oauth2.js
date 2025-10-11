@@ -31,16 +31,16 @@ module.exports.load = async function (app, db) {
     const loginAttemptId = crypto.randomBytes(16).toString('hex');
     res.cookie('loginAttempt', loginAttemptId, { httpOnly: true, maxAge: 5 * 60 * 1000 });
 
-    if (settings.api.client.oauth2.github.enable == false) return res.redirect("/login");
+    if (settings.api.client.oauth2.github.enable == false) return res.redirect("/auth");
     
     const authUrl = `https://github.com/login/oauth/authorize?client_id=${settings.api.client.oauth2.github.id}&redirect_uri=${encodeURIComponent(`${settings.website.domain}/auth/github/callback`)}&scope=read:user,user:email`;
     res.redirect(authUrl);
   });
 
   app.get(settings.api.client.oauth2.github.callbackpath, async (req, res) => {
-    if (!req.query.code) return res.redirect(`/login`);
+    if (!req.query.code) return res.redirect(`/auth`);
 
-    if (settings.api.client.oauth2.github.enable == false) return res.redirect("/login");
+    if (settings.api.client.oauth2.github.enable == false) return res.redirect("/auth");
 
     const loginAttemptId = req.cookies.loginAttempt;
 
@@ -225,7 +225,7 @@ module.exports.load = async function (app, db) {
       return res.redirect(theme.settings.redirect.callback ? theme.settings.redirect.callback : "/");
     } catch (error) {
       console.error('Error during GitHub OAuth:', error);
-      res.redirect('/login');
+      res.redirect('/auth');
     }
   });
 };

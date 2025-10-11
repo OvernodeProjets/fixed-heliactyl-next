@@ -95,7 +95,7 @@ const lastRequestTimes = new Map(); // Store last request times per user
 
   // Modified staking endpoint with rate limiting
   app.post("/stake", rateLimit, async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
     
     const { amount, lockPeriod } = req.body;
     const parsedAmount = parseFloat(amount);
@@ -143,7 +143,7 @@ const lastRequestTimes = new Map(); // Store last request times per user
 
   // Modified unstaking endpoint with rate limiting
   app.post("/unstake", rateLimit, async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
     
     const { positionId } = req.body;
     const userId = req.session.userinfo.id;
@@ -205,7 +205,7 @@ const lastRequestTimes = new Map(); // Store last request times per user
 
   // View staking positions and earnings
   app.get("/stake/positions", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
     
     const userId = req.session.userinfo.id;
     
@@ -246,7 +246,7 @@ const lastRequestTimes = new Map(); // Store last request times per user
   });
 
   app.get("/stake/positions/:positionId", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
     
     const userId = req.session.userinfo.id;
     const { positionId } = req.params;
@@ -301,7 +301,7 @@ const lastRequestTimes = new Map(); // Store last request times per user
 
   // Claim earnings for a specific position
   app.post("/stake/claim", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/login`);
+    if (!req.session.pterodactyl) return res.redirect(`/auth`);
     
     const { positionId } = req.body;
     const userId = req.session.userinfo.id;
