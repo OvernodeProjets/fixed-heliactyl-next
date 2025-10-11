@@ -122,16 +122,21 @@ if (cluster.isMaster) {
 
 
     const modulesTable = [];
+    const moduleLoadTimes = {};
 
     moduleFiles.forEach(file => {
       let moduleState = 'Initializing';
+      const startTime = process.hrtime();
       
       try {
         const module = require('./modules/' + file);
+        const loadTime = process.hrtime(startTime);
+        const loadTimeMs = (loadTime[0] * 1000 + loadTime[1] / 1000000).toFixed(2);
+        moduleLoadTimes[file] = loadTimeMs;
         
         if (!module.heliactylModule) {
           console.log(chalk.red(`Module "${file}" has an error: No module manifest was found in the file.`));
-          modulesTable.push({ File: file, Status: '❌ No module manifest', State: 'Error', 'Target Platform': 'N/A' });
+          modulesTable.push({ File: file, Status: '❌ No module manifest', State: 'Error', 'Target Platform': 'N/A', 'Load Time': `${loadTimeMs}ms` });
           return;
         }
 
@@ -155,15 +160,29 @@ if (cluster.isMaster) {
 
         // Version is compatible but different
         if (target_platform !== settings.version) {
-          moduleState = 'Compatible';
-          console.log(chalk.yellow(`Module "${name}" notice: Different but compatible version (platform: ${settings.version}, module: ${target_platform})`));
-          modulesTable.push({ File: file, Name: name, Status: '⚠️ Module loaded (different version)', State: moduleState, 'Target Platform': target_platform });
+        moduleState = 'Compatible';
+        console.log(chalk.yellow(`Module "${name}" notice: Different but compatible version (platform: ${settings.version}, module: ${target_platform}) in ${moduleLoadTimes[file]}ms`));
+        modulesTable.push({ 
+          File: file, 
+          Name: name, 
+          Status: '⚠️ Module loaded (different version)', 
+          State: moduleState, 
+          'Target Platform': target_platform,
+          'Load Time': `${moduleLoadTimes[file]}ms` 
+        });
           return;
         }
 
         moduleState = 'Active';
-        modulesTable.push({ File: file, Name: name, Status: '✓ Module loaded!', State: moduleState, 'Target Platform': target_platform });
-        console.log(chalk.green(`Module "${name}" loaded successfully (${target_platform}).`));
+        modulesTable.push({ 
+          File: file, 
+          Name: name, 
+          Status: '✓ Module loaded!', 
+          State: moduleState, 
+          'Target Platform': target_platform,
+          'Load Time': `${moduleLoadTimes[file]}ms`
+        });
+        console.log(chalk.green(`Module "${name}" loaded successfully (${target_platform}) in ${moduleLoadTimes[file]}ms`));
         
       } catch (error) {
         moduleState = 'Error';
