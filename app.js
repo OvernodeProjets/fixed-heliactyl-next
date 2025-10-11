@@ -340,7 +340,7 @@ app.use(async (req, res, next) => {
   
   app.use(rateLimiters.global);
   app.use(rateLimiters.specific);
-  
+
   const APIFiles = fs.readdirSync("./modules").filter((file) => file.endsWith(".js"));
 
     APIFiles.forEach((file) => {
@@ -367,28 +367,41 @@ app.use(async (req, res, next) => {
     });
     return routes;
   }
-  app.all("*", async (req, res) => {
-    if (req.session.pterodactyl)
-      if (
-        req.session.pterodactyl.id !==
-        (await db.get("users-" + req.session.userinfo.id))
-      )
+
+app.all("*", async (req, res) => {
+    // Validate session
+    if (req.session.pterodactyl && req.session.pterodactyl.id !==
+        (await db.get("users-" + req.session.userinfo.id))) {
         return res.redirect("/login?prompt=none");
-    let theme = indexjs.get(req);
-    if (settings.api.afk.enabled == true)
+    }
+
+    const theme = indexjs.get(req);
+
+    // AFK session token
+    if (settings.api.afk.enabled == true) {
       req.session.arcsessiontoken = Math.random().toString(36).substring(2, 15);
-    if (theme.settings.mustbeloggedin.includes(req._parsedUrl.pathname))
-      if (!req.session.userinfo || !req.session.pterodactyl)
-        return res.redirect(
-          "/auth"
-        );
+    }
+
+    // Check authentication requirements
+    if (theme.settings.mustbeloggedin.includes(req._parsedUrl.pathname)) {
+      if (!req.session.userinfo || !req.session.pterodactyl) {
+        return res.redirect("/auth");
+      }
+    }
+
+    // Check admin requirements
     if (theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
-      const renderData = await renderData(req, theme);
-      res.render(theme.settings.notfound, renderData);
+      const data = await renderData(req, theme);
+      res.render(theme.settings.notfound, data);
       return;
     }
+
+    // Render page
     const data = await renderData(req, theme);
-    res.render(theme.settings.pages[req._parsedUrl.pathname.slice(1)] || theme.settings.notfound, data);
+    res.render(
+      theme.settings.pages[req._parsedUrl.pathname.slice(1)] || theme.settings.notfound,
+      data
+    );
   });
 
   module.exports.get = function (req) {
