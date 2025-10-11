@@ -1,53 +1,22 @@
-SRYDEN PROPRIETARY LICENSE
+MIT License
 
-Copyright (c) 2024 SRYDEN, Inc. All Rights Reserved.
+Copyright (c) 2017 - 2025 Altare Technologies Inc
+Copyright (c) 2022 - 2025 Overnode
 
-PROPRIETARY AND CONFIDENTIAL
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-This software and its documentation are proprietary to SRYDEN, Inc. The software
-and documentation are protected under copyright law and other intellectual property
-laws. The software and documentation contain valuable trade secrets and
-confidential information of SRYDEN, Inc.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-NO UNAUTHORIZED USE, REPRODUCTION, OR DISTRIBUTION
-
-The software and documentation may not be used, copied, reproduced, translated,
-broadcasted, modified, licensed, transmitted, distributed, exhibited, performed,
-published, or displayed in any way, in whole or in part, without the express
-prior written permission of SRYDEN, Inc.
-
-RESTRICTIONS
-
-You may not:
-1. Copy, modify, or create derivative works of the software
-2. Reverse engineer, decompile, or disassemble the software
-3. Remove any copyright or other proprietary notices
-4. Transfer or sublicense the software to any third party
-5. Use the software for any unauthorized purpose
-
-TERMINATION
-
-SRYDEN, Inc. reserves the right to terminate this license at any time if you
-fail to comply with any term or condition of this license. Upon termination,
-you must immediately cease all use of the software and destroy all copies.
-
-NO WARRANTY
-
-The software is provided "AS IS" without warranty of any kind. SRYDEN, Inc.
-disclaims all warranties, whether express, implied, or statutory, including
-but not limited to any warranties of merchantability, fitness for a particular
-purpose, and non-infringement.
-
-LIMITATION OF LIABILITY
-
-In no event shall SRYDEN, Inc. be liable for any damages whatsoever arising
-out of the use of or inability to use this software, even if SRYDEN, Inc.
-has been advised of the possibility of such damages.
-
-GOVERNING LAW
-
-This license shall be governed by and construed in accordance with the laws
-of the United States, without regard to its conflict of law provisions.
-
-For licensing inquiries, please contact:
-SRYDEN, Inc.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

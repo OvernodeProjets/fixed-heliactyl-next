@@ -62,60 +62,6 @@ npm run start - starts Heliactyl
 npm run build:css - builds TailwindCSS, required for making changes to the UI
 ```
 
-## Heliactyl API v2
-
-Since v14, we've introduced the next generation of Heliactyl's API. You can see the documentation below:
-
-### api/v3/userinfo
-
-```
-Method: GET
-Query Parameters:
-  - id (string): The user's ID
-
-Response:
-  - status (string): "success" or an error message
-  - package (object): The user's package details
-  - extra (object): The user's additional resources
-  - userinfo (object): The user's information from the Pterodactyl panel
-  - coins (number | null): The user's coin balance (if coins is enabled)
-```
-
-### api/v3/setcoins
-
-```
-Method: POST
-Request Body:
-  - id (string): The user's ID
-  - coins (number): The number of coins to set
-
-Response:
-  - status (string): "success" or an error message
-```
-
-### api/v3/setplan
-
-```
-Method: POST
-Request Body:
-  - id (string): The user's ID
-  - package (string, optional): The package name (if not provided, the user's package will be removed)
-
-Response:
-  - status (string): "success" or an error message
-```
-
-### api/v3/setresources
-
-```
-Method: POST
-Request Body:
-  - id (string): The user's ID
-  - ram (number): The amount of RAM to set
-  - disk (number): The amount of disk space to set
-  - cpu (number): The amount of CPU to set
-  - servers (number): The number of servers to set
-
-Response:
-  - status (string): "success" or an error message
-```
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Copyright (c) 2017 - 2025 Altare Technologies Inc
