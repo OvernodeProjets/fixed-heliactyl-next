@@ -137,22 +137,10 @@ module.exports.load = async function(app, db) {
         await db.set(getUserGroupsKey(userId), groups);
         res.json(group);
     });
-    app.set('trust proxy', 1);
-    
-const createServerLimiter = rateLimit({
-    windowMs: 3 * 1000, // 3 seconds
-    max: 1, // limit each IP to 1 request per windowMs
-    message: "Too many server creation requests, please try again after 3 seconds.",
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    keyGenerator: (req) => {
-        // Use the left-most IP in the X-Forwarded-For header
-        return req.ip || req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress;
-    }
-});
+  
 
 app.get("/updateinfo", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect("/login");
+    if (!req.session.pterodactyl) return res.redirect("/auth");
     
     try {
         const cacheaccount = await getPteroUser(req.session.userinfo.id, db);
@@ -242,8 +230,8 @@ app.get("/updateinfo", async (req, res) => {
     }
 });
 
-app.get("/create", createServerLimiter, async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect("/login");
+app.get("/create", async (req, res) => {
+    if (!req.session.pterodactyl) return res.redirect("/auth");
 
     let theme = indexjs.get(req);
 
@@ -307,7 +295,7 @@ app.get("/create", createServerLimiter, async (req, res) => {
             let requiredpackage = Object.entries(settings.api.client.locations).filter((vname) => vname[0] == location)[0][1].package;
             if (requiredpackage)
                 if (!requiredpackage.includes(packagename ? packagename : settings.api.client.packages.default)) {
-                    return res.redirect(`../upgrade`);
+                    return res.redirect(`../dashboard?err=INVALIDLOCATIONFORPACKAGE`);
                 }
 
             let egg = req.query.egg;
@@ -355,28 +343,34 @@ app.get("/create", createServerLimiter, async (req, res) => {
                             return res.redirect(`${redirectlink}?err=TOOMUCHCPU&num=${egginfo.maximum.cpu}`);
                         }
                 }
+                const specs = egginfo.info;
 
-                let specs = egginfo.info;
-                specs["user"] = await db.get("users-" + req.session.userinfo.id);
-                if (!specs["limits"])
-                    specs["limits"] = {
-                        swap: 0,
-                        io: 500,
-                        backups: 0,
-                    };
-                specs.name = name;
-                specs.limits.swap = -1;
-                specs.limits.memory = ram;
-                specs.limits.disk = disk;
-                specs.limits.cpu = cpu;
-                specs.feature_limits.allocations = 10;
-                if (!specs["deploy"])
-                    specs.deploy = {
-                        locations: [],
-                        dedicated_ip: false,
-                        port_range: [],
-                    };
-                specs.deploy.locations = [location];
+                console.log(JSON.stringify(specs))
+                const serverSpecs = {
+                  name: name.trim(),
+                  user: await db.get(`users-${req.session.userinfo.id}`),
+                  egg: specs.egg,
+                  docker_image: specs.docker_image,
+                  startup: specs.startup,
+                  environment: specs.environment,
+                  limits: {
+                      memory: ram,
+                      swap: -1,
+                      disk: disk,
+                      io: 500,
+                      cpu: cpu
+                  },
+                  feature_limits: {
+                      databases: specs.feature_limits.databases,
+                      backups: specs.feature_limits.backups,
+                      allocations: specs.feature_limits.allocations
+                  },
+                  deploy: {
+                      locations: [location],
+                      dedicated_ip: false,
+                      port_range: []
+                  }
+        };
 
     let serverinfo = await fetch(
         settings.pterodactyl.domain + "/api/application/servers", {
@@ -386,7 +380,7 @@ app.get("/create", createServerLimiter, async (req, res) => {
                 Authorization: `Bearer ${settings.pterodactyl.key}`,
                 Accept: "application/json",
             },
-            body: JSON.stringify(await specs),
+            body: JSON.stringify(await serverSpecs),
         }
     );
     if (!serverinfo.ok) {
@@ -429,7 +423,6 @@ app.get("/create", createServerLimiter, async (req, res) => {
         );
     }
 });
-
 async function processQueue() {
   console.log('Processing queue...');
   let queuedServers = await db.get("queuedServers") || [];
@@ -537,7 +530,7 @@ setInterval(processQueue, 5 * 60 * 1000);
 
 // Route to manually process the queue
 app.get("/process-queue", async (req, res) => {
-  if (!req.session.pterodactyl) return res.redirect("/login");
+  if (!req.session.pterodactyl) return res.redirect("/auth");
 
   await processQueue();
   res.json({ status: 200, msg: 'Queue processed successfully' });
@@ -545,7 +538,7 @@ app.get("/process-queue", async (req, res) => {
 
 // Route to remove a server from the queue
 app.get("/queue-remove/:id", async (req, res) => {
-  if (!req.session.pterodactyl) return res.redirect("/login");
+  if (!req.session.pterodactyl) return res.redirect("/auth");
 
   let serverPos = parseInt(req.params.id);
   let userId = req.session.userinfo.id;
@@ -584,7 +577,7 @@ app.get("/queue-remove/:id", async (req, res) => {
 
 // Route to clear the entire queue
 app.get("/clear-queue", async (req, res) => {
-  if (!req.session.pterodactyl) return res.redirect("/login");
+  if (!req.session.pterodactyl) return res.redirect("/auth");
 
   try {
       let queuedServers = await db.get("queuedServers") || [];
@@ -610,7 +603,7 @@ app.get("/clear-queue", async (req, res) => {
 });
 
     app.get("/modify", async (req, res) => {
-        if (!req.session.pterodactyl) return res.redirect("/login");
+        if (!req.session.pterodactyl) return res.redirect("/auth");
     
         let theme = indexjs.get(req);
     
@@ -817,7 +810,7 @@ app.get("/clear-queue", async (req, res) => {
       });
     
 app.get("/delete", async (req, res) => {
-  if (!req.session.pterodactyl) return res.redirect("/login");
+  if (!req.session.pterodactyl) return res.redirect("/auth");
 
   if (!req.query.id) return res.send("Missing id.");
 
