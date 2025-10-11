@@ -653,69 +653,69 @@ serverSection.style.display = 'block';
                 </script>
 
 <script>
-// Add this script tag at the end of your page body
-const snowfallScript = document.createElement('script');
-snowfallScript.textContent = `
-// Create and inject the CSS
-const snowStyle = document.createElement('style');
-snowStyle.textContent = \`
-  #snowflakeContainer {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    pointer-events: none;
-  }
-  .snowflake {
-    position: fixed;
-    background-color: #FFFFFF;
-    user-select: none;
-    z-index: 1000;
-    pointer-events: none;
-    border-radius: 50%;
-    width: 10px;
-    height: 10px;
-    opacity: 0;
-  }
-  .snowflake.template {
-    display: none;
-  }
-  #snowToggle {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 7px 16px;
-    border-radius: 800px;
-    background-color: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-    cursor: pointer;
-    font-family: system-ui, -apple-system, sans-serif;
-    font-size: 14px;
-    z-index: 1001;
-    transition: background-color 0.3s ease;
- font-family: 'Ndot-55', sans-serif;
- font-weight: 800;
- text-transform: uppercase;
-  }
-  #snowToggle:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-\`;
-document.head.appendChild(snowStyle);
+window.addEventListener("DOMContentLoaded", () => {
+  // Create and inject the CSS
+  const snowStyle = document.createElement('style');
+  snowStyle.textContent = `
+    #snowflakeContainer {
+      position: fixed;
+      left: 0px;
+      top: 0px;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .snowflake {
+      position: fixed;
+      background-color: #FFFFFF;
+      user-select: none;
+      z-index: 1000;
+      pointer-events: none;
+      border-radius: 50%;
+      width: 10px;
+      height: 10px;
+      opacity: 0;
+    }
+    .snowflake.template {
+      display: none;
+    }
+    #snowToggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 7px 16px;
+      border-radius: 800px;
+      background-color: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      cursor: pointer;
+      font-family: 'Ndot-55', sans-serif;
+      font-size: 14px;
+      z-index: 1001;
+      transition: background-color 0.3s ease;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    #snowToggle:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  `;
+  document.head.appendChild(snowStyle);
 
-// Create and inject the snowflake container
-const container = document.createElement('div');
-container.id = 'snowflakeContainer';
-container.innerHTML = '<span class="snowflake template"></span>';
-document.body.appendChild(container);
+  // Create and inject the snowflake container
+  const container = document.createElement('div');
+  container.id = 'snowflakeContainer';
+  container.innerHTML = '<span class="snowflake template"></span>';
+  document.body.appendChild(container);
 
-// Create and inject the toggle button
-const toggleBtn = document.createElement('button');
-toggleBtn.id = 'snowToggle';
-toggleBtn.textContent = 'Snow: On';
-document.body.appendChild(toggleBtn);
+  // Create and inject the toggle button
+  const toggleBtn = document.createElement('button');
+  toggleBtn.id = 'snowToggle';
+  toggleBtn.textContent = 'Snow: On';
+  document.body.appendChild(toggleBtn);
 
 // Cookie functions
 function setCookie(name, value, days) {
@@ -735,162 +735,156 @@ function getCookie(name) {
   return null;
 }
 
-// Snowfall logic
-let snowflakes = [];
-let browserWidth;
-let browserHeight;
-let numberOfSnowflakes = 50;
-let resetPosition = false;
-let enableAnimations = false;
-let reduceMotionQuery = matchMedia("(prefers-reduced-motion)");
-let isSnowing = true; // Set to true by default
+  // Snowfall logic
+  let snowflakes = [];
+  let browserWidth;
+  let browserHeight;
+  let numberOfSnowflakes = 50;
+  let resetPosition = false;
+  let enableAnimations = true;
+  let reduceMotionQuery = matchMedia("(prefers-reduced-motion)");
+  let isSnowing = true;
 
-function setAccessibilityState() {
-  enableAnimations = !reduceMotionQuery.matches;
-}
-setAccessibilityState();
-reduceMotionQuery.addListener(setAccessibilityState);
-
-class Snowflake {
-  constructor(element, speed, xPos, yPos) {
-    this.element = element;
-    this.speed = speed;
-    this.xPos = xPos;
-    this.yPos = yPos;
-    this.scale = 1;
-    this.counter = 0;
-    this.sign = Math.random() < 0.5 ? 1 : -1;
-    this.element.style.opacity = (0.1 + Math.random()) / 3;
-  }
-
-  update(delta) {
-    this.counter += (this.speed / 5000) * delta;
-    this.xPos += (this.sign * delta * this.speed * Math.cos(this.counter)) / 40;
-    this.yPos += Math.sin(this.counter) / 40 + (this.speed * delta) / 30;
-    this.scale = 0.5 + Math.abs((10 * Math.cos(this.counter)) / 20);
-
-    setTransform(
-      Math.round(this.xPos),
-      Math.round(this.yPos),
-      this.scale,
-      this.element
-    );
-
-    if (this.yPos > browserHeight) {
-      this.yPos = -50;
+  class Snowflake {
+    constructor(element, speed, xPos, yPos) {
+      this.element = element;
+      this.speed = speed;
+      this.xPos = xPos;
+      this.yPos = yPos;
+      this.scale = 1;
+      this.counter = 0;
+      this.sign = Math.random() < 0.5 ? 1 : -1;
+      this.opacity = (0.1 + Math.random()) / 3;
+      this.element.style.opacity = this.opacity;
     }
-  }
-}
 
-function setTransform(xPos, yPos, scale, el) {
-  el.style.transform = \`translate3d(\${xPos}px, \${yPos}px, 0) scale(\${scale}, \${scale})\`;
-}
+    update(delta) {
+      this.counter += (this.speed / 5000) * delta;
+      this.xPos += (this.sign * delta * this.speed * Math.cos(this.counter)) / 40;
+      this.yPos += Math.sin(this.counter) / 40 + (this.speed * delta) / 30;
+      this.scale = 0.5 + Math.abs((10 * Math.cos(this.counter)) / 20);
 
-function getPosition(offset, size) {
-  return Math.round(-1 * offset + Math.random() * (size + 2 * offset));
-}
+      setTransform(
+        Math.round(this.xPos),
+        Math.round(this.yPos),
+        this.scale,
+        this.element
+      );
 
-function generateSnowflakes() {
-  const originalSnowflake = document.querySelector(".snowflake.template");
-  const snowflakeContainer = originalSnowflake.parentNode;
-
-  browserWidth = document.documentElement.clientWidth;
-  browserHeight = document.documentElement.clientHeight;
-
-  for (let i = 0; i < numberOfSnowflakes; i++) {
-    const snowflakeClone = originalSnowflake.cloneNode(true);
-    snowflakeClone.classList.remove('template');
-    snowflakeContainer.appendChild(snowflakeClone);
-
-    const initialXPos = getPosition(50, browserWidth);
-    const initialYPos = getPosition(50, browserHeight);
-    const speed = (5 + Math.random() * 40) * delta;
-
-    const snowflakeObject = new Snowflake(
-      snowflakeClone,
-      speed,
-      initialXPos,
-      initialYPos
-    );
-    snowflakes.push(snowflakeObject);
-  }
-
-  requestAnimationFrame(moveSnowflakes);
-}
-
-let frames_per_second = 60;
-let frame_interval = 1000 / frames_per_second;
-let previousTime = performance.now();
-let delta = 1;
-
-function moveSnowflakes(currentTime) {
-  delta = (currentTime - previousTime) / frame_interval;
-
-  if (enableAnimations && isSnowing) {
-    for (let i = 0; i < snowflakes.length; i++) {
-      snowflakes[i].update(delta);
+      if (this.yPos > browserHeight) {
+        this.yPos = -50;
+      }
     }
   }
 
-  previousTime = currentTime;
+  function setTransform(xPos, yPos, scale, el) {
+    el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0) scale(${scale}, ${scale})`;
+  }
 
-  if (resetPosition) {
+  function getPosition(offset, size) {
+    return Math.round(-1 * offset + Math.random() * (size + 2 * offset));
+  }
+
+  function generateSnowflakes() {
+    const originalSnowflake = document.querySelector(".snowflake.template");
+    const snowflakeContainer = originalSnowflake.parentNode;
+
     browserWidth = document.documentElement.clientWidth;
     browserHeight = document.documentElement.clientHeight;
 
-    for (let i = 0; i < snowflakes.length; i++) {
-      let snowflake = snowflakes[i];
-      snowflake.xPos = getPosition(50, browserWidth);
-      snowflake.yPos = getPosition(50, browserHeight);
+    for (let i = 0; i < numberOfSnowflakes; i++) {
+      const snowflakeClone = originalSnowflake.cloneNode(true);
+      snowflakeClone.classList.remove('template');
+      snowflakeContainer.appendChild(snowflakeClone);
+
+      const initialXPos = getPosition(50, browserWidth);
+      const initialYPos = getPosition(50, browserHeight);
+      const speed = 5 + Math.random() * 40;
+
+      const snowflakeObject = new Snowflake(
+        snowflakeClone,
+        speed,
+        initialXPos,
+        initialYPos
+      );
+      snowflakes.push(snowflakeObject);
     }
 
-    resetPosition = false;
+    requestAnimationFrame(moveSnowflakes);
   }
 
-  requestAnimationFrame(moveSnowflakes);
-}
+  let frames_per_second = 60;
+  let frame_interval = 1000 / frames_per_second;
+  let previousTime = performance.now();
+  let delta = 1;
 
-function setResetFlag() {
-  resetPosition = true;
-}
+  function moveSnowflakes(currentTime) {
+    delta = (currentTime - previousTime) / frame_interval;
 
-function toggleSnow() {
-  isSnowing = !isSnowing;
-  const snowflakeContainer = document.getElementById('snowflakeContainer');
-  const snowflakes = snowflakeContainer.querySelectorAll('.snowflake:not(.template)');
-  
-  if (isSnowing) {
-    snowflakes.forEach(flake => flake.style.opacity = ''); // Reset to original random opacity
-    toggleBtn.textContent = 'Snow: On';
-  } else {
-    snowflakes.forEach(flake => flake.style.opacity = '0');
+    if (isSnowing) {
+      for (let i = 0; i < snowflakes.length; i++) {
+        snowflakes[i].update(delta);
+      }
+    }
+
+    previousTime = currentTime;
+
+    if (resetPosition) {
+      browserWidth = document.documentElement.clientWidth;
+      browserHeight = document.documentElement.clientHeight;
+
+      for (let i = 0; i < snowflakes.length; i++) {
+        let snowflake = snowflakes[i];
+        snowflake.xPos = getPosition(50, browserWidth);
+        snowflake.yPos = getPosition(50, browserHeight);
+      }
+
+      resetPosition = false;
+    }
+
+    requestAnimationFrame(moveSnowflakes);
+  }
+
+  function setResetFlag() {
+    resetPosition = true;
+  }
+
+  function toggleSnow() {
+    isSnowing = !isSnowing;
+    const snowflakeContainer = document.getElementById('snowflakeContainer');
+    const snowflakeElements = snowflakeContainer.querySelectorAll('.snowflake:not(.template)');
+    
+    if (isSnowing) {
+      snowflakes.forEach((flake, index) => {
+        if (snowflakeElements[index]) {
+          snowflakeElements[index].style.opacity = flake.opacity;
+        }
+      });
+      toggleBtn.textContent = 'Snow: On';
+    } else {
+      snowflakeElements.forEach(flake => {
+        flake.style.opacity = '0';
+      });
+      toggleBtn.textContent = 'Snow: Off';
+    }
+    
+  setCookie('snowEnabled', isSnowing ? '1' : '0', 365);
+  }
+
+  // Setup
+  generateSnowflakes();
+
+  const snowEnabled = getCookie('snowEnabled');
+  if (snowEnabled === '0') {
+    isSnowing = false;
+    const snowflakeElements = document.querySelectorAll('.snowflake:not(.template)');
+    snowflakeElements.forEach(flake => flake.style.opacity = '0');
     toggleBtn.textContent = 'Snow: Off';
   }
   
-  setCookie('snowEnabled', isSnowing ? '1' : '0', 365);
-}
-
-// Setup
-if (enableAnimations) {
-  window.addEventListener("DOMContentLoaded", () => {
-    generateSnowflakes();
-    
-    // Check cookie and set initial state
-    const snowEnabled = getCookie('snowEnabled');
-    if (snowEnabled === '0') {
-      isSnowing = false;
-      const snowflakes = document.querySelectorAll('.snowflake:not(.template)');
-      snowflakes.forEach(flake => flake.style.opacity = '0');
-      toggleBtn.textContent = 'Snow: Off';
-    }
-  }, false);
-  
   window.addEventListener("resize", setResetFlag, false);
   toggleBtn.addEventListener("click", toggleSnow, false);
-}
-`;
-
-document.body.appendChild(snowfallScript);
+}, false);
 </script>
             
 <script>
