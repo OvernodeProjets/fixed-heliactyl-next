@@ -18,7 +18,6 @@ const heliactylModule = {
 module.exports.heliactylModule = heliactylModule;
 
 const express = require('express');
-const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const crypto = require('crypto');
 const { Readable, Transform } = require('stream');
@@ -37,14 +36,7 @@ module.exports.load = async function (app, db) {
       addresses.add(tx.receiverId);
     });
     return Array.from(addresses);
-  };
-
-  // Rate limiting middleware
-  const transferLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // Limit each IP to 5 requests per windowMs
-    message: "Too many transfer attempts, please try again later."
-  });
+  }
 
   // Helper function to get all user IDs
   const getAllUserIds = async () => {
@@ -179,7 +171,6 @@ function censorBadWords(text) {
   // Updated Transfer endpoint with XTC
   router.post('/transfer',
     isAuthenticated,
-    transferLimiter,
     [
       body('receiverId').isString().notEmpty(),
       body('amount').isInt({ min: 1 }),

@@ -18,7 +18,6 @@ const heliactylModule = {
 module.exports.heliactylModule = heliactylModule;
 
 const loadConfig = require("../handlers/config");
-const rateLimit = require("express-rate-limit");
 const settings = loadConfig("./config.toml");
 const fetch = require("node-fetch");
 const indexjs = require("../app.js");
