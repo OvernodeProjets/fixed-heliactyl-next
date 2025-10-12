@@ -201,7 +201,7 @@
                             <span class="bg-purple-500/20 text-purple-400 px-3 py-1 rounded-lg text-sm">One-time purchase</span>
                         </div>
                         <div x-show="!renewalBypassStatus.canAfford && !renewalBypassStatus.hasRenewalBypass" class="mt-3 text-red-400 text-sm">
-                            You need <span x-text="renewalBypassStatus.price - renewalBypassStatus.currentBalance"></span> more coins to purchase this.
+                            You need <span x-text="(renewalBypassStatus.price - renewalBypassStatus.currentBalance).toFixed(2)"></span> more coins to purchase this.
                         </div>
                     </div>
                 </div>

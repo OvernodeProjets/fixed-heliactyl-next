@@ -251,18 +251,35 @@ async function checkMigration() {
 
 async function fetchStakingData() {
     try {
-        const [positionsResponse] = await Promise.all([
+        // Start rendering loading state immediately
+        renderStakingPositions(null);
+        
+        const [positionsResponse, coinsResponse] = await Promise.all([
             fetch('/stake/positions'),
             fetch(`/coins-${userinfo.id}`)
         ]);
         
+        if (!positionsResponse.ok) {
+            throw new Error('Failed to fetch positions data');
+        }
+        
         const positionsData = await positionsResponse.json();
         
+        // Update UI with fetched data
         updateDashboard(positionsData);
         renderStakingPositions(positionsData.positions);
     } catch (error) {
         console.error('Error fetching staking data:', error);
         showError('Failed to load staking data');
+        // Show error state in positions container
+        const container = document.getElementById('staking-positions');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center text-red-400 py-8">
+                    Failed to load staking positions. Please try again later.
+                </div>
+            `;
+        }
     }
 }
 
@@ -295,8 +312,23 @@ function renderStakingPositions(positions) {
     }
 
     // Only render if we have a valid container
-    if (!positions || positions.length === 0) {
-        container.innerHTML = noPositionsMsg ? '' : `
+    // Show loading state immediately
+    if (!positions) {
+        container.innerHTML = `
+            <div class="text-center text-gray-400 py-8">
+                <svg class="inline w-6 h-6 animate-spin" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="ml-2">Loading positions...</span>
+            </div>
+        `;
+        return;
+    }
+
+    // Show empty state if no positions
+    if (positions.length === 0) {
+        container.innerHTML = `
             <div class="text-center text-gray-400 py-8">
                 No active staking positions. Start earning rewards by creating a new stake!
             </div>
