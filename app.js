@@ -287,7 +287,12 @@ if (cluster.isMaster) {
   const indexjs = require("./app.js");
 
   app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    
     res.setHeader('Access-Control-Allow-Origin', '*');
+
     res.setHeader("X-Powered-By", `13rd Gen Heliactyl Next (${settings.platform_codename})`);
     res.setHeader("X-Heliactyl", `Heliactyl Next v${settings.version} - "${settings.platform_codename}"`);
     next();
@@ -304,14 +309,17 @@ if (cluster.isMaster) {
       next(err);
     }
   });
-
+  console.log(settings.website.domain.startsWith('https') ? true : false)
   app.use(
     session({
       secret: settings.website.secret,
       resave: false,
       saveUninitialized: false,
-      cookie: { secure: false }, // Set to true if using https
-      proxy: true
+      cookie: {
+        httpOnly: true,
+        secure: settings.website.domain.startsWith('https') ? true : false,
+        maxAge: 1000 * 60 * 60 * 24 // 24 hours
+      }
     })
   );
 
