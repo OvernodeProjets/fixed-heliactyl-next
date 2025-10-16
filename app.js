@@ -309,7 +309,7 @@ if (cluster.isMaster) {
       next(err);
     }
   });
-  console.log(settings.website.domain.startsWith('https') ? true : false)
+  
   app.use(
     session({
       secret: settings.website.secret,
