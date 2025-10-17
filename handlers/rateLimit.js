@@ -50,8 +50,8 @@ function createRateLimiter() {
   });
 
   const globalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Max 100 requests per 15 minutes per IP/user
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    max: 250, // Max 250 requests per 15 minutes per IP/user
     standardHeaders: true,
     legacyHeaders: false,
     message: {

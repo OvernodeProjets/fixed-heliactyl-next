@@ -449,6 +449,7 @@ Settings
 const serverId = new URLSearchParams(window.location.search).get('id');
 let socket;
 let serverStatus = 'offline';
+let nodeName = '';
 let retryCount = 0;
 const maxRetries = 5;
 const retryDelay = 5000; 
@@ -493,7 +494,8 @@ function fetchServerDetails() {
             document.getElementById('server-name-card').textContent = data.attributes.name;
             document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
             document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
-            document.getElementById('node').textContent = data.attributes.node;
+            nodeName = data.attributes.node;
+            document.getElementById('node').textContent = nodeName;
             //document.getElementById('cpu-limit-card').textContent = `${data.attributes.limits.cpu}%`;
             document.getElementById('ram-limit-card').textContent = `${data.attributes.limits.memory/1024} GiB`;
             document.getElementById('disk-limit-card').textContent = `${data.attributes.limits.disk/1024} GiB`;
@@ -620,8 +622,8 @@ function displayStatusUpdate(status) {
 
 function appendToConsole(message, isInternal = false) {
     const consoleOutput = document.getElementById('console-output');
-    
-    message = message.replace(/Pterodactyl/g, "<%= settings.name %>").replace(/pterodactyl/g, "fractal.compute.edge_" + randomId());
+
+    message = message.replace(/Pterodactyl/g, "<%= settings.name %>").replace(/pterodactyl/g, `<%= settings.name %>.compute_${nodeName}_${randomId()}`);
     message = message.replace('Transfer System', '<%= settings.name %> Transfer System')
 
     // Replace specific messages with more friendly versions
