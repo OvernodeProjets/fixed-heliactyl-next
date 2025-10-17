@@ -17,7 +17,7 @@ class CustomDBHandler {
     });
 
     // Log queue stats every 5 seconds
-    setInterval(() => this.logQueueStats(), 5000);
+    //setInterval(() => this.logQueueStats(), 1000);
   }
 
   async initializeDatabase() {
@@ -80,7 +80,7 @@ class CustomDBHandler {
 
   logQueueStats() {
     const avgOperationTime = this.operationCount > 0 ? this.totalOperationTime / this.operationCount : 0;
-    //console.log(`Queue length: ${this.queue.length}, Average DB operation time: ${avgOperationTime.toFixed(2)}ms`);
+    console.log(`Queue length: ${this.queue.length}, Average DB operation time: ${avgOperationTime.toFixed(2)}ms`);
   }
 
   async get(key) {
