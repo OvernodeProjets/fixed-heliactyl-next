@@ -203,11 +203,27 @@ if (cluster.isMaster) {
       process.exit();
     }
 
+    let firstWorkerStarted = false;
+    
     for (let i = 0; i < numCPUs; i++) {
       const worker = cluster.fork();
-      if (i === 0) {
+      console.log(chalk.cyan(`Creating worker ${i + 1} of ${numCPUs}`));
+      
+      if (!firstWorkerStarted) {
         worker.send({ type: 'FIRST_WORKER' });
+        firstWorkerStarted = true;
+        console.log(chalk.cyan(`Designated primary worker: ${worker.process.pid}`));
       }
+      
+      worker.on('online', () => {
+        console.log(chalk.green(`Worker ${worker.process.pid} is online`));
+      });
+      
+      worker.on('message', (msg) => {
+        if (msg.type === 'WEB_SERVER_STARTED') {
+          console.log(chalk.green(`Web server started on worker ${worker.process.pid}`));
+        }
+      });
     }
   
     cluster.on('exit', (worker, code, signal) => {
@@ -241,10 +257,14 @@ if (cluster.isMaster) {
   process.on('message', (msg) => {
     if (msg.type === 'FIRST_WORKER') {
       isFirstWorker = true;
-      console.log(chalk.gray(`Worker ${process.pid} is designated as the first worker.`));
-      console.log(chalk.gray(`Heliactyl Next ${settings.version} (${settings.platform_codename}) - webserver is now listening on port ${settings.website.port}`));
+      console.log(chalk.cyan(`Worker ${process.pid} is designated as the first worker.`));
     }
   });
+
+  // Send ready message to master when worker is ready
+  if (process.send) {
+    process.send({ type: 'WORKER_READY', pid: process.pid });
+  }
 
   // Create a wrapper function for setInterval
   global.clusterSafeInterval = function(callback, delay) {
@@ -356,10 +376,18 @@ app.use(async (req, res, next) => {
 
   const listener = app.listen(settings.website.port, async function () {
     /* clear all afk sessions */
-    await db.set('afkSessions', {});
+    if (isFirstWorker) {
+      await db.set('afkSessions', {});
+    }
     console.log(
-      chalk.white(chalk.gray("[cluster]") + " Cluster state updated: ") + chalk.green('running')
+      chalk.gray(`Heliactyl Next ${settings.version} (${settings.platform_codename}) - webserver is now listening on port ${settings.website.port}`)
     );
+  }).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(chalk.yellow(`[cluster ${process.pid}] Port ${settings.website.port} is already in use, this is normal for worker processes`));
+    } else {
+      console.error(chalk.red(`[cluster ${process.pid}] Error starting server:`, err));
+    }
   });
 
   const createRateLimiter = require('./handlers/rateLimit.js');

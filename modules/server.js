@@ -1181,6 +1181,7 @@ async function sendCommandAndGetResponse(serverId, command, responseTimeout = 50
 // Players endpoints
 router.get('/server/:id/players', isAuthenticated, ownsServer, async (req, res) => {
   try {
+    // todo remove this
     const serverId = req.params.id;
     
     const consoleLines = await sendCommandAndGetResponse(serverId, 'list');
@@ -1190,6 +1191,8 @@ router.get('/server/:id/players', isAuthenticated, ownsServer, async (req, res) 
       return res.json({ players: [] });
     }
     const playerListLine = consoleLines.find(line => line.includes('players online:'));
+    //const consoleLines = await getServerConsoleLogs(serverId, 100);
+
     let players = [];
     
     if (playerListLine) {
