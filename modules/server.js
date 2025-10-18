@@ -1178,37 +1178,6 @@ async function sendCommandAndGetResponse(serverId, command, responseTimeout = 50
   });
 }
 
-// Players endpoints
-router.get('/server/:id/players', isAuthenticated, ownsServer, async (req, res) => {
-  try {
-    // todo remove this
-    const serverId = req.params.id;
-    
-    const consoleLines = await sendCommandAndGetResponse(serverId, 'list');
-    
-    // Parse player list from console output
-    if (!consoleLines || consoleLines.length === 0) {
-      return res.json({ players: [] });
-    }
-    const playerListLine = consoleLines.find(line => line.includes('players online:'));
-    //const consoleLines = await getServerConsoleLogs(serverId, 100);
-
-    let players = [];
-    
-    if (playerListLine) {
-      const match = playerListLine.match(/There are \d+ of a max of \d+ players online: (.*)/);
-      if (match && match[1]) {
-        players = match[1].split(',').map(p => p.trim()).filter(p => p);
-      }
-    }
-
-    res.json({ players });
-  } catch (error) {
-    console.error('Error getting player list:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
 // GET /api/server/:id/logs - Get server activity logs
 router.get('/server/:id/logs', isAuthenticated, ownsServer, async (req, res) => {
   try {
@@ -1243,82 +1212,6 @@ router.get('/server/:id/logs', isAuthenticated, ownsServer, async (req, res) => 
     res.json(response);
   } catch (error) {
     console.error('Error fetching activity logs:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-router.post('/server/:id/players/:player/kick', isAuthenticated, ownsServer, async (req, res) => {
-  try {
-    const { id: serverId, player } = req.params;
-    const { reason = 'You have been kicked from the server' } = req.body;
-
-    await sendCommandAndGetResponse(serverId, `kick ${player} ${reason}`, 2000);
-    await logActivity(db, serverId, 'Kick Player', { player, reason });
-    
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error kicking player:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-router.post('/server/:id/players/:player/ban', isAuthenticated, ownsServer, async (req, res) => {
-  try {
-    const { id: serverId, player } = req.params;
-    const { reason = 'You have been banned from the server' } = req.body;
-
-    await sendCommandAndGetResponse(serverId, `ban ${player} ${reason}`, 2000);
-    await logActivity(db, serverId, 'Ban Player', { player, reason });
-    
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error banning player:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-router.post('/server/:id/players/:player/unban', isAuthenticated, ownsServer, async (req, res) => {
-  try {
-    const { id: serverId, player } = req.params;
-
-    await sendCommandAndGetResponse(serverId, `pardon ${player}`, 2000);
-    await logActivity(db, serverId, 'Unban Player', { player });
-    
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error unbanning player:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-router.get('/server/:id/players/banned', isAuthenticated, ownsServer, async (req, res) => {
-  try {
-    const serverId = req.params.id;
-    const consoleLines = await sendCommandAndGetResponse(serverId, 'banlist');
-    
-    // Parse banned players from console output
-    const bannedPlayers = [];
-    let collectingBans = false;
-
-    if(!consoleLines || consoleLines.length === 0) {
-      return res.json({ bannedPlayers: [] });
-    }
-    
-    for (const line of consoleLines) {
-      if (line.includes('Banned players:')) {
-        collectingBans = true;
-        continue;
-      }
-      
-      if (collectingBans && line.trim()) {
-        const players = line.split(',').map(p => p.trim()).filter(p => p);
-        bannedPlayers.push(...players);
-      }
-    }
-
-    res.json({ bannedPlayers });
-  } catch (error) {
-    console.error('Error getting banned players:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

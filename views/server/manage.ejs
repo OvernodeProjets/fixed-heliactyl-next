@@ -414,33 +414,6 @@ Settings
         </div>
     </div>
 </div>
-            <div id="players-card" class="card rounded-xl p-6 mt-4 hidden fade-in">
-                <h2 class="text-xl font-semibold mb-4 heavy">Players</h2>
-                <div id="players-list" class="space-y-4">
-                </div>
-<div id="no-players-message" class="text-center py-8 hidden">
-    <!-- Example player avatars with overlap -->
-    <div class="flex justify-center mb-6">
-        <div class="relative inline-flex items-center">
-            <div class="w-8 h-8 rounded-lg overflow-hidden border-2 border-white/10 transform hover:-translate-y-1 transition-all duration-200 relative z-30">
-                <img src="https://mc-heads.net/avatar/xSkay4" alt="Example player" class="w-full h-full" />
-            </div>
-            <div class="w-8 h-8 rounded-lg overflow-hidden border-2 border-white/10 transform hover:-translate-y-1 transition-all duration-200 -ml-4 relative z-20">
-                <img src="https://mc-heads.net/avatar/daiwsy" alt="Example player" class="w-full h-full" />
-            </div>
-            <div class="w-8 h-8 rounded-lg overflow-hidden border-2 border-white/10 transform hover:-translate-y-1 transition-all duration-200 -ml-4 relative z-10">
-                <img src="https://mc-heads.net/avatar/Atqr" alt="Example player" class="w-full h-full" />
-            </div>
-        </div>
-    </div>
-    
-    <!-- Welcome message -->
-    <h3 class="text-lg font-medium text-white mb-2 heavy">No players online!</h3>
-    <p class="text-gray-400 text-sm">Share your server address with friends to begin your adventure</p>
-</div>
-                <div id="player-count" class="text-gray-400 text-xs heavy mt-4 text-center">
-                </div>
-            </div>
         </div>
     </div>
 </main>
@@ -573,8 +546,7 @@ function handleWebSocketMessage(event) {
             }, 1000);
             break;
         case 'console output':
-            appendToConsole(message.args[0]);
-            handleMinecraftOutput(message.args[0]);
+            appendToConsole(message.args[0])
       if (message.args[0].includes("You need to agree to the EULA")) {
         showEulaPopup();
       }
@@ -843,62 +815,6 @@ switch (status) {
             'bg-emerald-500/15', 'bg-red-500/15'
         );
 }
-}
-
-function handleMinecraftOutput(output) {
-    if (output.includes('There are') && output.includes('players online:')) {
-        isMinecraft = true;
-        const playersCard = document.getElementById('players-card');
-        playersCard.style.display = 'block';
-
-        const playerInfoMatch = output.match(/There are (\d+) of a max of (\d+) players online:(.*)/);
-        if (playerInfoMatch) {
-            const currentPlayers = parseInt(playerInfoMatch[1]);
-            const maxPlayers = parseInt(playerInfoMatch[2]);
-            const playerNamesString = playerInfoMatch[3].trim();
-            const playerNames = currentPlayers > 0 ? 
-                playerNamesString.split(/,\s*/).map(name => name.replace(/^\*|\*$/g, '').trim()) : 
-                [];
-            updatePlayersList(playerNames, maxPlayers);
-        } else {
-            updatePlayersList([], 0);
-        }
-    }
-}
-
-function updatePlayersList(players, maxPlayers) {
-    const playersList = document.getElementById('players-list');
-    const noPlayersMessage = document.getElementById('no-players-message');
-    const playerCount = document.getElementById('player-count');
-    
-    playersList.innerHTML = '';
-    
-    if (players.length === 0) {
-        playersList.style.display = 'none';
-        noPlayersMessage.style.display = 'block';
-    } else {
-        playersList.style.display = 'block';
-        noPlayersMessage.style.display = 'none';
-        
-        players.forEach(player => {
-            const playerItem = document.createElement('div');
-            playerItem.className = 'flex items-center justify-between bg-white/10 rounded-lg p-2 transition-all hover:bg-white/20';
-            playerItem.innerHTML = `
-                <div class="flex items-center">
-                    <img src="https://mc-heads.net/avatar/${encodeURIComponent(player)}" alt="${player}" class="w-8 h-8 rounded-sm mr-2">
-                    <span>${player}</span>
-                </div>
-                <div>
-                    <button onclick="sendPlayerCommand('kick', '${player}')" class="bg-yellow-600 hover:bg-yellow-700 text-white text-xs py-1 px-2 rounded mr-1 transition-colors">Kick</button>
-                    <button onclick="sendPlayerCommand('op', '${player}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-1 px-2 rounded mr-1 transition-colors">Op</button>
-                    <button onclick="sendPlayerCommand('ban', '${player}')" class="bg-red-600 hover:bg-red-700 text-white text-xs py-1 px-2 rounded transition-colors">Ban</button>
-                </div>
-            `;
-            playersList.appendChild(playerItem);
-        });
-    }
-    
-    playerCount.textContent = `${players.length}/${maxPlayers} PLAYERS ONLINE`;
 }
 
 function sendPlayerCommand(action, player) {
