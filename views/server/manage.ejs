@@ -541,9 +541,6 @@ function handleWebSocketMessage(event) {
             console.log('WebSocket authenticated successfully');
             socket.send(JSON.stringify({ event: 'send logs', args: [null] }));
             socket.send(JSON.stringify({ event: 'send stats', args: [null] }));
-            setTimeout(() => {
-                socket.send(JSON.stringify({ event: 'send command', args: ['list'] }));
-            }, 1000);
             break;
         case 'console output':
             appendToConsole(message.args[0])
