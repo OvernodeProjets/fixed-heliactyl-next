@@ -2472,34 +2472,43 @@ router.post('/server/:id/renewal/renew', isAuthenticated, ownsServer, async (req
   }
 });
 
-const DOMAINS = {
-  PRIMARY: {
-    domain: "fractal.limited",
-    zoneId: "e1002b67310e71a640f23209f24a1b80"
-  },
-  LEGACY: {
-    domain: "frac.gg",
-    zoneId: "9e9277f405ea2a4c600b7d740da9c588"
-  }
-};
+// Filter and map enabled domains from config
+const DOMAINS = (settings.cloudflare.domains || [])
+  .filter(domain => domain.enabled)
+  .reduce((acc, domain) => {
+    acc[domain.name] = {
+      domain: domain.domain,
+      zoneId: domain.zone_id,
+      isDefault: domain.is_default || false
+    };
+    return acc;
+  }, {});
 
-const CF_API_TOKEN = "-aoLhgkgf9vA2BwN0s6CdwrNmTubMmgX4C_NbA4j";
+// Get default domain for new records
+const DEFAULT_DOMAIN = Object.values(DOMAINS).find(d => d.isDefault) || Object.values(DOMAINS)[0];
+
+// Validate at least one domain is configured
+if (Object.keys(DOMAINS).length === 0) {
+  console.error('No enabled Cloudflare domains found in configuration');
+}
+
+const CF_API_TOKEN = settings.cloudflare.api_token;
 const CF_API_URL = "https://api.cloudflare.com/client/v4";
 // Helper function to format SRV record name for Cloudflare
-function formatSRVRecord(subdomain) {
-  // Now includes service and protocol in the name field
-  return `_minecraft._tcp.${subdomain}`;
-}
-// Helper function to check if subdomain exists across both domains
+ function formatSRVRecord(subdomain) {
+   // Now includes service and protocol in the name field
+   return `_minecraft._tcp.${subdomain}`;
+ }
+// Helper function to check if subdomain exists across all enabled domains
 async function checkSubdomainExists(subdomain) {
   try {
-    // Check both domains
-    const [primaryExists, legacyExists] = await Promise.all([
-      checkDomainExists(subdomain, DOMAINS.PRIMARY),
-      checkDomainExists(subdomain, DOMAINS.LEGACY)
-    ]);
-
-    return primaryExists || legacyExists;
+    // Check all enabled domains in parallel
+    const domainChecks = Object.values(DOMAINS).map(domain => 
+      checkDomainExists(subdomain, domain)
+    );
+    
+    const results = await Promise.all(domainChecks);
+    return results.some(exists => exists);
   } catch (error) {
     console.error('Error checking subdomain:', error);
     throw error;
@@ -2507,20 +2516,26 @@ async function checkSubdomainExists(subdomain) {
 }
 
 async function checkDomainExists(subdomain, domainConfig) {
-  const response = await axios.get(
-    `${CF_API_URL}/zones/${domainConfig.zoneId}/dns_records`,
-    {
-      headers: {
-        'Authorization': `Bearer ${CF_API_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
-      params: {
-        name: `${formatSRVRecord(subdomain)}.${domainConfig.domain}`
+  try {
+    const response = await axios.get(
+      `${CF_API_URL}/zones/${domainConfig.zone_id}/dns_records`,
+      {
+        headers: {
+          'Authorization': `Bearer ${CF_API_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        params: {
+          type: 'SRV',
+          name: `${formatSRVRecord(subdomain)}.${domainConfig.domain}`
+        }
       }
-    }
-  );
-  
-  return response.data.success && response.data.result.length > 0;
+    );
+    
+    return response.data.success && response.data.result.length > 0;
+  } catch (error) {
+    console.error('Error checking domain:', error.response?.data || error.message);
+    return false;
+  }
 }
 
 // Updated function to get server's existing subdomains
@@ -2561,23 +2576,25 @@ async function createDNSRecord(serverId, subdomain, serverDetails) {
   const port = allocation.port;
   const nodeSubdomain = allocation.ip_alias;
 
+  // Get the target domain from settings
+  const targetDomain = settings.cloudflare.domains.find(d => d.is_default) || settings.cloudflare.domains[0];
+  if (!targetDomain) {
+    throw new Error('No available domains configured for DNS records');
+  }
+
   // Create SRV record using Cloudflare API
   const response = await axios.post(
-    `${CF_API_URL}/zones/${DOMAINS.PRIMARY.zoneId}/dns_records`,
+    `${CF_API_URL}/zones/${targetDomain.zone_id}/dns_records`,
     {
-      name: formatSRVRecord(subdomain),
       type: "SRV",
-      comment: "Minecraft server subdomain",
-      tags: [],
+      name: `${formatSRVRecord(subdomain)}.${targetDomain.domain}`,
       ttl: 1,
+      priority: 0,
+      weight: 5,
+      port: port,
+      target: nodeSubdomain,
       proxied: false,
-      data: {
-        port: port,
-        weight: 10,
-        priority: 10,
-        target: nodeSubdomain
-      },
-      settings: {}
+      comment: "Created for server ID " + serverId
     },
     {
       headers: {
@@ -2593,7 +2610,7 @@ async function createDNSRecord(serverId, subdomain, serverDetails) {
 
   return {
     recordId: response.data.result.id,
-    domain: DOMAINS.PRIMARY.domain
+    domain: targetDomain.domain
   };
 }
 
@@ -2664,9 +2681,12 @@ router.delete('/server/:id/subdomains/:subdomain', isAuthenticated, ownsServer, 
       return res.status(404).json({ error: 'Subdomain not found' });
     }
 
-    const zoneId = subdomain.domain === DOMAINS.PRIMARY.domain ? 
-      DOMAINS.PRIMARY.zoneId : 
-      DOMAINS.LEGACY.zoneId;
+    // Find the matching domain configuration
+    const domainConfig = Object.values(DOMAINS).find(d => d.domain === subdomain.domain);
+    if (!domainConfig) {
+      throw new Error('Domain configuration not found for the subdomain');
+    }
+    const zoneId = domainConfig.zoneId;
 
     const response = await axios.delete(
       `${CF_API_URL}/zones/${zoneId}/dns_records/${subdomain.recordId}`,

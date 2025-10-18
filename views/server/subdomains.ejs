@@ -93,10 +93,21 @@
         <h3 class="text-xl font-semibold text-white mb-4">Add Custom Domain</h3>
         <div class="space-y-4">
             <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Domain Selection</label>
+                <select id="domain-select" class="w-full p-3 bg-black/20 text-white border border-transparent rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition mb-4">
+                    <option value="">Select a domain</option>
+                    <% settings.cloudflare.domains.forEach(function(domain) { %>
+                        <% if (domain.enabled) { %>
+                            <option value="<%= domain.name %>" <%= domain.is_default ? 'selected' : '' %>>.<%= domain.domain %></option>
+                        <% } %>
+                    <% }); %>
+                </select>
+            </div>
+            <div>
                 <label class="block text-sm font-medium text-gray-300 mb-2">Subdomain Name</label>
                 <div class="flex items-center">
                     <input type="text" id="subdomain-input" class="flex-1 p-3 bg-black/20 text-white border border-transparent rounded-l-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition" placeholder="Enter subdomain">
-                    <span class="bg-black/30 text-gray-400 py-3 px-4 rounded-r-lg border-l border-white/10">.fractal.limited</span>
+                    <span id="domain-suffix" class="bg-black/30 text-gray-400 py-3 px-4 rounded-r-lg border-l border-white/10">Select a domain</span>
                 </div>
                 <p class="mt-2 text-sm text-gray-400">Only letters, numbers, and hyphens allowed</p>
             </div>
@@ -115,6 +126,9 @@
     const serverId = new URLSearchParams(window.location.search).get('id');
     
     // Load server details and subdomains
+    // Initialize availableDomains from settings
+    const availableDomains = JSON.parse('<%- JSON.stringify(settings.cloudflare.domains) %>');
+
     function loadServerDetails() {
         fetch(`/api/server/${serverId}`)
             .then(response => response.json())
@@ -126,6 +140,22 @@
                 console.error('Error fetching server details:', error);
                 showToast('Failed to load server details', 'error');
             });
+    }
+
+    // Set initial domain suffix
+    function initializeDomainSuffix() {
+        const domainSelect = document.getElementById('domain-select');
+        const selectedDomain = availableDomains.find(d => d.name === domainSelect.value);
+        if (selectedDomain) {
+            updateDomainSuffix(selectedDomain.domain);
+        }
+    }
+
+    // Call initializeDomainSuffix when page loads
+    initializeDomainSuffix();
+
+    function updateDomainSuffix(domain) {
+        document.getElementById('domain-suffix').textContent = `.${domain}`;
     }
 
     function loadSubdomains() {
@@ -163,12 +193,17 @@ function createSubdomainCard(subdomain) {
     const div = document.createElement('div');
     div.className = 'bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors duration-200';
     
+    const domainConfig = availableDomains.find(d => d.domain === subdomain.domain);
+    const domainBadge = domainConfig ? 
+        `<span class="px-2 py-1 text-xs rounded-full bg-indigo-500/20 text-indigo-300 ml-2">${domainConfig.name}</span>` : '';
+    
     div.innerHTML = `
         <div class="flex items-center justify-between">
             <div class="space-y-1">
                 <div class="flex items-center space-x-2">
                     <h3 class="text-white font-medium">${subdomain.name}.${subdomain.domain}</h3>
                     <span class="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-300">Active</span>
+                    ${domainBadge}
                 </div>
                 <p class="text-sm text-gray-400 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
@@ -177,7 +212,7 @@ function createSubdomainCard(subdomain) {
                     Created: ${(new Date(subdomain.createdAt)).toDateString()}
                 </p>
             </div>
-            <button onclick="deleteSubdomain('${subdomain.name}')" class="text-red-400 hover:text-red-300 transition">
+            <button onclick="deleteSubdomain('${subdomain.name}', '${subdomain.domain}')" class="text-red-400 hover:text-red-300 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                 </svg>
@@ -206,9 +241,15 @@ function createSubdomainCard(subdomain) {
 
     function createSubdomain() {
         const subdomain = document.getElementById('subdomain-input').value.trim();
+        const selectedDomain = document.getElementById('domain-select').value;
         
         if (!subdomain) {
             showToast('Please enter a subdomain name', 'error');
+            return;
+        }
+
+        if (!selectedDomain) {
+            showToast('Please select a domain', 'error');
             return;
         }
 
@@ -222,7 +263,10 @@ function createSubdomainCard(subdomain) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ subdomain })
+            body: JSON.stringify({ 
+                subdomain,
+                domainName: selectedDomain
+            })
         })
         .then(response => {
             if (!response.ok) throw new Error('Failed to create subdomain');
@@ -240,8 +284,8 @@ function createSubdomainCard(subdomain) {
         });
     }
 
-function deleteSubdomain(subdomain) {
-    if (!confirm(`Are you sure you want to delete ${subdomain}.fractal.limited?`)) return;
+function deleteSubdomain(subdomain, domain) {
+    if (!confirm(`Are you sure you want to delete ${subdomain}.${domain}?`)) return;
 
     fetch(`/api/server/${serverId}/subdomains/${subdomain}`, {
         method: 'DELETE'
@@ -282,9 +326,20 @@ function deleteSubdomain(subdomain) {
         }, 3000);
     }
 
+    // Domain selector event handler
+    document.getElementById('domain-select').addEventListener('change', (e) => {
+        const selectedDomain = availableDomains.find(d => d.name === e.target.value);
+        if (selectedDomain) {
+            updateDomainSuffix(selectedDomain.domain);
+        } else {
+            updateDomainSuffix('Select a domain');
+        }
+    });
+
     // Initial load
     document.addEventListener('DOMContentLoaded', () => {
         loadServerDetails();
+        initializeDomainSuffix();
         loadSubdomains();
     });
 </script>
