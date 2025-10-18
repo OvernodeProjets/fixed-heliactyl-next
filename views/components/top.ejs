@@ -206,10 +206,15 @@
                         onclick="window.location.href='/'"
                         class="flex items-center gap-1.5 w-full px-3 py-1.5 text-zinc-400 cursor-pointer hover:bg-white/5 transition rounded-md">
                         <div class="flex items-center gap-1.5">
-                            <div
-                                class="w-6 h-6 bg-indigo-950 rounded-md flex items-center justify-center text-indigo-300 pt-0.5 text-xs">
-                                <%= req.session.userinfo.username.charAt(0).toUpperCase() %>
-                            </div>
+                            <% if (req.session.userinfo.picture) { %>
+                                <img src="<%= req.session.userinfo.picture %>" alt="User Avatar" class="w-6 h-6 rounded-md">
+                            <% } else if (req.session.userinfo.avatar) { %>
+                                <img src="https://cdn.discordapp.com/avatars/<%= req.session.userinfo.id %>/<%= req.session.userinfo.avatar %>.png?size=256" alt="User Avatar" class="w-6 h-6 rounded-md">
+                            <% } else { %>
+                                <div class="w-6 h-6 bg-indigo-950 rounded-md flex items-center justify-center text-indigo-300 pt-0.5 text-xs">
+                                    <%= req.session.userinfo.username.charAt(0).toUpperCase() %>
+                                </div>
+                            <% } %>
                             <span class="ml-1 text-sm">
                                 <%= req.session.userinfo.username %>
                             </span>
