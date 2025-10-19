@@ -11,7 +11,7 @@
  */
 
 const heliactylModule = {
-  "name": "Auth Module",
+  "name": "Local OAuth2 Module",
   "target_platform": "3.2.0"
 };
 
@@ -20,11 +20,11 @@ module.exports.heliactylModule = heliactylModule;
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
-const loadConfig = require("../handlers/config.js");
+const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const fetch = require("node-fetch");
-const indexjs = require("../app.js");
-const log = require("../handlers/log");
+const indexjs = require("../../app.js");
+const log = require("../../handlers/log.js");
 const fs = require("fs");
 const { renderFile } = require("ejs");
 

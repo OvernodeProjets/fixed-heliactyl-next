@@ -20,7 +20,7 @@ module.exports.heliactylModule = heliactylModule;
 "use strict";
 
 const crypto = require('crypto');
-const loadConfig = require("../handlers/config.js");
+const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 
 if (settings.api.client.oauth2.link.slice(-1) == "/")
@@ -37,13 +37,13 @@ if (settings.pterodactyl.domain.slice(-1) == "/")
   settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
 
 const fetch = require("node-fetch");
-const indexjs = require("../app.js");
-const log = require("../handlers/log");
+const indexjs = require("../../app.js");
+const log = require("../../handlers/log.js");
 
 const fs = require("fs");
 const { renderFile } = require("ejs");
 // 05/2023: removed - no one used it so this should be removed from oauth
-const vpnCheck = require("../handlers/vpnCheck");
+const vpnCheck = require("../../handlers/vpnCheck.js");
 
 module.exports.load = async function (app, db) {
   app.get("/login", async (req, res) => {

@@ -90,6 +90,22 @@ module.exports.db = db;
 
 let isFirstWorker = false;
 
+function getAllJsFiles(dir) {
+  const files = [];
+  const items = fs.readdirSync(dir, { withFileTypes: true });
+  
+  for (const item of items) {
+    const fullPath = `${dir}/${item.name}`;
+    if (item.isDirectory()) {
+      files.push(...getAllJsFiles(fullPath));
+    } else if (item.isFile() && item.name.endsWith('.js')) {
+      files.push(fullPath);
+    }
+  }
+  
+  return files;
+}
+
 if (cluster.isMaster) {
   // Display ASCII art and loading spinner
   const asciiArt = fs.readFileSync('./handlers/ascii.txt', 'utf8');
@@ -112,7 +128,7 @@ if (cluster.isMaster) {
   }, 2000);
 
   function startApp() {
-    const moduleFiles = fs.readdirSync("./modules").filter((file) => file.endsWith(".js"));
+    const moduleFiles = getAllJsFiles('./modules').map(file => file.replace('./modules/', ''));
     const compatibility = require('./handlers/compatibility');
     const runtime = typeof Bun !== 'undefined' ? 'Bun' : 'Node.js';
 
@@ -258,6 +274,9 @@ if (cluster.isMaster) {
     if (msg.type === 'FIRST_WORKER') {
       isFirstWorker = true;
       console.log(chalk.cyan(`Worker ${process.pid} is designated as the first worker.`));
+      console.log(
+        chalk.gray(`Heliactyl Next ${settings.version} (${settings.platform_codename}) - webserver is now listening on port ${settings.website.port}`)
+      );
     }
   });
 
@@ -380,7 +399,7 @@ app.use(async (req, res, next) => {
       await db.set('afkSessions', {});
     }
     console.log(
-      chalk.gray(`Heliactyl Next ${settings.version} (${settings.platform_codename}) - webserver is now listening on port ${settings.website.port}`)
+      chalk.white(chalk.gray("[cluster]") + " Cluster state updated: ") + chalk.green('running')
     );
   }).on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
@@ -396,10 +415,10 @@ app.use(async (req, res, next) => {
   app.use(rateLimiters.global);
   app.use(rateLimiters.specific);
 
-  const APIFiles = fs.readdirSync("./modules").filter((file) => file.endsWith(".js"));
+  const APIFiles = getAllJsFiles('./modules');
 
     APIFiles.forEach((file) => {
-      const APIFile = require(`./modules/${file}`);
+      const APIFile = require(file);
       APIFile.load(app, db);
   });
 

@@ -18,12 +18,12 @@ const heliactylModule = {
 module.exports.heliactylModule = heliactylModule;
 
 const crypto = require('crypto');
-const loadConfig = require("../handlers/config.js");
+const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 
 const fetch = require("node-fetch");
-const indexjs = require("../app.js");
-const log = require("../handlers/log");
+const indexjs = require("../../app.js");
+const log = require("../../handlers/log");
 
 let google;
 let oauth2Client;
