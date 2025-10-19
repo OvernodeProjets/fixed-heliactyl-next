@@ -21,6 +21,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const crypto = require('crypto');
 const { Readable, Transform } = require('stream');
+const { requireAuth } = require("../handlers/requireAuth.js");
 
 module.exports.load = async function (app, db) {
   const router = express.Router();
@@ -101,16 +102,8 @@ module.exports.load = async function (app, db) {
     await db.set('external_wallets', wallets);
   };
 
-  // Middleware to check if user is authenticated
-  const isAuthenticated = (req, res, next) => {
-    if (!req.session.pterodactyl) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-    next();
-  };
-
     // Buy XTC endpoint (GET)
-router.get('/xtc/buy/:amount', isAuthenticated, async (req, res) => {
+router.get('/xtc/buy/:amount', requireAuth, async (req, res) => {
   const { amount } = req.params; // The amount of XTC the user wants to buy
   const userId = req.session.userinfo.id;
   
@@ -147,7 +140,7 @@ router.get('/xtc/buy/:amount', isAuthenticated, async (req, res) => {
 });
 
 // 1. GET /api/votes
-router.get('/votes', isAuthenticated, async (req, res) => {
+router.get('/votes', requireAuth, async (req, res) => {
     try {
         const votes = await db.get('votes') || [];
         res.status(200).json(votes);
@@ -174,7 +167,7 @@ function censorBadWords(text) {
   
   // Updated Transfer endpoint with XTC
   router.post('/transfer',
-    isAuthenticated,
+    requireAuth,
     [
       body('receiverId').isString().notEmpty(),
       body('amount').isInt({ min: MIN_CURRENCY_AMOUNT, max: MAX_CURRENCY_AMOUNT }),
@@ -303,7 +296,7 @@ function censorBadWords(text) {
 
   // Get balance endpoint updated to include XTC
   router.get('/balance',
-    isAuthenticated,
+    requireAuth,
     async (req, res) => {
       const userId = req.session.userinfo.id;
       try {

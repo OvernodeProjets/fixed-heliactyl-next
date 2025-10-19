@@ -17,6 +17,8 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
+const { requireAuth } = require('../handlers/requireAuth');
+
 module.exports.load = async function (app, db) {
   // Configuration
   const DAILY_INTEREST_RATE = 0.05; // 5% daily interest
@@ -76,9 +78,7 @@ module.exports.load = async function (app, db) {
   }
 
   // Modified staking endpoint with rate limiting
-  app.post("/stake", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/auth`);
-    
+  app.post("/stake", requireAuth, async (req, res) => {
     const { amount, lockPeriod } = req.body;
     const parsedAmount = parseFloat(amount);
     
@@ -124,9 +124,7 @@ module.exports.load = async function (app, db) {
   });
 
   // Modified unstaking endpoint with rate limiting
-  app.post("/unstake", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/auth`);
-    
+  app.post("/unstake", requireAuth, async (req, res) => {
     const { positionId } = req.body;
     const userId = req.session.userinfo.id;
     
@@ -186,9 +184,7 @@ module.exports.load = async function (app, db) {
   });
 
   // View staking positions and earnings
-  app.get("/stake/positions", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/auth`);
-    
+  app.get("/stake/positions", requireAuth, async (req, res) => {
     const userId = req.session.userinfo.id;
     
     // Migrate old staking data if needed
@@ -227,9 +223,7 @@ module.exports.load = async function (app, db) {
     });
   });
 
-  app.get("/stake/positions/:positionId", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/auth`);
-    
+  app.get("/stake/positions/:positionId", requireAuth, async (req, res) => {
     const userId = req.session.userinfo.id;
     const { positionId } = req.params;
     
@@ -282,9 +276,7 @@ module.exports.load = async function (app, db) {
   });
 
   // Claim earnings for a specific position
-  app.post("/stake/claim", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect(`/auth`);
-    
+  app.post("/stake/claim", requireAuth, async (req, res) => {
     const { positionId } = req.body;
     const userId = req.session.userinfo.id;
     

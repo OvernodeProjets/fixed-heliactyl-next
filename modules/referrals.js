@@ -17,11 +17,10 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-module.exports.load = async function (app, db) {
-app.get('/generate', async (req, res) => {
-  if (!req.session) return res.redirect("/auth");
-  if (!req.session.pterodactyl) return res.redirect("/auth");
+const { requireAuth } = require("../handlers/requireAuth.js");
 
+module.exports.load = async function (app, db) {
+app.get('/generate', requireAuth, async (req, res) => {
   if (!req.query.code) {
     return res.redirect('../account?err=INVALIDCODE')
   }
@@ -45,10 +44,7 @@ app.get('/generate', async (req, res) => {
   res.redirect('../referrals?err=none')
 });
 
-app.get('/claim', async (req, res) => {
-  if (!req.session) return res.redirect("/auth");
-  if (!req.session.pterodactyl) return res.redirect("/auth");
-
+app.get('/claim', requireAuth, async (req, res) => {
   // Get the referral code from the request body
   if (!req.query.code) {
     return res.redirect('../account?err=INVALIDCODE')

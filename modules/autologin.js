@@ -20,13 +20,13 @@ module.exports.heliactylModule = heliactylModule;
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const jwt = require('jsonwebtoken');
+const { requireAuth } = require("../handlers/requireAuth.js");
 
 
 let secretKey = settings.website.secret;
 
 module.exports.load = async function (app, db) {
-  app.get("/panel/doAutologin", async (req,res) => {
-    if(!req.session.userinfo) return res.sendStatus(403);
+  app.get("/panel/doAutologin", requireAuth, async (req,res) => {
     let jwtData = {
         email: req.session.userinfo.email,
         isValidLogin: true

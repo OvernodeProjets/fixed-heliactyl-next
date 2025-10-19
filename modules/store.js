@@ -25,6 +25,7 @@ const fetch = require('node-fetch');
 const mysql = require('mysql2/promise');
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
+const { requireAuth } = require("../handlers/requireAuth.js");
 
 const HOUR_IN_MS = 3600000;
 const WEEK_IN_MS = 604800000;
@@ -585,11 +586,11 @@ class Store {
 
 module.exports.load = function(app, db) {
     
-      const billingManager = new BillingManager(db);
-    
+  const billingManager = new BillingManager(db);
   const afkManager = new AFKRewardsManager(db);
   const clusterId = process.env.CLUSTER_ID || `cluster-${Math.random().toString(36).substring(7)}`;
-const store = new Store(db); 
+  const store = new Store(db); 
+
   app.ws('/ws', async function(ws, req) {
     if (!req.session.userinfo) {
       ws.close(4001, 'Unauthorized');
@@ -721,12 +722,8 @@ app.post('/api/store/renewal-bypass', (req, res) => StoreController.handleRenewa
 app.get('/api/store/renewal-bypass', (req, res) => StoreController.checkRenewalBypassStatus(req, res));
 
   // Buy resource endpoint
-  app.post('/api/store/buy', async (req, res) => {
+  app.post('/api/store/buy', requireAuth, async (req, res) => {
     try {
-      if (!req.session.userinfo) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
-
       const userId = req.session.userinfo.id;
       const { resourceType, amount } = req.body;
 
@@ -775,12 +772,8 @@ app.get('/api/store/renewal-bypass', (req, res) => StoreController.checkRenewalB
   });
 
   // Get purchase history endpoint
-  app.get('/api/store/history', async (req, res) => {
+  app.get('/api/store/history', requireAuth, async (req, res) => {
     try {
-      if (!req.session.userinfo) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
-
       const userId = req.session.userinfo.id;
       const history = await db.get(`purchases-${userId}`) || [];
       
@@ -792,11 +785,8 @@ app.get('/api/store/renewal-bypass', (req, res) => StoreController.checkRenewalB
   });
 
   // Get current resources endpoint
-  app.get('/api/store/resources', async (req, res) => {
+  app.get('/api/store/resources', requireAuth, async (req, res) => {
     try {
-      if (!req.session.userinfo) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
 
       const userId = req.session.userinfo.id;
       const resources = await db.get(`extra-${userId}`) || {

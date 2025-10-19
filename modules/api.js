@@ -28,15 +28,11 @@ const NodeCache = require("node-cache");
 const Queue = require("../handlers/Queue.js");
 const log = require("../handlers/log");
 const arciotext = require("../handlers/afk");
+const { requireAuth } = require("../handlers/requireAuth.js");
 
 const myCache = new NodeCache({ deleteOnExpire: true, stdTTL: 59 });
 
 module.exports.load = async function (app, db) {
-  app.get("/bal/:id", async (req, res) => {
-let q = await db.get('staking-positions-' + req.params.id)
-let c = await db.get('coins-' + req.params.id)
-res.json({ coins: c, staking: q })
-})
 // Simple cache implementation
 const cache = {
     data: {},
@@ -108,10 +104,8 @@ app.get("/stats", async (req, res) => {
     }
 });
 
-  app.get(`/api/dailystatus`, async (req, res) => {
-    if (!req.session.userinfo.id) return res.redirect("/auth");
-  
-    let lastClaim = new Date(await db.get("dailycoins12-" + req.session.userinfo.id));
+  app.get(`/api/dailystatus`, requireAuth, async (req, res) => {
+      let lastClaim = new Date(await db.get("dailycoins12-" + req.session.userinfo.id));
   
     // Check if the user has already claimed coins today
     const today = new Date();
@@ -124,12 +118,7 @@ app.get("/stats", async (req, res) => {
     }
       })
   
-  app.get('/daily-coins', async (req, res) => {
-    // Check if user is logged in
-    if (!req.session.userinfo.id) return res.redirect("/auth");
-    const userId = req.session.userinfo.id
-    
-    // Get the date of the user's last coin claim
+  app.get('/daily-coins', requireAuth, async (req, res) => {
     let lastClaim = new Date(await db.get("dailycoins12-" + req.session.userinfo.id));
     
     // Check if the user has already claimed coins today
@@ -153,10 +142,6 @@ app.get("/stats", async (req, res) => {
  * Gifts coins to another user.
  */
 app.get("/giftcoins", async (req, res) => {
-  if (!req.session.pterodactyl) {
-    return res.redirect(`/`);
-  }
-
   const { coins: coinsStr, id: recipientId } = req.query;
   const coins = parseInt(coinsStr);
   const senderId = req.session.userinfo.id;

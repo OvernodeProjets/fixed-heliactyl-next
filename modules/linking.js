@@ -22,6 +22,7 @@ const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const indexjs = require("../app.js");
 const log = require("../handlers/log");
+const { requireAuth } = require("../handlers/requireAuth.js");
 
 module.exports.load = async function (app, db) {
   // Helper function to fetch user info from Discord API
@@ -70,9 +71,7 @@ module.exports.load = async function (app, db) {
   }
 
   // Discord linking endpoint
-  app.get('/api/discord-link', async (req, res) => {
-    if (!req.session.pterodactyl) return res.status(403).json({ error: 'Not logged in' });
-
+  app.get('/api/discord-link', requireAuth, async (req, res) => {
     const existingDiscordId = await db.get(`discord-${req.session.pterodactyl.id}`);
     if (existingDiscordId) {
       return res.status(400).json({ error: 'Discord account already linked' });
@@ -83,8 +82,7 @@ module.exports.load = async function (app, db) {
   });
 
   // Discord callback endpoint
-  app.get('/api/discord-callback', async (req, res) => {
-    if (!req.session.pterodactyl) return res.status(403).json({ error: 'Not logged in' });
+  app.get('/api/discord-callback', requireAuth, async (req, res) => {
     if (!req.query.code) return res.status(400).json({ error: 'Missing code' });
 
     try {
@@ -117,9 +115,7 @@ module.exports.load = async function (app, db) {
   });
 
   // Get Discord info endpoint
-  app.get('/api/discord-info', async (req, res) => {
-    if (!req.session.pterodactyl) return res.status(403).json({ error: 'Not logged in' });
-
+  app.get('/api/discord-info', requireAuth, async (req, res) => {
     const discordId = await db.get(`discord-${req.session.pterodactyl.id}`);
     if (!discordId) {
       return res.status(404).json({ error: 'No Discord account linked' });
@@ -143,15 +139,5 @@ module.exports.load = async function (app, db) {
       console.error('Error fetching Discord info:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
-  });
-
-  // Relink Discord account endpoint
-  app.get('/api/discord-relink', async (req, res) => {
-    if (!req.session.pterodactyl) return res.status(403).json({ error: 'Not logged in' });
-
-    await db.delete(`discord-${req.session.pterodactyl.id}`);
-
-    const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${settings.api.client.oauth2.id}&redirect_uri=${encodeURIComponent(settings.api.client.oauth2.link + '/api/discord-callback')}&response_type=code&scope=identify%20email%20guilds.join`;
-    res.json({ auth_url: authUrl });
   });
 };
