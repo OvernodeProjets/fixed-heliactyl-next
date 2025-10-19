@@ -19,72 +19,38 @@ module.exports.heliactylModule = heliactylModule;
 
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
-const fs = require("fs");
-const indexjs = require("../app.js");
 const fetch = require("node-fetch");
-const Queue = require("../handlers/Queue.js");
+const { requireAuth } = require("../handlers/requireAuth.js");
 
 module.exports.load = async function(app, db) {
-  app.get(`/api/password`, async (req, res) => {
-    if (!req.session.userinfo.id) return res.redirect("/auth");
-
-    let checkPassword = await db.get("password-" + req.session.userinfo.id);
-
-    if (checkPassword) {
-      return res.json({ password: checkPassword });
-    } else {
-      let newpassword = makeid(settings.api.client.passwordgenerator["length"]);
-
-      await fetch(
-        settings.pterodactyl.domain + "/api/application/users/" + req.session.pterodactyl.id,
-        {
-          method: "patch",
-          headers: {
-            'Content-Type': 'application/json',
-            "Authorization": `Bearer ${settings.pterodactyl.key}`
-          },
-          body: JSON.stringify({
-            username: req.session.pterodactyl.username,
-            email: req.session.pterodactyl.email,
-            first_name: req.session.pterodactyl.first_name,
-            last_name: req.session.pterodactyl.last_name,
-            password: newpassword
-          })
-        }
-      );
-
-      await db.set("password-" + req.session.userinfo.id, newpassword)
-      return res.json({ password: newpassword });
-    }
-  });
-
   app.get("/panel", async (req, res) => {
     res.redirect(settings.pterodactyl.domain);
   });
 
-  app.get("/notifications", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect("/auth");
-
+  // todo : implement notifications system
+  app.get("/notifications", requireAuth, async (req, res) => {
     let notifications = await db.get('notifications-' + req.session.userinfo.id) || [];
 
     res.json(notifications)
   });
 
-  // Existing /regen endpoint remains for compatibility
-  app.get("/regen", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect("/auth");
-    if (settings.api.client.allow.regen !== true) return res.send("You cannot regenerate your password currently.");
+  app.get("/api/password/regen", requireAuth, async (req, res) => {
+    if (!settings.api.client.allow.regen) return res.status(403).json({ error: "Password changes are not allowed" });
 
-    let newpassword = makeid(settings.api.client.passwordgenerator["length"]);
-    req.session.password = newpassword;
+    const newPassword = makeid(settings.api.client.passwordgenerator["length"]);
+    req.session.password = newPassword;
 
-    await updatePassword(req.session.pterodactyl, newpassword, settings, db);
-    res.redirect("/account");
+    try {
+      await updatePassword(req.session.pterodactyl, newPassword, settings, db);
+      res.redirect("/account");
+    } catch (error) {
+      console.error("Password update error:", error);
+      res.status(500).json({ error: "Failed to update password" });
+    }
   });
 
   // New endpoint for custom password changes
-  app.post("/api/password/change", async (req, res) => {
-    if (!req.session.pterodactyl) return res.status(401).json({ error: "Unauthorized" });
+  app.post("/api/password/change", requireAuth, async (req, res) => {
     if (!settings.api.client.allow.regen) return res.status(403).json({ error: "Password changes are not allowed" });
 
     const { password, confirmPassword } = req.body;
