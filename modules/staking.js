@@ -124,7 +124,7 @@ module.exports.load = async function (app, db) {
   });
 
   // Modified unstaking endpoint with rate limiting
-  app.post("/unstake", rateLimit, async (req, res) => {
+  app.post("/unstake", async (req, res) => {
     if (!req.session.pterodactyl) return res.redirect(`/auth`);
     
     const { positionId } = req.body;
