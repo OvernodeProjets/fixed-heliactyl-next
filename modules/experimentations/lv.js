@@ -11,13 +11,13 @@
  */
 
 const heliactylModule = {
-  "name": "XRS Module",
+  "name": "Linkvertise Module",
   "target_platform": "3.2.0"
 };
 
 module.exports.heliactylModule = heliactylModule;
 
-const { requireAuth } = require("../handlers/requireAuth.js");
+const { requireAuth } = require("../../handlers/requireAuth.js");
 
 module.exports.load = async function(app, db) {
   const lvcodes = {}

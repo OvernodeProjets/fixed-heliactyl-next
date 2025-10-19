@@ -17,10 +17,10 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const loadConfig = require("../handlers/config.js");
+const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const jwt = require('jsonwebtoken');
-const { requireAuth } = require("../handlers/requireAuth.js");
+const { requireAuth } = require("../../handlers/requireAuth.js");
 
 
 let secretKey = settings.website.secret;
