@@ -26,6 +26,7 @@ const fs = require("fs");
 const getPteroUser = require("../handlers/getPteroUser.js");
 const Queue = require("../handlers/Queue.js");
 const log = require("../handlers/log.js");
+const { requireAuth } = require("../handlers/requireAuth.js");
 
 if (settings.pterodactyl)
     if (settings.pterodactyl.domain) {
@@ -34,113 +35,8 @@ if (settings.pterodactyl)
     }
 
 module.exports.load = async function(app, db) {
-    // Helper function to get user-specific groups key
-    const getUserGroupsKey = (userId) => `user-${userId}-server-groups`;
-
-    // GET all groups for a user
-    app.get("/api/groups", async (req, res) => {
-        if (!req.session.pterodactyl) return res.status(401).json({ error: "Unauthorized" });
-
-        const userId = req.session.userinfo.id;
-        const groups = await db.get(getUserGroupsKey(userId)) || {};
-        res.json(groups);
-    });
-
-    // CREATE a new group for a user
-    app.post("/api/groups", async (req, res) => {
-        if (!req.session.pterodactyl) return res.status(401).json({ error: "Unauthorized" });
-        if (!req.body.name) return res.status(400).json({ error: "Group name is required" });
-
-        const userId = req.session.userinfo.id;
-        const groups = await db.get(getUserGroupsKey(userId)) || {};
-        const newGroupId = Date.now().toString();
-        groups[newGroupId] = { name: req.body.name, servers: [] };
-
-        await db.set(getUserGroupsKey(userId), groups);
-        res.status(201).json({ id: newGroupId, ...groups[newGroupId] });
-    });
-
-    // GET a specific group for a user
-    app.get("/api/groups/:groupId", async (req, res) => {
-        if (!req.session.pterodactyl) return res.status(401).json({ error: "Unauthorized" });
-
-        const userId = req.session.userinfo.id;
-        const groups = await db.get(getUserGroupsKey(userId)) || {};
-        const group = groups[req.params.groupId];
-
-        if (!group) return res.status(404).json({ error: "Group not found" });
-
-        res.json(group);
-    });
-
-    // UPDATE a group for a user
-    app.put("/api/groups/:groupId", async (req, res) => {
-        if (!req.session.pterodactyl) return res.status(401).json({ error: "Unauthorized" });
-
-        const userId = req.session.userinfo.id;
-        const groups = await db.get(getUserGroupsKey(userId)) || {};
-        const group = groups[req.params.groupId];
-
-        if (!group) return res.status(404).json({ error: "Group not found" });
-
-        if (req.body.name) group.name = req.body.name;
-
-        await db.set(getUserGroupsKey(userId), groups);
-        res.json(group);
-    });
-
-    // DELETE a group for a user
-    app.delete("/api/groups/:groupId", async (req, res) => {
-        if (!req.session.pterodactyl) return res.status(401).json({ error: "Unauthorized" });
-
-        const userId = req.session.userinfo.id;
-        const groups = await db.get(getUserGroupsKey(userId)) || {};
-
-        if (!groups[req.params.groupId]) return res.status(404).json({ error: "Group not found" });
-
-        delete groups[req.params.groupId];
-        await db.set(getUserGroupsKey(userId), groups);
-        res.status(204).send();
-    });
-
-    // ADD a server to a group
-    app.post("/api/groups/:groupId/servers", async (req, res) => {
-        if (!req.session.pterodactyl) return res.status(401).json({ error: "Unauthorized" });
-        if (!req.body.serverId) return res.status(400).json({ error: "Server ID is required" });
-
-        const userId = req.session.userinfo.id;
-        const groups = await db.get(getUserGroupsKey(userId)) || {};
-        const group = groups[req.params.groupId];
-
-        if (!group) return res.status(404).json({ error: "Group not found" });
-
-        if (!group.servers.includes(req.body.serverId)) {
-            group.servers.push(req.body.serverId);
-            await db.set(getUserGroupsKey(userId), groups);
-        }
-
-        res.json(group);
-    });
-
-    // REMOVE a server from a group
-    app.delete("/api/groups/:groupId/servers/:serverId", async (req, res) => {
-        if (!req.session.pterodactyl) return res.status(401).json({ error: "Unauthorized" });
-
-        const userId = req.session.userinfo.id;
-        const groups = await db.get(getUserGroupsKey(userId)) || {};
-        const group = groups[req.params.groupId];
-
-        if (!group) return res.status(404).json({ error: "Group not found" });
-
-        group.servers = group.servers.filter(id => id !== req.params.serverId);
-        await db.set(getUserGroupsKey(userId), groups);
-        res.json(group);
-    });
   
-
-app.get("/updateinfo", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect("/auth");
-    
+app.get("/updateinfo", requireAuth, async (req, res) => {
     try {
         const cacheaccount = await getPteroUser(req.session.userinfo.id, db);
         if (!cacheaccount) {
@@ -229,9 +125,7 @@ app.get("/updateinfo", async (req, res) => {
     }
 });
 
-app.get("/create", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect("/auth");
-
+app.get("/create", requireAuth, async (req, res) => {
     let theme = indexjs.get(req);
 
     if (settings.api.client.allow.server.create == true) {
@@ -528,17 +422,13 @@ async function removeFromQueue(server) {
 setInterval(processQueue, 5 * 60 * 1000);
 
 // Route to manually process the queue
-app.get("/process-queue", async (req, res) => {
-  if (!req.session.pterodactyl) return res.redirect("/auth");
-
+app.get("/process-queue", requireAuth, async (req, res) => {
   await processQueue();
   res.json({ status: 200, msg: 'Queue processed successfully' });
 });
 
 // Route to remove a server from the queue
-app.get("/queue-remove/:id", async (req, res) => {
-  if (!req.session.pterodactyl) return res.redirect("/auth");
-
+app.get("/queue-remove/:id", requireAuth, async (req, res) => {
   let serverPos = parseInt(req.params.id);
   let userId = req.session.userinfo.id;
 
@@ -575,9 +465,7 @@ app.get("/queue-remove/:id", async (req, res) => {
 });
 
 // Route to clear the entire queue
-app.get("/clear-queue", async (req, res) => {
-  if (!req.session.pterodactyl) return res.redirect("/auth");
-
+app.get("/clear-queue", requireAuth, async (req, res) => {
   try {
       let queuedServers = await db.get("queuedServers") || [];
 
@@ -601,9 +489,7 @@ app.get("/clear-queue", async (req, res) => {
   }
 });
 
-    app.get("/modify", async (req, res) => {
-        if (!req.session.pterodactyl) return res.redirect("/auth");
-    
+    app.get("/modify", requireAuth, async (req, res) => {
         let theme = indexjs.get(req);
     
         if (settings.api.client.allow.server.modify == true) {
@@ -808,9 +694,7 @@ app.get("/clear-queue", async (req, res) => {
         }
       });
     
-app.get("/delete", async (req, res) => {
-  if (!req.session.pterodactyl) return res.redirect("/auth");
-
+app.get("/delete", requireAuth, async (req, res) => {
   if (!req.query.id) return res.send("Missing id.");
 
   let theme = indexjs.get(req);
