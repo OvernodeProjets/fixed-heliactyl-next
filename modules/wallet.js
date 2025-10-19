@@ -168,12 +168,16 @@ function censorBadWords(text) {
     }, text);
 }
 
+  // Constants for validation
+  const MAX_CURRENCY_AMOUNT = 999999999999999; // 1 quadrillion - maximum reasonable amount for our system
+  const MIN_CURRENCY_AMOUNT = 1; // Minimum transfer amount
+  
   // Updated Transfer endpoint with XTC
   router.post('/transfer',
     isAuthenticated,
     [
       body('receiverId').isString().notEmpty(),
-      body('amount').isInt({ min: 1 }),
+      body('amount').isInt({ min: MIN_CURRENCY_AMOUNT, max: MAX_CURRENCY_AMOUNT }),
       body('currency').isIn(['XPL', 'XRS', 'XTC']), // Added XTC
     ],
     async (req, res) => {
@@ -189,6 +193,9 @@ function censorBadWords(text) {
         return res.status(400).json({ error: "Cannot transfer to yourself" });
       }
 
+      // Start a transaction-like operation
+      const transactionKey = `transaction-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+      
       try {
         const senderBalance = await getUserBalance(senderId, currency);
         if (senderBalance < amount) {
@@ -199,13 +206,32 @@ function censorBadWords(text) {
         const externalWallets = await db.get('external_wallets') || [];
         const isExternalReceiver = externalWallets.some(w => w.address === receiverId);
 
-        // Perform the transfer
-        await updateUserBalance(senderId, currency, -amount);
+        // Save transaction state
+        await db.set(transactionKey, {
+          status: 'pending',
+          senderId,
+          receiverId,
+          amount,
+          currency,
+          isExternalReceiver
+        });
 
-        if (isExternalReceiver) {
-          await updateExternalWalletBalance(receiverId, currency, amount);
-        } else {
-          await updateUserBalance(receiverId, currency, amount);
+        try {
+          // Perform the transfer
+          await updateUserBalance(senderId, currency, -amount);
+          
+          if (isExternalReceiver) {
+            await updateExternalWalletBalance(receiverId, currency, amount);
+          } else {
+            await updateUserBalance(receiverId, currency, amount);
+          }
+
+          // Mark transaction as completed
+          await db.set(transactionKey, { status: 'completed' });
+        } catch (error) {
+          // If anything fails, revert the sender's balance
+          await updateUserBalance(senderId, currency, amount);
+          throw error;
         }
 
         // Log the transaction

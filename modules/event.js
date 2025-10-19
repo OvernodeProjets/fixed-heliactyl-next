@@ -327,16 +327,18 @@ module.exports.load = async function(app, db) {
         const allUsers = await db.get('all-users') || [];
         let leaderboard = [];
 
-        for (const userId of allUsers) {
-            const eventData = await db.get(`halloween-event-${userId}`);
+        const promises = allUsers.map(userId => db.get(`halloween-event-${userId}`));
+        const results = await Promise.all(promises);
+
+        results.forEach((eventData, index) => {
             if (eventData) {
                 leaderboard.push({
-                    userId,
+                    userId: allUsers[index],
                     score: eventData.score,
                     serverLevel: getServerLevel(eventData.score).name
                 });
             }
-        }
+        });
 
         leaderboard.sort((a, b) => b.score - a.score);
         leaderboard = leaderboard.slice(0, 10); // Top 10

@@ -1679,8 +1679,12 @@ async function updateSubuserInfo(serverId, serverOwnerId) {
     // Remove any subusers that are no longer associated with this server
     const currentSubuserIds = new Set(subusers.map(u => u.id));
     const allUsers = await db.get('all_users') || [];
-    for (const userId of allUsers) {
-      let userSubuserServers = await db.get(`subuser-servers-${userId}`) || [];
+
+    const promises = allUsers.map(userId => db.get(`subuser-servers-${userId}`));
+    const results = await Promise.all(promises);
+    for (let i = 0; i < allUsers.length; i++) {
+      const userId = allUsers[i];
+      let userSubuserServers = results[i] || [];
       const updatedUserSubuserServers = userSubuserServers.filter(server => 
         server.id !== serverId || currentSubuserIds.has(userId)
       );

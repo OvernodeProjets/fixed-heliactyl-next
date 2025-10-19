@@ -28,8 +28,6 @@ module.exports.load = async function (app, db) {
   };
   const MASTER_USER_ID = "MASTER";
   const EARLY_WITHDRAWAL_PENALTY = 0.5; // 50% penalty on earnings for early withdrawal
-const RATE_LIMIT_WINDOW = 3000; // 3 seconds in milliseconds
-const lastRequestTimes = new Map(); // Store last request times per user
 
   // Helper function to calculate compound interest
   const calculateEarnings = (stakedAmount, lastStakeTime, lockPeriod) => {
@@ -77,24 +75,8 @@ const lastRequestTimes = new Map(); // Store last request times per user
     return null;
   }
 
-  const rateLimit = (req, res, next) => {
-    const userId = req.session.userinfo.id;
-    const now = Date.now();
-    const lastRequest = lastRequestTimes.get(userId) || 0;
-    
-    if (now - lastRequest < RATE_LIMIT_WINDOW) {
-      return res.status(429).json({
-        error: "Rate limit exceeded",
-        retryAfter: Math.ceil((RATE_LIMIT_WINDOW - (now - lastRequest)) / 1000)
-      });
-    }
-    
-    lastRequestTimes.set(userId, now);
-    next();
-  };
-
   // Modified staking endpoint with rate limiting
-  app.post("/stake", rateLimit, async (req, res) => {
+  app.post("/stake", async (req, res) => {
     if (!req.session.pterodactyl) return res.redirect(`/auth`);
     
     const { amount, lockPeriod } = req.body;
