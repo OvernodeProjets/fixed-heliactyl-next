@@ -1028,13 +1028,14 @@ function openFileEditor(fileName) {
                         <polyline points="17 21 17 13 7 13 7 21"></polyline>
                         <polyline points="7 3 7 8 15 8"></polyline>
                     </svg>
-                    Save & Exit
+                    Save
                 </button>
-                <button id="close-modal" class="editor-button secondary" style="display: none;">
+                <button id="close-modal" class="editor-button secondary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
+                    Exit
                 </button>
             </div>
         </div>
@@ -1076,45 +1077,72 @@ function openFileEditor(fileName) {
 
             const language = getMonacoLanguage(fileExtension);
 
-            if (!editor) {
-                require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.30.1/min/vs' }});
-                require(['vs/editor/editor.main'], function() {
-                    setupMonacoEditor(content, language);
-                });
-            } else {
-                editor.setValue(content);
-                monaco.editor.setModelLanguage(editor.getModel(), language);
+            // Dispose of previous editor instance if exists
+            if (editor) {
+                editor.dispose();
+                editor = null;
             }
+
+            require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.30.1/min/vs' }});
+            require(['vs/editor/editor.main'], function() {
+                setupMonacoEditor(content, language, fileName);
+            });
         })
         .catch(error => {
             console.error('Error loading file content:', error);
             showToast('Error loading file content. Please try again.');
         });
 
-    // Setup event listeners
-    document.getElementById('toggle-word-wrap').addEventListener('click', () => {
-        const wordWrap = editor.getOption(monaco.editor.EditorOption.wordWrap);
-        editor.updateOptions({
-            wordWrap: wordWrap === 'off' ? 'on' : 'off'
-        });
-    });
-
-    document.getElementById('save-file').addEventListener('click', () => saveFile(fileName));
-
     // Show keyboard shortcuts on first interaction
     let shortcutsVisible = false;
-    document.addEventListener('keydown', () => {
+    const keydownHandler = () => {
         if (!shortcutsVisible) {
-            document.querySelector('.keyboard-shortcuts').classList.add('visible');
-            setTimeout(() => {
-                document.querySelector('.keyboard-shortcuts').classList.remove('visible');
-            }, 3000);
+            const shortcuts = document.querySelector('.keyboard-shortcuts');
+            if (shortcuts) {
+                shortcuts.classList.add('visible');
+                setTimeout(() => {
+                    shortcuts.classList.remove('visible');
+                }, 3000);
+            }
             shortcutsVisible = true;
         }
-    }, { once: true });
+    };
+    
+    // Remove old listener if exists and add new one
+    document.removeEventListener('keydown', keydownHandler);
+    document.addEventListener('keydown', keydownHandler, { once: true });
 }
 
-function setupMonacoEditor(content, language) {
+function setupEditorButtons(fileName) {
+    const toggleWrapBtn = document.getElementById('toggle-word-wrap');
+    const saveBtn = document.getElementById('save-file');
+    const closeBtn = document.getElementById('close-modal');
+
+    if (toggleWrapBtn) {
+        toggleWrapBtn.onclick = () => {
+            const wordWrap = editor.getOption(monaco.editor.EditorOption.wordWrap);
+            editor.updateOptions({
+                wordWrap: wordWrap === 'off' ? 'on' : 'off'
+            });
+        };
+    }
+
+    if (saveBtn) {
+        saveBtn.onclick = () => saveFile(fileName, false);
+    }
+    
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            if (editor) {
+                editor.dispose();
+                editor = null;
+            }
+            closeModal('file-edit-modal');
+        };
+    }
+}
+
+function setupMonacoEditor(content, language, fileName) {
     // Define custom theme
     monaco.editor.defineTheme('customTheme', {
         base: 'vs-dark',
@@ -1170,14 +1198,16 @@ function setupMonacoEditor(content, language) {
 
     // Add keyboard shortcuts
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-        document.getElementById('save-file').click();
+        saveFile(fileName, false);
     });
 
     // Update status bar
     editor.onDidChangeCursorPosition((e) => {
         const position = e.position;
-        document.querySelector('.cursor-position').textContent = 
-            `Ln ${position.lineNumber}, Col ${position.column}`;
+        const cursorPos = document.querySelector('.cursor-position');
+        if (cursorPos) {
+            cursorPos.textContent = `Ln ${position.lineNumber}, Col ${position.column}`;
+        }
     });
 
     editor.onDidChangeCursorSelection((e) => {
@@ -1185,17 +1215,23 @@ function setupMonacoEditor(content, language) {
         const selectedText = editor.getModel().getValueInRange(selection);
         const selectionInfo = document.querySelector('.selection-info');
         
-        if (selectedText) {
-            const lines = selectedText.split('\n');
-            const chars = selectedText.length;
-            selectionInfo.textContent = `${lines.length} lines, ${chars} characters selected`;
-        } else {
-            selectionInfo.textContent = '';
+        if (selectionInfo) {
+            if (selectedText) {
+                const lines = selectedText.split('\n');
+                const chars = selectedText.length;
+                selectionInfo.textContent = `${lines.length} lines, ${chars} characters selected`;
+            } else {
+                selectionInfo.textContent = '';
+            }
         }
     });
 
     window.editor = editor;
+    
+    // Setup buttons after editor is created
+    setupEditorButtons(fileName);
 }
+
 
 function getMonacoLanguage(fileExtension) {
     const languageMap = {
@@ -1230,7 +1266,7 @@ function getMonacoLanguage(fileExtension) {
     return languageMap[fileExtension] || 'plaintext';
 }
 
-function saveFile(fileName) {
+function saveFile(fileName, shouldExit = true) {
     const content = window.editor.getValue();
     showLoading();
 
@@ -1243,10 +1279,17 @@ function saveFile(fileName) {
         },
         body: content
     }).then(() => {
-        closeModal('file-edit-modal');
+        if (shouldExit) {
+            if (editor) {
+                editor.dispose();
+                editor = null;
+            }
+            closeModal('file-edit-modal');
+            window.location.reload();
+        } else {
+            showToast('File saved successfully');
+        }
         loadFileList(currentPath);
-        showToast('File saved successfully');
-        window.location.reload()
     }).catch(err => {
         console.error('Error:', err);
         showToast('Error saving file. Please try again.');
@@ -1488,7 +1531,13 @@ function closeModal(modalId) {
 }
 
 // Event Listeners
-document.getElementById('close-modal').addEventListener('click', () => closeModal('file-edit-modal'));
+document.getElementById('close-modal').addEventListener('click', () => {
+    if (editor) {
+        editor.dispose();
+        editor = null;
+    }
+    closeModal('file-edit-modal');
+});
 document.getElementById('create-folder-cancel').addEventListener('click', () => closeModal('create-folder-modal'));
 document.getElementById('new-file-cancel').addEventListener('click', () => closeModal('new-file-modal'));
 
