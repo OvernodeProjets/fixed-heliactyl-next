@@ -20,7 +20,7 @@ version = "3.2.0"
 # General Settings
 # ------------------------------------------------------
 clusters = 2
-database = "sqlite://heliactyl.db"
+database = "sqlite://storage/heliactyl.db"
 
 # ------------------------------------------------------
 # External Services

@@ -19,6 +19,7 @@ module.exports.heliactylModule = heliactylModule;
 
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
+// todo : replace with an local
 const { v4: uuidv4 } = require('uuid');
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
@@ -29,6 +30,7 @@ const fs = require("fs");
 const { renderFile } = require("ejs");
 
 // Add Resend API key to your settings
+// todo : move to config file
 const RESEND_API_KEY = 're_GqVR7va3_8z8QuYyECBEDYKYdvrf9iqbb';
 
 
@@ -51,6 +53,7 @@ module.exports.load = async function (app, db) {
     }
   };
 
+  // todo : remove that
   const rateLimit = (req, res, next) => {
     if (!req.session.lastAuthAttempt) {
       req.session.lastAuthAttempt = Date.now();

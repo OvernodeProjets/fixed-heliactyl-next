@@ -285,10 +285,13 @@ if (cluster.isMaster) {
     process.send({ type: 'WORKER_READY', pid: process.pid });
   }
 
+  // Store the original setInterval
+  const originalSetInterval = global.setInterval;
+
   // Create a wrapper function for setInterval
   global.clusterSafeInterval = function(callback, delay) {
     if (isFirstWorker) {
-      return setInterval(callback, delay);
+      return originalSetInterval(callback, delay);
     } else {
       // Return a dummy interval object for non-first workers
       return {
@@ -299,9 +302,8 @@ if (cluster.isMaster) {
     }
   };
 
-  global.setInterval = function(callback, delay) {
-     return clusterSafeInterval(callback, delay);
-  };
+  // Replace the global setInterval with our cluster-safe version
+  global.setInterval = global.clusterSafeInterval;
 
   // Load websites.
   const express = require("express");
@@ -322,7 +324,7 @@ if (cluster.isMaster) {
 
   // Load express addons.
   const session = require("express-session");
-  const SessionStore = require("./handlers/session");
+  const sessionStore = require("./handlers/sessionStore");
   const indexjs = require("./app.js");
 
   app.use((req, res, next) => {
@@ -351,6 +353,7 @@ if (cluster.isMaster) {
   
   app.use(
     session({
+      store: sessionStore,
       secret: settings.website.secret,
       resave: false,
       saveUninitialized: false,
