@@ -122,7 +122,10 @@
         "/server/power"
     ],
     "mustbeadmin": [
-        "/admin"
+        "/admin",
+        "/admin/coins",
+        "/admin/other",
+        "/admin/resources"
     ],
     "generateafktoken": [
         "/earn"
