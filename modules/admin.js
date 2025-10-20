@@ -62,7 +62,7 @@ module.exports.load = async function (app, db) {
     if (cacheaccountinfo.attributes.root_admin !== true)
       return four0four(req, res, theme);
 
-    let failredirect = theme.settings.redirect.failedsetcoins || "/";
+    let failredirect = "/admin?err=FAILEDSETCOINS";
 
     let id = req.query.id;
     let coins = req.query.coins;
@@ -87,7 +87,7 @@ module.exports.load = async function (app, db) {
       await db.set("coins-" + id, coins);
     }
 
-    let successredirect = theme.settings.redirect.setcoins || "/";
+    let successredirect = "/admin/coins?success=SETCOINS";
     log(
       `set coins`,
       `${req.session.userinfo.username} set the coins of the user with the ID \`${id}\` to \`${coins}\`.`
@@ -121,7 +121,7 @@ module.exports.load = async function (app, db) {
     if (cacheaccountinfo.attributes.root_admin !== true)
       return four0four(req, res, theme);
 
-    let failredirect = theme.settings.redirect.failedsetcoins || "/";
+    let failredirect = "/admin?err=FAILEDSETCOINS";
 
     let id = req.query.id;
 
@@ -159,7 +159,7 @@ module.exports.load = async function (app, db) {
     if (cacheaccountinfo.attributes.root_admin !== true)
       return four0four(req, res, theme);
 
-    let failredirect = theme.settings.redirect.failedsetcoins || "/";
+    let failredirect = "/admin?err=FAILEDADDCOINS";
 
     let id = req.query.id;
     let coins = req.query.coins;
@@ -186,7 +186,7 @@ module.exports.load = async function (app, db) {
       await db.set("coins-" + id, coins);
     }
 
-    let successredirect = theme.settings.redirect.setcoins || "/";
+    let successredirect = "/admin/coins?success=ADDCOINS";
     log(
       `add coins`,
       `${req.session.userinfo.username} added \`${req.query.coins}\` coins to the user with the ID \`${id}\`'s account.`
@@ -220,14 +220,14 @@ module.exports.load = async function (app, db) {
     if (cacheaccountinfo.attributes.root_admin !== true)
       return four0four(req, res, theme);
 
-    let failredirect = theme.settings.redirect.failedsetresources || "/";
+    let failredirect = "/admin/resources?err=FAILEDSETRESOURCES";
 
     if (!req.query.id) return res.redirect(`${failredirect}?err=MISSINGID`);
 
     if (!(await db.get("users-" + req.query.id)))
       return res.redirect(`${failredirect}?err=INVALIDID`);
 
-    let successredirect = theme.settings.redirect.setresources || "/";
+    let successredirect = "/admin/resources?success=SETRESOURCES";
 
     if (req.query.ram || req.query.disk || req.query.cpu || req.query.servers) {
       let ramstring = req.query.ram;
@@ -331,18 +331,14 @@ module.exports.load = async function (app, db) {
     if (cacheaccountinfo.attributes.root_admin !== true)
       return four0four(req, res, theme);
 
-    let failredirect = theme.settings.redirect.failedsetresources
-      ? theme.settings.redirect.failedsetresources
-      : "/";
+    let failredirect = "/admin/resources?err=FAILEDSETRESOURCES";
 
     if (!req.query.id) return res.redirect(`${failredirect}?err=MISSINGID`);
 
     if (!(await db.get("users-" + req.query.id)))
       return res.redirect(`${failredirect}?err=INVALIDID`);
 
-    let successredirect = theme.settings.redirect.setresources
-      ? theme.settings.redirect.setresources
-      : "/";
+    let successredirect = "/admin/resources?success=ADDRESOURCES";
 
     if (req.query.ram || req.query.disk || req.query.cpu || req.query.servers) {
       let ramstring = req.query.ram;
@@ -440,14 +436,14 @@ module.exports.load = async function (app, db) {
     if (cacheaccountinfo.attributes.root_admin !== true)
       return four0four(req, res, theme);
 
-    let failredirect = theme.settings.redirect.failedsetplan || "/";
+    let failredirect = "/admin?err=FAILEDSETPLAN";
 
     if (!req.query.id) return res.redirect(`${failredirect}?err=MISSINGID`);
 
     if (!(await db.get("users-" + req.query.id)))
       return res.redirect(`${failredirect}?err=INVALIDID`);
 
-    let successredirect = theme.settings.redirect.setplan || "/";
+    let successredirect = "/admin?success=SETPLAN";
 
     if (!req.query.package) {
       await db.delete("package-" + req.query.id);
@@ -504,8 +500,7 @@ module.exports.load = async function (app, db) {
 
     if (!code.match(/^[a-z0-9]+$/i))
       return res.redirect(
-        theme.settings.redirect.couponcreationfailed +
-          "?err=CREATECOUPONINVALIDCHARACTERS"
+        "/admin?err=CREATECOUPONINVALIDCHARACTERS"
       );
 
     let coins = req.query.coins || 0;
@@ -522,33 +517,28 @@ module.exports.load = async function (app, db) {
 
     if (coins < 0)
       return res.redirect(
-        theme.settings.redirect.couponcreationfailed +
-          "?err=CREATECOUPONLESSTHANONE"
+        "/admin?err=CREATECOUPONLESSTHANONE"
       );
     if (ram < 0)
       return res.redirect(
-        theme.settings.redirect.couponcreationfailed +
-          "?err=CREATECOUPONLESSTHANONE"
+        "/admin?err=CREATECOUPONLESSTHANONE"
       );
     if (disk < 0)
       return res.redirect(
-        theme.settings.redirect.couponcreationfailed +
-          "?err=CREATECOUPONLESSTHANONE"
+          "/admin?err=CREATECOUPONLESSTHANONE"
       );
     if (cpu < 0)
       return res.redirect(
-        theme.settings.redirect.couponcreationfailed +
-          "?err=CREATECOUPONLESSTHANONE"
+        "/admin?err=CREATECOUPONLESSTHANONE"
       );
     if (servers < 0)
       return res.redirect(
-        theme.settings.redirect.couponcreationfailed +
-          "?err=CREATECOUPONLESSTHANONE"
+          "/admin?err=CREATECOUPONLESSTHANONE"
       );
 
     if (!coins && !ram && !disk && !cpu && !servers)
       return res.redirect(
-        theme.settings.redirect.couponcreationfailed + "?err=CREATECOUPONEMPTY"
+        "/admin?err=CREATECOUPONEMPTY"
       );
 
     await db.set("coupon-" + code, {
@@ -564,7 +554,7 @@ module.exports.load = async function (app, db) {
       `${req.session.userinfo.username} created the coupon code \`${code}\` which gives:\`\`\`coins: ${coins}\nMemory: ${ram} MB\nDisk: ${disk} MB\nCPU: ${cpu}%\nServers: ${servers}\`\`\``
     );
     res.redirect(
-      theme.settings.redirect.couponcreationsuccess + "?code=" + code
+      "/admin?code=" + code
     );
   });
 
@@ -598,14 +588,12 @@ module.exports.load = async function (app, db) {
 
     if (!code.match(/^[a-z0-9]+$/i))
       return res.redirect(
-        theme.settings.redirect.couponrevokefailed +
-          "?err=REVOKECOUPONCANNOTFINDCODE"
+        "/admin?err=REVOKECOUPONCANNOTFINDCODE"
       );
 
     if (!(await db.get("coupon-" + code)))
       return res.redirect(
-        theme.settings.redirect.couponrevokefailed +
-          "?err=REVOKECOUPONCANNOTFINDCODE"
+        "/admin?err=REVOKECOUPONCANNOTFINDCODE"
       );
 
     await db.delete("coupon-" + code);
@@ -615,7 +603,7 @@ module.exports.load = async function (app, db) {
       `${req.session.userinfo.username} revoked the coupon code \`${code}\`.`
     );
     res.redirect(
-      theme.settings.redirect.couponrevokesuccess + "?revokedcode=true"
+      "/admin?revokedcode=true"
     );
   });
 
@@ -649,8 +637,7 @@ module.exports.load = async function (app, db) {
 
     if (!req.query.id)
       return res.redirect(
-        theme.settings.redirect.removeaccountfailed +
-          "?err=REMOVEACCOUNTMISSINGID"
+          "/admin?err=REMOVEACCOUNTMISSINGID"
       );
 
     let discordid = req.query.id;
@@ -697,7 +684,7 @@ module.exports.load = async function (app, db) {
       `${req.session.userinfo.username} removed the account with the ID \`${discordid}\`.`
     );
     res.redirect(
-      theme.settings.redirect.removeaccountsuccess + "?success=REMOVEACCOUNT"
+      "/admin?success=REMOVEACCOUNT"
     );
   });
 
@@ -727,8 +714,8 @@ module.exports.load = async function (app, db) {
     if (cacheaccountinfo.attributes.root_admin !== true)
       return four0four(req, res, theme);
 
-    let failredirect = theme.settings.redirect.failedgetip || "/";
-    let successredirect = theme.settings.redirect.getip || "/";
+    let failredirect = "/admin?err=FAILEDGETIP";
+    let successredirect = "/admin?success=GETIP";
     if (!req.query.id) return res.redirect(`${failredirect}?err=MISSINGID`);
 
     if (!(await db.get("users-" + req.query.id)))

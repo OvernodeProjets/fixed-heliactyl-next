@@ -79,7 +79,7 @@ module.exports.load = async function (app, db) {
     let theme = indexjs.get(req);
     req.session.destroy(() => {
       return res.redirect(
-        theme.settings.redirect.logout ? theme.settings.redirect.logout : "/"
+        "/"
       );
     });
   });
@@ -634,9 +634,7 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
 
         if (customredirect) return res.redirect(customredirect);
         return res.redirect(
-          theme.settings.redirect.callback
-            ? theme.settings.redirect.callback
-            : "/"
+          "/dashboard"
         );
       }
       res.send(

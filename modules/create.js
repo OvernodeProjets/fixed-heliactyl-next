@@ -128,8 +128,13 @@ app.get("/updateinfo", requireAuth, async (req, res) => {
 app.get("/create", requireAuth, async (req, res) => {
     let theme = indexjs.get(req);
 
-    if (settings.api.client.allow.server.create == true) {
-        let redirectlink = theme.settings.redirect.failedcreateserver ?? "/";
+    if (!settings.api.client.allow.server.create) {
+      res.redirect(
+        "/servers?err=disabled"
+      );
+      return;
+    }
+        let redirectlink = "/servers/new";
 
         const cacheaccount = await getPteroUser(req.session.userinfo.id, db).catch(() => {
             return res.send("An error has occurred while attempting to update your account information and server list.");
@@ -308,13 +313,6 @@ app.get("/create", requireAuth, async (req, res) => {
         } else {
             res.redirect(`${redirectlink}?err=MISSINGVARIABLE`);
         }
-    } else {
-        res.redirect(
-            theme.settings.redirect.createserverdisabled ?
-            theme.settings.redirect.createserverdisabled :
-            "/"
-        );
-    }
 });
 async function processQueue() {
   console.log('Processing queue...');
@@ -492,7 +490,13 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
     app.get("/modify", requireAuth, async (req, res) => {
         let theme = indexjs.get(req);
     
-        if (settings.api.client.allow.server.modify == true) {
+        if (!settings.api.client.allow.server.modify) {
+          res.redirect(
+            "/servers?err=disabled"
+          );
+          return;
+        }
+
           if (!req.query.id) return res.send("Missing server id.");
     
           const cacheaccount = await getPteroUser(
@@ -506,9 +510,7 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
           if (!cacheaccount) return;
           req.session.pterodactyl = cacheaccount.attributes;
     
-          let redirectlink = theme.settings.redirect.failedmodifyserver
-            ? theme.settings.redirect.failedmodifyserver
-            : "/"; // fail redirect link
+          let redirectlink = "/servers/edit";
     
           let checkexist =
             req.session.pterodactyl.relationships.servers.data.filter(
@@ -685,13 +687,6 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
           } else {
             res.redirect(`${redirectlink}?id=${req.query.id}&err=MISSINGVARIABLE`);
           }
-        } else {
-          res.redirect(
-            theme.settings.redirect.modifyserverdisabled
-              ? theme.settings.redirect.modifyserverdisabled
-              : "/"
-          );
-        }
       });
     
 app.get("/delete", requireAuth, async (req, res) => {
@@ -699,7 +694,12 @@ app.get("/delete", requireAuth, async (req, res) => {
 
   let theme = indexjs.get(req);
 
-  if (settings.api.client.allow.server.delete == true) {
+  if (!settings.api.client.allow.server.delete) {
+    res.redirect(
+      "/servers?err=disabled"
+    );
+    return;
+  }
     if (
       req.session.pterodactyl.relationships.servers.data.filter(
         (server) => server.attributes.id == req.query.id
@@ -752,12 +752,5 @@ app.get("/delete", requireAuth, async (req, res) => {
     adminjs.suspend(req.session.userinfo.id);
 
     return res.redirect("/dashboard?err=DELETED");
-  } else {
-    res.redirect(
-      theme.settings.redirect.deleteserverdisabled
-        ? theme.settings.redirect.deleteserverdisabled
-        : "/"
-    );
-  }
-});
+  });
 };

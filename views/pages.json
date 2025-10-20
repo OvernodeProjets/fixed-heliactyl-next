@@ -1,45 +1,6 @@
 {
     "index": "website.ejs",
     "notfound": "404.ejs",
-    "redirect": {
-        "callback": "/dashboard",
-        "failedcallback": "/",
-        "logout": "/",
-        "deleteserver": "/dashboard",
-        "updateservers": "/dashboard",
-        "createserver": "/dashboard",
-        "failedcreateserver": "/servers/new",
-        "modifyserver": "/change",
-        "failedmodifyserver": "/servers/edit",
-        "setplan": "/admin",
-        "failedsetplan": "/admin",
-        "getip": "/admin",
-        "failedgetip": "/admin",
-        "createserverdisabled": "/servers?err=disabled",
-        "modifyserverdisabled": "/servers?err=disabled",
-        "deleteserverdisabled": "/servers?err=disabled",
-        "setresources": "/admin",
-        "failedsetresources": "/admin",
-        "setcoins": "/admin",
-        "failedsetcoins": "/admin",
-        "purchaseram": "/store",
-        "failedpurchaseram": "/store",
-        "purchasedisk": "/store",
-        "failedpurchasedisk": "/store",
-        "purchasecpu": "/store",
-        "failedpurchasecpu": "/store",
-        "purchaseservers": "/store",
-        "failedpurchaseservers": "/store",
-        "arcioerror": "/earn",
-        "missingorinvalidcouponcode": "/redeem",
-        "successfullyredeemedcoupon": "/redeem",
-        "couponcreationfailed": "/admin",
-        "couponcreationsuccess": "/admin",
-        "couponrevokefailed": "/admin",
-        "couponrevokesuccess": "/admin",
-        "removeaccountfailed": "/admin",
-        "removeaccountsuccess": "/admin"
-    },
     "pages": {
         "dashboard": "dashboard.ejs",
         "auth": "auth.ejs",
@@ -126,8 +87,5 @@
         "/admin/coins",
         "/admin/other",
         "/admin/resources"
-    ],
-    "generateafktoken": [
-        "/earn"
     ]
 }

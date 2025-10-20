@@ -222,7 +222,7 @@ module.exports.load = async function (app, db) {
       const customredirect = req.session.redirect;
       delete req.session.redirect;
       if (customredirect) return res.redirect(customredirect);
-      return res.redirect(theme.settings.redirect.callback ? theme.settings.redirect.callback : "/");
+      return res.redirect("/dashboard");
     } catch (error) {
       console.error('Error during GitHub OAuth:', error);
       res.redirect('/auth');

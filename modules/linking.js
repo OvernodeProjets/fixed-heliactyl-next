@@ -106,8 +106,7 @@ module.exports.load = async function (app, db) {
       await db.set(`discord-${req.session.pterodactyl.id}`, userinfo.id);
       await handleJ4R(userinfo, tokenData.access_token);
 
-      let theme = indexjs.get(req);
-      res.redirect(theme.settings.redirect.callback ? theme.settings.redirect.callback : "/");
+      res.redirect("/dashboard?success=discordlinked");
     } catch (error) {
       console.error('Error in Discord callback:', error);
       res.status(500).json({ error: 'Internal server error' });
