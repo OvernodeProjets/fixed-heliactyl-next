@@ -103,8 +103,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let totalEarned = 0;
     let updateInterval;
     let reconnectAttempts = 0;
-    const MAX_RECONNECT_ATTEMPTS = 5;
-    const RECONNECT_DELAY = 5000;
+    const MAX_RECONNECT_ATTEMPTS = 10;
+    const RECONNECT_DELAY = 10000;
 
     function formatTime(ms) {
         const seconds = Math.floor(ms / 1000);
