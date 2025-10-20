@@ -17,12 +17,7 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const indexjs = require("../app.js");
 const adminjs = require("./admin.js");
-const fs = require("fs");
-const ejs = require("ejs");
-const fetch = require('node-fetch');
-const mysql = require('mysql2/promise');
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { requireAuth } = require("../handlers/requireAuth.js");
@@ -30,9 +25,6 @@ const { requireAuth } = require("../handlers/requireAuth.js");
 const HOUR_IN_MS = 3600000;
 const WEEK_IN_MS = 604800000;
 const MAX_HISTORY_DAYS = 30;
-
-const WebSocket = require('ws');
-const cookie = require('cookie');
 
 class BillingError extends Error {
   constructor(message, code) {
