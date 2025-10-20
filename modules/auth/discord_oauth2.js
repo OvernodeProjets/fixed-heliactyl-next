@@ -251,7 +251,10 @@ ip = (ip ? ip : "::1")
         ),
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
     });
-    if (json.ok == true) {
+    if (!json.ok) {
+      res.redirect(`/login`);
+      return;
+    }
       let codeinfo = JSON.parse(await json.text());
       let scopes = codeinfo.scope;
       let missingscopes = [];
@@ -504,7 +507,9 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
         }
 
         if (!(await db.get("users-" + userinfo.id))) {
-          if (settings.api.client.allow.newusers == true) {
+          if (!settings.api.client.allow.newusers) {
+            return res.send("New users cannot signup currently.");
+          }
             let genpassword = null;
             if (settings.api.client.passwordgenerator.signup == true)
               genpassword = makeid(
@@ -590,13 +595,10 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
             
             log(
               "signup",
-              `${userinfo.username}#${userinfo.discriminator} logged in to the dashboard for the first time!`
+              `${userinfo.username} logged in to the dashboard for the first time with discord!`
             );
-          } else {
-            return res.send("New users cannot signup currently.");
-          }
         }
-
+        // todo : use getpterouser 
         let cacheaccount = await fetch(
           settings.pterodactyl.domain +
             "/api/application/users/" +
@@ -615,10 +617,9 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
             "An error has occured while attempting to get your user information."
           );
         let cacheaccountinfo = JSON.parse(await cacheaccount.text());
-        req.session.pterodactyl = cacheaccountinfo.attributes;
 
+        req.session.pterodactyl = cacheaccountinfo.attributes;
         req.session.userinfo = userinfo;
-        let theme = indexjs.get(req);
 
         // Auth notification
         let notifications = await db.get('notifications-' + userinfo.id) || [];
@@ -640,9 +641,6 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
       res.send(
         "Not verified a Discord account. Please verify the email on your Discord account."
       );
-    } else {
-      res.redirect(`/login`);
-    }
   });
 };
 
