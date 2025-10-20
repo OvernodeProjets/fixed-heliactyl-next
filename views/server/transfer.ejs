@@ -284,12 +284,16 @@
                     `This will initiate a server transfer to Node ${selectedNodeId}. Your server will be unavailable during the transfer, and there is a risk of data loss. Are you sure you want to proceed?`,
                     () => {
                         setModalLoading(true);
-                        
-                        fetch(`/api/server/transfer?id=${serverId}&nodeId=${selectedNodeId}`, {
-                            method: 'GET',
+
+                        fetch(`/api/server/transfer`, {
+                            method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
+                            body: JSON.stringify({
+                                id: serverId,
+                                nodeId: selectedNodeId
+                            })
                         })
                         .then(response => {
                             setModalLoading(false);

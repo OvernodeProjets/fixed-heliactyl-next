@@ -20,19 +20,19 @@ module.exports.heliactylModule = heliactylModule;
 const axios = require("axios");
 const loadConfig = require("../../handlers/config");
 const settings = loadConfig("./config.toml");
+const { requireAuth } = require("../../handlers/requireAuth");
 
 module.exports.load = async function (app, db) {
-  // idk
-  const ADMIN_COOKIES = "pterodactyl_session=eyJpdiI6ImpZclJJa1hKeFNWbmxhRGhWbUMvcXc9PSIsInZhbHVlIjoib1huRWVheGpGdjhWZ3VSUmxHTE5xNTRuY0RPcm5UaHIvaG95aitHLy9kM3FpdlJ5ODUrU0lRdGlNd0l0WTVicWNPcXA2eXc4RHQ2eGFaQVlycDZXU1orTFFUdmtyd1huQ3Z0K1ZQWDZPdzQ2ZXdEU2dWUlEvU3Bpc3lvMWZneXMiLCJtYWMiOiJmZDJmZGFkODc3MjMzMmVkNjJkZTExYTQ0OWVmNDVkOWZmYmU4Yjc3ZDhmZWU4N2E3NTExOWIwMTY1NDA4M2MxIiwidGFnIjoiIn0%3D"
-  const CSRF_TOKEN = "";
+  // Admin authentication data
+  const COOKIE_VALUE = settings.pterodactyl.cookie_admin;
+  const token = settings.pterodactyl.transfer_token;
 
   async function apiRequest(endpoint, method = "GET", data = null, isAdmin = false) {
     try {
       const headers = isAdmin
         ? {
-            Cookie: ADMIN_COOKIES,
-            "X-CSRF-TOKEN": CSRF_TOKEN,
             "Content-Type": "application/x-www-form-urlencoded",
+            "Cookie": COOKIE_VALUE,
           }
         : {
             Authorization: `Bearer ${settings.pterodactyl.key}`,
@@ -68,7 +68,7 @@ module.exports.load = async function (app, db) {
   }
 
   async function transferServer(serverId, allocationId, targetNodeId) {
-    const payload = `node_id=${targetNodeId}&allocation_id=${allocationId}`;
+    const payload = `node_id=${targetNodeId}&allocation_id=${allocationId}&_token=${token}`;
     await apiRequest(
       `/admin/servers/view/${serverId}/manage/transfer`,
       "POST",
@@ -78,7 +78,7 @@ module.exports.load = async function (app, db) {
     console.log(`Transfer job added to queue for server ${serverId}`);
   }
 
-  app.get("/api/servers/capacity/:node", async (req, res) => {
+  app.get("/api/servers/capacity/:node", requireAuth, async (req, res) => {
     const { node } = req.params;
     try {
       const allocations = await getAvailableAllocations(node);
@@ -88,8 +88,8 @@ module.exports.load = async function (app, db) {
     }
   });
 
-  app.get("/api/server/transfer", async (req, res) => {
-    const { id, nodeId } = req.query;
+  app.post("/api/server/transfer", requireAuth, async (req, res) => {
+    const { id, nodeId } = req.body;
 
     if (!id || !nodeId) {
       return res.status(400).json({ error: "Missing required parameters: id or nodeId" });

@@ -29,6 +29,11 @@ database = "sqlite://heliactyl.db"
 domain = "https://panel.example.com"
 key = "ptla_aa000aaaaaaaaaaaaaaaaaaaaa00aaaaaaaaaaa0aa0a"
 client_key = "ptlc_aa000aaaaaaaaaaaaaaaaaaaaa00aaaaaaaaaaa0aa0a"
+# Your admin authentication data for server transfers system
+# It could be found by inspecting your browser cookies when logged into the Pterodactyl admin panel
+cookie_admin = "remember_web_59ba36addc2b2f9401580f014c7f58ea4e30989d=...; XSRF-TOKEN=...; pterodactyl_session=..."
+# It could be found by inspecting the network requests when transferring a server in the Pterodactyl admin panel
+transfer_token = "6hUjLqcapcMj........."
 
 [website]
 port = 3000
