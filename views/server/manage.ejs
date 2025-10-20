@@ -469,10 +469,26 @@ function fetchServerDetails() {
             document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
             nodeName = data.attributes.node;
             document.getElementById('node').textContent = nodeName;
-            //document.getElementById('cpu-limit-card').textContent = `${data.attributes.limits.cpu}%`;
-            document.getElementById('ram-limit-card').textContent = `${data.attributes.limits.memory/1024} GiB`;
-            document.getElementById('disk-limit-card').textContent = `${data.attributes.limits.disk/1024} GiB`;
-
+            const limitConfigs = {
+                cpu: {
+                    element: 'cpu-limit-card',
+                    format: (value) => `${value}%`
+                },
+                memory: {
+                    element: 'ram-limit-card',
+                    format: (value) => `${(value / 1024).toFixed(2)} GiB`
+                },
+                disk: {
+                    element: 'disk-limit-card',
+                    format: (value) => `${(value / 1024).toFixed(2)} GiB`
+                }
+            };
+            
+            Object.entries(limitConfigs).forEach(([key, config]) => {
+                const value = data.attributes.limits[key];
+                const text = value === 0 ? 'Unlimited' : config.format(value);
+                document.getElementById(config.element).textContent = text;
+            });
             const defaultAllocation = data.attributes.relationships.allocations.data.find(allocation => allocation.attributes.is_default);
             if (defaultAllocation) {
                 document.getElementById('ip').textContent = `${defaultAllocation.attributes.ip_alias}:${defaultAllocation.attributes.port}`;
