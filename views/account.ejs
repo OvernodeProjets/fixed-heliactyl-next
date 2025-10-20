@@ -51,10 +51,10 @@
             <!-- Current Credentials -->
             <div class="mb-8">
                 <div class="mb-4">
-                    <input value="<%= req.session.userinfo.email %>" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500" disabled>
+                    <input value="<%= req.session.userinfo.email %>" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border placeholder-gray-400 focus:ring-2" disabled>
                 </div>
                 <div class="mb-4 relative">
-                    <input id="current-password" value="<%= req.session.password ? req.session.password : 'No password available: passwords are only shown once.' %>" class="transition ease-in-out delay-100 shadow-sm block w-full placeholder-white/60 sm:text-sm rounded-lg bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500" disabled>
+                    <input id="current-password" value="<%= req.session.password ? req.session.password : 'No password available: passwords are only shown once.' %>" class="transition ease-in-out delay-100 shadow-sm block w-full placeholder-white/60 sm:text-sm rounded-lg bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border placeholder-gray-400 focus:ring-2" disabled>
                 </div>
             </div>
 
@@ -63,10 +63,10 @@
                 <h3 class="text-lg font-semibold mb-4">Set a new password</h3>
                 <form id="password-change-form" class="space-y-4">
                     <div>
-                        <input type="password" id="new-password" placeholder="New Password" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 placeholder-white/60 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500">
+                        <input type="password" id="new-password" placeholder="New Password" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 placeholder-white/60 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border placeholder-gray-400 focus:ring-2">
                     </div>
                     <div>
-                        <input type="password" id="confirm-password" placeholder="Confirm New Password" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg placeholder-white/60 bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500">
+                        <input type="password" id="confirm-password" placeholder="Confirm New Password" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg placeholder-white/60 bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border placeholder-gray-400 focus:ring-2">
                     </div>
                     <p class="text-sm text-white/70 text-left py-2.5">
                         Password must contain:
