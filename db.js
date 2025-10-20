@@ -162,6 +162,22 @@ class CustomDBHandler {
       });
     });
   }
+
+  async list(pattern) {
+    return this.executeQuery(() => new Promise((resolve, reject) => {
+      const sqlPattern = pattern.replace('*', '%').replace('?', '_');
+      const namespacePattern = `${this.namespace}:${sqlPattern}`;
+      
+      this.db.all('SELECT [key] FROM keyv WHERE [key] LIKE ?', [namespacePattern], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          const keys = rows.map(row => row.key.replace(`${this.namespace}:`, ''));
+          resolve(keys);
+        }
+      });
+    }));
+  }
 }
 
 module.exports = CustomDBHandler;

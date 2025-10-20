@@ -400,6 +400,13 @@ app.use(async (req, res, next) => {
     /* clear all afk sessions */
     if (isFirstWorker) {
       await db.set('afkSessions', {});
+      const keys = await db.list('afk_session-*');
+        for (const key of keys) {
+          await db.delete(key);
+        }
+      console.log(
+        chalk.white(chalk.gray('[cluster]') + " Cleared all AFK sessions on startup.")
+      );
     }
     console.log(
       chalk.white(chalk.gray("[cluster]") + " Cluster state updated: ") + chalk.green('running')
