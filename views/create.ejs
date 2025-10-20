@@ -79,7 +79,14 @@ Back to server list
                             Server Name
                         </label>
                         <div class="mt-1">
-                            <input type="text" name="name" id="name" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500" placeholder="my-awesome-server">
+                        <input 
+                            type="text" 
+                            name="name" 
+                            id="name" 
+                            class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg rounded-l-xl bg-white/5 text-white border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 placeholder-gray-400" 
+                            placeholder="my-awesome-server"
+                            required
+                        >
                         </div>
                     </div>
 
@@ -228,7 +235,7 @@ Back to server list
                             RAM (GB)
                         </label>
                         <div class="mt-1">
-                            <input type="number" name="ram" id="ram" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500" value="<%= ((packages ? packages.ram : 0)/1024 + extraresources.ram/1024 - ram/1024).toFixed(2) %>">
+                            <input type="number" name="ram" id="ram" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border border-white/10 placeholder-gray-400 focus:ring-2" value="<%= ((packages ? packages.ram : 0)/1024 + extraresources.ram/1024 - ram/1024).toFixed(2) %>">
                         </div>
                     </div>
 
@@ -237,7 +244,7 @@ Back to server list
                             CPU (%)
                         </label>
                         <div class="mt-1">
-                            <input type="number" name="cpu" id="cpu" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500" value="<%= (packages ? packages.cpu : 0) + extraresources.cpu - cpu %>">
+                            <input type="number" name="cpu" id="cpu" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border border-white/10 placeholder-gray-400 focus:ring-2" value="<%= (packages ? packages.cpu : 0) + extraresources.cpu - cpu %>">
                         </div>
                     </div>
 
@@ -246,7 +253,7 @@ Back to server list
                             Disk (GB)
                         </label>
                         <div class="mt-1">
-                            <input type="number" name="disk" id="disk" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500" value="<%= ((packages ? packages.disk : 0)/1024 + extraresources.disk/1024 - disk/1024).toFixed(2) %>">
+                            <input type="number" name="disk" id="disk" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border border-white/10 placeholder-gray-400 focus:ring-2" value="<%= ((packages ? packages.disk : 0)/1024 + extraresources.disk/1024 - disk/1024).toFixed(2) %>">
                         </div>
                     </div>
                 </div>
