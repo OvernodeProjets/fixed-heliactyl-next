@@ -1,334 +1,364 @@
-<%- include('../components/top') %>
-<main class="flex-grow container mx-auto px-4 py-8">
-    <div class="mb-5 lg:flex lg:items-center lg:justify-between">
-        <div class="min-w-0 flex-1">
-          <h2 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight" id="server-name"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg></h2>
-          <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-            <div class="mt-2 flex items-center text-sm text-gray-300">
-              <!-- Heroicon name: mini/briefcase -->
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
-                <path fill-rule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z" clip-rule="evenodd" />
-                <path fill-rule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Zm9.586 4.594a.75.75 0 0 0-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.116-.062l3-3.75Z" clip-rule="evenodd" />
-              </svg>                    
-              <span id="server-description"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <%- include('../components/top') %>
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="mb-5 lg:flex lg:items-center lg:justify-between">
+            <div class="min-w-0 flex-1">
+            <h2 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight" id="server-name"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg></span>
-            </div>
-            <div class="mt-2 flex items-center text-sm text-gray-300">
-              <!-- Heroicon name: mini/map-pin -->
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
-                <path d="M4.08 5.227A3 3 0 0 1 6.979 3H17.02a3 3 0 0 1 2.9 2.227l2.113 7.926A5.228 5.228 0 0 0 18.75 12H5.25a5.228 5.228 0 0 0-3.284 1.153L4.08 5.227Z" />
-                <path fill-rule="evenodd" d="M5.25 13.5a3.75 3.75 0 1 0 0 7.5h13.5a3.75 3.75 0 1 0 0-7.5H5.25Zm10.5 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm3.75-.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" clip-rule="evenodd" />
-              </svg>              
-              Server <%= req.query.id %>
-            </div>
-            <div class="mt-2 flex items-center text-sm text-gray-300">
-              <!-- Heroicon name: mini/currency-dollar -->
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
-                <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 0 0 .374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 0 0-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08Zm3.094 8.016a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
-              </svg>              
-              Volumetric Shield enabled
-            </div>
-            <div class="hidden mt-2 flex items-center text-sm text-gray-300">
-              <!-- Heroicon name: mini/calendar -->
-              <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clip-rule="evenodd" />
-              </svg>
-              <span id="server-name-breadcrumb"></span>
-            </div>
-          </div>
-        </div>
-        <div class="mt-5 flex lg:mt-0 lg:ml-4">
-          <span class="hidden sm:block">
-            <a href="/servers" class="inline-flex items-center rounded-xl border border-transparent bg-indigo-900/50 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-800">
-              <!-- Heroicon name: mini/pencil -->
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
-                <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
-              </svg>                
-              Back to server list
-            </a>
-          </span>
-        </div>
-      </div>      
-
-    <%- include('../components/server') %>
-
-    <!-- Warning Alert -->
-    <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-6 mt-8">
-        <div class="flex items-start">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-amber-500 mt-1">
-                <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
-            </svg>
-            <div class="ml-3">
-                <h3 class="text-lg font-semibold text-amber-500">Experimental Feature</h3>
-                <p class="mt-2 text-sm text-gray-300">Server transfer is an experimental feature. Please be aware of the following risks:</p>
-                <ul class="mt-2 text-sm text-gray-300 list-disc list-inside space-y-1">
-                    <li>Potential data loss during transfer</li>
-                    <li>Transfer may fail for large servers</li>
-                    <li>Process cannot be reversed once started</li>
-                    <li>Server will be unavailable during transfer</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <!-- Transfer Server Section -->
-    <div class="bg-white/5 rounded-xl p-6 mt-8">
-        <h2 class="text-xl font-semibold mb-4 text-white">Transfer Server to New Node</h2>
-        
-        <!-- Node Selection -->
-        <div class="space-y-6">
-            <!-- Categories -->
-            <div id="node-grid" class="grid gap-8">
-                <!-- Node categories will be inserted here dynamically -->
-            </div>
-        </div>
-
-        <!-- Transfer Button -->
-        <div class="mt-8 flex flex-col items-center justify-center space-y-4">
-            <p class="text-sm text-gray-400 text-center max-w-lg">
-                By proceeding with the transfer, you acknowledge the risks involved and understand that this process cannot be undone.
-            </p>
-            <button id="transfer-server" class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-full hover:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
-                Transfer Server
-            </button>
-        </div>
-    </div>
-</main>
-
-<!-- Update the modal content to include a spinner state -->
-<div id="confirmation-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-    <div class="bg-[#0e0e10] rounded-xl p-8 max-w-md w-full mx-4">
-        <div class="flex flex-col items-center text-center">
-            <!-- This is the warning icon that shows by default -->
-            <div id="modal-icon-warning">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12 text-amber-500">
-                    <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
-                </svg>
-            </div>
-            <!-- This is the loading spinner that shows during API call -->
-            <div id="modal-icon-loading" class="hidden">
-                <svg class="animate-spin w-12 h-12 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            </svg></h2>
+            <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+                <div class="mt-2 flex items-center text-sm text-gray-300">
+                <!-- Heroicon name: mini/briefcase -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                    <path fill-rule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z" clip-rule="evenodd" />
+                    <path fill-rule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Zm9.586 4.594a.75.75 0 0 0-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.116-.062l3-3.75Z" clip-rule="evenodd" />
+                </svg>                    
+                <span id="server-description"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg></span>
+                </div>
+                <div class="mt-2 flex items-center text-sm text-gray-300">
+                <!-- Heroicon name: mini/map-pin -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                    <path d="M4.08 5.227A3 3 0 0 1 6.979 3H17.02a3 3 0 0 1 2.9 2.227l2.113 7.926A5.228 5.228 0 0 0 18.75 12H5.25a5.228 5.228 0 0 0-3.284 1.153L4.08 5.227Z" />
+                    <path fill-rule="evenodd" d="M5.25 13.5a3.75 3.75 0 1 0 0 7.5h13.5a3.75 3.75 0 1 0 0-7.5H5.25Zm10.5 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm3.75-.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" clip-rule="evenodd" />
+                </svg>              
+                Server <%= req.query.id %>
+                </div>
+                <div class="mt-2 flex items-center text-sm text-gray-300">
+                <!-- Heroicon name: mini/currency-dollar -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500">
+                    <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 0 0 .374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 0 0-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08Zm3.094 8.016a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+                </svg>              
+                Volumetric Shield enabled
+                </div>
+                <div class="hidden mt-2 flex items-center text-sm text-gray-300">
+                <!-- Heroicon name: mini/calendar -->
+                <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clip-rule="evenodd" />
                 </svg>
+                <span id="server-name-breadcrumb"></span>
+                </div>
             </div>
-            <h3 class="text-xl font-semibold mt-4 text-white" id="modal-title"></h3>
-            <p class="text-gray-300 mt-2" id="modal-message"></p>
-            <div class="w-full border-t border-white/10 my-6"></div>
-            <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4 w-full">
-                <button id="modal-cancel" class="w-full sm:w-auto bg-white/10 hover:bg-white/15 text-white font-medium py-2 px-6 rounded-lg transition">
-                    Cancel
-                </button>
-                <button id="modal-confirm" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-black font-medium py-2 px-6 rounded-lg transition flex items-center justify-center min-w-[160px]">
-                    <span id="modal-confirm-text">I Understand, Continue</span>
+            </div>
+            <div class="mt-5 flex lg:mt-0 lg:ml-4">
+            <span class="hidden sm:block">
+                <a href="/servers" class="inline-flex items-center rounded-xl border border-transparent bg-indigo-900/50 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-800">
+                <!-- Heroicon name: mini/pencil -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
+                    <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                </svg>                
+                Back to server list
+                </a>
+            </span>
+            </div>
+        </div>      
+
+        <%- include('../components/server') %>
+
+        <!-- Warning Alert -->
+        <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-6 mt-8">
+            <div class="flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-amber-500 mt-1">
+                    <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
+                </svg>
+                <div class="ml-3">
+                    <h3 class="text-lg font-semibold text-amber-500">Experimental Feature</h3>
+                    <p class="mt-2 text-sm text-gray-300">Server transfer is an experimental feature. Please be aware of the following risks:</p>
+                    <ul class="mt-2 text-sm text-gray-300 list-disc list-inside space-y-1">
+                        <li>Potential data loss during transfer</li>
+                        <li>Transfer may fail for large servers</li>
+                        <li>Process cannot be reversed once started</li>
+                        <li>Server will be unavailable during transfer</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transfer Server Section -->
+        <div class="bg-white/5 rounded-xl p-6 mt-8">
+            <h2 class="text-xl font-semibold mb-4 text-white">Transfer Server to New Node</h2>
+            
+            <!-- Node Selection -->
+            <div class="space-y-6">
+                <!-- Categories -->
+                <div id="node-grid" class="grid gap-8">
+                    <!-- Node categories will be inserted here dynamically -->
+                </div>
+            </div>
+
+            <!-- Transfer Button -->
+            <div class="mt-8 flex flex-col items-center justify-center space-y-4">
+                <p class="text-sm text-gray-400 text-center max-w-lg">
+                    By proceeding with the transfer, you acknowledge the risks involved and understand that this process cannot be undone.
+                </p>
+                <button id="transfer-server" class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-full hover:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                    Transfer Server
                 </button>
             </div>
         </div>
+    </main>
+
+    <!-- Update the modal content to include a spinner state -->
+    <div id="confirmation-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-[#0e0e10] rounded-xl p-8 max-w-md w-full mx-4">
+            <div class="flex flex-col items-center text-center">
+                <!-- This is the warning icon that shows by default -->
+                <div id="modal-icon-warning">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12 text-amber-500">
+                        <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <!-- This is the loading spinner that shows during API call -->
+                <div id="modal-icon-loading" class="hidden">
+                    <svg class="animate-spin w-12 h-12 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mt-4 text-white" id="modal-title"></h3>
+                <p class="text-gray-300 mt-2" id="modal-message"></p>
+                <div class="w-full border-t border-white/10 my-6"></div>
+                <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4 w-full">
+                    <button id="modal-cancel" class="w-full sm:w-auto bg-white/10 hover:bg-white/15 text-white font-medium py-2 px-6 rounded-lg transition">
+                        Cancel
+                    </button>
+                    <button id="modal-confirm" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-black font-medium py-2 px-6 rounded-lg transition flex items-center justify-center min-w-[160px]">
+                        <span id="modal-confirm-text">I Understand, Continue</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-<script>
-    const serverId = new URLSearchParams(window.location.search).get('numeric');
-    let selectedNodeId = null;
+    <script>
+        const serverId = new URLSearchParams(window.location.search).get('numeric');
+        let selectedNodeId = null;
+        let serverNode = null;
 
-const nodeData = [
-    {
-        category: "United States",
-        nodes: [
-            { id: "2", name: "US-01", location: "New York" }
-        ]
-    },
-    {
-        category: "Germany",
-        nodes: [
-            { id: "4", name: "DE-1", location: "Frankfurt" }
-        ]
-    },
-    {
-        category: "United Kingdom",
-        nodes: [
-            { id: "3", name: "UK-01", location: "London" }
-        ]
-    }
-];
+    const locations = JSON.parse('<%- JSON.stringify(settings.api.client.locations) %>');
+    const nodeData = Object.values(locations).reduce((acc, location) => {
+        if (!location.enabled && location.enabled !== undefined) return acc;
 
-    function createNodeGrid() {
-        const grid = document.getElementById('node-grid');
-        
-        nodeData.forEach(category => {
-            const categorySection = document.createElement('div');
-            categorySection.className = 'space-y-4';
-            
-            // Category header
-            const categoryHeader = document.createElement('div');
-            categoryHeader.className = 'flex items-center space-x-2';
-            categoryHeader.innerHTML = `
-                <h3 class="text-lg font-semibold text-white">${category.category}</h3>
-                <div class="flex-grow border-t border-white/5"></div>
-            `;
-            categorySection.appendChild(categoryHeader);
-            
-            // Nodes grid
-            const nodesGrid = document.createElement('div');
-            nodesGrid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
-            
-            category.nodes.forEach(node => {
-                const nodeCard = document.createElement('div');
-                nodeCard.className = `p-4 rounded-lg ${node.disabled ? 'bg-white/5 opacity-50' : 'bg-white/5 hover:bg-white/10'} transition cursor-pointer border border-transparent`;
-                nodeCard.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <span class="font-medium text-white">${node.name}</span>
-                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs ${node.disabled ? 'bg-gray-700 text-gray-300' : 'bg-indigo-500/10 text-indigo-400'}">
-                            ${node.location}
-                        </span>
-                    </div>
-                `;
-                
-                if (!node.disabled) {
-                    nodeCard.addEventListener('click', () => selectNode(node.id, nodeCard));
-                }
-                
-                nodesGrid.appendChild(nodeCard);
-            });
-            
-            categorySection.appendChild(nodesGrid);
-            grid.appendChild(categorySection);
-        });
-    }
+        const existingCategory = acc.find(cat => cat.category === location.country);
+        const node = location.nodes[0];
 
-    function selectNode(nodeId, nodeElement) {
-        // Remove highlight from previously selected node
-        document.querySelectorAll('#node-grid .ring-2').forEach(el => {
-            el.classList.remove('ring-2', 'ring-indigo-500', 'border-transparent');
-        });
-        
-        // Highlight the selected node
-        nodeElement.classList.add('ring-2', 'ring-indigo-500', 'border-transparent');
-        selectedNodeId = nodeId;
-        
-        // Enable/disable transfer button
-        const transferButton = document.getElementById('transfer-server');
-        transferButton.disabled = !selectedNodeId;
-    }
-
-    function showConfirmationModal(title, message, onConfirm) {
-        const modal = document.getElementById('confirmation-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalMessage = document.getElementById('modal-message');
-        const confirmButton = document.getElementById('modal-confirm');
-        const cancelButton = document.getElementById('modal-cancel');
-
-        modalTitle.textContent = title;
-        modalMessage.textContent = message;
-        modal.classList.remove('hidden');
-
-        const closeModal = () => {
-            modal.classList.add('hidden');
-            confirmButton.onclick = null;
-            cancelButton.onclick = null;
+        const nodeInfo = {
+            id: node.id,
+            idName: node.name,
+            name: location.name,
+            location: location.region,
+            disabled: false
         };
-
-        confirmButton.onclick = () => {
-            onConfirm();
-            closeModal();
-        };
-
-        cancelButton.onclick = closeModal;
-        modal.onclick = (e) => {
-            if (e.target === modal) closeModal();
-        };
-    }
-
-    function setModalLoading(isLoading) {
-        const warningIcon = document.getElementById('modal-icon-warning');
-        const loadingIcon = document.getElementById('modal-icon-loading');
-        const confirmButton = document.getElementById('modal-confirm');
-        const cancelButton = document.getElementById('modal-cancel');
-        const confirmText = document.getElementById('modal-confirm-text');
         
-        if (isLoading) {
-            warningIcon.classList.add('hidden');
-            loadingIcon.classList.remove('hidden');
-            confirmButton.disabled = true;
-            cancelButton.disabled = true;
-            confirmButton.classList.add('opacity-50', 'cursor-not-allowed');
-            cancelButton.classList.add('opacity-50', 'cursor-not-allowed');
-            confirmText.textContent = 'Transferring...';
+        if (existingCategory) {
+            existingCategory.nodes.push(nodeInfo);
         } else {
-            warningIcon.classList.remove('hidden');
-            loadingIcon.classList.add('hidden');
-            confirmButton.disabled = false;
-            cancelButton.disabled = false;
-            confirmButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            cancelButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            confirmText.textContent = 'I Understand, Continue';
+            acc.push({
+                category: location.country,
+                nodes: [nodeInfo]
+            });
+        }
+        
+        return acc;
+    }, []);
+
+        function createNodeGrid() {
+            const grid = document.getElementById('node-grid');
+            
+            nodeData.forEach(category => {
+                const categorySection = document.createElement('div');
+                categorySection.className = 'space-y-4';
+                
+                // Category header
+                const categoryHeader = document.createElement('div');
+                categoryHeader.className = 'flex items-center space-x-2';
+                categoryHeader.innerHTML = `
+                    <h3 class="text-lg font-semibold text-white">${category.category}</h3>
+                    <div class="flex-grow border-t border-white/5"></div>
+                `;
+                categorySection.appendChild(categoryHeader);
+                
+                // Nodes grid
+                const nodesGrid = document.createElement('div');
+                nodesGrid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
+                
+                category.nodes.forEach(node => {
+                    const nodeCard = document.createElement('div');
+                    nodeCard.className = `p-4 rounded-lg ${node.disabled ? 'bg-white/5 opacity-50' : 'bg-white/5 hover:bg-white/10'} transition cursor-pointer border border-transparent`;
+                    nodeCard.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium text-white">${node.name}</span>
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs ${node.disabled ? 'bg-gray-700 text-gray-300' : 'bg-indigo-500/10 text-indigo-400'}">
+                                ${node.location}
+                            </span>
+                        </div>
+                    `;
+                    
+                    if (!node.disabled) {
+                        nodeCard.addEventListener('click', () => selectNode(node.id, nodeCard));
+                    }
+                    
+                    nodesGrid.appendChild(nodeCard);
+                });
+                
+                categorySection.appendChild(nodesGrid);
+                grid.appendChild(categorySection);
+            });
+        }
+
+        function selectNode(nodeId, nodeElement) {
+            // Remove highlight from previously selected node
+            document.querySelectorAll('#node-grid .ring-2').forEach(el => {
+                el.classList.remove('ring-2', 'ring-indigo-500', 'border-transparent');
+            });
+            
+            // Highlight the selected node
+            nodeElement.classList.add('ring-2', 'ring-indigo-500', 'border-transparent');
+            selectedNodeId = nodeId;
+            
+            // Enable/disable transfer button
+            const transferButton = document.getElementById('transfer-server');
+            transferButton.disabled = !selectedNodeId;
+        }
+
+        function showConfirmationModal(title, message, onConfirm) {
+            const modal = document.getElementById('confirmation-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalMessage = document.getElementById('modal-message');
+            const confirmButton = document.getElementById('modal-confirm');
+            const cancelButton = document.getElementById('modal-cancel');
+
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modal.classList.remove('hidden');
+
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                confirmButton.onclick = null;
+                cancelButton.onclick = null;
+            };
+
+            confirmButton.onclick = () => {
+                onConfirm();
+                closeModal();
+            };
+
+            cancelButton.onclick = closeModal;
+            modal.onclick = (e) => {
+                if (e.target === modal) closeModal();
+            };
+        }
+
+        function setModalLoading(isLoading) {
+            const warningIcon = document.getElementById('modal-icon-warning');
+            const loadingIcon = document.getElementById('modal-icon-loading');
+            const confirmButton = document.getElementById('modal-confirm');
+            const cancelButton = document.getElementById('modal-cancel');
+            const confirmText = document.getElementById('modal-confirm-text');
+            
+            if (isLoading) {
+                warningIcon.classList.add('hidden');
+                loadingIcon.classList.remove('hidden');
+                confirmButton.disabled = true;
+                cancelButton.disabled = true;
+                confirmButton.classList.add('opacity-50', 'cursor-not-allowed');
+                cancelButton.classList.add('opacity-50', 'cursor-not-allowed');
+                confirmText.textContent = 'Transferring...';
+            } else {
+                warningIcon.classList.remove('hidden');
+                loadingIcon.classList.add('hidden');
+                confirmButton.disabled = false;
+                cancelButton.disabled = false;
+                confirmButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                cancelButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                confirmText.textContent = 'I Understand, Continue';
+            }
+        }
+
+        document.getElementById('transfer-server').addEventListener('click', () => {
+            if (selectedNodeId) {
+                showConfirmationModal(
+                    'Confirm Server Transfer',
+                    `This will initiate a server transfer to Node ${selectedNodeId}. Your server will be unavailable during the transfer, and there is a risk of data loss. Are you sure you want to proceed?`,
+                    () => {
+                        setModalLoading(true);
+                        
+                        fetch(`/api/server/transfer?id=${serverId}&nodeId=${selectedNodeId}`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        })
+                        .then(response => {
+                            setModalLoading(false);
+                            if (response.ok) {
+                                showConfirmationModal(
+                                    'Transfer Initiated',
+                                    'Server transfer has been initiated. Please allow a few minutes for the transfer to complete. If it has not completed within 10 minutes, your server may be too large to transfer or the node may be experiencing issues.',
+                                    () => window.location.reload()
+                                );
+                            } else {
+                                return response.json().then(error => {
+                                    showConfirmationModal(
+                                        'Transfer Failed',
+                                        'Failed to transfer server: ' + JSON.stringify(error),
+                                        () => {}
+                                    );
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            setModalLoading(false);
+                            console.error('Error:', error);
+                            showConfirmationModal(
+                                'Error',
+                                'An unexpected error occurred while transferring the server.',
+                                () => {}
+                            );
+                        });
+                    }
+                );
+            }
+        });
+
+        // Initialize
+
+document.addEventListener('DOMContentLoaded', async () => {
+    async function availableCapacity(nodeId) {
+        try {
+            const response = await fetch(`/api/servers/capacity/${nodeId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            return data.availableAllocations || 0;
+        } catch (error) {
+            console.error(`Error fetching servers for node ${nodeId}:`, error);
+            return 0;
         }
     }
 
-    document.getElementById('transfer-server').addEventListener('click', () => {
-        if (selectedNodeId) {
-            showConfirmationModal(
-                'Confirm Server Transfer',
-                `This will initiate a server transfer to Node ${selectedNodeId}. Your server will be unavailable during the transfer, and there is a risk of data loss. Are you sure you want to proceed?`,
-                () => {
-                    setModalLoading(true);
-                    
-                    fetch(`/api/server/transfer?id=${serverId}&nodeId=${selectedNodeId}`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    })
-                    .then(response => {
-                        setModalLoading(false);
-                        if (response.ok) {
-                            showConfirmationModal(
-                                'Transfer Initiated',
-                                'Server transfer has been initiated. Please allow a few minutes for the transfer to complete. If it has not completed within 10 minutes, your server may be too large to transfer or the node may be experiencing issues.',
-                                () => window.location.reload()
-                            );
-                        } else {
-                            return response.json().then(error => {
-                                showConfirmationModal(
-                                    'Transfer Failed',
-                                    'Failed to transfer server: ' + JSON.stringify(error),
-                                    () => {}
-                                );
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        setModalLoading(false);
-                        console.error('Error:', error);
-                        showConfirmationModal(
-                            'Error',
-                            'An unexpected error occurred while transferring the server.',
-                            () => {}
-                        );
-                    });
-                }
-            );
+    const serverResponse = await fetch(`/api/server/<%= req.query.id %>`);
+    const serverData = await serverResponse.json();
+    document.getElementById('server-name').textContent = serverData.attributes.name;
+    document.getElementById('server-name-breadcrumb').textContent = serverData.attributes.name;
+    document.getElementById('server-description').textContent = serverData.attributes.description || "No description set.";
+    serverNode = serverData.attributes.node;
+
+    const nodePromises = nodeData.map(async category => {
+        for (const node of category.nodes) {
+            const capacity = await availableCapacity(node.id);
+            // Disable the node if no capacity or if it's the current server node
+            node.disabled = capacity <= 0 || node.idName === serverNode;
         }
     });
 
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
-        createNodeGrid();
-        document.getElementById('transfer-server').disabled = true;
-        
-        // Fetch server details
-        fetch(`/api/server/<%= req.query.id %>`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('server-name').textContent = data.attributes.name;
-                document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
-                document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
-            });
-    });
-</script>
-<%- include('../components/bottom') %>
+    await Promise.all(nodePromises);
+    createNodeGrid();
+    document.getElementById('transfer-server').disabled = true;
+});
+
+    </script>
+    <%- include('../components/bottom') %>

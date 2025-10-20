@@ -216,10 +216,17 @@ accountSwitcher = true
   country = "France"
   flag = "https://cdn-icons-png.flaticon.com/512/197/197560.png"
   region = "eu-west"
-  nodes = ["FR-1", "FR-2"]
   capacity = 100
   cpu = "Intel Xeon & AMD Ryzen"
   storage = "1 TB SSD"
+
+  [[api.client.locations.2.nodes]]
+  name = "fr.mrs.1"
+  id = 1
+
+  [[api.client.locations.2.nodes]]
+  name = "fr.mrs.2"
+  id = 2
 
 # --- Egg Templates ---
 [api.client.eggs.velocity]
