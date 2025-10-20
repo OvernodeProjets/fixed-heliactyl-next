@@ -18,6 +18,8 @@ const heliactylModule = {
 module.exports.heliactylModule = heliactylModule;
 
 const axios = require("axios");
+const loadConfig = require("../../handlers/config");
+const settings = loadConfig("./config.toml");
 
 module.exports.load = async function (app, db) {
   // idk
