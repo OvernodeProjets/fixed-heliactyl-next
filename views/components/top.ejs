@@ -660,8 +660,9 @@ serverSection.style.display = 'block';
                     });
                 </script>
 
-<script>
-window.addEventListener("DOMContentLoaded", () => {
+<script data-cfasync="false" type="text/javascript">
+(function() {
+  function initSnow() {
   // Create and inject the CSS
   const snowStyle = document.createElement('style');
   snowStyle.textContent = `
@@ -892,7 +893,14 @@ function getCookie(name) {
   
   window.addEventListener("resize", setResetFlag, false);
   toggleBtn.addEventListener("click", toggleSnow, false);
-}, false);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSnow);
+  } else {
+    initSnow();
+  }
+})();
 </script>
             
 <script>
