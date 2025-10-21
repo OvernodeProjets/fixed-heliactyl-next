@@ -182,7 +182,7 @@ module.exports.load = async function (app, db) {
         }
       }
 
-      const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
+      const PterodactylUser = await getPteroUser(userinfo.id, db);
       if (!PterodactylUser) {
           res.send("An error has occurred while attempting to update your account information and server list.");
           return;
