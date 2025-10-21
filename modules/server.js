@@ -18,7 +18,7 @@ const heliactylModule = {
 module.exports.heliactylModule = heliactylModule;
 
 const express = require("express");
-const PterodactylClientModule = require("../handlers/Client.js");
+const PterodactylClientModule = require("../handlers/ClientAPI.js");
 const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 const WebSocket = require("ws");
