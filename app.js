@@ -456,6 +456,7 @@ app.all("*", async (req, res) => {
     // Validate session
     if (req.session.pterodactyl && req.session.pterodactyl.id !==
         (await db.get("users-" + req.session.userinfo.id))) {
+        req.session.destroy();
         return res.redirect("/auth?prompt=none");
     }
 

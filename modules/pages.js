@@ -34,6 +34,7 @@ module.exports.load = async function (app, db) {
         req.session.pterodactyl.id !==
           (await db.get("users-" + req.session.userinfo.id))
       ) {
+        req.session.destroy();
         return res.redirect("/auth?prompt=none");
       }
 
