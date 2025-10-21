@@ -22,6 +22,7 @@ module.exports.heliactylModule = heliactylModule;
 const crypto = require('crypto');
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
+const getPteroUser = require("../../handlers/getPteroUser.js");
 
 if (settings.api.client.oauth2.link.slice(-1) == "/")
   settings.api.client.oauth2.link = settings.api.client.oauth2.link.slice(
@@ -592,27 +593,14 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
               `${userinfo.username} logged in to the dashboard for the first time with discord!`
             );
         }
-        // todo : use getpterouser 
-        let cacheaccount = await fetch(
-          settings.pterodactyl.domain +
-            "/api/application/users/" +
-            (await db.get("users-" + userinfo.id)) +
-            "?include=servers",
-          {
-            method: "get",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${settings.pterodactyl.key}`,
-            },
-          }
-        );
-        if ((await cacheaccount.statusText) == "Not Found")
-          return res.send(
-            "An error has occured while attempting to get your user information."
-          );
-        let cacheaccountinfo = JSON.parse(await cacheaccount.text());
 
-        req.session.pterodactyl = cacheaccountinfo.attributes;
+        const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
+        if (!PterodactylUser) {
+            res.send("An error has occurred while attempting to update your account information and server list.");
+            return;
+        }
+        console.log(JSON.stringify(PterodactylUser));
+        req.session.pterodactyl = PterodactylUser.attributes;
         req.session.userinfo = userinfo;
 
         // Auth notification

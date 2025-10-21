@@ -38,9 +38,10 @@ module.exports.load = async function(app, db) {
   
 app.get("/updateinfo", requireAuth, async (req, res) => {
     try {
-        const cacheaccount = await getPteroUser(req.session.userinfo.id, db);
-        if (!cacheaccount) {
-            return res.send("An error has occurred while attempting to update your account information and server list.");
+        const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
+        if (!PterodactylUser) {
+            res.send("An error has occurred while attempting to update your account information and server list.");
+            return;
         }
 
         // Get user's package and extra resources
@@ -62,7 +63,7 @@ app.get("/updateinfo", requireAuth, async (req, res) => {
         let totalUsedRam = 0;
         let totalUsedDisk = 0;
         let totalUsedCpu = 0;
-        const servers = cacheaccount.attributes.relationships.servers.data;
+        const servers = PterodactylUser.attributes.relationships.servers.data;
 
         for (const server of servers) {
             totalUsedRam += server.attributes.limits.memory;
@@ -105,13 +106,15 @@ app.get("/updateinfo", requireAuth, async (req, res) => {
                 );
             }
 
-            // Refresh user's session with updated server information
-            const updatedAccount = await getPteroUser(req.session.userinfo.id, db);
-            if (updatedAccount) {
-                req.session.pterodactyl = updatedAccount.attributes;
+            const PterodactylUserRefresh = await getPteroUser(req.session.userinfo.id, db);
+            if (!PterodactylUserRefresh) {
+                res.send("An error has occurred while attempting to update your account information and server list.");
+                return;
+            } else {
+                req.session.pterodactyl = PterodactylUserRefresh.attributes;
             }
         } else {
-            req.session.pterodactyl = cacheaccount.attributes;
+            req.session.pterodactyl = PterodactylUser.attributes;
         }
 
         if (req.query.redirect && typeof req.query.redirect === "string") {
@@ -126,29 +129,24 @@ app.get("/updateinfo", requireAuth, async (req, res) => {
 });
 
 app.get("/create", requireAuth, async (req, res) => {
-    let theme = indexjs.get(req);
-
     if (!settings.api.client.allow.server.create) {
-      res.redirect(
-        "/servers?err=disabled"
-      );
+      res.redirect("/servers?err=disabled");
       return;
     }
-        let redirectlink = "/servers/new";
 
-        const cacheaccount = await getPteroUser(req.session.userinfo.id, db).catch(() => {
-            return res.send("An error has occurred while attempting to update your account information and server list.");
-        });
-        if (!cacheaccount) {
-            return res.send("Heliactyl failed to find an account on the configured panel, try relogging");
+        const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
+        if (!PterodactylUser) {
+            res.send("Heliactyl failed to find an account on the configured panel, try relogging");
+            return;
         }
-        req.session.pterodactyl = cacheaccount.attributes;
+        
+        req.session.pterodactyl = PterodactylUser.attributes;
 
         if (req.query.name && req.query.ram && req.query.disk && req.query.cpu && req.query.egg && req.query.location) {
             try {
                 decodeURIComponent(req.query.name);
             } catch (err) {
-                return res.redirect(`${redirectlink}?err=COULDNOTDECODENAME`);
+                return res.redirect(`/servers/new?err=COULDNOTDECODENAME`);
             }
 
             let packagename = await db.get("package-" + req.session.userinfo.id);
@@ -173,21 +171,21 @@ app.get("/create", requireAuth, async (req, res) => {
             }
 
             if (servers2 >= package.servers + extra.servers) {
-                return res.redirect(`${redirectlink}?err=TOOMUCHSERVERS`);
+                return res.redirect(`/servers/new?err=TOOMUCHSERVERS`);
             }
 
             let name = decodeURIComponent(req.query.name);
             if (name.length < 1) {
-                return res.redirect(`${redirectlink}?err=LITTLESERVERNAME`);
+                return res.redirect(`/servers/new?err=LITTLESERVERNAME`);
             }
             if (name.length > 191) {
-                return res.redirect(`${redirectlink}?err=BIGSERVERNAME`);
+                return res.redirect(`/servers/new?err=BIGSERVERNAME`);
             }
 
             let location = req.query.location;
 
             if (Object.entries(settings.api.client.locations).filter((vname) => vname[0] == location).length !== 1) {
-                return res.redirect(`${redirectlink}?err=INVALIDLOCATION`);
+                return res.redirect(`/servers/new?err=INVALIDLOCATION`);
             }
 
             let requiredpackage = Object.entries(settings.api.client.locations).filter((vname) => vname[0] == location)[0][1].package;
@@ -199,7 +197,7 @@ app.get("/create", requireAuth, async (req, res) => {
             let egg = req.query.egg;
             let egginfo = settings.api.client.eggs[egg];
             if (!egginfo) {
-                return res.redirect(`${redirectlink}?err=INVALIDEGG`);
+                return res.redirect(`/servers/new?err=INVALIDEGG`);
             }
 
             let ram = parseFloat(req.query.ram);
@@ -207,38 +205,38 @@ app.get("/create", requireAuth, async (req, res) => {
             let cpu = parseFloat(req.query.cpu);
             if (!isNaN(ram) && !isNaN(disk) && !isNaN(cpu)) {
                 if (ram2 + ram > package.ram + extra.ram) {
-                    return res.redirect(`${redirectlink}?err=EXCEEDRAM&num=${package.ram + extra.ram - ram2}`);
+                    return res.redirect(`/servers/new?err=EXCEEDRAM&num=${package.ram + extra.ram - ram2}`);
                 }
                 if (disk2 + disk > package.disk + extra.disk) {
-                    return res.redirect(`${redirectlink}?err=EXCEEDDISK&num=${package.disk + extra.disk - disk2}`);
+                    return res.redirect(`/servers/new?err=EXCEEDDISK&num=${package.disk + extra.disk - disk2}`);
                 }
                 if (cpu2 + cpu > package.cpu + extra.cpu) {
-                    return res.redirect(`${redirectlink}?err=EXCEEDCPU&num=${package.cpu + extra.cpu - cpu2}`);
+                    return res.redirect(`/servers/new?err=EXCEEDCPU&num=${package.cpu + extra.cpu - cpu2}`);
                 }
                 if (egginfo.minimum.ram)
                     if (ram < egginfo.minimum.ram) {
-                        return res.redirect(`${redirectlink}?err=TOOLITTLERAM&num=${egginfo.minimum.ram}`);
+                        return res.redirect(`/servers/new?err=TOOLITTLERAM&num=${egginfo.minimum.ram}`);
                     }
                 if (egginfo.minimum.disk)
                     if (disk < egginfo.minimum.disk) {
-                        return res.redirect(`${redirectlink}?err=TOOLITTLEDISK&num=${egginfo.minimum.disk}`);
+                        return res.redirect(`/servers/new?err=TOOLITTLEDISK&num=${egginfo.minimum.disk}`);
                     }
                 if (egginfo.minimum.cpu)
                     if (cpu < egginfo.minimum.cpu) {
-                        return res.redirect(`${redirectlink}?err=TOOLITTLECPU&num=${egginfo.minimum.cpu}`);
+                        return res.redirect(`/servers/new?err=TOOLITTLECPU&num=${egginfo.minimum.cpu}`);
                     }
                 if (egginfo.maximum) {
                     if (egginfo.maximum.ram)
                         if (ram > egginfo.maximum.ram) {
-                            return res.redirect(`${redirectlink}?err=TOOMUCHRAM&num=${egginfo.maximum.ram}`);
+                            return res.redirect(`/servers/new?err=TOOMUCHRAM&num=${egginfo.maximum.ram}`);
                         }
                     if (egginfo.maximum.disk)
                         if (disk > egginfo.maximum.disk) {
-                            return res.redirect(`${redirectlink}?err=TOOMUCHDISK&num=${egginfo.maximum.disk}`);
+                            return res.redirect(`/servers/new?err=TOOMUCHDISK&num=${egginfo.maximum.disk}`);
                         }
                     if (egginfo.maximum.cpu)
                         if (cpu > egginfo.maximum.cpu) {
-                            return res.redirect(`${redirectlink}?err=TOOMUCHCPU&num=${egginfo.maximum.cpu}`);
+                            return res.redirect(`/servers/new?err=TOOMUCHCPU&num=${egginfo.maximum.cpu}`);
                         }
                 }
                 const specs = egginfo.info;
@@ -308,10 +306,10 @@ app.get("/create", requireAuth, async (req, res) => {
                 console.log(`user ${req.session.userinfo.username} created a server called ${name}`)
                 return res.redirect("/dashboard?err=CREATED");
             } else {
-                res.redirect(`${redirectlink}?err=NOTANUMBER`);
+                res.redirect(`/servers/new?err=NOTANUMBER`);
             }
         } else {
-            res.redirect(`${redirectlink}?err=MISSINGVARIABLE`);
+            res.redirect(`/servers/new?err=MISSINGVARIABLE`);
         }
 });
 async function processQueue() {
@@ -499,16 +497,13 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
 
           if (!req.query.id) return res.send("Missing server id.");
     
-          const cacheaccount = await getPteroUser(
-            req.session.userinfo.id,
-            db
-          ).catch(() => {
-            return res.send(
-              "An error has occured while attempting to update your account information and server list."
-            );
-          });
-          if (!cacheaccount) return;
-          req.session.pterodactyl = cacheaccount.attributes;
+          const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
+          if (!PterodactylUser) {
+              res.send("An error has occurred while attempting to update your account information and server list.");
+              return;
+          }
+          
+          req.session.pterodactyl = PterodactylUser.attributes;
     
           let redirectlink = "/servers/edit";
     
