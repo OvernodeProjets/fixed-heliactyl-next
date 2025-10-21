@@ -27,7 +27,7 @@ const fetch = require("node-fetch");
 const NodeCache = require("node-cache");
 const Queue = require("../handlers/Queue.js");
 const log = require("../handlers/log");
-const arciotext = require("../handlers/afk");
+const getPteroUser = require('../handlers/getPteroUser.js');
 const { requireAuth } = require("../handlers/requireAuth.js");
 
 const myCache = new NodeCache({ deleteOnExpire: true, stdTTL: 59 });
@@ -207,11 +207,12 @@ app.get("/giftcoins", async (req, res) => {
   app.get("api/v3/userinfo", async (req, res) => {
     /* Check that the API key is valid */
     let authentication = await check(req, res);
-    if (!authentication ) return;
+    if (!authentication) return;
+    const { id } = req.query;
 
-    if (!req.query.id) return res.send({ status: "missing id" });
+    if (!id) return res.send({ status: "missing id" });
 
-    if (!(await db.get("users-" + req.query.id)))
+    if (!(await db.get("users-" + id)))
       return res.send({ status: "invalid id" });
 
     if (settings.api.client.oauth2.link.slice(-1) == "/")
@@ -228,7 +229,7 @@ app.get("/giftcoins", async (req, res) => {
         -1
       );
 
-    let packagename = await db.get("package-" + req.query.id);
+    let packagename = await db.get("package-" + id);
     let package =
       settings.api.client.packages.list[
         packagename ? packagename : settings.api.client.packages.default
@@ -242,29 +243,11 @@ app.get("/giftcoins", async (req, res) => {
       };
     package["name"] = packagename;
 
-    let pterodactylid = await db.get("users-" + req.query.id);
-    let userinforeq = await fetch(
-      settings.pterodactyl.domain +
-        "/api/application/users/" +
-        pterodactylid +
-        "?include=servers",
-      {
-        method: "get",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${settings.pterodactyl.key}`,
-        },
-      }
-    );
-    if ((await userinforeq.statusText) == "Not Found") {
-      console.log(
-        "App ― An error has occured while attempting to get a user's information"
-      );
-      console.log("- Discord ID: " + req.query.id);
-      console.log("- Pterodactyl Panel ID: " + pterodactylid);
-      return res.send({ status: "could not find user on panel" });
+    const PterodactylUser = await getPteroUser(id, db);
+    if (!PterodactylUser) {
+        res.send("An error has occurred while attempting to update your account information and server list.");
+        return;
     }
-    let userinfo = await userinforeq.json();
 
     res.send({
       status: "success",
@@ -277,11 +260,11 @@ app.get("/giftcoins", async (req, res) => {
             cpu: 0,
             servers: 0,
           },
-      userinfo: userinfo,
+      userinfo: PterodactylUser,
       coins:
         settings.api.client.coins.enabled == true
-          ? (await db.get("coins-" + req.query.id))
-            ? await db.get("coins-" + req.query.id)
+          ? (await db.get("coins-" + id))
+            ? await db.get("coins-" + id)
             : 0
           : null,
     });

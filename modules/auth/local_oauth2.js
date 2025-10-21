@@ -21,6 +21,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const axios = require('axios');
 const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
+const getPteroUser = require('../../handlers/getPteroUser.js');
 // todo : replace with an local
 const { v4: uuidv4 } = require('uuid');
 const loadConfig = require("../../handlers/config.js");
@@ -234,24 +235,13 @@ module.exports.load = async function (app, db) {
       global_name: user.username
     };
 
-    // Fetch Pterodactyl user info
-    let cacheaccount = await fetch(
-      settings.pterodactyl.domain + "/api/application/users/" + (await db.get("users-" + user.id)) + "?include=servers",
-      {
-        method: "get",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${settings.pterodactyl.key}`,
-        },
-      }
-    );
-
-    if ((await cacheaccount.statusText) == "Not Found") {
-      return res.status(500).json({ error: "Failed to fetch user information" });
+    const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
+    if (!PterodactylUser) {
+        res.send("An error has occurred while attempting to update your account information and server list.");
+        return;
     }
 
-    let cacheaccountinfo = JSON.parse(await cacheaccount.text());
-    req.session.pterodactyl = cacheaccountinfo.attributes;
+    req.session.pterodactyl = PterodactylUser.attributes;
 
     // Auth notification
     let notifications = await db.get('notifications-' + user.id) || [];

@@ -599,7 +599,7 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
             res.send("An error has occurred while attempting to update your account information and server list.");
             return;
         }
-        console.log(JSON.stringify(PterodactylUser));
+        
         req.session.pterodactyl = PterodactylUser.attributes;
         req.session.userinfo = userinfo;
 

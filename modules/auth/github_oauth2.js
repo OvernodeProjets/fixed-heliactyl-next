@@ -20,6 +20,7 @@ module.exports.heliactylModule = heliactylModule;
 const crypto = require('crypto');
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
+const getPteroUser = require('../../handlers/getPteroUser.js');
 
 const fetch = require("node-fetch");
 const indexjs = require("../../app.js");
@@ -181,22 +182,13 @@ module.exports.load = async function (app, db) {
         }
       }
 
-      let cacheaccount = await fetch(
-        settings.pterodactyl.domain + "/api/application/users/" + (await db.get("users-" + userinfo.id)) + "?include=servers",
-        {
-          method: "get",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${settings.pterodactyl.key}`,
-          },
-        }
-      );
+      const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
+      if (!PterodactylUser) {
+          res.send("An error has occurred while attempting to update your account information and server list.");
+          return;
+      }
 
-      if ((await cacheaccount.statusText) == "Not Found")
-        return res.send("An error has occurred while attempting to get your user information.");
-
-      let cacheaccountinfo = JSON.parse(await cacheaccount.text());
-      req.session.pterodactyl = cacheaccountinfo.attributes;
+      req.session.pterodactyl = PterodactylUser.attributes;
 
       req.session.userinfo = {
         ...userinfo,
