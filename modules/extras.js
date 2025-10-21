@@ -37,7 +37,9 @@ module.exports.load = async function(app, db) {
   app.get("/api/password/regen", requireAuth, async (req, res) => {
     if (!settings.api.client.allow.regen) return res.status(403).json({ error: "Password changes are not allowed" });
 
-    const newPassword = makeid(settings.api.client.passwordgenerator["length"]);
+    const newPassword = settings.api.client.passwordgenerator.signup
+      ? makeid(settings.api.client.passwordgenerator["length"])
+      : makeid(16);
     req.session.password = newPassword;
 
     try {
