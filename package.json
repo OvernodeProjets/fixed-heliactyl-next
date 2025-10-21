@@ -22,7 +22,6 @@
     "express-ws": "^4.0.0",
     "form-data": "^4.0.4",
     "googleapis": "^144.0.0",
-    "javascript-obfuscator": "^4.0.2",
     "jsonwebtoken": "^9.0.2",
     "nocache": "^4.0.0",
     "node-cache": "^5.1.2",
@@ -46,7 +45,6 @@
       "@tailwindcss/oxide",
       "bcrypt",
       "cpu-features",
-      "javascript-obfuscator",
       "sqlite3",
       "ssh2"
     ]

@@ -12,7 +12,6 @@ require("./handlers/console.js")();
 // Load packages.
 const fs = require("fs");
 const chalk = require("chalk");
-const arciotext = require("./handlers/afk.js");
 const cluster = require("cluster");
 const chokidar = require('chokidar');
 
@@ -48,7 +47,6 @@ const defaultthemesettings = {
  * @returns {Promise<Object>} The rendered data.
  */
 async function renderData(req, theme) {
-  const JavaScriptObfuscator = require('javascript-obfuscator');
   let userinfo = req.session.userinfo;
   let userId = userinfo ? userinfo.id : null;
   let packageId = userId ? await db.get("package-" + userId) || settings.api.client.packages.default : null;
@@ -69,14 +67,6 @@ async function renderData(req, theme) {
     extra: theme.settings.variables,
     db
   };
-
-  renderdata.arcioafktext = JavaScriptObfuscator.obfuscate(`
-    let everywhat = ${settings.api.afk.every};
-    let gaincoins = ${settings.api.afk.coins};
-    let wspath = "ws";
-
-    ${arciotext}
-  `).getObfuscatedCode();
 
   return renderdata;
 }

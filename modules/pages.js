@@ -23,7 +23,6 @@ const express = require("express");
 const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 const fetch = require("node-fetch");
-const arciotext = require("../handlers/afk.js");
 const path = require("path");
 
 module.exports.load = async function (app, db) {

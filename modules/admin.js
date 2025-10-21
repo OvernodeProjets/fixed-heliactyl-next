@@ -32,7 +32,6 @@ const indexjs = require("../app.js");
 const adminjs = require("./admin.js");
 const ejs = require("ejs");
 const log = require("../handlers/log.js");
-const arciotext = require('../handlers/afk.js')
 
 
 module.exports.load = async function (app, db) {
