@@ -104,9 +104,9 @@ module.exports.load = async function (app, db) {
 
       if (!(await db.get("users-" + userinfo.id))) {
         if (settings.api.client.allow.newusers == true) {
-          let genpassword = null;
-          if (settings.api.client.passwordgenerator.signup == true)
-            genpassword = makeid(settings.api.client.passwordgenerator["length"]);
+        const genpassword = settings.api.client.passwordgenerator.signup
+          ? makeid(settings.api.client.passwordgenerator["length"])
+          : makeid(16);
           
           let accountjson = await fetch(
             settings.pterodactyl.domain + "/api/application/users",

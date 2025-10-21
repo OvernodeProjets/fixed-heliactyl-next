@@ -19,6 +19,8 @@ module.exports.heliactylModule = heliactylModule;
 
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
+const axios = require('axios');
+const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
 // todo : replace with an local
 const { v4: uuidv4 } = require('uuid');
 const loadConfig = require("../../handlers/config.js");
@@ -35,6 +37,8 @@ const RESEND_API_KEY = 're_GqVR7va3_8z8QuYyECBEDYKYdvrf9iqbb';
 
 
 module.exports.load = async function (app, db) {
+  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.client_key);
+
   const verifyCaptcha = async (recaptchaResponse) => {
     if (!settings.security.enableCaptcha) return true;
     if (!recaptchaResponse) return false;
@@ -147,62 +151,61 @@ module.exports.load = async function (app, db) {
     await db.set(`username-${username}`, userId);
 
     // Create Pterodactyl account
-    let genpassword = makeid(settings.api.client.passwordgenerator.length);
-    let accountData = await fetch(
-      settings.pterodactyl.domain + "/api/application/users",
-      {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${settings.pterodactyl.key}`,
-        },
-        body: JSON.stringify({
-          username: username,
-          email: email,
-          first_name: username,
-          last_name: " on Heliactyl",
-          password: genpassword,
-        }),
-      }
-    );
-
-    if ((await accountData.status) == 201) {
-      const userData = JSON.parse(await accountData.text());
-      const userDataID = userData.attributes.id;
-      const user = (await db.get("users")) || [];
-      user.push(userDataID);
-      await db.set("users", user);
-      await db.set(`users-${userId}`, userDataID);
-    } else {
-      //return res.status(500).json({ error: "Failed to create Pterodactyl account" });
-      const accountListResponse = await fetch(`${settings.pterodactyl.domain}/api/application/users?include=servers&filter[email]=${encodeURIComponent(email)}`, {
-          method: "GET",
-          headers: {
-            'Content-Type': 'application/json',
-            "Authorization": `Bearer ${settings.pterodactyl.key}`
-          }
+    try {
+      const createAccount = await AppAPI.createUser({
+        username,
+        email,
+        first_name: username,
+        last_name: "on Heliactyl",
+        password: password
       });
-      if (!accountListResponse.ok) return res.send("An error has occurred when attempting to create your account.");
-
-      const accountList = await accountListResponse.json();
-      const user = accountList.data.find(acc => acc.attributes.email === email);
-
-      if (user) {
-          let userDB = await db.get("users") || [];
-          let userDataID = accountList.data.find(acc => acc.attributes.email === email).attributes.id;
+    
+      const userDataID = createAccount.attributes.id;
+    
+      const userList = (await db.get("users")) || [];
+      userList.push(userDataID);
+    
+      await db.set("users", userList);
+      await db.set(`users-${userId}`, userDataID);
+    
+    } catch (error) {
+      try {
+        const accountListResponse = await axios.get(
+          `${settings.pterodactyl.domain}/api/application/users?include=servers&filter[email]=${encodeURIComponent(email)}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${settings.pterodactyl.key}`
+            }
+          }
+        );
+      
+        const accountList = accountListResponse.data;
+        const user = accountList.data.find(acc => acc.attributes.email === email);
+      
+        if (user) {
+          const userDB = (await db.get("users")) || [];
+          const userDataID = user.attributes.id;
+        
           if (!userDB.includes(userDataID)) {
             userDB.push(userDataID);
-            await db.set("users", userDataID);
+            await db.set("users", userDB);
             await db.set(`users-${userId}`, userDataID);
           } else {
             return res.send("We have detected an account with your Discord email on it but the user id has already been claimed on another Discord account.");
           }
         } else {
-          return res.send("An error has occurred when attempting to create your account.");
+          return res.send("An error occurred while attempting to create the account.");
         }
+
+      } catch (fetchError) {
+        console.error("Error fetching existing account:", fetchError.response?.data || fetchError.message);
+        return res.send("An error occurred while attempting to create the account.");
+      }
     }
 
     res.status(201).json({ message: "User registered successfully" });
+    return;
   });
 
   // Login route
@@ -455,13 +458,3 @@ module.exports.load = async function (app, db) {
     res.redirect('/dashboard'); // Redirect to dashboard after successful login
   });
 };
-
-function makeid(length) {
-  let result = "";
-  let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let charactersLength = characters.length;
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}

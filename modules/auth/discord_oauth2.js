@@ -214,13 +214,13 @@ module.exports.load = async function (app, db) {
     delete req.session.redirect;
     if (!req.query.code) return res.send("Missing code.");
 
-let ip;
-
-ip = req.headers["cf-connecting-ip"] || req.connection.remoteAddress;
-
-ip = (ip ? ip : "::1")
-  .replace(/::1/g, "::ffff:127.0.0.1") // Replace IPv6 loopback address with IPv4 loopback
-  .replace(/^.*:/, ""); // Strip out any leading characters before the IP address
+    let ip;
+      
+    ip = req.headers["cf-connecting-ip"] || req.connection.remoteAddress;
+      
+    ip = (ip ? ip : "::1")
+      .replace(/::1/g, "::ffff:127.0.0.1") // Replace IPv6 loopback address with IPv4 loopback
+      .replace(/^.*:/, ""); // Strip out any leading characters before the IP address
 
     if (
       settings.antivpn.status &&
@@ -506,11 +506,9 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
           if (!settings.api.client.allow.newusers) {
             return res.send("New users cannot signup currently.");
           }
-            let genpassword = null;
-            if (settings.api.client.passwordgenerator.signup == true)
-              genpassword = makeid(
-                settings.api.client.passwordgenerator["length"]
-              );
+        const genpassword = settings.api.client.passwordgenerator.signup
+          ? makeid(settings.api.client.passwordgenerator["length"])
+          : makeid(16);
             let accountjson = await fetch(
               settings.pterodactyl.domain + "/api/application/users",
               {
