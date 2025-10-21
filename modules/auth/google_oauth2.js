@@ -40,7 +40,7 @@ module.exports.load = async function (app, db) {
     );
   }
 
-  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.client_key);
+  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
 
   app.get("/google/login", (req, res) => {
     if (req.query.redirect) req.session.redirect = "/" + req.query.redirect;
@@ -135,20 +135,14 @@ module.exports.load = async function (app, db) {
 
         } catch (createError) {
           try {
-            const accountListResponse = await axios.get(
-              `${settings.pterodactyl.domain}/api/application/users?include=servers&filter[email]=${encodeURIComponent(user.email)}`,
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer ${settings.pterodactyl.key}`
-                }
-              }
-            );
-
-            const accountList = accountListResponse.data;
-            const existingUser = accountList.data.find(acc => acc.attributes.email === user.email);
+            const users = await AppAPI.listUsers({
+              'include': 'servers',
+              'filter[email]': encodeURIComponent(user.email),
+            });
+            const existingUser = users.data.find(acc => acc.attributes.email === user.email);
 
             if (!existingUser) {
+              // todo : check on user if the email is already taken by another account, if not , create account
               return res.redirect('/auth?error=account_creation_failed');
             }
 

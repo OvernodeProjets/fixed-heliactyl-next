@@ -25,12 +25,19 @@ class PterodactylApplicationModule {
 
   // ==================== USERS ====================
   
-  async listUsers(page = 1, perPage = 50) {
+  async listUsers({ page = 1, perPage = 100, ...extraParams } = {}) {
     try {
+      const params = {
+        page,
+        per_page: perPage,
+        ...extraParams,
+      };
+
       const response = await axios.get(`${this.apiUrl}/api/application/users`, {
         headers: this.getHeaders(),
-        params: { page, per_page: perPage }
+        params,
       });
+
       return response.data;
     } catch (error) {
       this.logError('Error listing users:', error);
@@ -38,10 +45,11 @@ class PterodactylApplicationModule {
     }
   }
 
-  async getUserDetails(userId) {
+  async getUserDetails(userId, include = []) {
     try {
       const response = await axios.get(`${this.apiUrl}/api/application/users/${userId}`, {
-        headers: this.getHeaders()
+        headers: this.getHeaders(),
+        params: { include: include.join(',') }
       });
       return response.data;
     } catch (error) {

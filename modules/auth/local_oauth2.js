@@ -37,7 +37,7 @@ const RESEND_API_KEY = 're_GqVR7va3_8z8QuYyECBEDYKYdvrf9iqbb';
 
 
 module.exports.load = async function (app, db) {
-  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.client_key);
+  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
 
   const verifyCaptcha = async (recaptchaResponse) => {
     if (!settings.security.enableCaptcha) return true;
