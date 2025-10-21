@@ -463,12 +463,18 @@ function fetchServerDetails() {
     fetch(`/api/server/${serverId}`)
         .then(response => response.json())
         .then(data => {
-            document.getElementById('server-name').textContent = data.attributes.name;
-            document.getElementById('server-name-card').textContent = data.attributes.name;
-            document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
-            document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
+            const serverName = document.getElementById('server-name');
+            const serverNameCard = document.getElementById('server-name-card');
+            const serverNameBreadcrumb = document.getElementById('server-name-breadcrumb');
+            const serverDescription = document.getElementById('server-description');
+            const nodeElement = document.getElementById('node');
+
+            if (serverName) serverName.textContent = data.attributes.name;
+            if (serverNameCard) serverNameCard.textContent = data.attributes.name;
+            if (serverNameBreadcrumb) serverNameBreadcrumb.textContent = data.attributes.name;
+            if (serverDescription) serverDescription.textContent = data.attributes.description || "No description set.";
             nodeName = data.attributes.node;
-            document.getElementById('node').textContent = nodeName;
+            if (nodeElement) nodeElement.textContent = nodeName;
             const limitConfigs = {
                 cpu: {
                     element: 'cpu-limit-card',
@@ -485,13 +491,19 @@ function fetchServerDetails() {
             };
             
             Object.entries(limitConfigs).forEach(([key, config]) => {
-                const value = data.attributes.limits[key];
-                const text = value === 0 ? 'Unlimited' : config.format(value);
-                document.getElementById(config.element).textContent = text;
+                const element = document.getElementById(config.element);
+                if (element) {
+                    const value = data.attributes.limits[key];
+                    const text = value === 0 ? 'Unlimited' : config.format(value);
+                    element.textContent = text;
+                }
             });
             const defaultAllocation = data.attributes.relationships.allocations.data.find(allocation => allocation.attributes.is_default);
             if (defaultAllocation) {
-                document.getElementById('ip').textContent = `${defaultAllocation.attributes.ip_alias}:${defaultAllocation.attributes.port}`;
+                const ipElement = document.getElementById('ip');
+                if (ipElement) {
+                    ipElement.textContent = `${defaultAllocation.attributes.ip_alias}:${defaultAllocation.attributes.port}`;
+                }
             }
 
             if (data.attributes.is_installing) {
