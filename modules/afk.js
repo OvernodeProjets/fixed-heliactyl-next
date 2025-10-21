@@ -17,7 +17,8 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-
+const loadConfig = require("../handlers/config");
+const settings = loadConfig("./config.toml");
 
   const clusterId = process.env.CLUSTER_ID || `cluster-${Math.random().toString(36).substring(7)}`;
 
@@ -26,7 +27,7 @@ module.exports.load = function(app, db) {
   class AFKRewardsManager {
   constructor(db) {
     this.db = db;
-    this.COINS_PER_MINUTE = 1.5;
+    this.COINS_PER_MINUTE = settings.api.afk.coins || 2;
     this.INTERVAL_MS = 60000;
     this.timeouts = new Map();
     this.stateTimeouts = new Map();
@@ -37,7 +38,7 @@ module.exports.load = function(app, db) {
       const session = await this.db.get(`afk_session-${userId}`);
       if (!session) return false;
       
-      // Vérifier si la session est active (moins d'une minute)
+      // Check if session is still active (not stale)
       return (Date.now() - session.lastUpdate) < this.INTERVAL_MS;
     } catch (error) {
       console.error(`[ERROR] Failed to check session for ${userId}:`, error);
