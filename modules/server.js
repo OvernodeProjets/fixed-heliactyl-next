@@ -368,13 +368,14 @@ router.get('/teams', isAuthenticated, async (req, res) => {
 const ownsServer = async (req, res, next) => {
   const serverId = req.params.id || req.params.serverId || req.params.instanceId;
   const userId = req.session.pterodactyl.username;
-  console.log(`Checking server access for user ${userId} and server ${serverId}`);
-  
+  const username = req.session.userinfo.first_name;
+  console.log(`Checking server access for user ${username} (${userId}) and server ${serverId}`);
+
   const userServers = req.session.pterodactyl.relationships.servers.data;
   const serverOwned = userServers.some(server => server.attributes.identifier === serverId);
 
   if (serverOwned) {
-    console.log(`User ${userId} owns server ${serverId}`);
+    console.log(`User ${username} (${userId}) owns server ${serverId}`);
     return next();
   }
 
