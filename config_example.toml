@@ -389,10 +389,11 @@ private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAa
 
   [logging.actions.user]
   "signup" = true
-  "create server" = true
+  "created server" = true
   "gifted coins" = true
   "modify server" = true
-  "buy servers" = true
+  # don't used
+  "buy servers" = true  
   "buy ram" = true
   "buy cpu" = true
   "buy disk" = true
@@ -402,6 +403,7 @@ private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAa
   "add coins" = true
   "set resources" = true
   "set plan" = true
+  # don't used
   "create coupon" = true
   "revoke coupon" = true
   "remove account" = true
