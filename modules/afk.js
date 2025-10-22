@@ -171,6 +171,7 @@ module.exports.load = function(app, db) {
     }
 
     const userId = req.session.userinfo.id;
+    const username = req.session.userinfo.username;
 
     try {
       // Check for existing session across all clusters
@@ -182,7 +183,7 @@ module.exports.load = function(app, db) {
 
       // Create new session
       await afkManager.createSession(userId, clusterId);
-      console.log(`[AFK] User ${userId} connected on cluster ${clusterId}`);
+      console.log(`[AFK] User ${username} (${userId}) connected on cluster ${clusterId}`);
 
       // Start reward cycle
       afkManager.scheduleNextReward(userId, ws);
@@ -193,7 +194,7 @@ module.exports.load = function(app, db) {
       // Handle disconnection
       ws.on('close', () => {
         afkManager.cleanup(userId);
-        console.log(`[AFK] User ${userId} disconnected from cluster ${clusterId}`);
+        console.log(`[AFK] User ${username} (${userId}) disconnected from cluster ${clusterId}`);
       });
 
     } catch (error) {
