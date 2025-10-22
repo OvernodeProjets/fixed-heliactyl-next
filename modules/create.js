@@ -415,7 +415,7 @@ async function removeFromQueue(server) {
 }
 
 // Set up interval to process queue every 5 minutes
-setInterval(processQueue, 5 * 60 * 1000);
+//setInterval(processQueue, 5 * 60 * 1000);
 
 // Route to manually process the queue
 app.get("/process-queue", requireAuth, async (req, res) => {
