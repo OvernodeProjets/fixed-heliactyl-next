@@ -78,8 +78,6 @@ const Database = require("./db.js");
 const db = new Database(settings.database);
 module.exports.db = db;
 
-let isFirstWorker = false;
-
 function getAllJsFiles(dir) {
   const files = [];
   const items = fs.readdirSync(dir, { withFileTypes: true });
@@ -270,15 +268,12 @@ if (cluster.isMaster) {
 
 } else {
   // Worker process
-  process.on('message', (msg) => {
-    if (msg.type === 'FIRST_WORKER') {
-      isFirstWorker = true;
-      console.log(chalk.cyan(`Worker ${process.pid} is designated as the first worker.`));
-      console.log(
-        chalk.gray(`Heliactyl Next ${settings.version} (${settings.platform_codename}) - webserver is now listening on port ${settings.website.port}`)
-      );
-    }
-  });
+  if (cluster.worker.id === 1) {
+    console.log(chalk.cyan(`Worker ${process.pid} is designated as the first worker.`));
+    console.log(
+      chalk.gray(`Heliactyl Next ${settings.version} (${settings.platform_codename}) - webserver is now listening on port ${settings.website.port}`)
+    );
+  }
 
   // Send ready message to master when worker is ready
   if (process.send) {
@@ -290,7 +285,7 @@ if (cluster.isMaster) {
 
   // Create a wrapper function for setInterval
   global.clusterSafeInterval = function(callback, delay) {
-    if (isFirstWorker) {
+    if (cluster.worker.id === 1) {
       return originalSetInterval(callback, delay);
     } else {
       // Return a dummy interval object for non-first workers
@@ -398,7 +393,7 @@ app.use(async (req, res, next) => {
 
   const listener = app.listen(settings.website.port, async function () {
     /* clear all afk sessions */
-    if (isFirstWorker) {
+    if (cluster.worker.id === 1) {
       await db.set('afkSessions', {});
       const keys = await db.list('afk_session-*');
         for (const key of keys) {
