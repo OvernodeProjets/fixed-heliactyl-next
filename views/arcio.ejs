@@ -150,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('[AFK] Closing existing connection');
             ws.close();
             return;
+        }
 
         isConnecting = true;
         if (reconnectTimeout) {
