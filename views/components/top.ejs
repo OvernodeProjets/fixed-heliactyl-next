@@ -7,6 +7,7 @@
     <title><%= settings.name %></title>
 
     <link rel="stylesheet" href="/assets/tailwind.css">
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.png">
 
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -202,7 +203,7 @@
                 <!-- Header -->
                 <div class="flex items-center mt-2 mb-4 py-2 mx-2 border-b border-white/5">
                     <button
-                        onclick="window.location.href='/'"
+                        onclick="window.location.href='/logout'"
                         class="flex items-center gap-1.5 w-full px-3 py-1.5 text-zinc-400 cursor-pointer hover:bg-white/5 transition rounded-md">
                         <div class="flex items-center gap-1.5">
                             <% if (req.session.userinfo.picture) { %>

@@ -77,12 +77,16 @@ module.exports.load = async function (app, db) {
     return;
   });
 
-  app.get("/logout", (req, res) => {
-    req.session.destroy(() => {
-      res.redirect("/");
-      return;
-    });
+app.get("/logout", (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      console.error("Error during session destruction:", err);
+      return res.status(500).send("Error during logout.");
+    }
+    res.redirect("/");
+    return;
   });
+});
 
   app.get(settings.api.client.oauth2.callbackpath, async (req, res) => {
     if (!req.query.code) return res.redirect(`/login`);
