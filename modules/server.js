@@ -369,7 +369,6 @@ const ownsServer = async (req, res, next) => {
   const serverId = req.params.id || req.params.serverId || req.params.instanceId;
   const userId = req.session.pterodactyl.username;
   const username = req.session.userinfo.first_name;
-  console.log(`Checking server access for user ${username} (${userId}) and server ${serverId}`);
 
   const userServers = req.session.pterodactyl.relationships.servers.data;
   const serverOwned = userServers.some(server => server.attributes.identifier === serverId);
@@ -384,17 +383,18 @@ const ownsServer = async (req, res, next) => {
     const subuserServers = await db.get(`subuser-servers-${userId}`) || [];
     const hasAccess = subuserServers.some(server => server.id === serverId);
     if (hasAccess) {
-      console.log(`User ${userId} is a subuser of server ${serverId}`);
+      console.log(`User ${username} (${userId}) is a subuser of server ${serverId}`);
       return next();
     }
   } catch (error) {
     console.error('Error checking subuser status:', error);
   }
 
-  console.log(`User ${userId} does not have access to server ${serverId}`);
+  console.log(`User ${username} (${userId}) does not have access to server ${serverId}`);
   res.status(403).json({ error: 'Forbidden.' });
 };
 // Helper function to get world type (default, nether, end, or custom)
+// should be based on server.properties
 function getWorldType(worldName, defaultWorld) {
   if (worldName === defaultWorld) return 'default';
   if (worldName === `${defaultWorld}_nether`) return 'nether';
