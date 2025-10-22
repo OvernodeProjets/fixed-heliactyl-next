@@ -455,6 +455,11 @@ app.all("*", async (req, res) => {
         return res.redirect("/auth?prompt=none");
     }
 
+    // Redirect already logged in users away from auth page
+    if (req.path === "/auth" && req.session.pterodactyl && req.session.userinfo) {
+      return res.redirect("/dashboard");
+    }
+
     const theme = indexjs.get(req);
 
     // AFK session token
