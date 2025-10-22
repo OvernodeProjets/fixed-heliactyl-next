@@ -137,24 +137,41 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    let isConnecting = false;
+    let reconnectTimeout = null;
+
     function connect() {
-        if (ws) {
+        if (isConnecting) {
+            console.log('[AFK] Connection attempt already in progress');
+            return;
+        }
+
+        if (ws && ws.readyState !== WebSocket.CLOSED) {
+            console.log('[AFK] Closing existing connection');
             ws.close();
+            return;
+
+        isConnecting = true;
+        if (reconnectTimeout) {
+            clearTimeout(reconnectTimeout);
+            reconnectTimeout = null;
         }
 
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        ws = new WebSocket(`${protocol}//${window.location.host}/ws `);
+        ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
 
         ws.onopen = () => {
             console.log('[AFK] Connected to server');
             updateConnectionStatus('Connected');
             reconnectAttempts = 0;
+            isConnecting = false;
             // Start session statistics update
             setInterval(updateSessionStats, 1000);
         };
 
         ws.onclose = (event) => {
             console.log(`[AFK] Disconnected from server: ${event.code}`);
+            isConnecting = false;
             
             if (event.code === 4002) {
                 updateConnectionStatus('AFK page already open in another tab', true);
@@ -166,8 +183,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Attempt to reconnect
                 if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
                     reconnectAttempts++;
-                    setTimeout(connect, RECONNECT_DELAY);
                     updateConnectionStatus(`Reconnecting (Attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+                    reconnectTimeout = setTimeout(() => {
+                        if (!isConnecting) {
+                            connect();
+                        }
+                    }, RECONNECT_DELAY);
                 } else {
                     updateConnectionStatus('Connection failed. Please refresh the page.', true);
                 }
