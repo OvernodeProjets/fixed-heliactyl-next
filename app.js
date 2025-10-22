@@ -246,11 +246,21 @@ if (cluster.isMaster) {
     });
     
     const watchDirs = ['./modules', './handlers'];
-    
+
     watchDirs.forEach(dir => {
       const watcher = chokidar.watch(dir);
-      watcher.on('change', (path) => {
+      watcher.on('change', async (path) => {
         console.log(chalk.yellow(`File changed: ${path}. Rebooting workers...`));
+        
+        if (path.includes('afk.js') || path.includes('modules/afk')) {
+          console.log(chalk.cyan('AFK module modified, clearing AFK sessions...'));
+          await db.set('afkSessions', {});
+          const keys = await db.list('afk_session-*');
+          for (const key of keys) {
+            await db.delete(key);
+          }
+        }
+
         for (const id in cluster.workers) {
           cluster.workers[id].kill();
         }
