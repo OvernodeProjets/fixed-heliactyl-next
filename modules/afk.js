@@ -93,26 +93,26 @@ module.exports.load = function(app, db) {
     }
   }
 
-  async processReward(userId, ws) {
+  async processReward(userId, ws, username) {
     try {
       const currentCoins = await this.db.get(`coins-${userId}`) || 0;
       const newBalance = currentCoins + this.COINS_PER_MINUTE;
       await this.db.set(`coins-${userId}`, newBalance);
       
       await this.updateSession(userId);
-      console.log(`[AFK] Rewarded ${userId} with ${this.COINS_PER_MINUTE} coins. New balance: ${newBalance}`);
+      console.log(`[AFK] Rewarded ${username} (${userId}) with ${this.COINS_PER_MINUTE} coins. New balance: ${newBalance}`);
       
       this.sendState(userId, ws);
-      this.scheduleNextReward(userId, ws);
+      this.scheduleNextReward(userId, ws, username);
     } catch (error) {
       console.error(`[ERROR] Failed to process reward for ${userId}:`, error);
       ws.close(4000, 'Failed to process reward');
     }
   }
 
-  scheduleNextReward(userId, ws) {
+  scheduleNextReward(userId, ws, username) {
     const timeout = setTimeout(() => {
-      this.processReward(userId, ws);
+      this.processReward(userId, ws, username);
     }, this.INTERVAL_MS);
 
     this.timeouts.set(userId, timeout);
@@ -186,7 +186,7 @@ module.exports.load = function(app, db) {
       console.log(`[AFK] User ${username} (${userId}) connected on cluster ${clusterId}`);
 
       // Start reward cycle
-      afkManager.scheduleNextReward(userId, ws);
+      afkManager.scheduleNextReward(userId, ws, username);
       
       // Start state updates
       afkManager.startStateUpdates(userId, ws);
