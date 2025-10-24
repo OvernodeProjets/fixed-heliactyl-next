@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <link rel="stylesheet" href="../assets/tailwind.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    .error-code {
+      font-family: 'Fira Code', 'Courier New', monospace;
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      margin-top: 1.5rem;
+      background: linear-gradient(145deg, #f3f4f6, #e5e7eb);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.6),
+                  0 2px 6px rgba(0,0,0,0.08);
+      position: relative;
+    }
+    .error-code::before {
+      content: "Error Log";
+      position: absolute;
+      top: -12px;
+      left: 1rem;
+      background-color: #111827;
+      color: white;
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      padding: 0.15rem 0.5rem;
+      border-radius: 0.375rem;
+      text-transform: uppercase;
+    }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <main class="flex-grow flex items-center justify-center p-8">
+        <div class="py-8 px-6 md:py-12 md:px-8 max-w-xl w-full">
+            <div class="flex justify-center mb-8">
+                <img src="../assets/logo-text.png" class="h-12" alt="Logo">
+            </div>
+            <h1 class="text-center text-4xl tracking-tight font-bold text-gray-900 mb-4">404</h1>
+            <h2 class="text-center text-2xl tracking-tight font-semibold text-gray-800 mb-2">Page Not Found</h2>
+            <p class="text-gray-600 text-center mt-1 text-sm mb-8">Oops! The page you are looking for does not exist.</p>
+
+            <div class="error-code bg-gray-200/50 text-sm text-gray-700">
+              <pre><code><% if (typeof error !== 'undefined' && error) { %><%= error %><% } else { %>The requested resource could not be found on this server.<% } %></code></pre>
+            </div>
+
+            <div class="mt-8 text-center">
+                <a href="/" class="hover:bg-gray-800 bg-gray-700 text-white font-medium py-2 px-4 rounded-full transition hover:scale-95">
+                    Go back to homepage
+                </a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
