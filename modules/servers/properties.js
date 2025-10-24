@@ -7,6 +7,7 @@
  *                               /____/      
  * 
  *     Heliactyl Next 3.2.0 (Avalanche)
+ *      UNUSED MODULE
  * 
  */
 
@@ -19,35 +20,14 @@ module.exports.heliactylModule = heliactylModule;
 
 const express = require('express');
 const axios = require('axios');
-const PterodactylClientModule = require('../handlers/ClientAPI.js');
-const loadConfig = require("../handlers/config");
+const PterodactylClientModule = require('../../handlers/ClientAPI.js');
+const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
+const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js")
 
 module.exports.load = async function(app, db) {
     const router = express.Router();
     const pterodactylClient = new PterodactylClientModule(settings.pterodactyl.domain, settings.pterodactyl.client_key);
-
-    // Middleware to check if user is authenticated
-    const isAuthenticated = (req, res, next) => {
-        if (req.session.pterodactyl) {
-            next();
-        } else {
-            res.status(401).json({ error: "Unauthorized" });
-        }
-    };
-
-    // Middleware to check if user owns the server
-    const ownsServer = (req, res, next) => {
-        const serverId = req.params.id;
-        const userServers = req.session.pterodactyl.relationships.servers.data;
-        const serverOwned = userServers.some(server => server.attributes.identifier === serverId);
-        
-        if (serverOwned) {
-            next();
-        } else {
-            res.status(403).json({ error: "Forbidden. You don't have access to this server." });
-        }
-    };
 
     // Helper function to parse server.properties content
     const parseServerProperties = (content) => {
@@ -64,7 +44,7 @@ module.exports.load = async function(app, db) {
     };
 
     // GET server properties
-    router.get('/server/:id/properties', isAuthenticated, ownsServer, async (req, res) => {
+    router.get('/server/:id/properties', requireAuth, ownsServer, async (req, res) => {
         try {
             const serverId = req.params.id;
             const response = await axios.get(`${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/contents`, {
@@ -85,7 +65,7 @@ module.exports.load = async function(app, db) {
     });
 
     // PUT update server properties
-    router.put('/server/:id/properties', isAuthenticated, ownsServer, async (req, res) => {
+    router.put('/server/:id/properties', requireAuth, ownsServer, async (req, res) => {
         try {
             const serverId = req.params.id;
             const updatedProperties = req.body;
@@ -130,42 +110,37 @@ module.exports.load = async function(app, db) {
         }
     });
 
-    // GET property info
-    router.get('/minecraft/property-info', (req, res) => {
+    // GET Minecraft property info + default value
+    router.get('/minecraft/property', (req, res) => {
         const { key } = req.query;
+
         const propertyInfo = {
-            // Add more properties and their descriptions as needed
             'server-port': 'The port on which the server is running',
             'gamemode': 'The default game mode for new players',
             'difficulty': 'The difficulty setting of the game',
             'max-players': 'The maximum number of players allowed on the server',
             'view-distance': 'The maximum distance from players that world data is sent to them',
             'spawn-protection': 'The radius around world spawn which cannot be modified by non-operators'
-            // ... other properties
         };
 
-        res.json({ description: propertyInfo[key] || 'No information available for this property.' });
-    });
-
-    // GET default property value
-    router.get('/minecraft/default-property', (req, res) => {
-        const { key } = req.query;
         const defaultValues = {
-            // Add more properties and their default values as needed
             'server-port': '25565',
             'gamemode': 'survival',
             'difficulty': 'easy',
             'max-players': '20',
             'view-distance': '10',
             'spawn-protection': '16',
-            // ... other properties
         };
 
-        res.json({ defaultValue: defaultValues[key] || 'Default value not available.' });
+        const description = propertyInfo[key] || 'No information available for this property.';
+        const defaultValue = defaultValues[key] || 'Default value not available.';
+
+        res.json({
+            key,
+            description,
+            defaultValue
+        });
     });
 
-    // Use the router with the '/api' prefix
     app.use('/api', router);
-
-    //console.log('Pterodactyl Server Properties module loaded');
 };
