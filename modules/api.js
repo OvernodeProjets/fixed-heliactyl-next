@@ -462,28 +462,13 @@ app.get("/giftcoins", async (req, res) => {
         if (auth == "Bearer " + settings.api.client.api.code) {
           return settings;
         }
+      } else {
+        res.status(403).send({ status: "forbidden" });
+        return null;
       }
+    } else {
+      res.status(403).send({ status: "forbidden" });
+      return null;
     }
-    let theme = indexjs.get(req);
-    ejs.renderFile(
-      `./views/${theme.settings.notfound}`,
-      await eval(indexjs.renderdataeval),
-      null,
-      function (err, str) {
-        delete req.session.newaccount;
-        if (err) {
-          console.log(
-            `App ― An error has occured on path ${req._parsedUrl.pathname}:`
-          );
-          console.log(err);
-          return res.send(
-            "Internal Server Error"
-          );
-        }
-        res.status(200);
-        res.send(str);
-      }
-    );
-    return null;
   }
 };
