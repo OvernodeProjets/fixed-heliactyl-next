@@ -1898,6 +1898,8 @@ async function handleExpiredServer(db, serverId) {
     // Stop the server
     await executePowerAction(serverId, 'stop');
 
+    console.log(`Server ${serverId} has expired and been stopped.`);
+
     // Log the expiration
     await logActivity(db, serverId, 'Server Expired', {
       lastRenewal: renewalData.lastRenewal,
