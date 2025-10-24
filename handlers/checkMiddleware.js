@@ -1,3 +1,7 @@
+const indexjs = require('../app.js');
+
+const db = indexjs.db;
+
 const requireAuth = (req, res, next) => {
   if (!req.session.userinfo || !req.session.pterodactyl) {
     return res.status(401).json({ error: 'Unauthorized' });
