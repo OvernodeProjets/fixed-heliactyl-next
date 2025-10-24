@@ -1,6 +1,7 @@
 {
     "index": "website.ejs",
-    "notfound": "404.ejs",
+    "notFound": "error/404.ejs",
+    "internalError": "error/500.ejs",
     "pages": {
         "dashboard": "dashboard.ejs",
         "auth": "auth.ejs",

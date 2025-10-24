@@ -29,17 +29,6 @@ if (typeof atob === "undefined") {
 const loadConfig = require("./handlers/config");
 const settings = loadConfig("./config.toml");
 
-
-const defaultthemesettings = {
-  index: "index.ejs",
-  notfound: "index.ejs",
-  redirect: {},
-  pages: {},
-  mustbeloggedin: [],
-  mustbeadmin: [],
-  variables: {},
-};
-
 /**
  * Renders data for the theme.
  * @param {Object} req - The request object.
@@ -336,13 +325,12 @@ if (cluster.isMaster) {
 
   app.use((err, req, res, next) => {
     if (err.status === 500 && err.message === 'Gateway Timeout') {
-      let theme = indexjs.get(req);
-      const renderData = {
-        err: 'Gateway Timeout'
-      };
-      res.status(500).render('500', renderData);
+      const theme = indexjs.get(req);
+      res.status(500).render(theme.settings.internalError, { error: 'Gateway Timeout' });
+      return;
     } else {
       next(err);
+      return;
     }
   });
   
@@ -448,52 +436,58 @@ app.use(async (req, res, next) => {
   }
 
 app.all("*", async (req, res) => {
-    // Validate session
-    if (req.session.pterodactyl && req.session.pterodactyl.id !==
-        (await db.get("users-" + req.session.userinfo.id))) {
-        req.session.destroy();
-        return res.redirect("/auth?prompt=none");
+  // Validate session
+  if (
+    req.session.pterodactyl &&
+    req.session.pterodactyl.id !== 
+    (await db.get("users-" + req.session.userinfo.id))
+  ) {
+    req.session.destroy();
+    return res.redirect("/auth?prompt=none");
+  }
+
+  // Redirect already logged in users away from auth page
+  if (req.path === "/auth" && req.session.pterodactyl && req.session.userinfo) {
+    return res.redirect("/dashboard");
+  }
+
+  const theme = indexjs.get(req);
+
+  // AFK session token
+  if (settings.api.afk.enabled === true) {
+    req.session.arcsessiontoken = Math.random().toString(36).substring(2, 15);
+  }
+
+  // Check authentication requirements
+  if (theme.settings.mustbeloggedin.includes(req._parsedUrl.pathname)) {
+    if (!req.session.userinfo || !req.session.pterodactyl) {
+      return res.redirect("/auth");
     }
+  }
 
-    // Redirect already logged in users away from auth page
-    if (req.path === "/auth" && req.session.pterodactyl && req.session.userinfo) {
-      return res.redirect("/dashboard");
-    }
-
-    const theme = indexjs.get(req);
-
-    // AFK session token
-    if (settings.api.afk.enabled == true) {
-      req.session.arcsessiontoken = Math.random().toString(36).substring(2, 15);
-    }
-
-    // Check authentication requirements
-    if (theme.settings.mustbeloggedin.includes(req._parsedUrl.pathname)) {
-      if (!req.session.userinfo || !req.session.pterodactyl) {
-        return res.redirect("/auth");
-      }
-    }
-
-    // Check admin requirements
-    if (theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
-      const data = await renderData(req, theme);
-      res.render(theme.settings.notfound, data);
-      return;
-    }
-
-    // Render page
+  // Check admin requirements
+  if (theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
     const data = await renderData(req, theme);
-    res.render(
-      theme.settings.pages[req._parsedUrl.pathname.slice(1)] || theme.settings.notfound,
-      data
-    );
-  });
+    res.render(theme.settings.notfound, data);
+    return;
+  }
+
+  const pageName = req._parsedUrl.pathname.slice(1);
+  const pageToRender = theme.settings.pages[pageName];
+
+  const data = await renderData(req, theme);
+
+  if (pageToRender) {
+    res.render(pageToRender, data);
+  } else {
+    res.status(404).render(theme.settings.notFound, data);
+  }
+});
+
 
   module.exports.get = function (req) {
     return {
-      settings: fs.existsSync(`./views/pages.json`)
-        ? JSON.parse(fs.readFileSync(`./views/pages.json`).toString())
-        : defaultthemesettings
+      settings: fs.existsSync(`./views/pages.json`) ? JSON.parse(fs.readFileSync(`./views/pages.json`).toString()) : []
     };
   };
 
