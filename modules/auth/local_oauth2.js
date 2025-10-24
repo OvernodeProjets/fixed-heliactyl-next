@@ -228,12 +228,14 @@ module.exports.load = async function (app, db) {
     }
 
     // Create session
-    req.session.userinfo = {
+    const userinfo = {
       id: user.id,
       username: user.username,
       email: user.email,
       global_name: user.username
     };
+
+    req.session.userinfo = userinfo;
 
     const PterodactylUser = await getPteroUser(userinfo.id, db);
     if (!PterodactylUser) {
