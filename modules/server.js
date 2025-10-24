@@ -27,6 +27,7 @@ const FormData = require("form-data");
 const path = require("path");
 const fs = require("fs");
 const schedule = require("node-schedule");
+const { requireAuth, ownsServer } = require("../handlers/checkMiddleware.js")
 
 const workflowsFilePath = path.join(__dirname, "../storage/workflows.json");
 const scheduledWorkflowsFilePath = path.join(
@@ -54,15 +55,6 @@ async function logActivity(db, serverId, action, details) {
     settings.pterodactyl.domain,
     settings.pterodactyl.client_key
   );
-
-  // Middleware to check if user is authenticated
-  const isAuthenticated = (req, res, next) => {
-    if (req.session.pterodactyl) {
-      next();
-    } else {
-      res.status(401).json({ error: "Unauthorized" });
-    }
-  };
 
 // Add a list function to get all keys with a specific prefix
 async function listKeys(prefix) {
@@ -96,7 +88,7 @@ async function getPterodactylUserId(userId) {
 }
 
 // Create a team
-router.post('/teams', isAuthenticated, async (req, res) => {
+router.post('/teams', requireAuth, async (req, res) => {
   try {
     const { name } = req.body;
     const ownerId = req.session.userinfo.id;
@@ -119,7 +111,7 @@ router.post('/teams', isAuthenticated, async (req, res) => {
 });
 
 // Add member to team
-router.post('/teams/:teamId/members', isAuthenticated, async (req, res) => {
+router.post('/teams/:teamId/members', requireAuth, async (req, res) => {
   try {
     const { teamId } = req.params;
     const { userId } = req.body;
@@ -151,7 +143,7 @@ router.post('/teams/:teamId/members', isAuthenticated, async (req, res) => {
 });
 
 // Remove member from team
-router.delete('/teams/:teamId/members/:userId', isAuthenticated, async (req, res) => {
+router.delete('/teams/:teamId/members/:userId', requireAuth, async (req, res) => {
   try {
     const { teamId, userId } = req.params;
     const team = await db.get(`team-${teamId}`);
@@ -175,7 +167,7 @@ router.delete('/teams/:teamId/members/:userId', isAuthenticated, async (req, res
 });
 
 // Add server to team
-router.post('/teams/:teamId/servers', isAuthenticated, async (req, res) => {
+router.post('/teams/:teamId/servers', requireAuth, async (req, res) => {
   try {
     const { teamId } = req.params;
     const { serverId } = req.body;
@@ -202,7 +194,7 @@ router.post('/teams/:teamId/servers', isAuthenticated, async (req, res) => {
 });
 
 // Remove server from team
-router.delete('/teams/:teamId/servers/:serverId', isAuthenticated, async (req, res) => {
+router.delete('/teams/:teamId/servers/:serverId', requireAuth, async (req, res) => {
   try {
     const { teamId, serverId } = req.params;
     const team = await db.get(`team-${teamId}`);
@@ -226,7 +218,7 @@ router.delete('/teams/:teamId/servers/:serverId', isAuthenticated, async (req, r
 });
 
 // List accessible servers from all teams
-router.get('/teams/servers', isAuthenticated, async (req, res) => {
+router.get('/teams/servers', requireAuth, async (req, res) => {
   try {
     const userId = req.session.userinfo.id;
     const teamKeys = await listKeys('team-');
@@ -253,7 +245,7 @@ router.get('/teams/servers', isAuthenticated, async (req, res) => {
 });
 
 // Edit team settings
-router.put('/teams/:teamId', isAuthenticated, async (req, res) => {
+router.put('/teams/:teamId', requireAuth, async (req, res) => {
   try {
     const { teamId } = req.params;
     const { name } = req.body;
@@ -278,7 +270,7 @@ router.put('/teams/:teamId', isAuthenticated, async (req, res) => {
 });
 
 // Delete team
-router.delete('/teams/:teamId', isAuthenticated, async (req, res) => {
+router.delete('/teams/:teamId', requireAuth, async (req, res) => {
   try {
     const { teamId } = req.params;
     const team = await db.get(`team-${teamId}`);
@@ -304,7 +296,7 @@ router.delete('/teams/:teamId', isAuthenticated, async (req, res) => {
 });
 
 // List user's teams
-router.get('/teams', isAuthenticated, async (req, res) => {
+router.get('/teams', requireAuth, async (req, res) => {
   try {
     const userId = req.session.userinfo.id;
     const teamKeys = await listKeys('team-');
@@ -365,34 +357,6 @@ router.get('/teams', isAuthenticated, async (req, res) => {
   }
 });
 
-const ownsServer = async (req, res, next) => {
-  const serverId = req.params.id || req.params.serverId || req.params.instanceId;
-  const userId = req.session.pterodactyl.username;
-  const username = req.session.userinfo.first_name;
-
-  const userServers = req.session.pterodactyl.relationships.servers.data;
-  const serverOwned = userServers.some(server => server.attributes.identifier === serverId);
-
-  if (serverOwned) {
-    console.log(`User ${username} (${userId}) owns server ${serverId}`);
-    return next();
-  }
-
-  // Check if the user is a subuser of the server
-  try {
-    const subuserServers = await db.get(`subuser-servers-${userId}`) || [];
-    const hasAccess = subuserServers.some(server => server.id === serverId);
-    if (hasAccess) {
-      console.log(`User ${username} (${userId}) is a subuser of server ${serverId}`);
-      return next();
-    }
-  } catch (error) {
-    console.error('Error checking subuser status:', error);
-  }
-
-  console.log(`User ${username} (${userId}) does not have access to server ${serverId}`);
-  res.status(403).json({ error: 'Forbidden.' });
-};
 // Helper function to get world type (default, nether, end, or custom)
 // should be based on server.properties
 function getWorldType(worldName, defaultWorld) {
@@ -441,7 +405,7 @@ async function isValidWorld(fileData, serverId) {
 
 
 // Worlds endpoints
-router.get('/server/:id/worlds', isAuthenticated, ownsServer, async (req, res) => {
+router.get('/server/:id/worlds', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     
@@ -527,7 +491,7 @@ router.get('/server/:id/worlds', isAuthenticated, ownsServer, async (req, res) =
   }
 });
 
-router.post('/server/:id/worlds/import', isAuthenticated, ownsServer, async (req, res) => {
+router.post('/server/:id/worlds/import', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const { worldName } = req.body;
@@ -579,7 +543,7 @@ router.post('/server/:id/worlds/import', isAuthenticated, ownsServer, async (req
   }
 });
 
-router.post('/server/:id/worlds/import/complete', isAuthenticated, ownsServer, async (req, res) => {
+router.post('/server/:id/worlds/import/complete', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const { worldName, fileName } = req.body;
@@ -771,7 +735,7 @@ router.post('/server/:id/worlds/import/complete', isAuthenticated, ownsServer, a
   }
 });
 
-router.delete('/server/:id/worlds/:worldName', isAuthenticated, ownsServer, async (req, res) => {
+router.delete('/server/:id/worlds/:worldName', requireAuth, ownsServer, async (req, res) => {
   try {
     const { id: serverId, worldName } = req.params;
 
@@ -833,7 +797,7 @@ router.delete('/server/:id/worlds/:worldName', isAuthenticated, ownsServer, asyn
 });
 
 // PUT /api/server/:id/startup
-router.put('/server/:serverId/startup', isAuthenticated, async (req, res) => {
+router.put('/server/:serverId/startup', requireAuth, async (req, res) => {
   try {
     const serverId = req.params.serverId;
     const { startup, environment, egg, image, skip_scripts } = req.body;
@@ -883,7 +847,7 @@ router.put('/server/:serverId/startup', isAuthenticated, async (req, res) => {
 });
 
 // POST /api/server/:id/allocations - Assign new allocation
-router.post('/server/:id/allocations', isAuthenticated, ownsServer, async (req, res) => {
+router.post('/server/:id/allocations', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
 
@@ -1091,7 +1055,7 @@ async function sendCommandAndGetResponse(serverId, command, responseTimeout = 50
 }
 
 // GET /api/server/:id/logs - Get server activity logs
-router.get('/server/:id/logs', isAuthenticated, ownsServer, async (req, res) => {
+router.get('/server/:id/logs', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const page = parseInt(req.query.page) || 1;
@@ -1174,7 +1138,7 @@ router.get('/server/:id/logs', isAuthenticated, ownsServer, async (req, res) => 
   // GET /api/server/:id/backups
   router.get(
     "/server/:id/backups",
-    isAuthenticated,
+    requireAuth,
     ownsServer,
     async (req, res) => {
       try {
@@ -1200,7 +1164,7 @@ router.get('/server/:id/logs', isAuthenticated, ownsServer, async (req, res) => 
   // POST /api/server/:id/backups
   router.post(
     "/server/:id/backups",
-    isAuthenticated,
+    requireAuth,
     ownsServer,
     async (req, res) => {
       try {
@@ -1227,7 +1191,7 @@ router.get('/server/:id/logs', isAuthenticated, ownsServer, async (req, res) => 
   // GET /api/server/:id/backups/:backupId/download
   router.get(
     "/server/:id/backups/:backupId/download",
-    isAuthenticated,
+    requireAuth,
     ownsServer,
     async (req, res) => {
       try {
@@ -1254,7 +1218,7 @@ router.get('/server/:id/logs', isAuthenticated, ownsServer, async (req, res) => 
   // DELETE /api/server/:id/backups/:backupId
   router.delete(
     "/server/:id/backups/:backupId",
-    isAuthenticated,
+    requireAuth,
     ownsServer,
     async (req, res) => {
       try {
@@ -1280,7 +1244,7 @@ router.get('/server/:id/logs', isAuthenticated, ownsServer, async (req, res) => 
 
   router.post(
     "/plugins/install/:serverId",
-    isAuthenticated,
+    requireAuth,
     ownsServer,
     async (req, res) => {
       const { serverId } = req.params;
@@ -1362,39 +1326,12 @@ router.get('/server/:id/logs', isAuthenticated, ownsServer, async (req, res) => 
     }
   );
 
-  // GET /api/server/:id/files/download
-router.get('/server/:id/files/download', isAuthenticated, ownsServer, async (req, res) => {
-  try {
-    const serverId = req.params.id;
-    const file = req.query.file;
-    
-    if (!file) {
-      return res.status(400).json({ error: 'File parameter is required' });
-    }
 
-    const response = await axios.get(
-      `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/download`,
-      {
-        params: { file },
-        headers: {
-          Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    res.json(response.data);
-  } catch (error) {
-    console.error('Error generating download link:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
   // GET workflow
   router.get(
     "/server/:id/workflow",
-    isAuthenticated,
+    requireAuth,
     ownsServer,
     async (req, res) => {
       try {
@@ -1417,7 +1354,7 @@ router.get('/server/:id/files/download', isAuthenticated, ownsServer, async (req
   );
 
 // GET /api/server/:id/variables
-router.get('/server/:id/variables', isAuthenticated, ownsServer, async (req, res) => {
+router.get('/server/:id/variables', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const response = await axios.get(
@@ -1437,7 +1374,7 @@ router.get('/server/:id/variables', isAuthenticated, ownsServer, async (req, res
 });
 
 // PUT /api/server/:id/variables
-router.put('/server/:id/variables', isAuthenticated, ownsServer, async (req, res) => {
+router.put('/server/:id/variables', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const { key, value } = req.body;
@@ -1464,38 +1401,12 @@ router.put('/server/:id/variables', isAuthenticated, ownsServer, async (req, res
   }
 });
 
-// POST /api/server/:id/files/copy
-router.post('/server/:id/files/copy', isAuthenticated, ownsServer, async (req, res) => {
-  try {
-    const serverId = req.params.id;
-    const { location } = req.body;
 
-    if (!location) {
-      return res.status(400).json({ error: 'Missing location' });
-    }
-
-    await axios.post(
-      `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/copy`,
-      { location },
-      {
-        headers: {
-          Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-    res.status(204).send();
-  } catch (error) {
-    console.error('Error copying file:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
   // POST save workflow
   router.post(
     "/server/:instanceId/workflow/save-workflow",
-    isAuthenticated,
+    requireAuth,
     ownsServer,
     async (req, res) => {
       const { instanceId } = req.params;
@@ -1533,7 +1444,7 @@ router.post('/server/:id/files/copy', isAuthenticated, ownsServer, async (req, r
   );
 
 // Add new endpoint to show servers where the user is a subuser
-router.get('/subuser-servers', isAuthenticated, async (req, res) => {
+router.get('/subuser-servers', requireAuth, async (req, res) => {
   try {
     const userId = req.session.pterodactyl.username;
     console.log(`Fetching subuser servers for user ${userId}`);
@@ -1611,7 +1522,7 @@ async function updateSubuserInfo(serverId, serverOwnerId) {
   }
 }
 
-router.post('/sync-user-servers', isAuthenticated, async (req, res) => {
+router.post('/sync-user-servers', requireAuth, async (req, res) => {
   try {
     const userId = req.session.pterodactyl.id;
     console.log(`Syncing servers for user ${userId}`);
@@ -1667,7 +1578,7 @@ async function addUserToAllUsersList(userId) {
 }
 
 // Update the existing /server/:id/users endpoint to call updateSubuserInfo
-router.get('/server/:id/users', isAuthenticated, ownsServer, async (req, res) => {
+router.get('/server/:id/users', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const response = await axios.get(
@@ -1691,7 +1602,7 @@ router.get('/server/:id/users', isAuthenticated, ownsServer, async (req, res) =>
   }
 });
 
-router.post('/server/:id/users', isAuthenticated, ownsServer, async (req, res) => {
+router.post('/server/:id/users', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const { email } = req.body;
@@ -1762,7 +1673,7 @@ router.post('/server/:id/users', isAuthenticated, ownsServer, async (req, res) =
 });
 
   // DELETE /api/server/:id/users/:subuser - Delete User
-  router.delete('/server/:id/users/:subuser', isAuthenticated, ownsServer, async (req, res) => {
+  router.delete('/server/:id/users/:subuser', requireAuth, ownsServer, async (req, res) => {
     try {
       const { id: serverId, subuser: subuserId } = req.params;
       await axios.delete(
@@ -1783,7 +1694,7 @@ router.post('/server/:id/users', isAuthenticated, ownsServer, async (req, res) =
   });
 
   // GET server details
-  router.get("/server/:id", isAuthenticated, ownsServer, async (req, res) => {
+  router.get("/server/:id", requireAuth, ownsServer, async (req, res) => {
     try {
       const serverId = req.params.id;
       const serverDetails = await pterodactylClient.getServerDetails(serverId);
@@ -1797,7 +1708,7 @@ router.post('/server/:id/users', isAuthenticated, ownsServer, async (req, res) =
   // GET WebSocket credentials
   router.get(
     "/server/:id/websocket",
-    isAuthenticated,
+    requireAuth,
     ownsServer,
     async (req, res) => {
       try {
@@ -1816,7 +1727,7 @@ router.post('/server/:id/users', isAuthenticated, ownsServer, async (req, res) =
   // POST Send command to server
   router.post(
     "/server/:id/command",
-    isAuthenticated,
+    requireAuth,
     ownsServer,
     async (req, res) => {
       try {
@@ -1834,7 +1745,7 @@ router.post('/server/:id/users', isAuthenticated, ownsServer, async (req, res) =
   // POST Set server power state
   router.post(
     "/server/:id/power",
-    isAuthenticated,
+    requireAuth,
     ownsServer,
     async (req, res) => {
       try {
@@ -1863,326 +1774,7 @@ router.post('/server/:id/users', isAuthenticated, ownsServer, async (req, res) =
     }
   );
 
-  // GET /api/server/:id/files/list
-router.get(
-  "/server/:id/files/list",
-  isAuthenticated,
-  ownsServer,
-  async (req, res) => {
-    try {
-      const serverId = req.params.id;
-      const directory = req.query.directory || "/";
-      const page = parseInt(req.query.page) || 1;
-      const perPage = parseInt(req.query.per_page) || 10;
 
-      const response = await axios.get(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/list`,
-        {
-          params: { 
-            directory,
-            page: page,
-            per_page: perPage
-          },
-          headers: {
-            Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      // Add pagination metadata to the response
-      const totalItems = response.data.meta?.pagination?.total || 0;
-      const totalPages = Math.ceil(totalItems / perPage);
-
-      const paginatedResponse = {
-        ...response.data,
-        meta: {
-          ...response.data.meta,
-          pagination: {
-            ...response.data.meta?.pagination,
-            current_page: page,
-            per_page: perPage,
-            total_pages: totalPages
-          }
-        }
-      };
-
-      res.json(paginatedResponse);
-    } catch (error) {
-      console.error("Error listing files:", error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  }
-);
-
-  /// GET /api/server/:id/files/contents
-  router.get(
-    "/server/:id/files/contents",
-    isAuthenticated,
-    ownsServer,
-    async (req, res) => {
-      try {
-        const serverId = req.params.id;
-        const file = encodeURIComponent(req.query.file); // URL-encode the file path
-        const response = await axios.get(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/contents?file=${file}`,
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            responseType: "text", // Treat the response as plain text
-          }
-        );
-
-        // Log the raw content for debugging
-
-        // Send the raw file content back to the client
-        res.send(response.data);
-      } catch (error) {
-        console.error("Error getting file contents:", error);
-
-        // Optionally log the error response for more details
-        if (error.response) {
-          console.error("Error response data:", error.response.data);
-        }
-
-        res.status(500).json({ error: "Internal server error" });
-      }
-    }
-  );
-
-  // GET /api/server/:id/files/download
-  router.get(
-    "/server/:id/files/download",
-    isAuthenticated,
-    ownsServer,
-    async (req, res) => {
-      try {
-        const serverId = req.params.id;
-        const file = req.query.file;
-        const response = await axios.get(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/download`,
-          {
-            params: { file },
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        res.json(response.data);
-      } catch (error) {
-        console.error("Error getting download link:", error);
-        res.status(500).json({ error: "Internal server error" });
-      }
-    }
-  );
-
-  // POST /api/server/:id/files/write
-  router.post(
-    "/server/:id/files/write",
-    isAuthenticated,
-    ownsServer,
-    async (req, res) => {
-      try {
-        const serverId = req.params.id;
-        const file = encodeURIComponent(req.query.file); // URL-encode the file path
-        const content = req.body; // Expect the raw file content from the client
-
-        const response = await axios.post(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/write?file=${file}`,
-          content, // Send the content as the raw body
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "text/plain", // Adjust based on your file type (e.g., 'text/yaml')
-            },
-          }
-        );
-
-    await logActivity(db, serverId, 'Write File', { file });
-
-        res.status(204).send(); // No content response
-      } catch (error) {
-        console.error("Error writing file:", error);
-        res.status(500).json({ error: "Internal server error" });
-      }
-    }
-  );
-
-  // POST /api/server/:id/files/compress
-  router.post(
-    "/server/:id/files/compress",
-    isAuthenticated,
-    ownsServer,
-    async (req, res) => {
-      try {
-        const serverId = req.params.id;
-        const { root, files } = req.body;
-        const response = await axios.post(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/compress`,
-          { root, files },
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        res.status(200).json(response.data);
-      } catch (error) {
-        console.error("Error compressing files:", error);
-        res.status(500).json({ error: "Internal server error" });
-      }
-    }
-  );
-
-  // POST /api/server/:id/files/decompress
-  router.post(
-    "/server/:id/files/decompress",
-    isAuthenticated,
-    ownsServer,
-    async (req, res) => {
-      try {
-        const serverId = req.params.id;
-        const { root, file } = req.body;
-        await axios.post(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/decompress`,
-          { root, file },
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        res.status(204).send();
-      } catch (error) {
-        console.error("Error decompressing file:", error);
-        res.status(500).json({ error: "Internal server error" });
-      }
-    }
-  );
-
-  // POST /api/server/:id/files/delete
-  router.post(
-    "/server/:id/files/delete",
-    isAuthenticated,
-    ownsServer,
-    async (req, res) => {
-      try {
-        const serverId = req.params.id;
-        const { root, files } = req.body;
-        await axios.post(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/delete`,
-          { root, files },
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-    await logActivity(db, serverId, 'Delete File', { root, files });
-        res.status(204).send();
-      } catch (error) {
-        console.error("Error deleting files:", error);
-        res.status(500).json({ error: "Internal server error" });
-      }
-    }
-  );
-
-  // GET /api/server/:id/files/upload
-  router.get(
-    "/server/:id/files/upload",
-    isAuthenticated,
-    ownsServer,
-    async (req, res) => {
-      try {
-        const serverId = req.params.id;
-        const directory = req.query.directory || "/";
-        const response = await axios.get(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/upload`,
-          {
-            params: { directory },
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        res.json(response.data);
-      } catch (error) {
-        console.error("Error getting upload URL:", error);
-        res.status(500).json({ error: "Internal server error" });
-      }
-    }
-  );
-
-  // POST /api/server/:id/files/create-folder
-  router.post(
-    "/server/:id/files/create-folder",
-    isAuthenticated,
-    ownsServer,
-    async (req, res) => {
-      try {
-        const serverId = req.params.id;
-        const { root, name } = req.body;
-        await axios.post(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/create-folder`,
-          { root, name },
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        res.status(204).send();
-      } catch (error) {
-        console.error("Error creating folder:", error);
-        res.status(500).json({ error: "Internal server error" });
-      }
-    }
-  );
-
-  // PUT /api/server/:id/files/rename
-  router.put(
-    "/server/:id/files/rename",
-    isAuthenticated,
-    ownsServer,
-    async (req, res) => {
-      try {
-        const serverId = req.params.id;
-        const { root, files } = req.body;
-        await axios.put(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/rename`,
-          { root, files },
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        res.status(204).send();
-      } catch (error) {
-        console.error("Error renaming file/folder:", error);
-        res.status(500).json({ error: "Internal server error" });
-      }
-    }
-  );
 
 // Add these constants at the top of the file
 const RENEWAL_PERIOD_HOURS = 48;
@@ -2317,7 +1909,7 @@ async function handleExpiredServer(db, serverId) {
 }
 
 // Add these routes to the router
-router.get('/server/:id/renewal/status', isAuthenticated, ownsServer, async (req, res) => {
+router.get('/server/:id/renewal/status', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const renewalStatus = await getRenewalStatus(db, serverId, req.session.userinfo.id);
@@ -2348,7 +1940,7 @@ router.get('/server/:id/renewal/status', isAuthenticated, ownsServer, async (req
 });
 
 // And update the renewal endpoint validation in the POST route:
-router.post('/server/:id/renewal/renew', isAuthenticated, ownsServer, async (req, res) => {
+router.post('/server/:id/renewal/renew', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const currentStatus = await getRenewalStatus(db, serverId);
@@ -2433,6 +2025,7 @@ async function checkSubdomainExists(subdomain) {
 
 async function checkDomainExists(subdomain, domainConfig) {
   try {
+    console.log(domainConfig)
     const response = await axios.get(
       `${CF_API_URL}/zones/${domainConfig.zone_id}/dns_records`,
       {
@@ -2531,7 +2124,7 @@ async function createDNSRecord(serverId, subdomain, serverDetails) {
 }
 
 // Updated router endpoints
-router.post('/server/:id/subdomains', isAuthenticated, ownsServer, async (req, res) => {
+router.post('/server/:id/subdomains', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const { subdomain } = req.body;
@@ -2573,7 +2166,7 @@ router.post('/server/:id/subdomains', isAuthenticated, ownsServer, async (req, r
   }
 });
 
-router.get('/server/:id/subdomains', isAuthenticated, ownsServer, async (req, res) => {
+router.get('/server/:id/subdomains', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const subdomains = await getServerSubdomains(serverId);
@@ -2585,7 +2178,7 @@ router.get('/server/:id/subdomains', isAuthenticated, ownsServer, async (req, re
   }
 });
 
-router.delete('/server/:id/subdomains/:subdomain', isAuthenticated, ownsServer, async (req, res) => {
+router.delete('/server/:id/subdomains/:subdomain', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const subdomainToDelete = req.params.subdomain;
