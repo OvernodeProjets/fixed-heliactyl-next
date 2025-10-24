@@ -43,7 +43,8 @@
         "website": "website.ejs",
         "admin/coins": "admin/coins.ejs",
         "admin/resources": "admin/resources.ejs",
-        "admin/other": "admin/other.ejs"
+        "admin/other": "admin/other.ejs",
+        "events/halloween": "events/halloween.ejs"
     },
     "mustbeloggedin": [
         "/dashboard",

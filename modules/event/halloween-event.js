@@ -20,9 +20,36 @@ module.exports.heliactylModule = heliactylModule;
 const { discordLog } = require("../../handlers/log.js");
 const { requireAuth } = require("../../handlers/checkMiddleware.js");
 
-const HALLOWEEN_EVENT_DURATION = 7 * 24 * 60 * 60 * 1000; // 1 week
-const EVENT_START_TIME = new Date('2024-10-03T12:30:22+00:00').getTime();
-const EVENT_END_TIME = EVENT_START_TIME + HALLOWEEN_EVENT_DURATION;
+/* === 🎃 Date calculation for Halloween Event === */
+
+// Date/Hours of event start and end (UTC)
+const EVENT_START_MONTH = 10; // October (Warning : January = 0)
+const EVENT_START_DAY = 3;
+const EVENT_START_HOUR = 12;
+const EVENT_START_MINUTE = 30;
+const EVENT_START_SECOND = 22;
+
+const EVENT_END_MONTH = 10;
+const EVENT_END_DAY = 31;
+const EVENT_END_HOUR = 23;
+const EVENT_END_MINUTE = 59;
+const EVENT_END_SECOND = 59;
+
+const now = new Date();
+let eventYear = now.getUTCFullYear();
+
+// Calculate event start and end times
+let EVENT_START_TIME = Date.UTC(eventYear, EVENT_START_MONTH - 1, EVENT_START_DAY, EVENT_START_HOUR, EVENT_START_MINUTE, EVENT_START_SECOND);
+let EVENT_END_TIME = Date.UTC(eventYear, EVENT_END_MONTH - 1, EVENT_END_DAY, EVENT_END_HOUR, EVENT_END_MINUTE, EVENT_END_SECOND);
+
+// If the current date is past the event end time, set the event to next year
+if (Date.now() > EVENT_END_TIME) {
+  eventYear++;
+  EVENT_START_TIME = Date.UTC(eventYear, EVENT_START_MONTH - 1, EVENT_START_DAY, EVENT_START_HOUR, EVENT_START_MINUTE, EVENT_START_SECOND);
+  EVENT_END_TIME = Date.UTC(eventYear, EVENT_END_MONTH - 1, EVENT_END_DAY, EVENT_END_HOUR, EVENT_END_MINUTE, EVENT_END_SECOND);
+}
+
+/* ===================================================== */
 
 const HAUNTED_SERVER_LEVELS = [
     { name: "Spooky", minScore: 0, maxScore: 100 },
