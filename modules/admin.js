@@ -31,7 +31,7 @@ const fs = require("fs");
 const indexjs = require("../app.js");
 const adminjs = require("./admin.js");
 const ejs = require("ejs");
-const log = require("../handlers/log.js");
+const { discordLog } = require("../handlers/log.js");
 
 
 module.exports.load = async function (app, db) {
@@ -87,7 +87,7 @@ module.exports.load = async function (app, db) {
     }
 
     let successredirect = "/admin/coins?success=SETCOINS";
-    log(
+    discordLog(
       `set coins`,
       `${req.session.userinfo.username} set the coins of the user with the ID \`${id}\` to \`${coins}\`.`
     );
@@ -186,7 +186,7 @@ module.exports.load = async function (app, db) {
     }
 
     let successredirect = "/admin/coins?success=ADDCOINS";
-    log(
+    discordLog(
       `add coins`,
       `${req.session.userinfo.username} added \`${req.query.coins}\` coins to the user with the ID \`${id}\`'s account.`
     );
@@ -294,7 +294,7 @@ module.exports.load = async function (app, db) {
 
       adminjs.suspend(req.query.id);
 
-      log(
+      discordLog(
         `set resources`,
         `${req.session.userinfo.username} set the resources of the user with the ID \`${id}\` to:\`\`\`servers: ${serversstring}\nCPU: ${cpustring}%\nMemory: ${ramstring} MB\nDisk: ${diskstring} MB\`\`\``
       );
@@ -448,7 +448,7 @@ module.exports.load = async function (app, db) {
       await db.delete("package-" + req.query.id);
       adminjs.suspend(req.query.id);
 
-      log(
+      discordLog(
         `set plan`,
         `${req.session.userinfo.username} removed the plan of the user with the ID \`${req.query.id}\`.`
       );
@@ -459,7 +459,7 @@ module.exports.load = async function (app, db) {
       await db.set("package-" + req.query.id, req.query.package);
       adminjs.suspend(req.query.id);
 
-      log(
+      discordLog(
         `set plan`,
         `${req.session.userinfo.username} set the plan of the user with the ID \`${req.query.id}\` to \`${req.query.package}\`.`
       );
@@ -548,7 +548,7 @@ module.exports.load = async function (app, db) {
       servers: servers,
     });
 
-    log(
+    discordLog(
       `create coupon`,
       `${req.session.userinfo.username} created the coupon code \`${code}\` which gives:\`\`\`coins: ${coins}\nMemory: ${ram} MB\nDisk: ${disk} MB\nCPU: ${cpu}%\nServers: ${servers}\`\`\``
     );
@@ -597,7 +597,7 @@ module.exports.load = async function (app, db) {
 
     await db.delete("coupon-" + code);
 
-    log(
+    discordLog(
       `revoke coupon`,
       `${req.session.userinfo.username} revoked the coupon code \`${code}\`.`
     );
@@ -678,7 +678,7 @@ module.exports.load = async function (app, db) {
     await db.delete("extra-" + discordid);
     await db.delete("package-" + discordid);
 
-    log(
+    discordLog(
       `remove account`,
       `${req.session.userinfo.username} removed the account with the ID \`${discordid}\`.`
     );
@@ -723,7 +723,7 @@ module.exports.load = async function (app, db) {
     if (!(await db.get("ip-" + req.query.id)))
       return res.redirect(`${failredirect}?err=NOIP`);
     let ip = await db.get("ip-" + req.query.id);
-    log(
+    discordLog(
       `view ip`,
       `${req.session.userinfo.username} viewed the IP of the account with the ID \`${req.query.id}\`.`
     );

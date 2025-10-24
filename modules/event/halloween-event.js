@@ -17,7 +17,7 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const log = require("../../handlers/log.js");
+const { discordLog } = require("../../handlers/log.js");
 const { requireAuth } = require("../../handlers/checkMiddleware.js");
 
 const HALLOWEEN_EVENT_DURATION = 7 * 24 * 60 * 60 * 1000; // 1 week
@@ -298,7 +298,7 @@ module.exports.load = async function(app, db) {
         eventData.rewardsClaimed = true;
         await db.set(`halloween-event-${userId}`, eventData);
 
-        log(`Halloween Rewards Claimed`, `${req.session.userinfo.username}#${req.session.userinfo.discriminator} claimed Halloween event rewards: ${JSON.stringify(totalRewards)}`);
+        discordLog(`Halloween Rewards Claimed`, `${req.session.userinfo.username}#${req.session.userinfo.discriminator} claimed Halloween event rewards: ${JSON.stringify(totalRewards)}`);
 
         res.json({
             success: true,

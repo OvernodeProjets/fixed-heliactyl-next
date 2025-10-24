@@ -28,6 +28,7 @@ const path = require("path");
 const fs = require("fs");
 const schedule = require("node-schedule");
 const { requireAuth, ownsServer } = require("../handlers/checkMiddleware.js")
+const { discordLog, serverActivityLog } = require("../handlers/log.js");
 
 const workflowsFilePath = path.join(__dirname, "../storage/workflows.json");
 const scheduledWorkflowsFilePath = path.join(
@@ -35,20 +36,6 @@ const scheduledWorkflowsFilePath = path.join(
   "../storage/scheduledWorkflows.json"
 );
 module.exports.load = async function (app, db) {
-
-async function logActivity(db, serverId, action, details) {
-  const timestamp = new Date().toISOString();
-  const activityLog = await db.get(`activity_log_${serverId}`) || [];
-  
-  activityLog.unshift({ timestamp, action, details });
-  
-  // Keep only the last 100 activities
-  if (activityLog.length > 100) {
-    activityLog.pop();
-  }
-  
-  await db.set(`activity_log_${serverId}`, activityLog);
-}
 
   const router = express.Router();
   const pterodactylClient = new PterodactylClientModule(
@@ -727,7 +714,7 @@ router.post('/server/:id/worlds/import/complete', requireAuth, ownsServer, async
       await db.set(`worlds-${serverId}`, trackedWorlds);
     }
 
-    await logActivity(db, serverId, 'Import World', { worldName });
+    await serverActivityLog(db, serverId, 'Import World', { worldName });
     res.json({ success: true });
   } catch (error) {
     console.error('Error completing world import:', error);
@@ -788,7 +775,7 @@ router.delete('/server/:id/worlds/:worldName', requireAuth, ownsServer, async (r
     const updatedWorlds = trackedWorlds.filter(w => w !== worldName);
     await db.set(`worlds-${serverId}`, updatedWorlds);
 
-    await logActivity(db, serverId, 'Delete World', { worldName });
+    await serverActivityLog(db, serverId, 'Delete World', { worldName });
     res.json({ success: true });
   } catch (error) {
     console.error('Error deleting world:', error);
@@ -1431,7 +1418,7 @@ router.put('/server/:id/variables', requireAuth, ownsServer, async (req, res) =>
 
         saveScheduledWorkflows();
 
-    await logActivity(db, instanceId, 'Save Workflow', { workflowDetails: workflow });
+        await serverActivityLog(db, instanceId, 'Save Workflow', { workflowDetails: workflow });
 
         res.json({ success: true, message: "Workflow saved successfully" });
       } catch (error) {
@@ -1845,7 +1832,7 @@ async function renewServer(db, serverId) {
     };
     
     await db.set(`renewal_${serverId}`, updatedRenewalData);
-    await logActivity(db, serverId, 'Server Renewal', {
+    await serverActivityLog(db, serverId, 'Server Renewal', {
       renewalCount: updatedRenewalData.renewalCount,
       nextRenewal: updatedRenewalData.nextRenewal
     });
@@ -1878,7 +1865,7 @@ async function checkExpiredServers(db) {
       }
       // If server is approaching expiration, log a warning
       else if (hoursUntilExpiration <= WARNING_THRESHOLD_HOURS) {
-        await logActivity(db, serverId, 'Renewal Warning', {
+        await serverActivityLog(db, serverId, 'Renewal Warning', {
           hoursRemaining: Math.round(hoursUntilExpiration * 10) / 10
         });
       }
@@ -1901,7 +1888,7 @@ async function handleExpiredServer(db, serverId) {
     console.log(`Server ${serverId} has expired and been stopped.`);
 
     // Log the expiration
-    await logActivity(db, serverId, 'Server Expired', {
+    await serverActivityLog(db, serverId, 'Server Expired', {
       lastRenewal: renewalData.lastRenewal,
       renewalCount: renewalData.renewalCount
     });
@@ -2156,7 +2143,7 @@ router.post('/server/:id/subdomains', requireAuth, ownsServer, async (req, res) 
     
     existingSubdomains.push(newSubdomain);
     await db.set(`subdomains-${serverId}`, existingSubdomains);
-    await logActivity(db, serverId, 'Create Subdomain', { subdomain, domain });
+    await serverActivityLog(db, serverId, 'Create Subdomain', { subdomain, domain });
     
     res.status(201).json({
       message: 'Subdomain created successfully',
@@ -2215,7 +2202,7 @@ router.delete('/server/:id/subdomains/:subdomain', requireAuth, ownsServer, asyn
 
     const updatedSubdomains = subdomains.filter(s => s.name !== subdomainToDelete);
     await db.set(`subdomains-${serverId}`, updatedSubdomains);
-    await logActivity(db, serverId, 'Delete Subdomain', { 
+    await serverActivityLog(db, serverId, 'Delete Subdomain', { 
       subdomain: subdomainToDelete,
       domain: subdomain.domain 
     });

@@ -21,7 +21,7 @@ const crypto = require('crypto');
 const axios = require('axios');
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
-const log = require("../../handlers/log");
+const { discordLog } = require("../../handlers/log");
 const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
 
 let google;
@@ -131,7 +131,7 @@ module.exports.load = async function (app, db) {
             timestamp: new Date().toISOString()
           }]);
 
-          log("signup", `${user.name} logged in to the dashboard for the first time with Google!`);
+          discordLog("signup", `${user.name} logged in to the dashboard for the first time with Google!`);
 
         } catch (createError) {
           try {

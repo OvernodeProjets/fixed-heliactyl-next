@@ -25,7 +25,7 @@ const adminjs = require("./admin.js");
 const fs = require("fs");
 const getPteroUser = require("../handlers/getPteroUser.js");
 const Queue = require("../handlers/Queue.js");
-const log = require("../handlers/log.js");
+const {discordLog} = require("../handlers/log.js");
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 
 if (settings.pterodactyl)
@@ -100,7 +100,7 @@ app.get("/updateinfo", requireAuth, async (req, res) => {
                     }
                 );
 
-                log(
+                discordLog(
                     "resource adjustment",
                     `Adjusted resources for server ${serverId} belonging to user ${req.session.userinfo.id} to standard limits (RAM: 1024MB, Disk: 5120MB, CPU: 50%)`
                 );
@@ -241,7 +241,6 @@ app.get("/create", requireAuth, async (req, res) => {
                 }
                 const specs = egginfo.info;
 
-                console.log(JSON.stringify(specs))
                 const serverSpecs = {
                   name: name.trim(),
                   user: await db.get(`users-${req.session.userinfo.id}`),
@@ -284,7 +283,7 @@ app.get("/create", requireAuth, async (req, res) => {
         console.error("Pterodactyl API Error:", errorData);
         
         // Log the error
-        log(
+        discordLog(
             "server creation error",
             `Failed to create server for ${req.session.userinfo.username}. Pterodactyl API Error: ${JSON.stringify(errorData)}`
         );
@@ -299,7 +298,7 @@ app.get("/create", requireAuth, async (req, res) => {
                 newpterodactylinfo.relationships.servers.data.push(serverinfotext);
                 req.session.pterodactyl = newpterodactylinfo;
 
-                log(
+                discordLog(
                     "created server",
                     `${req.session.userinfo.username} created a new server named \`${name}\` with the following specs:\n\`\`\`Memory: ${ram} MB\nCPU: ${cpu}%\nDisk: ${disk}\`\`\``
                 );
@@ -369,7 +368,7 @@ async function processQueue() {
       console.log('Server created successfully');
       await removeFromQueue(serverToCreate);
 
-      log(
+      discordLog(
         "server created from queue",
         `Server \`${serverToCreate.name}\` for user ID ${serverToCreate.userId} has been successfully created from the queue.`
       );
@@ -380,7 +379,7 @@ async function processQueue() {
       // Remove the server from the queue if Pterodactyl sent an error
       await removeFromQueue(serverToCreate);
       
-      log(
+      discordLog(
         "server creation failed",
         `Failed to create server \`${serverToCreate.name}\` for user ID ${serverToCreate.userId} from the queue. Server removed from queue due to Pterodactyl error.`
       );
@@ -390,7 +389,7 @@ async function processQueue() {
     // Remove the server from the queue if an error occurred
     await removeFromQueue(serverToCreate);
     
-    log(
+    discordLog(
       "server creation error",
       `Error occurred while creating server \`${serverToCreate.name}\` for user ID ${serverToCreate.userId} from the queue. Server removed from queue.`
     );
@@ -449,7 +448,7 @@ app.get("/queue-remove/:id", requireAuth, async (req, res) => {
       userQueuedServers = userQueuedServers.filter(server => server.queuePosition !== serverPos);
       await db.set(`${userId}-queued`, userQueuedServers);
 
-      log(
+      discordLog(
           "removed server from queue",
           `User ${userId} removed server "${serverToRemove.name}" from queue position ${serverPos}`
       );
@@ -465,7 +464,7 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
   try {
       let queuedServers = await db.get("queuedServers") || [];
 
-      log(
+      discordLog(
           "cleared server queue",
           `Admin ${req.session.userinfo.username} cleared the server queue. ${queuedServers.length} servers were removed from the queue.`
       );
@@ -669,7 +668,7 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
                 `${redirectlink}?id=${req.query.id}&err=ERRORONMODIFY`
               );
             let text = JSON.parse(await serverinfo.text());
-            log(
+            discordLog(
               `modify server`,
               `${req.session.userinfo.username}#${req.session.userinfo.discriminator} modified the server called \`${text.attributes.name}\` to have the following specs:\n\`\`\`Memory: ${ram} MB\nCPU: ${cpu}%\nDisk: ${disk}\`\`\``
             );

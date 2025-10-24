@@ -2,16 +2,26 @@ const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 const fetch = require('node-fetch')
 
-/**
- * Log an action to a Discord webhook.
- * @param {string} action 
- * @param {string} message 
- */
-module.exports = (action, message) => {
+const logTransaction = async (db, userId, type, amount, balanceAfter, details) => {
+}
+ 
+const serverActivityLog = async (db, serverId, action, details) => {
+    const timestamp = new Date().toISOString();
+    const activityLog = await db.get(`activity_log_${serverId}`) || [];
+  
+    activityLog.unshift({ timestamp, action, details });
+  
+    // Keep only the last 100 activities
+    if (activityLog.length > 100) {
+      activityLog.pop();
+    }
+  
+    await db.set(`activity_log_${serverId}`, activityLog);
+}
+
+const discordLog = async (action, message) => {
     if (!settings.logging.status) return
     if (!settings.logging.actions.user[action] && !settings.logging.actions.admin[action]) return
-
-    console.log(action, message);
 
     fetch(settings.logging.private, {
         method: 'POST',
@@ -39,4 +49,9 @@ module.exports = (action, message) => {
 
 function hexToDecimal(hex) {
     return parseInt(hex.replace("#", ""), 16)
+}
+
+module.exports = {
+    discordLog,
+    serverActivityLog
 }

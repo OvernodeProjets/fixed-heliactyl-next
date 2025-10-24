@@ -22,27 +22,13 @@ const loadConfig = require("../../handlers/config");
 const settings = loadConfig("./config.toml");
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware")
 const express = require("express");
+const { discordLog, serverActivityLog } = require("../../handlers/log");
 
 
 module.exports.load = async function (app, db) {
 const router = express.Router();
 
-
-  async function logActivity(db, serverId, action, details) {
-  const timestamp = new Date().toISOString();
-  const activityLog = await db.get(`activity_log_${serverId}`) || [];
-  
-  activityLog.unshift({ timestamp, action, details });
-  
-  // Keep only the last 100 activities
-  if (activityLog.length > 100) {
-    activityLog.pop();
-  }
-  
-  await db.set(`activity_log_${serverId}`, activityLog);
-}
-
-    // GET /api/server/:id/files/download
+// GET /api/server/:id/files/download
 router.get('/server/:id/files/download', requireAuth, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
@@ -214,7 +200,7 @@ router.get(
           }
         );
 
-    await logActivity(db, serverId, 'Write File', { file });
+    await serverActivityLog(db, serverId, 'Write File', { file });
 
         res.status(204).send(); // No content response
       } catch (error) {
@@ -300,7 +286,7 @@ router.get(
             },
           }
         );
-    await logActivity(db, serverId, 'Delete File', { root, files });
+        await serverActivityLog(db, serverId, 'Delete File', { root, files });
         res.status(204).send();
       } catch (error) {
         console.error("Error deleting files:", error);

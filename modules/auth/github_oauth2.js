@@ -24,7 +24,7 @@ const getPteroUser = require('../../handlers/getPteroUser.js');
 
 const fetch = require("node-fetch");
 const indexjs = require("../../app.js");
-const log = require("../../handlers/log");
+const { discordLog } = require("../../handlers/log");
 module.exports.load = async function (app, db) {
   app.get("/github/login", (req, res) => {
     if (req.query.redirect) req.session.redirect = "/" + req.query.redirect;
@@ -176,7 +176,7 @@ module.exports.load = async function (app, db) {
           notifications.push(notification)
           await db.set('notifications-' + userinfo.id, notifications)
           
-          log("signup", `${userinfo.login} logged in to the dashboard for the first time!`);
+          discordLog("signup", `${userinfo.login} logged in to the dashboard for the first time!`);
         } else {
           return res.send("New users cannot signup currently.");
         }

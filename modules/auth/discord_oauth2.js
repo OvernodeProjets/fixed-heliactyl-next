@@ -39,7 +39,7 @@ if (settings.pterodactyl.domain.slice(-1) == "/")
 
 const fetch = require("node-fetch");
 const indexjs = require("../../app.js");
-const log = require("../../handlers/log.js");
+const { discordLog } = require("../../handlers/log.js");
 
 const fs = require("fs");
 const { renderFile } = require("ejs");
@@ -592,7 +592,7 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
             await db.set('notifications-' + userinfo.id, notifications)
             // Done
             
-            log(
+            discordLog(
               "signup",
               `${userinfo.username} logged in to the dashboard for the first time with discord!`
             );

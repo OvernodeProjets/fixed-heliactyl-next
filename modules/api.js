@@ -26,7 +26,7 @@ const ejs = require("ejs");
 const fetch = require("node-fetch");
 const NodeCache = require("node-cache");
 const Queue = require("../handlers/Queue.js");
-const log = require("../handlers/log");
+const { discordLog } = require("../handlers/log");
 const getPteroUser = require('../handlers/getPteroUser.js');
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 
@@ -179,7 +179,7 @@ app.get("/giftcoins", async (req, res) => {
     ]);
 
     // Log the transaction
-    log('Gifted Coins', `${req.session.userinfo.username} sent ${coins} coins to the user with the ID \`${recipientId}\`.`);
+    discordLog('Gifted Coins', `${req.session.userinfo.username} sent ${coins} coins to the user with the ID \`${recipientId}\`.`);
 
     return res.redirect(`/transfer?err=none`);
   } catch (error) {
