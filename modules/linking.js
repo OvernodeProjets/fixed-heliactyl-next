@@ -22,7 +22,7 @@ const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const indexjs = require("../app.js");
 const log = require("../handlers/log");
-const { requireAuth } = require("../handlers/requireAuth.js");
+const { requireAuth } = require("../handlers/checkMiddleware.js");
 
 module.exports.load = async function (app, db) {
   // Helper function to fetch user info from Discord API

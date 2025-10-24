@@ -17,7 +17,7 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const { requireAuth } = require('../handlers/requireAuth');
+const { requireAuth } = require('../handlers/checkMiddleware');
 
 module.exports.load = async function (app, db) {
   // Configuration

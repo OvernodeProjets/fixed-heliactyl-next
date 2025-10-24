@@ -18,7 +18,7 @@ const heliactylModule = {
 module.exports.heliactylModule = heliactylModule;
 
 const crypto = require('crypto');
-const { requireAuth } = require('../../handlers/requireAuth.js');
+const { requireAuth } = require('../../handlers/checkMiddleware.js');
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 

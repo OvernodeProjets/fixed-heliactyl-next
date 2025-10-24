@@ -23,7 +23,7 @@ const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 const WebSocket = require('ws');
 const axios = require('axios');
-const { requireAuth } = require("../handlers/requireAuth.js");
+const { requireAuth } = require("../handlers/checkMiddleware.js");
 
 module.exports.load = async function(app, db) {
 

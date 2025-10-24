@@ -28,7 +28,7 @@ const NodeCache = require("node-cache");
 const Queue = require("../handlers/Queue.js");
 const log = require("../handlers/log");
 const getPteroUser = require('../handlers/getPteroUser.js');
-const { requireAuth } = require("../handlers/requireAuth.js");
+const { requireAuth } = require("../handlers/checkMiddleware.js");
 
 const myCache = new NodeCache({ deleteOnExpire: true, stdTTL: 59 });
 

@@ -21,7 +21,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const crypto = require('crypto');
 const { Readable, Transform } = require('stream');
-const { requireAuth } = require("../handlers/requireAuth.js");
+const { requireAuth } = require("../handlers/checkMiddleware.js");
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
 

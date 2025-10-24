@@ -18,7 +18,7 @@ const heliactylModule = {
 module.exports.heliactylModule = heliactylModule;
 
 const log = require("../../handlers/log.js");
-const { requireAuth } = require("../../handlers/requireAuth.js");
+const { requireAuth } = require("../../handlers/checkMiddleware.js");
 
 const HALLOWEEN_EVENT_DURATION = 7 * 24 * 60 * 60 * 1000; // 1 week
 const EVENT_START_TIME = new Date('2024-10-03T12:30:22+00:00').getTime();

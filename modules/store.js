@@ -20,7 +20,7 @@ module.exports.heliactylModule = heliactylModule;
 const adminjs = require("./admin.js");
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
-const { requireAuth } = require("../handlers/requireAuth.js");
+const { requireAuth } = require("../handlers/checkMiddleware.js");
 
 const HOUR_IN_MS = 3600000;
 const WEEK_IN_MS = 604800000;

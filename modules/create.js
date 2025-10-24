@@ -26,7 +26,7 @@ const fs = require("fs");
 const getPteroUser = require("../handlers/getPteroUser.js");
 const Queue = require("../handlers/Queue.js");
 const log = require("../handlers/log.js");
-const { requireAuth } = require("../handlers/requireAuth.js");
+const { requireAuth } = require("../handlers/checkMiddleware.js");
 
 if (settings.pterodactyl)
     if (settings.pterodactyl.domain) {

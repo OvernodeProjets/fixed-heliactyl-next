@@ -20,7 +20,7 @@ module.exports.heliactylModule = heliactylModule;
 const axios = require("axios");
 const loadConfig = require("../../handlers/config");
 const settings = loadConfig("./config.toml");
-const { requireAuth } = require("../../handlers/requireAuth");
+const { requireAuth } = require("../../handlers/checkMiddleware");
 
 module.exports.load = async function (app, db) {
   // Admin authentication data

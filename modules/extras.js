@@ -20,7 +20,7 @@ module.exports.heliactylModule = heliactylModule;
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const fetch = require("node-fetch");
-const { requireAuth } = require("../handlers/requireAuth.js");
+const { requireAuth } = require("../handlers/checkMiddleware.js");
 
 module.exports.load = async function(app, db) {
   app.get("/panel", async (req, res) => {

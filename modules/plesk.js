@@ -20,7 +20,7 @@ module.exports.heliactylModule = heliactylModule;
 const fetch = require("node-fetch");
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
-const { requireAuth } = require("../handlers/requireAuth.js");
+const { requireAuth } = require("../handlers/checkMiddleware.js");
 
 // Plesk API configuration
 const PLESK_URL = settings.api.client.plesk.PLESK_URL;
