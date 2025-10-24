@@ -126,7 +126,6 @@ display:none;
 </style>
 
 <main class="flex-grow container mx-auto px-4 py-8 transition-all">
-    <%- include('../components/server') %>
     <div class="mb-5 lg:flex lg:items-center lg:justify-between">
         <div class="min-w-0 flex-1">
           <h2 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight" id="server-name">
@@ -184,7 +183,8 @@ display:none;
             </a>
           </span>
         </div>
-      </div>      
+    </div>  
+    <%- include('../components/server') %>    
     <!-- Mobile View -->
     <div class="lg:hidden">
         <div class="flex space-x-2 mb-4">
