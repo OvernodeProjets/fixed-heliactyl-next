@@ -816,7 +816,7 @@ function smoothScrollConsole() {
 }
 
 function updateStats(stats) {
-    const cpuUsage = (stats.cpu_absolute / 100).toFixed(2);
+    const cpuUsage = (stats.cpu_absolute).toFixed(2);
     const ramUsage = (stats.memory_bytes / 1024 / 1024).toFixed(2);
     const diskUsage = (stats.disk_bytes / 1024 / 1024).toFixed(2);
     const networkUsage = (stats.network.tx_bytes / 1024).toFixed(2);
