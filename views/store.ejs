@@ -326,7 +326,7 @@ function storeBilling() {
     return {
         renewalBypassStatus: {
             hasRenewalBypass: false,
-            price: 3500,
+            price: <%= settings.api.client.coins.store.renewalbypass.cost %>,
             canAfford: false,
             currentBalance: 0
         },

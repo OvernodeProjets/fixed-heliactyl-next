@@ -337,21 +337,29 @@ free = true
     [api.client.coins.store]
     enabled = true
 
+      [api.client.coins.store.renewalbypass]
+      enabled = true # implementation soon
+      cost = 3500
+
       [api.client.coins.store.ram]
-      cost = 300
+      cost = 600
       per = 1_024
+      limit = 16 # limit * per = limit total RAM in MB
 
       [api.client.coins.store.disk]
       cost = 200
       per = 5_120
+      limit = 100 # limit * per = limit total disk in MB
 
       [api.client.coins.store.cpu]
-      cost = 350
+      cost = 500
       per = 100
+      limit = 8 # limit * per = limit total CPU in %
 
       [api.client.coins.store.servers]
-      cost = 100
-      per = 2
+      cost = 200
+      per = 1
+      limit = 10
 
 # ======================================================
 # Secondary Modules

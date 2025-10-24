@@ -17,323 +17,32 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const adminjs = require("./admin.js");
+const { requireAuth } = require("../handlers/checkMiddleware.js");
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
-const { requireAuth } = require("../handlers/checkMiddleware.js");
 
-const HOUR_IN_MS = 3600000;
-const WEEK_IN_MS = 604800000;
-const MAX_HISTORY_DAYS = 30;
-
-class BillingError extends Error {
-  constructor(message, code) {
-    super(message);
-    this.name = 'BillingError';
-    this.code = code;
-  }
-}
-
-class RateLimiter {
-  constructor() {
-    this.requests = new Map();
-    this.limit = 100; // requests per minute
-    this.windowMs = 60000; // 1 minute
-  }
-
-  isRateLimited(userId) {
-    const now = Date.now();
-    const userRequests = this.requests.get(userId) || [];
-    const windowRequests = userRequests.filter(time => time > now - this.windowMs);
-    
-    this.requests.set(userId, windowRequests);
-    
-    if (windowRequests.length >= this.limit) {
-      return true;
-    }
-    
-    windowRequests.push(now);
-    return false;
-  }
-}
-
-class BillingManager {
-  constructor(db) {
-    this.db = db;
-    this.rateLimiter = new RateLimiter();
-    this.isProcessingBilling = false;
-    this.resourcePrices = {
-      ram: settings.api.client.coins.store.ram.cost,
-      disk: settings.api.client.coins.store.disk.cost,
-      cpu: settings.api.client.coins.store.cpu.cost,
-      servers: settings.api.client.coins.store.servers.cost
-    };
-
-    // Initialize billing cycle check
-    setInterval(() => this.processBillingCycles().catch(err => {
-      console.error('[ERROR] Billing cycle processing failed:', err);
-      this.isProcessingBilling = false;
-    }), HOUR_IN_MS);
-
-    // Initialize usage tracking
-    setInterval(() => this.processUsageTracking().catch(err => {
-      console.error('[ERROR] Usage tracking failed:', err);
-    }), HOUR_IN_MS);
-  }
-
-  async safeDbOperation(operation) {
-    try {
-      return await operation();
-    } catch (error) {
-      console.error('[ERROR] Database operation failed:', error);
-      throw new BillingError('Database operation failed', 'DB_ERROR');
-    }
-  }
-
-  validateResourceAmount(resourceType, amount) {
-    if (!this.resourcePrices[resourceType]) {
-      throw new BillingError('Invalid resource type', 'INVALID_RESOURCE');
-    }
-    
-    if (!Number.isFinite(amount) || amount < 1 || amount > 10) {
-      throw new BillingError('Invalid amount', 'INVALID_AMOUNT');
-    }
-
-    return true;
-  }
-
-  async getActiveSubscriptionCount(userId) {
-    const subscriptions = await this.safeDbOperation(() => 
-      this.db.get(`subscriptions-${userId}`) || []
-    );
-    return subscriptions.filter(sub => sub.active).length;
-  }
-
-  async logHistory(userId, amount, resourceType, recurring = false) {
-    const historyEntry = {
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      userId,
-      amount,
-      resourceType,
-      recurring,
-      timestamp: Date.now()
-    };
-    
-    await this.safeDbOperation(async () => {
-      const history = await this.db.get(`history-${userId}`) || [];
-      history.push(historyEntry);
-      
-      // Keep only last 30 days
-      const thirtyDaysAgo = Date.now() - (MAX_HISTORY_DAYS * 24 * HOUR_IN_MS);
-      const filteredHistory = history.filter(h => h.timestamp > thirtyDaysAgo);
-      
-      await this.db.set(`history-${userId}`, filteredHistory);
-    });
-    
-    log(`Resource ${recurring ? 'Billing' : 'Purchase'}`, 
-      `User ${userId} ${recurring ? 'billed' : 'purchased'} ${resourceType} for ${amount} coins`);
-  }
-
-  async createSubscription(userId, resourceType, amount, cost) {
-    this.validateResourceAmount(resourceType, amount);
-    
-    const subscription = {
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      userId,
-      resourceType,
-      amount,
-      weeklyCost: cost,
-      nextBillingDate: Date.now() + WEEK_IN_MS,
-      active: true,
-      created: Date.now(),
-      lastUpdated: Date.now()
-    };
-
-    await this.safeDbOperation(async () => {
-      const subscriptions = await this.db.get(`subscriptions-${userId}`) || [];
-      subscriptions.push(subscription);
-      await this.db.set(`subscriptions-${userId}`, subscriptions);
-    });
-    
-    return subscription;
-  }
-
-  async updateResourceLimits(userId, resourceType, amount, isAddition = true) {
-    await this.safeDbOperation(async () => {
-      const extra = await this.db.get(`extra-${userId}`) || {
-        ram: 0,
-        disk: 0,
-        cpu: 0,
-        servers: 0
-      };
-
-      // Calculate actual resource amount using multiplier
-      const actualAmount = amount * (RESOURCE_MULTIPLIERS[resourceType] || 1);
-
-      const newAmount = isAddition ? 
-        extra[resourceType] + actualAmount :
-        extra[resourceType] - actualAmount;
-
-      // Convert MAX_RESOURCE_LIMITS to actual values using multipliers  
-      const maxLimit = MAX_RESOURCE_LIMITS[resourceType] * (RESOURCE_MULTIPLIERS[resourceType] || 1);
-
-      if (newAmount > maxLimit) {
-        throw new BillingError('Resource limit exceeded', 'RESOURCE_LIMIT_EXCEEDED');
-      }
-
-      extra[resourceType] = Math.max(0, newAmount);
-
-      if (Object.values(extra).every(v => v === 0)) {
-        await this.db.delete(`extra-${userId}`);
-      } else {
-        await this.db.set(`extra-${userId}`, extra);
-      }
-
-      return extra;
-    });
-  }
-
-  async processSubscriptionPayment(userId, subscription) {
-    return await this.safeDbOperation(async () => {
-      const userCoins = await this.db.get(`coins-${userId}`) || 0;
-      const hasRenewalBypass = await this.db.get(`renewbypass-${userId}`);
-
-      // Skip payment if user has renewal bypass
-      if (hasRenewalBypass) {
-        const subscriptions = await this.db.get(`subscriptions-${userId}`) || [];
-        const index = subscriptions.findIndex(s => s.id === subscription.id);
-        
-        if (index !== -1) {
-          subscriptions[index].nextBillingDate = Date.now() + WEEK_IN_MS;
-          subscriptions[index].lastUpdated = Date.now();
-          await this.db.set(`subscriptions-${userId}`, subscriptions);
-        }
-
-        return true;
-      }
-
-      if (userCoins < subscription.weeklyCost) {
-        await this.revokeResources(userId, subscription);
-        return false;
-      }
-
-      const newBalance = userCoins - subscription.weeklyCost;
-      await this.db.set(`coins-${userId}`, newBalance);
-      
-      const subscriptions = await this.db.get(`subscriptions-${userId}`) || [];
-      const index = subscriptions.findIndex(s => s.id === subscription.id);
-      
-      if (index !== -1) {
-        subscriptions[index].nextBillingDate = Date.now() + WEEK_IN_MS;
-        subscriptions[index].lastUpdated = Date.now();
-        await this.db.set(`subscriptions-${userId}`, subscriptions);
-      }
-
-      await this.logHistory(userId, subscription.weeklyCost, subscription.resourceType, true);
-      return true;
-    });
-  }
-
-  async revokeResources(userId, subscription) {
-    if (!subscription.active) return;
-
-    await this.safeDbOperation(async () => {
-      await this.updateResourceLimits(userId, subscription.resourceType, subscription.amount, false);
-      
-      const subscriptions = await this.db.get(`subscriptions-${userId}`) || [];
-      const index = subscriptions.findIndex(s => s.id === subscription.id);
-      
-      if (index !== -1) {
-        subscriptions[index].active = false;
-        subscriptions[index].lastUpdated = Date.now();
-        await this.db.set(`subscriptions-${userId}`, subscriptions);
-      }
-    });
-
-    adminjs.suspend(userId);
-    
-    log('Resources Revoked', 
-      `Revoked ${subscription.amount} ${subscription.resourceType} from user ${userId} due to non-payment`);
-  }
-
-  async processBillingCycles() {
-    if (this.isProcessingBilling) return;
-    this.isProcessingBilling = true;
-
-    try {
-      const now = Date.now();
-      const accounts = await this.safeDbOperation(() => this.db.get('accounts') || []);
-      
-      for (const userId of accounts) {
-        try {
-          const subscriptions = await this.db.get(`subscriptions-${userId}`) || [];
-          const activeSubscriptions = subscriptions.filter(s => s.active && s.nextBillingDate <= now);
-          
-          for (const subscription of activeSubscriptions) {
-            await this.processSubscriptionPayment(userId, subscription);
-          }
-        } catch (error) {
-          console.error(`[ERROR] Failed to process billing for user ${userId}:`, error);
-          continue;
-        }
-      }
-    } finally {
-      this.isProcessingBilling = false;
-    }
-  }
-
-  async processUsageTracking() {
-    const now = Date.now();
-    const accounts = await this.safeDbOperation(() => this.db.get('accounts') || []);
-
-    for (const userId of accounts) {
-      try {
-        const resources = await this.db.get(`extra-${userId}`);
-        if (!resources) continue;
-
-        const usage = {
-          timestamp: now,
-          resources: { ...resources }
-        };
-
-        const usageHistory = await this.db.get(`usage-${userId}`) || [];
-        usageHistory.push(usage);
-
-        // Keep only last 30 days
-        const thirtyDaysAgo = now - (MAX_HISTORY_DAYS * 24 * HOUR_IN_MS);
-        const filteredHistory = usageHistory.filter(u => u.timestamp > thirtyDaysAgo);
-        
-        await this.db.set(`usage-${userId}`, filteredHistory);
-      } catch (error) {
-        console.error(`[ERROR] Failed to track usage for user ${userId}:`, error);
-        continue;
-      }
-    }
-  }
-}
-
-const RENEWAL_BYPASS_PRICE = 3500;
+const RENEWAL_BYPASS_PRICE = settings.api.client.coins.store.renewalbypass.cost;
 const RESOURCE_PRICES = {
-  ram: 600,     // coins per GB
-  disk: 50,     // coins per 5GB
-  cpu: 500,     // coins per 100% CPU
-  servers: 200  // coins per server
+  ram: settings.api.client.coins.store.ram.cost,     // coins per GB
+  disk: settings.api.client.coins.store.disk.cost,   // coins per 5GB
+  cpu: settings.api.client.coins.store.cpu.cost,     // coins per 100% CPU
+  servers: settings.api.client.coins.store.servers.cost  // coins per server
 };
 
 // Resource multipliers to convert units to actual values
 const RESOURCE_MULTIPLIERS = {
-  ram: 1024,    // 1 unit = 1024 MB (1 GB)
-  disk: 5120,   // 1 unit = 5120 MB (5 GB)
-  cpu: 100,     // 1 unit = 100% CPU
-  servers: 1    // 1 unit = 1 server
+  ram: settings.api.client.coins.store.ram.per,    // 1 unit = 1024 MB (1 GB)
+  disk: settings.api.client.coins.store.disk.per,   // 1 unit = 5120 MB (5 GB)
+  cpu: settings.api.client.coins.store.cpu.per,     // 1 unit = 100% CPU
+  servers: settings.api.client.coins.store.servers.per    // 1 unit = 1 server
 };
 
 // Maximum resource limits per user
 const MAX_RESOURCE_LIMITS = {
-  ram: 96,      // 32 GB
-  disk: 200,    // 1TB (200 * 5GB)
-  cpu: 36,      // 1000% (10 * 100%)
-  servers: 20   // 20 servers
+  ram: settings.api.client.coins.store.ram.limit,      // 32 GB
+  disk: settings.api.client.coins.store.disk.limit,    // 1TB (200 * 5GB)
+  cpu: settings.api.client.coins.store.cpu.limit,      // 1000% (10 * 100%)
+  servers: settings.api.client.coins.store.servers.limit   // 20 servers
 };
 
 class StoreError extends Error {
@@ -438,8 +147,7 @@ class Store {
 }
 
 module.exports.load = function(app, db) {
-    
-  const billingManager = new BillingManager(db);
+  
   const store = new Store(db); 
 
 class StoreController {
@@ -450,10 +158,6 @@ class StoreController {
       }
 
       const userId = req.session.userinfo.id;
-
-      if (billingManager.rateLimiter.isRateLimited(userId)) {
-        return this.sendError(res, 429, 'Rate limit exceeded');
-      }
 
       // Check if user already has renewal bypass
       const hasRenewalBypass = await db.get(`renewbypass-${userId}`);
