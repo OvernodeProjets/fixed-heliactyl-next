@@ -19,10 +19,12 @@ module.exports.heliactylModule = heliactylModule;
 
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
-const fetch = require("node-fetch");
 const { requireAuth } = require("../handlers/checkMiddleware.js");
+const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
 
 module.exports.load = async function(app, db) {
+  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
+
   app.get("/panel", async (req, res) => {
     res.redirect(settings.pterodactyl.domain);
   });
@@ -94,25 +96,15 @@ module.exports.load = async function(app, db) {
 
 // Helper function to update password
 async function updatePassword(userInfo, newPassword, settings, db) {
-  await fetch(
-    `${settings.pterodactyl.domain}/api/application/users/${userInfo.id}`,
-    {
-      method: "patch",
-      headers: {
-        'Content-Type': 'application/json',
-        "Authorization": `Bearer ${settings.pterodactyl.key}`
-      },
-      body: JSON.stringify({
-        username: userInfo.username,
-        email: userInfo.email,
-        first_name: userInfo.first_name,
-        last_name: userInfo.last_name,
-        password: newPassword
-      })
-    }
-  );
+  await AppAPI.updateUser(userInfo.id, {
+    username: userInfo.username,
+    email: userInfo.email,
+    first_name: userInfo.first_name,
+    last_name: userInfo.last_name,
+    password: newPassword
+  });
 
-  await db.set("password-" + userInfo.id, newPassword);
+  await db.set(`password-${userInfo.id}`, newPassword);
 }
 };
 
