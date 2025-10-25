@@ -198,14 +198,23 @@ module.exports.load = async function (app, db) {
         } else {
           return res.send("An error occurred while attempting to create the account.");
         }
-
-        discordLog(`User ${user.id} (${user.email}) created an account.`);
-
       } catch (fetchError) {
         console.error("Error fetching existing account:", fetchError.response?.data || fetchError.message);
         return res.send("An error occurred while attempting to create the account.");
       }
     }
+
+    // Auth notification
+    let notifications = await db.get('notifications-' + userId) || [];
+    let notification = {
+      "action": "user:signup",
+      "name": "Account created via Local OAuth2",
+      "ip": req.ip,
+      "timestamp": new Date().toISOString()
+    }
+
+    notifications.push(notification)
+    await db.set('notifications-' + userId, notifications)
 
     res.status(201).json({ message: "User registered successfully" });
     return;
@@ -252,6 +261,7 @@ module.exports.load = async function (app, db) {
     let notification = {
       "action": "user:auth",
       "name": "Sign in from new location",
+      "ip": req.ip,
       "timestamp": new Date().toISOString()
     }
 
@@ -431,6 +441,7 @@ module.exports.load = async function (app, db) {
     let notification = {
       "action": "user:auth",
       "name": "Sign in using magic link",
+      "ip": req.ip,
       "timestamp": new Date().toISOString()
     }
 

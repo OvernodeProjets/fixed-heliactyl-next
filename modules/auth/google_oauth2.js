@@ -127,7 +127,8 @@ module.exports.load = async function (app, db) {
 
           await db.set('notifications-' + user.id, [{
             action: "user:signup",
-            name: "User registration",
+            name: "Account created via Google OAuth2",
+            ip: req.ip,
             timestamp: new Date().toISOString()
           }]);
 
@@ -187,6 +188,7 @@ module.exports.load = async function (app, db) {
       notifications.push({
         action: "user:auth",
         name: "Sign in from new location",
+        ip: req.ip,
         timestamp: new Date().toISOString()
       });
       await db.set('notifications-' + user.id, notifications);

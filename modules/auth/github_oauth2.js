@@ -170,6 +170,7 @@ module.exports.load = async function (app, db) {
           let notification = {
             "action": "user:signup",
             "name": "User registration",
+            "ip": req.ip,
             "timestamp": new Date().toISOString()
           }
 
@@ -205,6 +206,7 @@ module.exports.load = async function (app, db) {
       let notification = {
         "action": "user:auth",
         "name": "Sign in from new location",
+        "ip": req.ip,
         "timestamp": new Date().toISOString()
       }
 

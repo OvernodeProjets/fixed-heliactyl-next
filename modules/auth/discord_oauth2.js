@@ -562,12 +562,12 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
             let notification = {
               "action": "user:signup",
               "name": "User registration",
+              "ip": req.ip,
               "timestamp": new Date().toISOString()
             }
 
             notifications.push(notification)
             await db.set('notifications-' + userinfo.id, notifications)
-            // Done
             
             discordLog(
               "signup",
@@ -589,12 +589,12 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
         let notification = {
           "action": "user:auth",
           "name": "Sign in from new location",
+          "ip": req.ip,
           "timestamp": new Date().toISOString()
         }
 
         notifications.push(notification)
         await db.set('notifications-' + userinfo.id, notifications)
-        // Done
 
         if (customredirect) return res.redirect(customredirect);
         return res.redirect(
