@@ -416,24 +416,12 @@ module.exports.load = async function (app, db) {
       global_name: user.username
     };
 
-    // Fetch Pterodactyl user info
-    let cacheaccount = await fetch(
-      settings.pterodactyl.domain + "/api/application/users/" + (await db.get("users-" + user.id)) + "?include=servers",
-      {
-        method: "get",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${settings.pterodactyl.key}`,
-        },
-      }
-    );
-
-    if ((await cacheaccount.statusText) == "Not Found") {
-      return res.status(500).json({ error: "Failed to fetch user information" });
+    const PterodactylUser = await getPteroUser(userinfo.id, db);
+    if (!PterodactylUser) {
+        res.send("An error has occurred while attempting to update your account information and server list.");
+        return;
     }
-
-    let cacheaccountinfo = JSON.parse(await cacheaccount.text());
-    req.session.pterodactyl = cacheaccountinfo.attributes;
+    req.session.pterodactyl = PterodactylUser.attributes;
 
     // Delete the used magic token
     await db.delete(`magic-${token}`);
