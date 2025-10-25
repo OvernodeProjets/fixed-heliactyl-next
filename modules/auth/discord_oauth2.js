@@ -211,7 +211,7 @@ app.get("/logout", (req, res) => {
   app.get(`/submitlogin`, async (req, res) => {
     let customredirect = req.session.redirect;
     delete req.session.redirect;
-    if (!req.query.code) return res.send("Missing code.")
+    if (!req.query.code) return res.send("Missing code.");
 
     let json = await fetch("https://discord.com/api/oauth2/token", {
       method: "post",
