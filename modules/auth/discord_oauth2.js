@@ -38,13 +38,7 @@ if (settings.pterodactyl.domain.slice(-1) == "/")
   settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
 
 const fetch = require("node-fetch");
-const indexjs = require("../../app.js");
 const { discordLog } = require("../../handlers/log.js");
-
-const fs = require("fs");
-const { renderFile } = require("ejs");
-// 05/2023: removed - no one used it so this should be removed from oauth
-const vpnCheck = require("../../handlers/vpnCheck.js");
 
 module.exports.load = async function (app, db) {
   app.get("/login", async (req, res) => {
@@ -217,24 +211,7 @@ app.get("/logout", (req, res) => {
   app.get(`/submitlogin`, async (req, res) => {
     let customredirect = req.session.redirect;
     delete req.session.redirect;
-    if (!req.query.code) return res.send("Missing code.");
-
-    let ip;
-      
-    ip = req.headers["cf-connecting-ip"] || req.connection.remoteAddress;
-      
-    ip = (ip ? ip : "::1")
-      .replace(/::1/g, "::ffff:127.0.0.1") // Replace IPv6 loopback address with IPv4 loopback
-      .replace(/^.*:/, ""); // Strip out any leading characters before the IP address
-
-    if (
-      settings.antivpn.status &&
-      ip !== "127.0.0.1" &&
-      !settings.antivpn.whitelistedIPs.includes(ip)
-    ) {
-      const vpn = await vpnCheck(settings.antivpn.APIKey, db, ip, res);
-      if (vpn) return;
-    }
+    if (!req.query.code) return res.send("Missing code.")
 
     let json = await fetch("https://discord.com/api/oauth2/token", {
       method: "post",

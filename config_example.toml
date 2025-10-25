@@ -372,15 +372,8 @@ every = 60
 coins = 2.5
 _note = "This is the 2nd-generation version of Heliactyl's AFK system. Please report any bugs on the GitHub (github.com/heliactyloss/heliactyl). Thank you."
 
-
 [api.rdv]
 enabled = false
-
-[antivpn]
-status = false
-APIKey = "Proxycheck API Key"
-whitelistedIPs = ["IP address"]
-note = "For this to work, generate an API Key on https://proxycheck.io/. If you do not put a key, Heliactyl will automatically disable anti-VPN."
 
 [whitelist]
 status = false
