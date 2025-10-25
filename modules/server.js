@@ -1521,7 +1521,6 @@ router.post('/server/:id/users', requireAuth, ownsServer, async (req, res) => {
         let serverDetails = await pterodactylClient.getServerDetails(
           serverId
         );
-        console.log(`Server ${serverId} suspension status: ${serverDetails.attributes.is_suspended}`);
         if (serverDetails.attributes.is_suspended) {
           console.log(`Server ${serverId} is suspended. Denying WebSocket access.`);
           return res
