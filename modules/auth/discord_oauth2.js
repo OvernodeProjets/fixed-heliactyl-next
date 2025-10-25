@@ -269,6 +269,7 @@ app.get("/logout", (req, res) => {
       });
       let guildsinfo = await guildsjson.json();
       if (userinfo.verified == true) {
+          const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.ip;
         if (settings.api.client.oauth2.ip.block.includes(ip))
           return res.send(
             "You could not sign in, because your IP has been blocked from signing in."
