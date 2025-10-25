@@ -48,7 +48,7 @@ module.exports.load = async function (app, db) {
         const recaptchaVerification = await fetch('https://www.google.com/recaptcha/api/siteverify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: `secret=${settings.security.recaptchaSiteKey}&response=${recaptchaResponse}`
+          body: `secret=${settings.security.recaptchaServerKey}&response=${recaptchaResponse}`
         });
         const data = await recaptchaVerification.json();
         return data.success;

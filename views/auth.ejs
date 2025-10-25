@@ -204,7 +204,7 @@
             modal.classList.add('show');
             <% if(settings.security.enableCaptcha) { %>
             grecaptcha.render('recaptcha-container', {
-                'sitekey': '6LcpgpAqAAAAAGVhH7T0gaRx0AqS4jbw8NQlvk1x'
+                'sitekey': '<%= settings.security.recaptchaSiteKey %>'
             });
             <% } %> 
         }

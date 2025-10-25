@@ -76,7 +76,7 @@
                 </div>
                 <% if(settings.security.enableCaptcha) { %>
                 <div class="flex justify-center">
-                    <div class="g-recaptcha" data-sitekey="<%= settings.security.captchaSiteKey %>"></div>
+                    <div class="g-recaptcha" data-sitekey="<%= settings.security.recaptchaSiteKey %>"></div>
                 </div>
                 <% } %>
                 <button style="box-shadow: inset 0px 4px 5px -3px rgba(55,65,81,1);" type="submit" class="hover:scale-95 w-full py-2.5 px-4 bg-gray-800 hover:bg-gray-700 transition text-white rounded-full transition font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center">

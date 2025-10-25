@@ -380,6 +380,11 @@ status = false
 users = [ "User ID" ]
 note = "This allows only specific people to be able to login to the Heliactyl dashboard. This does not affect your Panel."
 
+[security]
+enableCaptcha = false
+recaptchaSiteKey = "0aa0aaaaaaaaaaaaaaa0aaaaaaaaaaaaaa0aaa0aa"
+recaptchaServerKey = "0aa0aaaaaaaaaaaaaaa0aaaaaaaaaaaaaa0aaa0aa"
+
 # ======================================================
 # Logging System
 # ======================================================
