@@ -60,7 +60,7 @@ async function renderData(req, theme) {
   return renderdata;
 }
 
-module.exports.renderdataeval = renderData;
+module.exports.renderData = renderData;
 
 // Load database
 const Database = require("./db.js");

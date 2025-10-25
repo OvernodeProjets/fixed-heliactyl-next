@@ -36,52 +36,8 @@
             </form>
         </div>
 
-        <!-- Create Coupon Form -->
-        <div class="bg-white/5 p-6 rounded-2xl">
-            <h2 class="text-lg font-semibold text-white mb-4">Create Coupon</h2>
-            <form action="/create_coupon" method="GET">
-                <div class="mb-4">
-                    <label for="coupon-code" class="block text-sm font-medium text-gray-300 mb-2">Coupon Code</label>
-                    <input type="text" id="coupon-code" name="code" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
-                </div>
-                <div class="mb-4">
-                    <label for="coupon-coins" class="block text-sm font-medium text-gray-300 mb-2">Coins</label>
-                    <input type="number" id="coupon-coins" name="coins" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
-                </div>
-                <div class="mb-4">
-                    <label for="coupon-ram" class="block text-sm font-medium text-gray-300 mb-2">RAM (MB)</label>
-                    <input type="number" id="coupon-ram" name="ram" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
-                </div>
-                <div class="mb-4">
-                    <label for="coupon-disk" class="block text-sm font-medium text-gray-300 mb-2">Disk (MB)</label>
-                    <input type="number" id="coupon-disk" name="disk" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
-                </div>
-                <div class="mb-4">
-                    <label for="coupon-cpu" class="block text-sm font-medium text-gray-300 mb-2">CPU (%)</label>
-                    <input type="number" id="coupon-cpu" name="cpu" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
-                </div>
-                <div class="mb-4">
-                    <label for="coupon-servers" class="block text-sm font-medium text-gray-300 mb-2">Servers</label>
-                    <input type="number" id="coupon-servers" name="servers" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
-                </div>
-                <button type="submit" class="w-full bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">Create Coupon</button>
-            </form>
-        </div>
-    </div>
-
+        
     <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Revoke Coupon Form -->
-        <div class="bg-white/5 p-6 rounded-2xl">
-            <h2 class="text-lg font-semibold text-white mb-4">Revoke Coupon</h2>
-            <form action="/revoke_coupon" method="GET">
-                <div class="mb-4">
-                    <label for="revoke-coupon-code" class="block text-sm font-medium text-gray-300 mb-2">Coupon Code</label>
-                    <input type="text" id="revoke-coupon-code" name="code" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white" required>
-                </div>
-                <button type="submit" class="w-full bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">Revoke Coupon</button>
-            </form>
-        </div>
-
         <!-- Remove Account Form -->
         <div class="bg-white/5 p-6 rounded-2xl">
             <h2 class="text-lg font-semibold text-white mb-4">Remove Account</h2>

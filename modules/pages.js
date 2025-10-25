@@ -46,12 +46,12 @@ module.exports.load = async function (app, db) {
       }
 
       if (theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
-        const renderData = await indexjs.renderdataeval(req, theme);
+        const renderData = await indexjs.renderData(req, theme);
         res.render(theme.settings.index, renderData);
         return;
       }
 
-      const renderDataPromise = indexjs.renderdataeval(req, theme);
+      const renderDataPromise = indexjs.renderData(req, theme);
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Database Failure')), 3000)
       );
