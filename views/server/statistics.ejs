@@ -48,7 +48,7 @@
             </span>
         </div>
     </div>
-
+<div id="alert-container" class="mb-4 space-y-2"></div>
     <%- include('../components/server') %>
 
     <!-- Metrics Grid -->
@@ -358,6 +358,9 @@ function connectWebSocket() {
     fetch(`/api/server/${serverId}/websocket`)
         .then(response => response.json())
         .then(data => {
+            if (data.status === 'suspended') {
+                return;
+            }
             socket = new WebSocket(data.data.socket);
 
             socket.onopen = () => {

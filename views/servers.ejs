@@ -64,7 +64,7 @@
 </div>
         </div>
     </div>
-
+<div id="alert-container" class="mb-4 space-y-2"></div>
     <% if (settings.api.rdv.enabled) { %>
         <div class="bg-gradient-to-r from-indigo-500/10 to-indigo-600/15 border border-indigo-500/10 rounded-3xl p-6 pl-12 mb-8 container mx-auto mt-8">
             <div class="flex items-center justify-between">
@@ -207,6 +207,11 @@ function connectToServer(serverId, numericId) {
     fetch(`/api/server/${serverId}/websocket`)
         .then(response => response.json())
         .then(data => {
+            if (data.status === 'suspended') {
+                console.log(`Server ${serverId} is suspended. Denying WebSocket access.`);
+                showAlert('error', 'Access Denied', 'Your server has been suspended. Please contact support via our Discord (discord.gg/<%= settings.discord %>) for more information.', 100000);
+                return;
+            }
             const socket = new WebSocket(data.data.socket);
             const serverRow = document.querySelector(`[data-server-id="${serverId}"]`);
             

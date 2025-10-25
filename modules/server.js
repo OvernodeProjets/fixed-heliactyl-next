@@ -922,125 +922,6 @@ router.post('/server/:id/allocations', requireAuth, ownsServer, async (req, res)
 
   loadScheduledWorkflows();
 
-// Helper function to manage WebSocket connections
-async function withServerWebSocket(serverId, callback) {
-  let ws = null;
-  try {
-    // Get WebSocket credentials
-    const credsResponse = await axios.get(
-      `${settings.pterodactyl.domain}/api/client/servers/${serverId}/websocket`,
-      {
-        headers: {
-          'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-          'Accept': 'application/json',
-        },
-      }
-    );
-
-    const { socket, token } = credsResponse.data.data;
-
-    // Connect to WebSocket
-    return new Promise((resolve, reject) => {
-      ws = new WebSocket(socket);
-      const timeout = setTimeout(() => {
-        if (ws.readyState !== WebSocket.CLOSED) {
-          ws.close();
-        }
-        reject(new Error('WebSocket operation timed out'));
-      }, 10000); // 10 second timeout
-
-      let consoleBuffer = [];
-      let authenticated = false;
-
-      ws.on('error', (error) => {
-        clearTimeout(timeout);
-        reject(error);
-      });
-
-      ws.on('open', () => {
-        console.log('WebSocket connection established');
-        // Authenticate
-        ws.send(JSON.stringify({
-          event: "auth",
-          args: [token]
-        }));
-      });
-
-      ws.on('message', async (data) => {
-        const message = JSON.parse(data.toString());
-
-        if (message.event === 'auth success') {
-          authenticated = true;
-          try {
-            await callback(ws, consoleBuffer);
-            clearTimeout(timeout);
-            resolve();
-          } catch (error) {
-            clearTimeout(timeout);
-            reject(error);
-          }
-        }
-        else if (message.event === 'console output') {
-          consoleBuffer.push(message.args[0]);
-        }
-        else if (message.event === 'token expiring') {
-          // Get new token
-          const newCredsResponse = await axios.get(
-            `${settings.pterodactyl.domain}/api/client/servers/${serverId}/websocket`,
-            {
-              headers: {
-                'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-                'Accept': 'application/json',
-              },
-            }
-          );
-          // Send new token
-          ws.send(JSON.stringify({
-            event: "auth",
-            args: [newCredsResponse.data.data.token]
-          }));
-        }
-      });
-
-      ws.on('close', () => {
-        if (!authenticated) {
-          clearTimeout(timeout);
-          reject(new Error('WebSocket closed before authentication'));
-        }
-      });
-    });
-  } catch (error) {
-    console.error(`WebSocket error for server ${serverId}:`, error);
-    throw error;
-  } finally {
-    // Only close if the connection was established
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.close();
-    }
-  }
-}
-
-// Helper to send command and wait for response
-async function sendCommandAndGetResponse(serverId, command, responseTimeout = 5000) {
-  return withServerWebSocket(serverId, async (ws, consoleBuffer) => {
-    return new Promise((resolve) => {
-      // Clear existing buffer
-      consoleBuffer.length = 0;
-
-      // Send command
-      ws.send(JSON.stringify({
-        event: "send command",
-        args: [command]
-      }));
-
-      // Wait for response
-      setTimeout(() => {
-        resolve([...consoleBuffer]); // Return a copy of the buffer
-      }, responseTimeout);
-    });
-  });
-}
-
 // GET /api/server/:id/logs - Get server activity logs
 router.get('/server/:id/logs', requireAuth, ownsServer, async (req, res) => {
   try {
@@ -1685,6 +1566,23 @@ router.post('/server/:id/users', requireAuth, ownsServer, async (req, res) => {
     try {
       const serverId = req.params.id;
       const serverDetails = await pterodactylClient.getServerDetails(serverId);
+
+      try {
+        let serverDetails = await pterodactylClient.getServerDetails(
+          serverId
+        );
+        console.log(`Server ${serverId} suspension status: ${serverDetails.attributes.is_suspended}`);
+        if (serverDetails.attributes.is_suspended) {
+          console.log(`Server ${serverId} is suspended. Denying WebSocket access.`);
+          return res
+            .status(403)
+            .json({ error: "Server is suspended. Cannot connect to WebSocket.", status : "suspended" });
+          }
+      } catch (error) {
+        console.error("Error fetching server details for suspension check:", error);
+        return res.status(500).json({ error: "Internal server error" });
+      }
+
       res.json(serverDetails);
     } catch (error) {
       console.error("Error fetching server details:", error);
@@ -1700,6 +1598,22 @@ router.post('/server/:id/users', requireAuth, ownsServer, async (req, res) => {
     async (req, res) => {
       try {
         const serverId = req.params.id;
+
+        try {
+          let serverDetails = await pterodactylClient.getServerDetails(
+            serverId
+          );
+          if (serverDetails.attributes.is_suspended) {
+            console.log(`Server ${serverId} is suspended. Denying WebSocket access.`);
+            return res
+              .status(403)
+              .json({ error: "Server is suspended. Cannot connect to WebSocket.", status : "suspended" });
+            }
+        } catch (error) {
+          console.error("Error fetching server details for suspension check:", error);
+          return res.status(500).json({ error: "Internal server error" });
+        }
+
         const wsCredentials = await pterodactylClient.getWebSocketCredentials(
           serverId
         );

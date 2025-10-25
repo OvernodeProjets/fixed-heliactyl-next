@@ -20,7 +20,7 @@ module.exports.heliactylModule = heliactylModule;
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { requireAuth } = require("../handlers/checkMiddleware.js");
-const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
+const PterodactylApplicationModule = require('../handlers/ApplicationAPI.js');
 
 module.exports.load = async function(app, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
