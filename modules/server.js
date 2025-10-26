@@ -783,56 +783,6 @@ router.delete('/server/:id/worlds/:worldName', requireAuth, ownsServer, async (r
   }
 });
 
-// PUT /api/server/:id/startup
-router.put('/server/:serverId/startup', requireAuth, async (req, res) => {
-  try {
-    const serverId = req.params.serverId;
-    const { startup, environment, egg, image, skip_scripts } = req.body;
-
-    // First, get the current server details
-    const serverDetailsResponse = await axios.get(
-      `${settings.pterodactyl.domain}/api/application/servers/${serverId}?include=container`,
-      {
-        headers: {
-          'Authorization': `Bearer ${settings.pterodactyl.key}`,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    const currentServerDetails = serverDetailsResponse.data.attributes;
-    console.log(JSON.stringify(currentServerDetails))
-
-    // Prepare the update payload
-    const updatePayload = {
-      startup: startup || currentServerDetails.container.startup_command,
-      environment: environment || currentServerDetails.container.environment,
-      egg: egg || currentServerDetails.egg,
-      image: image || currentServerDetails.container.image,
-      skip_scripts: skip_scripts !== undefined ? skip_scripts : false,
-    };
-
-    // Send the update request
-    const response = await axios.patch(
-      `${settings.pterodactyl.domain}/api/application/servers/${serverId}/startup`,
-      updatePayload,
-      {
-        headers: {
-          'Authorization': `Bearer ${settings.pterodactyl.key}`,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    res.json(response.data);
-  } catch (error) {
-    console.error('Error updating server startup:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
 // POST /api/server/:id/allocations - Assign new allocation
 router.post('/server/:id/allocations', requireAuth, ownsServer, async (req, res) => {
   try {
@@ -1571,7 +1521,6 @@ router.post('/server/:id/users', requireAuth, ownsServer, async (req, res) => {
         let serverDetails = await pterodactylClient.getServerDetails(
           serverId
         );
-        console.log(`Server ${serverId} suspension status: ${serverDetails.attributes.is_suspended}`);
         if (serverDetails.attributes.is_suspended) {
           console.log(`Server ${serverId} is suspended. Denying WebSocket access.`);
           return res
