@@ -669,8 +669,8 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
               );
             let text = JSON.parse(await serverinfo.text());
             discordLog(
-              `modify server`,
-              `${req.session.userinfo.username}#${req.session.userinfo.discriminator} modified the server called \`${text.attributes.name}\` to have the following specs:\n\`\`\`Memory: ${ram} MB\nCPU: ${cpu}%\nDisk: ${disk}\`\`\``
+              `modified server`,
+              `${req.session.userinfo.username} modified the server called \`${text.attributes.name}\` to have the following specs:\n\`\`\`Memory: ${ram} MB\nCPU: ${cpu}%\nDisk: ${disk}\`\`\``
             );
             pterorelationshipsserverdata.push(text);
             req.session.pterodactyl.relationships.servers.data =
@@ -742,6 +742,10 @@ app.get("/delete", requireAuth, async (req, res) => {
         (server) => server.attributes.id.toString() !== req.query.id
       );
     req.session.pterodactyl = pterodactylinfo;
+    discordLog(
+      `deleted server`,
+      `${req.session.userinfo.username} deleted the server called \`${serverData.attributes.name}\``
+    );
 
     adminjs.suspend(req.session.userinfo.id);
 

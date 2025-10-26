@@ -207,7 +207,7 @@ module.exports.load = async function (app, db) {
     // Auth notification
     let notifications = await db.get('notifications-' + userId) || [];
     let notification = {
-      "action": "user:signup",
+      "action": "user:sign in",
       "name": "Account created via Local OAuth2",
       "ip": req.ip,
       "timestamp": new Date().toISOString()

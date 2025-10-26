@@ -165,19 +165,19 @@ module.exports.load = async function (app, db) {
             }
           }
 
-          // Signup notification
+          // Sign in notification
           let notifications = await db.get('notifications-' + userinfo.id) || [];
-          let notification = {
-            "action": "user:signup",
-            "name": "User registration",
+            let notification = {
+            "action": "user:sign in",
+            "name": "User sign in",
             "ip": req.ip,
             "timestamp": new Date().toISOString()
           }
 
           notifications.push(notification)
           await db.set('notifications-' + userinfo.id, notifications)
-          
-          discordLog("signup", `${userinfo.login} logged in to the dashboard for the first time!`);
+
+          discordLog("sign up", `${userinfo.login} logged in to the dashboard for the first time!`);
         } else {
           return res.send("New users cannot signup currently.");
         }

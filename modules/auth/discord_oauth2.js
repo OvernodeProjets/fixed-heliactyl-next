@@ -504,7 +504,7 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
                   username: userinfo.id,
                   email: userinfo.email,
                   first_name: userinfo.username,
-                  last_name: "#" + userinfo.discriminator,
+                  last_name: "On Heliactyl",
                   password: genpassword,
                 }),
               }
@@ -558,11 +558,11 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
               }
             }
 
-            // Signup notification
+            // Sign in notification
             let notifications = await db.get('notifications-' + userinfo.id) || [];
             let notification = {
-              "action": "user:signup",
-              "name": "User registration",
+              "action": "user:sign in",
+              "name": "User Sign in",
               "ip": req.ip,
               "timestamp": new Date().toISOString()
             }
@@ -571,8 +571,8 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
             await db.set('notifications-' + userinfo.id, notifications)
             
             discordLog(
-              "signup",
-              `${userinfo.username} logged in to the dashboard for the first time with discord!`
+              "sign in",
+              `${userinfo.username} signed in with Discord!`
             );
         }
 
@@ -588,14 +588,19 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
         // Auth notification
         let notifications = await db.get('notifications-' + userinfo.id) || [];
         let notification = {
-          "action": "user:auth",
+          "action": "user:sign in",
           "name": "Sign in from new location",
           "ip": req.ip,
           "timestamp": new Date().toISOString()
-        }
+        };
 
         notifications.push(notification)
-        await db.set('notifications-' + userinfo.id, notifications)
+        await db.set('notifications-' + userinfo.id, notifications);
+
+        discordLog(
+          "sign in",
+          `${userinfo.username} logged in to the dashboard with Discord!`
+        );
 
         if (customredirect) return res.redirect(customredirect);
         return res.redirect(

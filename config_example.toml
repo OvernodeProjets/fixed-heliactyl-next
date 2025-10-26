@@ -394,10 +394,12 @@ public = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAaa
 private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAaaA-aaaaaaaaa0aaa0aAa0aa0aa0aa0a0"
 
   [logging.actions.user]
-  "signup" = true
+  "sign up" = true
+  "sign in" = true
   "created server" = true
+  "modified server" = true
+  "deleted server" = true
   "gifted coins" = true
-  "modify server" = true
   # don't used
   "buy servers" = true  
   "buy ram" = true

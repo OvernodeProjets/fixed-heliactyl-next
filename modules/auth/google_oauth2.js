@@ -126,13 +126,13 @@ module.exports.load = async function (app, db) {
           req.session.password = genpassword;
 
           await db.set('notifications-' + user.id, [{
-            action: "user:signup",
+            action: "user:sign up",
             name: "Account created via Google OAuth2",
             ip: req.ip,
             timestamp: new Date().toISOString()
           }]);
 
-          discordLog("signup", `${user.name} logged in to the dashboard for the first time with Google!`);
+          discordLog("sign in", `${user.name} signed in with Google!`);
 
         } catch (createError) {
           try {
