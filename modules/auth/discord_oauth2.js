@@ -598,7 +598,7 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
         await db.set('notifications-' + userinfo.id, notifications);
 
         discordLog(
-          "sign in",
+          "sign up",
           `${userinfo.username} logged in to the dashboard with Discord!`
         );
 

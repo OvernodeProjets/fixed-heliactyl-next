@@ -177,9 +177,9 @@ module.exports.load = async function (app, db) {
           notifications.push(notification)
           await db.set('notifications-' + userinfo.id, notifications)
 
-          discordLog("sign up", `${userinfo.login} logged in to the dashboard for the first time!`);
+          discordLog("sign in", `${userinfo.login} signed in to the dashboard with GitHub!`);
         } else {
-          return res.send("New users cannot signup currently.");
+          return res.send("New users cannot sign up currently.");
         }
       }
 
@@ -212,6 +212,8 @@ module.exports.load = async function (app, db) {
 
       notifications.push(notification)
       await db.set('notifications-' + userinfo.id, notifications)
+
+      discordLog("sign up", `${userinfo.login} logged in to the dashboard with GitHub!`);
 
       const customredirect = req.session.redirect;
       delete req.session.redirect;

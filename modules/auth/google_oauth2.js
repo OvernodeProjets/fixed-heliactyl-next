@@ -193,6 +193,8 @@ module.exports.load = async function (app, db) {
       });
       await db.set('notifications-' + user.id, notifications);
 
+      discordLog("sign in", `${user.name} logged in to the dashboard with Google!`);
+
       const redirect = req.session.redirect;
       delete req.session.redirect;
 
