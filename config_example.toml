@@ -403,7 +403,7 @@ private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAa
   "gifted coins" = true
   # event
   "halloween rewards claimed" = true
-  # don't used
+  # store
   "buy servers" = true  
   "buy ram" = true
   "buy cpu" = true

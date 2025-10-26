@@ -20,6 +20,7 @@ module.exports.heliactylModule = heliactylModule;
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
+const { discordLog } = require("../handlers/log");
 
 const RENEWAL_BYPASS_PRICE = settings.api.client.coins.store.renewalbypass.cost;
 const RESOURCE_PRICES = {
@@ -244,6 +245,10 @@ app.get('/api/store/renewal-bypass', (req, res) => StoreController.checkRenewalB
       const userId = req.session.userinfo.id;
       const { resourceType, amount } = req.body;
 
+      if (!resourceType || !amount) {
+        return res.status(400).json({ error: 'Missing resourceType or amount' });
+      }
+
       // Validate request
       store.validateResourceAmount(resourceType, amount);
 
@@ -269,6 +274,8 @@ app.get('/api/store/renewal-bypass', (req, res) => StoreController.checkRenewalB
       
       // Log purchase
       const purchase = await store.logPurchase(userId, resourceType, amount, cost);
+
+      discordLog(`buy ${resourceType}`, `${req.session.userinfo.username} purchased ${amount} ${resourceType} for ${cost} coins.`);
 
       res.json({
         success: true,
