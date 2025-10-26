@@ -5,7 +5,7 @@
 <nav class="relative z-50 mb-6">
 
     <!-- Navigation Items -->
-<div class="block md:overflow-x-visible overflow-x-auto scrollbar-hide">
+<div class="block md:overflow-x-visible overflow-x-auto scrollbar-hide relative overflow-visible">
 
     <div class="space-x-2 md:space-x-4 rounded-full bg-white/5 backdrop-blur-xl p-2 md:p-1.5 inline-flex items-center">
         <% if (req.query.mode !== "rdp") { %>
@@ -150,11 +150,10 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Elements
     const currentPath = window.location.pathname;
     const moreMenuButton = document.getElementById('more-menu-button');
     const moreMenuContent = document.getElementById('more-menu-content');
-    
+
     // Active link highlighting
     document.querySelectorAll('.srv-link').forEach(link => {
         const href = link.getAttribute('href')?.split('?')[0];
@@ -163,36 +162,83 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Vérifie que le menu existe avant de continuer
     if (!moreMenuButton || !moreMenuContent) return;
 
-    // More menu handling
     let isMoreMenuOpen = false;
     let closeTimeout;
+    let originalParent = moreMenuContent.parentNode;
+    let originalNextSibling = moreMenuContent.nextSibling;
+
+    // utility: position menu under button (for fixed positioning)
+    function positionMenuFixed() {
+        const btnRect = moreMenuButton.getBoundingClientRect();
+        const menuRect = moreMenuContent.getBoundingClientRect();
+        // place menu just below button, align right edges
+        const top = Math.min(window.innerHeight - menuRect.height - 8, btnRect.bottom + 6);
+        const right = Math.max(8, window.innerWidth - (btnRect.right));
+        moreMenuContent.style.position = 'fixed';
+        moreMenuContent.style.top = top + 'px';
+        moreMenuContent.style.right = right + 'px';
+        moreMenuContent.style.left = 'auto';
+        moreMenuContent.style.zIndex = 99999;
+    }
+
+    function resetMenuPlacement() {
+        moreMenuContent.style.position = '';
+        moreMenuContent.style.top = '';
+        moreMenuContent.style.right = '';
+        moreMenuContent.style.left = '';
+        moreMenuContent.style.zIndex = '';
+    }
 
     const openMoreMenu = () => {
         isMoreMenuOpen = true;
         moreMenuButton.setAttribute('data-state', 'open');
-        moreMenuContent.classList.remove('hidden');
-        requestAnimationFrame(() => {
-            moreMenuContent.classList.remove('opacity-0', 'scale-95');
+
+        // If touch device (no hover) we move the menu to body and use fixed positioning
+        if (!window.matchMedia("(hover: hover)").matches) {
+            // move element to body so it's not clipped by ancestor overflow
+            if (moreMenuContent.parentNode !== document.body) {
+                document.body.appendChild(moreMenuContent);
+            }
+            moreMenuContent.classList.remove('hidden', 'opacity-0', 'scale-95');
             moreMenuContent.classList.add('opacity-100', 'scale-100');
-        });
+            // compute position
+            requestAnimationFrame(() => {
+                positionMenuFixed();
+            });
+        } else {
+            // Desktop behaviour: leave it in place (absolute)
+            moreMenuContent.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                moreMenuContent.classList.remove('opacity-0', 'scale-95');
+                moreMenuContent.classList.add('opacity-100', 'scale-100');
+            });
+        }
     };
 
     const closeMoreMenu = () => {
         isMoreMenuOpen = false;
         moreMenuButton.setAttribute('data-state', 'closed');
+
         moreMenuContent.classList.remove('opacity-100', 'scale-100');
         moreMenuContent.classList.add('opacity-0', 'scale-95');
+
+        // On touch/mobile, after animation, move it back to original parent to preserve DOM structure
         setTimeout(() => {
             if (!isMoreMenuOpen) {
                 moreMenuContent.classList.add('hidden');
+                if (moreMenuContent.parentNode === document.body && originalParent) {
+                    // put it back where it was
+                    if (originalNextSibling) originalParent.insertBefore(moreMenuContent, originalNextSibling);
+                    else originalParent.appendChild(moreMenuContent);
+                    resetMenuPlacement();
+                }
             }
         }, 200);
     };
 
-    // Desktop hover handling (only if hover is supported)
+    // Desktop hover handling
     if (window.matchMedia("(hover: hover)").matches) {
         moreMenuButton.addEventListener('mouseenter', () => {
             clearTimeout(closeTimeout);
@@ -219,7 +265,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Mobile / click handling
     moreMenuButton.addEventListener('click', (e) => {
-        e.stopPropagation(); // empêche le document click de fermer immédiatement
+        e.stopPropagation();
+        e.preventDefault();
         if (isMoreMenuOpen) {
             closeMoreMenu();
         } else {
@@ -227,13 +274,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Close menu when clicking outside
+    // Close when clicking outside (works whether menu is in body or original parent)
     document.addEventListener('click', (event) => {
-        const isClickInMoreMenu = event.target.closest('#more-menu-button, #more-menu-content');
-        if (!isClickInMoreMenu && isMoreMenuOpen) {
+        const isIn = event.target.closest('#more-menu-button, #more-menu-content');
+        if (!isIn && isMoreMenuOpen) {
             closeMoreMenu();
+        }
+    });
+
+    // Keep menu fixed when scrolling on mobile
+    window.addEventListener('scroll', () => {
+       if (isMoreMenuOpen && moreMenuContent.style.position === 'fixed') {
+            positionMenuFixed();
+        }
+    }, { passive: true });
+
+
+    // Ensure anchor clicks inside menu close the menu (so navigation works cleanly)
+    moreMenuContent.addEventListener('click', (ev) => {
+        const anchor = ev.target.closest('a');
+        if (anchor) {
+            // let the navigation happen, but close the menu visually
+            closeMoreMenu();
+            // Do not prevent default: allow navigation
         }
     });
 });
 </script>
-
