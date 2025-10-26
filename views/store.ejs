@@ -74,7 +74,7 @@
                     <h3 class="text-xl font-semibold">RAM</h3>
                 </div>
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-lg font-medium">600 <%= settings.website.currency %> / GB</span>
+                    <span class="text-lg font-medium"><%= settings.api.client.coins.store.ram.cost %> <%= settings.website.currency %> / GB</span>
                     <div class="flex items-center">
                         <button @click="decrement('ram')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-l transition">-</button>
                         <input x-model.number="ram" type="number" min="1" max="32" class="bg-black text-white w-16 text-center px-2 py-1 border-t border-b border-white/5">
@@ -82,7 +82,7 @@
                     </div>
                 </div>
                 <p class="text-sm text-gray-400 mb-4">
-                    Total cost: <span x-text="formatCost(ram * 600)"></span> <%= settings.website.currency %>
+                    Total cost: <span x-text="formatCost(ram * <%= settings.api.client.coins.store.ram.cost %>)"></span> <%= settings.website.currency %>
                 </p>
                 <button @click="purchaseResource('ram')" :disabled="isLoading" class="w-full bg-indigo-500 font-medium text-white py-2 rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center">
                     <svg x-show="isLoading" class="animate-spin w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -99,7 +99,7 @@
                     <h3 class="text-xl font-semibold">Disk</h3>
                 </div>
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-lg font-medium">50 <%= settings.website.currency %> / 5GB</span>
+                    <span class="text-lg font-medium"><%= settings.api.client.coins.store.disk.cost %> <%= settings.website.currency %> / 5GB</span>
                     <div class="flex items-center">
                         <button @click="decrement('disk')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-l transition">-</button>
                         <input x-model.number="disk" type="number" min="1" max="200" class="bg-black text-white w-16 text-center px-2 py-1 border-t border-b border-white/5">
@@ -107,7 +107,7 @@
                     </div>
                 </div>
                 <p class="text-sm text-gray-400 mb-4">
-                    Total cost: <span x-text="formatCost(disk * 50)"></span> <%= settings.website.currency %>
+                    Total cost: <span x-text="formatCost(disk * <%= settings.api.client.coins.store.disk.cost %>)"></span> <%= settings.website.currency %>
                 </p>
                 <button @click="purchaseResource('disk')" :disabled="isLoading" class="w-full bg-indigo-500 font-medium text-white py-2 rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center">
                     <svg x-show="isLoading" class="animate-spin w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -124,7 +124,7 @@
                     <h3 class="text-xl font-semibold">CPU</h3>
                 </div>
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-lg font-medium">500 <%= settings.website.currency %> / Core</span>
+                    <span class="text-lg font-medium"><%= settings.api.client.coins.store.cpu.cost %> <%= settings.website.currency %> / Core</span>
                     <div class="flex items-center">
                         <button @click="decrement('cpu')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-l transition">-</button>
                         <input x-model.number="cpu" type="number" min="1" max="10" class="bg-black text-white w-16 text-center px-2 py-1 border-t border-b border-white/5">
@@ -132,7 +132,7 @@
                     </div>
                 </div>
                 <p class="text-sm text-gray-400 mb-4">
-                    Total cost: <span x-text="formatCost(cpu * 500)"></span> <%= settings.website.currency %>
+                    Total cost: <span x-text="formatCost(cpu * <%= settings.api.client.coins.store.cpu.cost %>)"></span> <%= settings.website.currency %>
                 </p>
                 <button @click="purchaseResource('cpu')" :disabled="isLoading" class="w-full bg-indigo-500 font-medium text-white py-2 rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center">
                     <svg x-show="isLoading" class="animate-spin w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -149,7 +149,7 @@
                     <h3 class="text-xl font-semibold">Servers</h3>
                 </div>
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-lg font-medium">200 <%= settings.website.currency %> / Server</span>
+                    <span class="text-lg font-medium"><%= settings.api.client.coins.store.servers.cost %> <%= settings.website.currency %> / Server</span>
                     <div class="flex items-center">
                         <button @click="decrement('servers')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-l transition">-</button>
                         <input x-model.number="servers" type="number" min="1" max="20" class="bg-black text-white w-16 text-center px-2 py-1 border-t border-b border-white/5">
@@ -157,7 +157,7 @@
                     </div>
                 </div>
                 <p class="text-sm text-gray-400 mb-4">
-                    Total cost: <span x-text="formatCost(servers * 200)"></span> <%= settings.website.currency %>
+                    Total cost: <span x-text="formatCost(servers * <%= settings.api.client.coins.store.servers.cost %>)"></span> <%= settings.website.currency %>
                 </p>
                 <button @click="purchaseResource('servers')" :disabled="isLoading" class="w-full bg-indigo-500 font-medium text-white py-2 rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center">
                     <svg x-show="isLoading" class="animate-spin w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
