@@ -2,9 +2,26 @@ const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 const fetch = require('node-fetch')
 
-const logTransaction = async (db, userId, type, amount, balanceAfter, details) => {
-}
- 
+// Helper function to log a transaction
+const logTransaction = async (db, userId, type, amount, balanceAfter, details = {}) => {
+  const transactionKey = `transaction-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+  const transaction = {
+    transactionKey,
+    status: 'completed',
+    type, // 'debit' or 'credit'
+    amount,
+    balanceAfter,
+    timestamp: Date.now(),
+    ...details
+  };
+
+  const userTransactions = await db.get(`transactions-${userId}`) || [];
+  userTransactions.push(transaction);
+  await db.set(`transactions-${userId}`, userTransactions);
+
+  return transactionKey;
+};
+
 const serverActivityLog = async (db, serverId, action, details) => {
     const timestamp = new Date().toISOString();
     const activityLog = await db.get(`activity_log_${serverId}`) || [];
@@ -53,5 +70,6 @@ function hexToDecimal(hex) {
 
 module.exports = {
     discordLog,
-    serverActivityLog
+    serverActivityLog,
+    logTransaction
 }

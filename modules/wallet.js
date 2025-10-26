@@ -19,11 +19,10 @@ module.exports.heliactylModule = heliactylModule;
 
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const crypto = require('crypto');
-const { Readable, Transform } = require('stream');
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
+const { logTransaction } = require("../handlers/log.js");
 
 module.exports.load = async function (app, db) {
   const router = express.Router();
@@ -73,66 +72,38 @@ module.exports.load = async function (app, db) {
         return res.status(400).json({ error: "Cannot transfer to yourself" });
       }
 
-      // Start a transaction-like operation
-      const transactionKey = `transaction-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
-      let existingSenderTransactions = await db.get(`transactions-${senderId}`) || [];
-      let existingReceiverTransactions = await db.get(`transactions-${receiverId}`) || [];
-
       try {
         const senderBalance = await getUserBalance(senderId, currency);
         if (senderBalance < amount) {
           return res.status(400).json({ error: "Insufficient balance" });
         }
 
-        // Log the transaction
-        const transactionSender = {
-          transactionKey,
-          status: 'pending',
-          senderId,
-          receiverId,
-          amount: -amount,
-          currency,
-          transactionKey,
-          timestamp: Date.now()
-        };
+        const receiverBalance = await getUserBalance(receiverId, currency);
 
-        const transactionReceiver = {
-          transactionKey,
-          status: 'pending',
-          senderId,
-          receiverId,
-          amount: +amount,
-          currency,
-          transactionKey,
-          timestamp: Date.now()
-        };
-          
+        // Deduct from sender
+        await updateUserBalance(senderId, currency, -amount);
 
-        existingSenderTransactions.push(transactionSender);
-        existingReceiverTransactions.push(transactionReceiver);
+        // Add to receiver
+        await updateUserBalance(receiverId, currency, amount);
 
-        try {
-          // Deduct from sender
-          await updateUserBalance(senderId, currency, -amount);
-          
-          // Add to receiver
-          await updateUserBalance(receiverId, currency, amount);
+        // Mark transaction as completed
+        const senderBalanceAfter = senderBalance - amount;
+        const receiverBalanceAfter = receiverBalance + amount;
 
-          // Mark transaction as completed
-          existingSenderTransactions.push({ ...transactionSender, status: 'completed' });
-          existingReceiverTransactions.push({ ...transactionReceiver, status: 'completed' });
-        } catch (error) {
-          // If anything fails, revert the sender's balance
-          await updateUserBalance(senderId, currency, amount);
-          throw error;
-        }
-
-        await db.set(`transactions-${senderId}`, existingSenderTransactions);
-        await db.set(`transactions-${receiverId}`, existingReceiverTransactions);
+        await logTransaction(db, senderId, 'debit', -amount, senderBalanceAfter, { receiverId, currency });
+        await logTransaction(db, receiverId, 'credit', amount, receiverBalanceAfter, { senderId, currency });
 
         res.status(200).json({ message: "Transfer successful" });
+
       } catch (error) {
         console.error('Transfer error:', error);
+        // If anything fails, revert the sender's balance
+        try {
+          await updateUserBalance(senderId, currency, amount);
+          await updateUserBalance(receiverId, currency, -amount);
+        } catch (_) {
+          console.error('Rollback failed');
+        }
         res.status(500).json({ error: "An error occurred during the transfer" });
       }
     }
