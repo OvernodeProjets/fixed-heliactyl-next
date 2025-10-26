@@ -389,7 +389,7 @@ recaptchaServerKey = "0aa0aaaaaaaaaaaaaaa0aaaaaaaaaaaaaa0aaa0aa"
 # Logging System
 # ======================================================
 [logging]
-status = true
+status = false
 public = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAaaA-aaaaaaaaa0aaa0aAa0aa0aa0aa0a0"
 private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAaaA-aaaaaaaaa0aaa0aAa0aa0aa0aa0a0"
 
@@ -399,7 +399,10 @@ private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAa
   "created server" = true
   "modified server" = true
   "deleted server" = true
+  "resource adjustment" = true
   "gifted coins" = true
+  # event
+  "halloween rewards claimed" = true
   # don't used
   "buy servers" = true  
   "buy ram" = true
@@ -412,8 +415,8 @@ private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAa
   "set resources" = true
   "add resources" = true
   "set plan" = true
+  "remove account" = true
   # don't used
   "create coupon" = true
   "revoke coupon" = true
-  "remove account" = true
   "view ip" = true

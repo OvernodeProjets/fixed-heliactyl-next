@@ -325,7 +325,7 @@ module.exports.load = async function(app, db) {
         eventData.rewardsClaimed = true;
         await db.set(`halloween-event-${userId}`, eventData);
 
-        discordLog(`Halloween Rewards Claimed`, `${req.session.userinfo.username} claimed Halloween event rewards: ${JSON.stringify(totalRewards)}`);
+        discordLog(`halloween rewards claimed`, `${req.session.userinfo.username} claimed Halloween event rewards: ${JSON.stringify(totalRewards)}`);
 
         res.json({
             success: true,

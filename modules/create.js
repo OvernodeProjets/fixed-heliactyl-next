@@ -281,12 +281,6 @@ app.get("/create", requireAuth, async (req, res) => {
     if (!serverinfo.ok) {
         const errorData = await serverinfo.json();
         console.error("Pterodactyl API Error:", errorData);
-        
-        // Log the error
-        discordLog(
-            "server creation error",
-            `Failed to create server for ${req.session.userinfo.username}. Pterodactyl API Error: ${JSON.stringify(errorData)}`
-        );
 
         // Encode the error response for the URL
         const encodedError = encodeURIComponent(JSON.stringify(errorData));

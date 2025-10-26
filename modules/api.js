@@ -179,7 +179,7 @@ app.get("/giftcoins", async (req, res) => {
     ]);
 
     // Log the transaction
-    discordLog('Gifted Coins', `${req.session.userinfo.username} sent ${coins} coins to the user with the ID \`${recipientId}\`.`);
+    discordLog('gifted coins', `${req.session.userinfo.username} sent ${coins} coins to the user with the ID \`${recipientId}\`.`);
 
     return res.redirect(`/transfer?err=none`);
   } catch (error) {
