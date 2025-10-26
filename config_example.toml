@@ -63,14 +63,14 @@ api_token = "YOUR-CLOUDFLARE-API-TOKEN"
 name = "main"                              # Unique identifier for this domain
 enabled = true                             # Set to false to disable this domain
 domain = "your-main-domain.com"            # Domain name
-zone_id = "your-main-domain-zone-id"       # Cloudflare Zone ID
+zoneId = "your-main-domain-zone-id"       # Cloudflare Zone ID
 is_default = true                          # Mark as default domain for new records
 
 [[cloudflare.domains]]
 name = "secondary"
 enabled = true
 domain = "your-secondary-domain.com"
-zone_id = "your-secondary-domain-zone-id"
+zoneId = "your-secondary-domain-zone-id"
 is_default = false
 
 # Example of additional domain (copy and modify as needed)
@@ -78,7 +78,7 @@ is_default = false
 name = "another-domain"
 enabled = false                            # Disabled by default
 domain = "another-domain.com"
-zone_id = "another-domain-zone-id"
+zoneId = "another-domain-zone-id"
 is_default = false
 
 # ======================================================
