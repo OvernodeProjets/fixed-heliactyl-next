@@ -90,8 +90,8 @@ module.exports.load = async function (app, db) {
         const senderBalanceAfter = senderBalance - amount;
         const receiverBalanceAfter = receiverBalance + amount;
 
-        await logTransaction(db, senderId, 'debit', -amount, senderBalanceAfter, { receiverId, currency });
-        await logTransaction(db, receiverId, 'credit', amount, receiverBalanceAfter, { senderId, currency });
+        await logTransaction(db, senderId, 'debit', -amount, senderBalanceAfter, { receiverId, senderId });
+        await logTransaction(db, receiverId, 'credit', amount, receiverBalanceAfter, { receiverId, senderId });
 
         res.status(200).json({ message: "Transfer successful" });
 

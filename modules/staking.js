@@ -18,6 +18,7 @@ const heliactylModule = {
 module.exports.heliactylModule = heliactylModule;
 
 const { requireAuth } = require('../handlers/checkMiddleware');
+const { logTransaction } = require('../handlers/log');
 
 module.exports.load = async function (app, db) {
   // Configuration
@@ -28,7 +29,6 @@ module.exports.load = async function (app, db) {
     '90d': { days: 90, bonus: 0.5 }, // 50% bonus
     '180d': { days: 180, bonus: 1.0 }, // 100% bonus
   };
-  const MASTER_USER_ID = "MASTER";
   const EARLY_WITHDRAWAL_PENALTY = 0.5; // 50% penalty on earnings for early withdrawal
 
   // Helper function to calculate compound interest
@@ -44,9 +44,6 @@ module.exports.load = async function (app, db) {
     return stakedAmount * (Math.pow(1 + effectiveRate, daysStaked) - 1);
   };
 
-  // Helper function to log transactions
-  async function logTransaction(senderId, receiverId, amount, description) {
-  }
 
   // Migrate old staking data to new format
   async function migrateStakingData(userId) {
@@ -115,11 +112,20 @@ module.exports.load = async function (app, db) {
     // Update balances
     await db.set(`staking-positions-${userId}`, userPositions);
     await db.set(`coins-${userId}`, userCoins - parsedAmount);
-    await logTransaction(userId, MASTER_USER_ID, parsedAmount, `Staked with ${lockPeriod} lock`);
-    
-    res.status(200).json({ 
-      message: "Staked successfully", 
-      position: newPosition 
+
+    // Log the staking transaction
+    await logTransaction(
+      db,
+      userId,
+      'debit',
+      parsedAmount,
+      userCoins - parsedAmount,
+      { description: `Staked with ${lockPeriod} lock`, receiverId: 'staking-contract' }
+    );
+
+    res.status(200).json({
+      message: "Staked successfully",
+      position: newPosition
     });
   });
 
@@ -159,19 +165,23 @@ module.exports.load = async function (app, db) {
     await db.set(`staking-positions-${userId}`, positions);
     
     await logTransaction(
-      MASTER_USER_ID, 
-      userId, 
-      position.amount, 
-      `Unstaked position ${positionId}`
+      db,
+      userId,
+      'credit',
+      position.amount,
+      userCoins + position.amount,
+      { description: `Unstaked position ${positionId}`, senderId: 'staking-contract', receiverId: userId }
     );
     
     if (earnings > 0) {
-      await logTransaction(
-        MASTER_USER_ID, 
-        userId, 
-        earnings, 
-        `Staking earnings for position ${positionId}`
-      );
+  await logTransaction(
+    db,
+    userId,
+    'credit',
+    earnings,
+    userCoins + totalReturn,
+    { description: `Staking earnings for position ${positionId}`, senderId: 'staking-contract', receiverId: userId }
+  );
     }
     
     res.status(200).json({
@@ -309,10 +319,12 @@ module.exports.load = async function (app, db) {
     
     // Log the transaction
     await logTransaction(
-      MASTER_USER_ID, 
-      userId, 
-      earnings, 
-      `Claimed earnings for position ${positionId}`
+      db,
+      userId,
+      'credit',
+      earnings,
+      userCoins + earnings,
+      { receiverId: userId, senderId: 'staking-contract', description: `Claimed earnings for position ${positionId}` }
     );
     
     res.status(200).json({
