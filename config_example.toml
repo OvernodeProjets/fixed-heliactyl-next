@@ -408,6 +408,7 @@ private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAa
   "buy ram" = true
   "buy cpu" = true
   "buy disk" = true
+  "transaction" = true
 
   [logging.actions.admin]
   "set coins" = true

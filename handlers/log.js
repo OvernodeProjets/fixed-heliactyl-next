@@ -1,9 +1,13 @@
 const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 const fetch = require('node-fetch')
+const crypto = require('crypto');
 
 // Helper function to log a transaction
 const logTransaction = async (db, userId, type, amount, balanceAfter, details = {}) => {
+  if (details.currency === undefined) {
+    details.currency = settings.website.currency;
+}
   const transactionKey = `transaction-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
   const transaction = {
     transactionKey,
@@ -18,6 +22,8 @@ const logTransaction = async (db, userId, type, amount, balanceAfter, details = 
   const userTransactions = await db.get(`transactions-${userId}`) || [];
   userTransactions.push(transaction);
   await db.set(`transactions-${userId}`, userTransactions);
+
+  discordLog('transaction', `User ID: \`${userId}\` | Type: \`${type}\` | Amount: \`${amount}\` | Balance After: \`${balanceAfter}\` | Details: \`${JSON.stringify(details)}\``);
 
   return transactionKey;
 };
