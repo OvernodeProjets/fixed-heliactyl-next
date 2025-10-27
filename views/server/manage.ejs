@@ -2,11 +2,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
-<% if (req.query.mode == "rdp") { %>
-<script>
-window.location.href = "/server/rdp?id=<%=req.query.id%>&numeric=<%=req.query.numeric%>&mode=rdp"
-</script>
-<% } %>
 <style>
   .scrollbar-hide {
     -ms-overflow-style: none;
@@ -256,22 +251,6 @@ display:none;
         </div>
     </div>
     <!-- End Mobile View -->
-
-<% if (req.query.mode == "vm") { %>
-
-<div class="bg-gradient-to-r from-indigo-500/10 to-indigo-600/15 border border-indigo-500/10 rounded-3xl p-6 pl-12 mb-8 container mx-auto mt-8">
-    <div class="flex items-center justify-between">
-        <div class="space-y-4">
-            <h2 class="text-2xl heavy font-semibold text-white">Virtual machines</h2>
-            <p class="text-white/60">This is a beta experience and is not suitable for production environments. Please report any bugs or issues you find via our Discord. The administrator account's password will be <code class="font-mono"><%= settings.name %></code>.</p>
-        </div>
-        <div class="hidden md:block">
-            <img src="https://i.imgur.com/NUDxhDy.png" alt="d" class="rounded-lg w-[300px] shadow-sm h-[190px] object-cover" />
-        </div>
-    </div>
-</div>
-
-<% } %>    
 
 <div id="alert-container" class="mb-4 space-y-2"></div>
 
@@ -636,10 +615,6 @@ function handleWebSocketMessage(event) {
       if (message.args[0].includes("You need to agree to the EULA")) {
         showEulaPopup();
       }
-if (message.args[0].includes("Ubuntu 22.04.3 LTS ubuntu ttyS0")) {
-socket.send(JSON.stringify({ event: 'send command', args: ['root'] }));
-showAlert('warning', 'Authenticated', 'The VM has been authenticated as user: root.');
-}
             break;
         case 'transfer logs':
             appendToConsole(message.args[0]);

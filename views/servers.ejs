@@ -51,46 +51,12 @@
 </svg>
         Game server
       </a>
-      <% if (settings.api.rdv.enabled) { %>
-      <a href="/vms/new" class="flex items-center gap-2 px-4 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-4">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
-        </svg>
-        Virtual machine
-      </a>
-      <% } %>
     </div>
   </div>
 </div>
         </div>
     </div>
 <div id="alert-container" class="mb-4 space-y-2"></div>
-    <% if (settings.api.rdv.enabled) { %>
-        <div class="bg-gradient-to-r from-indigo-500/10 to-indigo-600/15 border border-indigo-500/10 rounded-3xl p-6 pl-12 mb-8 container mx-auto mt-8">
-            <div class="flex items-center justify-between">
-                <div class="space-y-4">
-                    <div class="flex items-center gap-2">
-                        <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300">
-                            <span class="size-2 rounded-full bg-indigo-400 mr-2"></span>
-                            VMs, RDPs are available right now.
-                        </div>
-                    </div>
-                    <h2 class="text-2xl heavy font-semibold text-white">Need a windows machine? We've got it.</h2>
-                    <p class="text-white/60">Windows RDPs and Linux VMs are on hold temporarily. We're working on getting more capacity and upgrading how deployment works.</p>
-                    <a href="/vms/new" class="inline-flex opacity-50 items-center justify-center h-11 gap-2 px-6 text-sm font-medium text-white transition-all duration-200 rounded-full shadow bg-indigo-500 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-800 focus:ring-offset-2 ring-offset-gray-200 hover:shadow-none" disabled>
-                        Deploy Now
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                        </svg>
-                    </a>
-                </div>
-                <div class="hidden md:block">
-                    <img src="https://i.imgur.com/NUDxhDy.png" alt="BHS Data Center" class="rounded-lg w-[400px] h-[250px] object-cover" />
-                </div>
-                </div>
-            </div>
-    <% } %>
-
     <!-- Servers List Header -->
     <div class="px-6 py-3 mt-6 grid grid-cols-12 gap-4 items-center text-sm font-medium text-white/50">
         <div class="col-span-2">Server</div>
@@ -114,7 +80,7 @@
      data-server-id="<%= server.attributes.identifier %>"
      data-server-numeric="<%= server.attributes.id %>"
      data-egg="<%= server.attributes.egg %>"
-     onclick="window.location.href='/server/manage?id=<%= server.attributes.identifier%>&numeric=<%= server.attributes.id%>&mode=' + ((<%=server.attributes.egg%> === 18 || <%=server.attributes.egg%> === 19 || <%=server.attributes.egg%> === 18) ? 'vm' : (<%=server.attributes.node%> === 42 || <%=server.attributes.node%> === 51 ? 'rdp' : 'server'))">
+     onclick="window.location.href='/server/manage?id=<%= server.attributes.identifier%>&numeric=<%= server.attributes.id%>&mode=server'">
                     
                     <!-- Server Name & Node -->
                     <div class="col-span-2">
@@ -122,10 +88,7 @@
                     </div>
 
                     <!-- Status -->
-<% if (server.attributes.node == "42") { %>                    <div class="col-span-2">                <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300">
-                    RDP (Beta)
-                </div></div><% } %>
-                    <div class="col-span-2 <% if (server.attributes.node == "42") { %>hidden<% } %>">
+                    <div class="col-span-2">
                         <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-zinc-500/20 text-zinc-300">
                             <div class="size-2 rounded-full bg-zinc-400 mr-2 status-indicator"></div>
                             <span class="status-text">Connecting...</span>
@@ -134,7 +97,7 @@
 
                     <!-- Memory Usage -->
                     <div class="col-span-2">
-                        <div class="flex <% if (server.attributes.node == "42") { %>hidden<% } %> items-center gap-2">
+                        <div class="flex items-center gap-2">
                             <div class="w-full bg-white/10 rounded-full h-1.5">
                                 <div class="memory-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
                             </div>
@@ -144,7 +107,7 @@
 
                     <!-- CPU Usage -->
                     <div class="col-span-2">
-                        <div class="flex <% if (server.attributes.node == "42") { %>hidden<% } %> items-center gap-2">
+                        <div class="flex items-center gap-2">
                             <div class="w-full bg-white/10 rounded-full h-1.5">
                                 <div class="cpu-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
                             </div>
@@ -154,7 +117,7 @@
 
                     <!-- Server Details -->
                     <div class="col-span-3 ml-4">
-                        <div class="text-xs <% if (server.attributes.node == "42") { %>hidden<% } %> font-mono text-white/70 bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg shadow-sm">
+                        <div class="text-xs font-mono text-white/70 bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg shadow-sm">
                             <span class="server-address">Fetching...</span>
                         </div>
                     </div>

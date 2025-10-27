@@ -26,12 +26,10 @@
         "server/worlds": "server/worlds.ejs",
         "server/import": "server/import.ejs",
         "server/logs": "server/logs.ejs",
-        "server/rdp": "server/rdp.ejs",
         "wallet": "wallet.ejs",
         "webhosting": "webhosting.ejs",
         "j4r": "j4r.ejs",
         "staking": "staking.ejs",
-        "vms/new": "create-vm.ejs",
         "admin": "admin.ejs",
         "store": "store.ejs",
         "afk": "arcio.ejs",
@@ -79,7 +77,6 @@
         "/server/worlds",
         "/server/import",
         "/server/logs",
-        "/server/rdp",
         "/server/power"
     ],
     "mustbeadmin": [

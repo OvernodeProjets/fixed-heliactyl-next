@@ -8,21 +8,13 @@
 <div class="block md:overflow-x-visible overflow-x-auto scrollbar-hide relative overflow-visible">
 
     <div class="space-x-2 md:space-x-4 rounded-full bg-white/5 backdrop-blur-xl p-2 md:p-1.5 inline-flex items-center">
-        <% if (req.query.mode !== "rdp") { %>
             <!-- Core Server Management -->
             <a href="/server/manage?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
                 Console
             </a>
-<% if (req.query.mode !== "vm") { %>
             <a href="/server/files?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
                 Files
             </a>
-<% } else { %>
-            <a href="/server/files?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
-                Container
-            </a>
-<% } %>
-<% if (req.query.mode !== "vm") { %>
             <a href="/server/backups?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
                 Backups
             </a>
@@ -35,17 +27,11 @@
                 Plugins
             </a>
             
-<% } %>
-<% if (req.query.mode !== "vm") { %>
             <!-- Configuration -->
             <a href="/server/allocations?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
                 Allocations
             </a>
-<% } else { %>
-            <a href="/server/allocations?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
-                Networking
-            </a>
-<% } %>
+
             <a href="/server/settings?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
                 Settings
             </a>
@@ -133,17 +119,6 @@
         </div>
     </div>
 </div>
-<% } else { %>
-            <a href="/server/rdp?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "rdp" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
-                VNC
-            </a>
-            <a href="/server/power?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "rdp" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
-                Power Actions
-            </a>
-            <a href="/server/settings?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "rdp" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
-                Settings
-            </a>
-<% } %>
         </div>
     </div>
 </nav>

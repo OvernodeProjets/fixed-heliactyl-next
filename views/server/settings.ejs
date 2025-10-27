@@ -59,7 +59,7 @@
 
 <div class="space-y-8">
     <!-- SFTP Access Panel -->
-    <div class="bg-white/5 rounded-xl overflow-hidden <% if (req.query.mode == "rdp") { %>hidden<% } %>">
+    <div class="bg-white/5 rounded-xl overflow-hidden">
         <div class="bg-white/5 px-6 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <h2 class="text-lg font-semibold text-white">SFTP Access</h2>
@@ -100,7 +100,7 @@
     </div>
 
     <!-- Server Rename Panel -->
-    <div class="bg-white/5 rounded-xl overflow-hidden <% if (req.query.mode == "rdp") { %>hidden<% } %>">
+    <div class="bg-white/5 rounded-xl overflow-hidden">
         <div class="bg-white/5 px-6 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <h2 class="text-lg font-semibold text-white">Rename Server</h2>
@@ -117,7 +117,7 @@
     </div>
 
     <!-- Server Reinstall Panel -->
-    <div class="bg-white/5 rounded-xl overflow-hidden <% if (req.query.mode == "rdp") { %>hidden<% } %>">
+    <div class="bg-white/5 rounded-xl overflow-hidden">
         <div class="bg-white/5 px-6 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <h2 class="text-lg font-semibold text-white">Reinstall Server</h2>
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
     <!-- Enhanced Advanced Settings -->
-    <div class="bg-white/5 rounded-xl p-6 mt-8 <% if (req.query.mode == "rdp") { %>hidden<% } %>">
+    <div class="bg-white/5 rounded-xl p-6 mt-8">
         <!-- Docker Image Selection -->
         <div class="mb-6">
             <label class="block text-sm font-medium text-gray-300 mb-2">Docker Image</label>

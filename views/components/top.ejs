@@ -461,7 +461,7 @@ serverSection.style.display = 'block';
                                     <% pterodactyl.relationships.servers.data.forEach(server => { %>
                                         <a
                                             class="flex cursor-pointer items-center w-full px-4 py-2 text-sm text-white/70 hover:bg-white/5"
-                                            onclick="window.location.href='/server/manage?id=<%= server.attributes.identifier%>&numeric=<%= server.attributes.id%>&mode=' + ((<%=server.attributes.egg%> === 18 || <%=server.attributes.egg%> === 19) ? 'vm' : (<%=server.attributes.node%> === 42 || <%=server.attributes.node%> === 51 ? 'rdp' : 'server'))">
+                                            onclick="window.location.href='/server/manage?id=<%= server.attributes.identifier%>&numeric=<%= server.attributes.id%>&mode=server'">
                                             <%= server.attributes.name %>
                                         </a>
                                     <% }); %>
