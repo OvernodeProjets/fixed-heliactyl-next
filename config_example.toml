@@ -147,9 +147,9 @@ accountSwitcher = true
 
 # --- Permissions / Allow List ---
   [api.client.allow]
-  newusers = true
-  regen = true
-  overresourcessuspend = false
+  new_users = true
+  change_password = true
+  over_resources_suspend = false
 
     [api.client.allow.server]
     create = true
@@ -188,14 +188,6 @@ accountSwitcher = true
 # --- Rate Limits ---
   [api.client.ratelimits]
   "/callback" = 2
-  "/create" = 1
-  "/delete" = 1
-  "/modify" = 1
-  "/updateinfo" = 1
-  "/setplan" = 2
-  "/admin" = 1
-  "/regen" = 1
-  "/renew" = 1
   "/api/userinfo" = 1
 
 # --- Packages ---
@@ -222,7 +214,7 @@ accountSwitcher = true
       "0000000000000000000" = "2"
 
 # --- Locations ---
-  [api.client.locations.2]
+  [api.client.locations.1]
   name = "France, FR"
   country = "France"
   flag = "https://cdn-icons-png.flaticon.com/512/197/197560.png"
@@ -231,11 +223,11 @@ accountSwitcher = true
   cpu = "Intel Xeon & AMD Ryzen"
   storage = "1 TB SSD"
 
-  [[api.client.locations.2.nodes]]
+  [[api.client.locations.1.nodes]]
   name = "fr.mrs.1"
   id = 1
 
-  [[api.client.locations.2.nodes]]
+  [[api.client.locations.1.nodes]]
   name = "fr.mrs.2"
   id = 2
 

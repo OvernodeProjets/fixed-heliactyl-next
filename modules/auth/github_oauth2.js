@@ -104,7 +104,7 @@ module.exports.load = async function (app, db) {
       res.cookie('userId', userinfo.id.toString(), { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
 
       if (!(await db.get("users-" + userinfo.id))) {
-        if (settings.api.client.allow.newusers == true) {
+        if (settings.api.client.allow.new_users) {
         const genpassword = settings.api.client.passwordgenerator.signup
           ? makeid(settings.api.client.passwordgenerator["length"])
           : makeid(16);

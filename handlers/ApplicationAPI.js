@@ -112,7 +112,6 @@ class PterodactylApplicationModule {
     try {
       const params = { page, per_page: perPage };
       
-      // Ajouter les filtres optionnels
       if (filters.include) params.include = filters.include;
       if (filters.filter) params.filter = filters.filter;
       if (filters.sort) params.sort = filters.sort;

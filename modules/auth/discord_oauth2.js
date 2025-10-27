@@ -486,7 +486,7 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
         }
 
         if (!(await db.get("users-" + userinfo.id))) {
-          if (!settings.api.client.allow.newusers) {
+          if (!settings.api.client.allow.new_users) {
             return res.send("New users cannot signup currently.");
           }
         const genpassword = settings.api.client.passwordgenerator.signup

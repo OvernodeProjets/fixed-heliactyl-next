@@ -27,6 +27,7 @@ const getPteroUser = require("../handlers/getPteroUser.js");
 const Queue = require("../handlers/Queue.js");
 const {discordLog} = require("../handlers/log.js");
 const { requireAuth } = require("../handlers/checkMiddleware.js");
+const PterodactylApplicationModule = require('../handlers/ApplicationAPI.js');
 
 if (settings.pterodactyl)
     if (settings.pterodactyl.domain) {
@@ -35,6 +36,7 @@ if (settings.pterodactyl)
     }
 
 module.exports.load = async function(app, db) {
+    const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
   
 app.get("/updateinfo", requireAuth, async (req, res) => {
     try {
@@ -78,7 +80,13 @@ app.get("/updateinfo", requireAuth, async (req, res) => {
             // Adjust each server's resources
             for (const server of servers) {
                 const serverId = server.attributes.id;
-                
+
+                await AppAPI.updateServerBuild(serverId, {
+                    memory: 1024,
+                    disk: 5120,
+                    cpu: 50
+                });
+
                 await fetch(
                     `${settings.pterodactyl.domain}/api/application/servers/${serverId}/build`,
                     {
@@ -110,9 +118,9 @@ app.get("/updateinfo", requireAuth, async (req, res) => {
             if (!PterodactylUserRefresh) {
                 res.send("An error has occurred while attempting to update your account information and server list.");
                 return;
-            } else {
-                req.session.pterodactyl = PterodactylUserRefresh.attributes;
             }
+
+            req.session.pterodactyl = PterodactylUserRefresh.attributes;
         } else {
             req.session.pterodactyl = PterodactylUser.attributes;
         }

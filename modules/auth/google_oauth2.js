@@ -95,7 +95,7 @@ module.exports.load = async function (app, db) {
       res.cookie('userId', user.id, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
 
       if (!(await db.get("users-" + user.id))) {
-        if (!settings.api.client.allow.newusers) {
+        if (!settings.api.client.allow.new_users) {
           return res.send("New users cannot sign up currently.");
         }
 

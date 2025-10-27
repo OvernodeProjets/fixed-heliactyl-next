@@ -36,8 +36,8 @@ module.exports.load = async function(app, db) {
     res.json(notifications)
   });
 
-  app.get("/api/password/regen", requireAuth, async (req, res) => {
-    if (!settings.api.client.allow.regen) return res.status(403).json({ error: "Password changes are not allowed" });
+  app.get("/api/password/generate", requireAuth, async (req, res) => {
+    if (!settings.api.client.allow.change_password) return res.status(403).json({ error: "Password changes are not allowed" });
 
     const newPassword = settings.api.client.passwordgenerator.signup
       ? makeid(settings.api.client.passwordgenerator["length"])
@@ -55,7 +55,7 @@ module.exports.load = async function(app, db) {
 
   // New endpoint for custom password changes
   app.post("/api/password/change", requireAuth, async (req, res) => {
-    if (!settings.api.client.allow.regen) return res.status(403).json({ error: "Password changes are not allowed" });
+    if (!settings.api.client.allow.change_password) return res.status(403).json({ error: "Password changes are not allowed" });
 
     const { password, confirmPassword } = req.body;
 

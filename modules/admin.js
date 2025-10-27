@@ -32,9 +32,11 @@ const indexjs = require("../app.js");
 const adminjs = require("./admin.js");
 const { discordLog } = require("../handlers/log.js");
 const getPteroUser = require("../handlers/getPteroUser");
-
+const PterodactylApplicationModule = require('../handlers/ApplicationAPI.js');
 
 module.exports.load = async function (app, db) {
+  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
+
   app.get("/setcoins", async (req, res) => {
     if (!req.session.pterodactyl) return four0four(req, res);
 
@@ -505,9 +507,9 @@ module.exports.load = async function (app, db) {
   }
 
   module.exports.suspend = async function (discordid) {
-    if (settings.api.client.allow.overresourcessuspend !== true) return;
+    if (!settings.api.client.allow.over_resources_suspend) return;
 
-    let canpass = await indexjs.islimited();
+    const canpass = await indexjs.islimited();
     if (canpass == false) {
       setTimeout(async function () {
         adminjs.suspend(discordid);
@@ -523,20 +525,20 @@ module.exports.load = async function (app, db) {
         return;
     }
 
-    let packagename = await db.get("package-" + discordid);
-    let package =
+    const packagename = await db.get("package-" + discordid);
+    const package =
       settings.api.client.packages.list[
         packagename || settings.api.client.packages.default
       ];
 
-    let extra = (await db.get("extra-" + discordid)) || {
+    const extra = (await db.get("extra-" + discordid)) || {
       ram: 0,
       disk: 0,
       cpu: 0,
       servers: 0,
     };
 
-    let plan = {
+    const plan = {
       ram: package.ram + extra.ram,
       disk: package.disk + extra.disk,
       cpu: package.cpu + extra.cpu,
@@ -556,12 +558,10 @@ module.exports.load = async function (app, db) {
     ) {
       current.ram =
         current.ram +
-        PterodactylUser.attributes.relationships.servers.data[i].attributes.limits
-          .memory;
+        PterodactylUser.attributes.relationships.servers.data[i].attributes.limits.memory;
       current.disk =
         current.disk +
-        PterodactylUser.attributes.relationships.servers.data[i].attributes.limits
-          .disk;
+        PterodactylUser.attributes.relationships.servers.data[i].attributes.limits.disk;
       current.cpu =
         current.cpu +
         PterodactylUser.attributes.relationships.servers.data[i].attributes.limits.cpu;
@@ -579,44 +579,17 @@ module.exports.load = async function (app, db) {
         i < len;
         i++
       ) {
-        let suspendid =
-          PterodactylUser.attributes.relationships.servers.data[i].attributes.id;
-        await fetch(
-          settings.pterodactyl.domain +
-            "/api/application/servers/" +
-            suspendid +
-            "/suspend",
-          {
-            method: "post",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${settings.pterodactyl.key}`,
-            },
-          }
-        );
+        const suspendID = PterodactylUser.attributes.relationships.servers.data[i].attributes.id;
+        await AppAPI.suspendServer(suspendID);
       }
     } else {
-      if (settings.api.client.allow.renewsuspendsystem.enabled == true) return;
       for (
         let i = 0, len = PterodactylUser.attributes.relationships.servers.data.length;
         i < len;
         i++
       ) {
-        let suspendid =
-          PterodactylUser.attributes.relationships.servers.data[i].attributes.id;
-        await fetch(
-          settings.pterodactyl.domain +
-            "/api/application/servers/" +
-            suspendid +
-            "/unsuspend",
-          {
-            method: "post",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${settings.pterodactyl.key}`,
-            },
-          }
-        );
+        const suspendID = PterodactylUser.attributes.relationships.servers.data[i].attributes.id;
+        await AppAPI.unsuspendServer(suspendID);
       }
     }
   };

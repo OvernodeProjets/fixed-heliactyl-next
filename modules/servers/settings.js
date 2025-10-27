@@ -24,8 +24,10 @@ const settings = loadConfig("./config.toml");
 const WebSocket = require('ws');
 const axios = require('axios');
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js");
+const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
 
 module.exports.load = async function(app, db) {
+  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
     
     // PUT /api/server/:id/startup
     router.put('/server/:serverId/startup', requireAuth, async (req, res) => {
@@ -34,19 +36,9 @@ module.exports.load = async function(app, db) {
         const { startup, environment, egg, image, skip_scripts } = req.body;
     
         // First, get the current server details
-        const serverDetailsResponse = await axios.get(
-          `${settings.pterodactyl.domain}/api/application/servers/${serverId}?include=container`,
-          {
-            headers: {
-              'Authorization': `Bearer ${settings.pterodactyl.key}`,
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const serverDetailsResponse = await AppAPI.getServerDetails(serverId, ['container']);
     
-        const currentServerDetails = serverDetailsResponse.data.attributes;
-        console.log(JSON.stringify(currentServerDetails))
+        const currentServerDetails = serverDetailsResponse.attributes;
     
         // Prepare the update payload
         const updatePayload = {
@@ -58,17 +50,7 @@ module.exports.load = async function(app, db) {
         };
     
         // Send the update request
-        const response = await axios.patch(
-          `${settings.pterodactyl.domain}/api/application/servers/${serverId}/startup`,
-          updatePayload,
-          {
-            headers: {
-              'Authorization': `Bearer ${settings.pterodactyl.key}`,
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const response = await AppAPI.updateServerStartup(serverId, updatePayload);
     
         res.json(response.data);
       } catch (error) {
