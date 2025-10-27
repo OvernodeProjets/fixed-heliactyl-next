@@ -1,4 +1,4 @@
-<%- include('./components/top') %>
+<%- include('../components/top') %>
 
 <main class="flex-grow container mx-auto px-4 py-8">
     <!-- Header Section -->
@@ -32,9 +32,9 @@
         </nav>
     </div>
 
-    <div class="relative overflow-hidden mt-4 rounded-2xl mb-8 bg-gradient-to-br from-blue-600/20 to-blue-900/30 border border-blue-500/20">
+    <div id="frosted-glass" class="relative overflow-hidden mt-4 rounded-2xl mb-8 bg-gradient-to-br from-blue-600/20 to-blue-900/30 border border-blue-500/20">
         <!-- Frosted Glass Effect Container -->
-        <div class="relative backdrop-blur-sm p-8 md:p-12">
+        <div  class="relative backdrop-blur-sm p-8 md:p-12">
             <div class="flex flex-col md:flex-row items-center justify-between gap-8">
                 <!-- Text Content -->
                 <div class="max-w-2xl">
@@ -265,6 +265,67 @@ function adventCalendar() {
         async fetchCalendar() {
             try {
                 const response = await fetch('/api/advent/calendar');
+                if (response.status === 400) {
+                document.getElementById('frosted-glass').innerHTML = `
+                    <div class="relative backdrop-blur-sm p-8 md:p-12">
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                            <!-- Text Content -->
+                            <div class="max-w-2xl">
+                                <h2 class="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-red-100 to-red-300 bg-clip-text text-transparent">
+                                    Advent Calendar Unavailable
+                                </h2>
+                                <p class="text-lg text-red-100/90 mb-6">
+                                    The Advent Calendar is not available at this time. This could be because the event hasn't started yet, has ended, or is temporarily disabled. Please check back later or contact our support team for more information.
+                                </p>
+                                <a href="<%= settings.website.discord %>" 
+                                   class="inline-flex items-center px-6 py-3 rounded-xl bg-red-200/20 backdrop-blur-xl hover:bg-red-200/30 text-white font-medium transition-all duration-200 group">
+                                    Contact Support on Discord
+                                    <svg xmlns="http://www.w3.org/2000/svg" 
+                                         class="size-5 ml-2 transform group-hover:translate-x-1 transition-transform" 
+                                         viewBox="0 0 24 24" 
+                                         fill="none" 
+                                         stroke="currentColor" 
+                                         stroke-width="2">
+                                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        
+                            <!-- Decorative Alert Icon -->
+                            <div class="relative w-48 h-48 flex-shrink-0">
+                                <div class="absolute inset-0 bg-red-500/20 rounded-full blur-2xl animate-pulse"></div>
+                                <div class="relative w-full h-full flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-32 h-32 text-red-300/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M12 8v4"/>
+                                        <path d="M12 16h.01"/>
+                                    </svg>
+                                </div>
+                                <!-- Floating snowflakes -->
+                                <div class="absolute top-4 right-4 animate-float" style="animation-delay: 0s">
+                                    <svg class="w-6 h-6 text-red-200/30" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2L13 7H11L12 2ZM12 22L11 17H13L12 22ZM2 12L7 11V13L2 12ZM22 12L17 13V11L22 12ZM5.64 5.64L9.05 9.05L7.64 10.46L4.22 7.05L5.64 5.64ZM18.36 18.36L14.95 14.95L16.36 13.54L19.78 16.95L18.36 18.36ZM5.64 18.36L4.22 16.95L7.64 13.54L9.05 14.95L5.64 18.36ZM18.36 5.64L19.78 7.05L16.36 10.46L14.95 9.05L18.36 5.64Z"/>
+                                    </svg>
+                                </div>
+                                <div class="absolute bottom-8 left-8 animate-float" style="animation-delay: 0.7s">
+                                    <svg class="w-5 h-5 text-red-200/30" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2L13 7H11L12 2ZM12 22L11 17H13L12 22ZM2 12L7 11V13L2 12ZM22 12L17 13V11L22 12ZM5.64 5.64L9.05 9.05L7.64 10.46L4.22 7.05L5.64 5.64ZM18.36 18.36L14.95 14.95L16.36 13.54L19.78 16.95L18.36 18.36ZM5.64 18.36L4.22 16.95L7.64 13.54L9.05 14.95L5.64 18.36ZM18.36 5.64L19.78 7.05L16.36 10.46L14.95 9.05L18.36 5.64Z"/>
+                                    </svg>
+                                </div>
+                                <div class="absolute top-1/2 left-4 animate-float" style="animation-delay: 1.2s">
+                                    <svg class="w-4 h-4 text-red-200/30" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2L13 7H11L12 2ZM12 22L11 17H13L12 22ZM2 12L7 11V13L2 12ZM22 12L17 13V11L22 12ZM5.64 5.64L9.05 9.05L7.64 10.46L4.22 7.05L5.64 5.64ZM18.36 18.36L14.95 14.95L16.36 13.54L19.78 16.95L18.36 18.36ZM5.64 18.36L4.22 16.95L7.64 13.54L9.05 14.95L5.64 18.36ZM18.36 5.64L19.78 7.05L16.36 10.46L14.95 9.05L18.36 5.64Z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ice Border Effect -->
+                    <div class="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-red-300/50 to-transparent"></div>
+                `
+                    return;
+                }
                 if (!response.ok) throw new Error('Failed to fetch calendar');
                 const data = await response.json();
                 this.calendarData = data.calendar;
@@ -469,4 +530,4 @@ html {
 }
 </style>
 
-<%- include('./components/bottom') %>
+<%- include('../components/bottom') %>
