@@ -74,7 +74,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mb-0.5 text-indigo-300 rounded-full shadow-sm bg-indigo-500/15 p-1.5 mr-2.5 inline-flex">
   <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
 </svg>
-Action completed - daily rewards (150 <%= settings.website.currency %>) have been claimed! <code style="font-family: 'JetBrains Mono'" class="text-white/60">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
+Action completed - daily rewards (<%= settings.api.client.coins.daily.amount %> <%= settings.website.currency %>) have been claimed! <code style="font-family: 'JetBrains Mono'" class="text-white/60">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
 </span>
 </div>
 <% } %>
@@ -124,6 +124,21 @@ Action completed - the server has been deleted. <code style="font-family: 'JetBr
         </div>
     </div>
 <% } %>
+<div id="dailyCoinsBanner" class="hidden w-full border-l-4 mt-2 mb-8 bg-white/5 border-white/10 rounded-r-2xl">
+  <div class="p-6">
+    <h2 class="text-white/90 text-lg font-semibold">Your daily reward is available.</h2>
+    <div class="space-y-5">
+      <p class="text-white/60 text-sm leading-5">
+        As a thank you for being a <%= settings.name %> user, each day you can claim a reward of <%= settings.api.client.coins.daily.amount %> (<%= settings.website.currency %>)
+        <br />
+        Click the button below to claim your reward!
+      </p>
+      <a class="transition hover:scale-95 cursor-pointer font-semibold gap-2 grow-0 items-center justify-center rounded-xl shrink-0 disabled:cursor-not-allowed inline-flex border focus:outline-none px-4 py-[9px] bg-emerald-700 border-emerald-700 text-white hover:bg-emerald-600 hover:border-emerald-600 focus:ring-4 focus:ring-emerald-900 disabled:bg-emerald-900 disabled:border-emerald-900 disabled:text-emerald-400 text-sm" href="/daily-coins">
+        <span class="pointer-events-none shrink-0">Claim rewards</span>
+      </a>
+    </div>
+  </div>
+</div>
     <!-- New Flex Container for Side-by-Side Layout -->
     <div class="flex gap-8 mt-4">
         <!-- Welcome Message on the Left -->
@@ -319,10 +334,24 @@ Action completed - the server has been deleted. <code style="font-family: 'JetBr
       console.error('Error fetching stats:', error);
     }
   }
+  // Function to fetch daily coins status
+  async function checkDailyCoins() {
+    try {
+      const response = await fetch('/api/dailystatus');
+      const data = await response.json();
+      if (data.text === '1') {
+                document.getElementById('dailyCoinsBanner').classList.remove('hidden');
+                document.getElementById('dailyCoinsBanner').classList.add('animate-fadeIn');
+            }
+        } catch (error) {
+            console.error('Error checking daily coins:', error);
+        }
+    }
 
   // Update stats when page loads
   document.addEventListener('DOMContentLoaded', () => {
     updateStats();
+    checkDailyCoins();
     // Update stats every minute
     setInterval(updateStats, 60000);
   });

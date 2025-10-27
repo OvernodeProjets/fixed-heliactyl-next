@@ -104,37 +104,81 @@ app.get("/stats", async (req, res) => {
     }
 });
 
-  app.get(`/api/dailystatus`, requireAuth, async (req, res) => {
-      let lastClaim = new Date(await db.get("dailycoins12-" + req.session.userinfo.id));
-  
-    // Check if the user has already claimed coins today
-    const today = new Date();
-    if (lastClaim && lastClaim.toDateString() === today.toDateString()) {
-      return res.json({ text: '0' });
-    } else {
-      // If the user has not claimed coins today, give them their coins and update the last claim date
-      // (assuming you have a function to give the user coins)
-      return res.json({ text: '1' });
+  app.get('/api/dailystatus', requireAuth, async (req, res) => {
+    if (!settings.api.client.coins.daily.enabled) {
+      return res.json({ text: 'DISABLED' });
     }
-      })
+  
+    const per = settings.api.client.coins.daily.per;
+    const lastClaimTimestamp = await db.get("dailycoins-" + req.session.userinfo.id);
+    const lastClaim = lastClaimTimestamp ? new Date(lastClaimTimestamp) : null;
+
+    function getPeriodStart(date) {
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0);
+      switch (per) {
+        case "week":
+          const day = d.getDay();
+          const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+          d.setDate(diff);
+          break;
+        case "month":
+          d.setDate(1);
+          break;
+      }
+      return d;
+    }
+  
+    const today = getPeriodStart(new Date());
+    const lastPeriod = lastClaim ? getPeriodStart(lastClaim) : null;
+  
+    if (lastPeriod && lastPeriod.getTime() === today.getTime()) {
+      return res.json({ text: '0' }); // Already claimed
+    } else {
+      return res.json({ text: '1' }); // Can claim
+    }
+  });
+  
   
   app.get('/daily-coins', requireAuth, async (req, res) => {
-    let lastClaim = new Date(await db.get("dailycoins12-" + req.session.userinfo.id));
-    
-    // Check if the user has already claimed coins today
-    const today = new Date();
-    if (lastClaim && lastClaim.toDateString() === today.toDateString()) {
-      // If the user has already claimed coins today, redirect to /daily
-      res.redirect('../dashboard?err=CLAIMED');
-    } else {
-      // If the user has not claimed coins today, give them their coins and update the last claim date
-      // (assuming you have a function to give the user coins)
-      const coins = await db.get("coins-" + req.session.userinfo.id) || 0;
-      db.set("coins-" + req.session.userinfo.id, coins + 150)
-  
-      await db.set("dailycoins12-" + req.session.userinfo.id, today);
-      res.redirect('../dashboard?err=none');
+    if (!settings.api.client.coins.daily.enabled) {
+      return res.redirect('../dashboard?err=DISABLED');
     }
+  
+    const per = settings.api.client.coins.daily.per;
+    const lastClaimTimestamp = await db.get("dailycoins-" + req.session.userinfo.id);
+    const lastClaim = lastClaimTimestamp ? new Date(lastClaimTimestamp) : null;
+  
+    function getPeriodStart(date) {
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0);
+      switch (per) {
+        case "week":
+          const day = d.getDay();
+          const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+          d.setDate(diff);
+          break;
+        case "month":
+          d.setDate(1);
+          break;
+      }
+      return d;
+    }
+  
+    const today = getPeriodStart(new Date());
+    const lastPeriod = lastClaim ? getPeriodStart(lastClaim) : null;
+  
+    if (lastPeriod && lastPeriod.getTime() === today.getTime()) {
+      return res.redirect('../dashboard?err=CLAIMED');
+    }
+  
+    const coins = (await db.get("coins-" + req.session.userinfo.id)) || 0;
+    await db.set("coins-" + req.session.userinfo.id, coins + settings.api.client.coins.daily.amount);
+  
+    discordLog('daily coins', `${req.session.userinfo.username} has claimed their daily reward of ${settings.api.client.coins.daily.amount} ${settings.website.currency}.`);
+  
+    await db.set("dailycoins-" + req.session.userinfo.id, today.getTime());
+    return res.redirect('../dashboard?err=none');
   });
   
 /**
