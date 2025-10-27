@@ -36,7 +36,7 @@ if (settings.pterodactyl)
     }
 
 module.exports.load = async function(app, db) {
-    const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
+  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
   
 app.get("/updateinfo", requireAuth, async (req, res) => {
     try {
@@ -121,9 +121,9 @@ app.get("/updateinfo", requireAuth, async (req, res) => {
             }
 
             req.session.pterodactyl = PterodactylUserRefresh.attributes;
-        } else {
-            req.session.pterodactyl = PterodactylUser.attributes;
         }
+
+        req.session.pterodactyl = PterodactylUser.attributes;
 
         if (req.query.redirect && typeof req.query.redirect === "string") {
             return res.redirect("/" + req.query.redirect);
@@ -150,7 +150,10 @@ app.get("/create", requireAuth, async (req, res) => {
         
         req.session.pterodactyl = PterodactylUser.attributes;
 
-        if (req.query.name && req.query.ram && req.query.disk && req.query.cpu && req.query.egg && req.query.location) {
+        if (!req.query.name || !req.query.ram || !req.query.disk || !req.query.cpu || !req.query.egg || !req.query.location) {
+            res.redirect(`/servers/new?err=MISSINGVARIABLE`);
+            return;
+        }
             try {
                 decodeURIComponent(req.query.name);
             } catch (err) {
@@ -211,7 +214,9 @@ app.get("/create", requireAuth, async (req, res) => {
             let ram = parseFloat(req.query.ram);
             let disk = parseFloat(req.query.disk);
             let cpu = parseFloat(req.query.cpu);
-            if (!isNaN(ram) && !isNaN(disk) && !isNaN(cpu)) {
+            if (isNaN(ram) || isNaN(disk) || isNaN(cpu)) {
+              return res.redirect(`/servers/new?err=NOTANUMBER`);
+            }
                 if (ram2 + ram > package.ram + extra.ram) {
                     return res.redirect(`/servers/new?err=EXCEEDRAM&num=${package.ram + extra.ram - ram2}`);
                 }
@@ -306,12 +311,6 @@ app.get("/create", requireAuth, async (req, res) => {
                 );
                 console.log(`user ${req.session.userinfo.username} created a server called ${name}`)
                 return res.redirect("/dashboard?err=CREATED");
-            } else {
-                res.redirect(`/servers/new?err=NOTANUMBER`);
-            }
-        } else {
-            res.redirect(`/servers/new?err=MISSINGVARIABLE`);
-        }
 });
 async function processQueue() {
   console.log('Processing queue...');
@@ -487,12 +486,8 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
 });
 
     app.get("/modify", requireAuth, async (req, res) => {
-        let theme = indexjs.get(req);
-    
         if (!settings.api.client.allow.server.modify) {
-          res.redirect(
-            "/servers?err=disabled"
-          );
+          res.redirect("/servers?err=disabled");
           return;
         }
 
@@ -529,8 +524,11 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
               ? undefined
               : parseFloat(req.query.cpu)
             : undefined;
-    
-          if (ram || disk || cpu) {
+
+          if (!ram || !disk || !cpu) {
+            res.redirect(`${redirectlink}?id=${req.query.id}&err=MISSINGVARIABLE`);
+            return;
+          }
     
             let packagename = await db.get("package-" + req.session.userinfo.id);
             let package =
@@ -677,76 +675,50 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
             pterorelationshipsserverdata.push(text);
             req.session.pterodactyl.relationships.servers.data =
               pterorelationshipsserverdata;
-            let theme = indexjs.get(req);
+
             adminjs.suspend(req.session.userinfo.id);
             res.redirect("/dashboard?err=MODIFIED");
-          } else {
-            res.redirect(`${redirectlink}?id=${req.query.id}&err=MISSINGVARIABLE`);
-          }
       });
-    
-app.get("/delete", requireAuth, async (req, res) => {
-  if (!req.query.id) return res.send("Missing id.");
 
-  let theme = indexjs.get(req);
+app.get("/api/server/:id/delete", requireAuth, async (req, res) => {
+  const { id } = req.params;
+  if (!id) return res.send("Missing id.");
 
   if (!settings.api.client.allow.server.delete) {
-    res.redirect(
-      "/servers?err=disabled"
-    );
+    res.redirect("/servers?err=disabled");
     return;
   }
     if (
       req.session.pterodactyl.relationships.servers.data.filter(
-        (server) => server.attributes.id == req.query.id
+        (server) => server.attributes.id == id
       ).length == 0
     )
       return res.send("Could not find server with that ID.");
 
     // Check if the server is suspended
-    let serverInfo = await fetch(
-      `${settings.pterodactyl.domain}/api/application/servers/${req.query.id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${settings.pterodactyl.key}`,
-        },
-      }
-    );
+    const server = await AppAPI.getServer(id);
 
-    let serverData = await serverInfo.json();
-
-    if (serverData.attributes.suspended) {
+    if (server.attributes.suspended) {
       return res.redirect("/dashboard?err=SUSPENDED")
     }
 
-    let deletionresults = await fetch(
-      settings.pterodactyl.domain +
-        "/api/application/servers/" +
-        req.query.id + '/force',
-      {
-        method: "delete",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${settings.pterodactyl.key}`,
-        },
-      }
-    );
-    let ok = await deletionresults.ok;
-    if (ok !== true)
+    try {
+      await AppAPI.deleteServer(id, true);
+    } catch (error) {
       return res.send(
         "An error has occurred while attempting to delete the server."
       );
+    }
+
     let pterodactylinfo = req.session.pterodactyl;
     pterodactylinfo.relationships.servers.data =
       pterodactylinfo.relationships.servers.data.filter(
-        (server) => server.attributes.id.toString() !== req.query.id
+        (server) => server.attributes.id.toString() !== id
       );
     req.session.pterodactyl = pterodactylinfo;
     discordLog(
       `deleted server`,
-      `${req.session.userinfo.username} deleted the server called \`${serverData.attributes.name}\``
+      `${req.session.userinfo.username} deleted the server called \`${server.attributes.name}\``
     );
 
     adminjs.suspend(req.session.userinfo.id);

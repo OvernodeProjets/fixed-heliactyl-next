@@ -552,7 +552,7 @@ document.getElementById('reinstall-server').addEventListener('click', () => {
             'Delete Server',
             'Are you sure you want to delete the server? This action cannot be undone and all data will be lost.',
             () => {
-                window.location.href = '/delete?id=<%= req.query.numeric %>'
+                window.location.href = `/api/server/${req.query.numeric}/delete`
             }
         );
     });
