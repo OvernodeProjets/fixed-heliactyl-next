@@ -40,15 +40,12 @@
         "admin/coins": "admin/coins.ejs",
         "admin/resources": "admin/resources.ejs",
         "admin/other": "admin/other.ejs",
+        "events/christmas": "events/advent.ejs",
         "events/halloween": "events/halloween.ejs"
     },
     "mustbeloggedin": [
         "/dashboard",
-        "/change",
-        "/admin",
         "/store",
-        "/earn",
-        "/daily",
         "/referrals",
         "/transfer",
         "/account",
