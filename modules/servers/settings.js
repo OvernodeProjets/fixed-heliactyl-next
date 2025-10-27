@@ -52,7 +52,7 @@ module.exports.load = async function(app, db) {
         // Send the update request
         const response = await AppAPI.updateServerStartup(serverId, updatePayload);
     
-        res.json(response.data);
+        res.json(response);
       } catch (error) {
         console.error('Error updating server startup:', error);
         res.status(500).json({ error: 'Internal server error' });
