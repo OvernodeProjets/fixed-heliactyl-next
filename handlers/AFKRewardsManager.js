@@ -112,7 +112,7 @@ class AFKRewardsManager {
     const updateState = () => {
       this.sendState(userId, ws);
       
-      const timeout = setTimeout(updateState, 1000);
+      const timeout = setTimeout(updateState, 30000);
       this.stateTimeouts.set(userId, timeout);
     };
 

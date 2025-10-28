@@ -212,21 +212,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // Update countdown
                     if (updateInterval) clearInterval(updateInterval);
-                    
+                    let remainingTime = data.nextRewardIn;
+
                     function updateCountdown() {
-                        const remainingSeconds = Math.ceil(data.nextRewardIn / 1000);
+                        const seconds = Math.max(0, Math.ceil(remainingTime / 1000));
                         document.getElementById('countdown').textContent = 
-                            `${remainingSeconds}s`;
+                            `${seconds}s`;
+
+                        if (remainingTime <= 0) {
+                            totalEarned += data.coinsPerMinute;
+                            updateSessionStats();
+                            remainingTime = 30000; // Reset to 30 seconds for the next cycle
+                        } else {
+                            remainingTime -= 1000;
+                        }
                     }
 
                     updateCountdown();
                     updateInterval = setInterval(updateCountdown, 1000);
-
-                    // Update total earned (add coins every reward)
-                    if (data.nextRewardIn === 0) {
-                        totalEarned += data.coinsPerMinute;
-                        updateSessionStats();
-                    }
                 }
             } catch (error) {
                 console.error('[AFK] Failed to parse message:', error);
