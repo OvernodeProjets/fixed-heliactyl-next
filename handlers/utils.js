@@ -3,29 +3,52 @@
  * PS: Temporary solution until refactoring.
  */
 
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 
-const PAGES_PATH = path.join(__dirname, '..', 'views', 'pages.json');
+function getAllJsFiles(dir, options = {}) {
+    const {
+        recursive = true,
+        extensions = ['.js'],
+        exclude = []
+    } = options;
 
-getPages = async function () {
+    const files = [];
+
     try {
-        const data = await fs.readFile(PAGES_PATH, 'utf-8');
-        return {
-            settings: JSON.parse(data)
-        };
-    } catch (error) {
-        if (error.code === 'ENOENT') {
-            return { settings: [] };
-        }
-        throw error;
-    }
-};
+        const items = fs.readdirSync(dir, { withFileTypes: true });
 
-module.exports.islimited = async function () {
+        for (const item of items) {
+            const fullPath = path.join(dir, item.name);
+
+            // Skip excluded paths
+            if (exclude.some(pattern => fullPath.includes(pattern))) {
+                continue;
+            }
+
+            if (item.isDirectory() && recursive) {
+                files.push(...getAllJsFiles(fullPath, options));
+            } else if (item.isFile()) {
+                const ext = path.extname(item.name);
+                if (extensions.includes(ext)) {
+                    files.push(fullPath);
+                }
+            }
+        }
+    } catch (error) {
+        if (error.code !== 'EACCES') { // Skip permission errors
+            throw error;
+        }
+    }
+
+    return files;
+}
+
+async function isLimited() {
     return cache == true ? false : true;
 };
 
 module.exports = {
-    getPages
+    getAllJsFiles,
+    isLimited
 }

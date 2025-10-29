@@ -2,20 +2,28 @@
  
 Heliactyl Next - Avalanche
 
+    __         ___            __        __
+   / /_  ___  / (_)___ ______/ /___  __/ /
+  / __ \/ _ \/ / / __ `/ ___/ __/ / / / / 
+ / / / /  __/ / / /_/ / /__/ /_/ /_/ / /  
+/_/ /_/\___/_/_/\__,_/\___/\__/\__, /_/   
+                              /____/ 
+
 */
 
 "use strict";
 
-// Load logging.
 require("./handlers/console.js")();
 
-// Load packages.
 const fs = require("fs");
+const path = require('path');
 const chalk = require("chalk");
 const cluster = require("cluster");
-const chokidar = require('chokidar');
 
-const { getPages } = require('./handlers/utils');
+const { renderData, getPages } = require('./handlers/theme');
+const { getAllJsFiles } = require('./handlers/utils');
+const { validateModules } = require('./handlers/moduleValidator');
+const { startCluster } = require('./handlers/clusterManager');
 
 global.Buffer = global.Buffer || require("buffer").Buffer;
 process.emitWarning = function () { };
@@ -31,62 +39,12 @@ if (typeof atob === "undefined") {
 const loadConfig = require("./handlers/config");
 const settings = loadConfig("./config.toml");
 
-/**
- * Renders data for the theme.
- * @param {Object} req - The request object.
- * @param {Object} theme - The theme object.
- * @returns {Promise<Object>} The rendered data.
- */
-async function renderData(req, theme) {
-  let userinfo = req.session.userinfo;
-  let userId = userinfo ? userinfo.id : null;
-  let packageId = userId ? await db.get("package-" + userId) || settings.api.client.packages.default : null;
-  let extraresources = userId ? await db.get("extra-" + userId) || { ram: 0, disk: 0, cpu: 0, servers: 0 } : null;
-  let coins = settings.api.client.coins.enabled && userId ? await db.get("coins-" + userId) || 0 : null;
-  let plesk = userId ? await db.get("plesk-" + userId) || null : null;
-
-  let renderdata = {
-    req,
-    settings,
-    userinfo,
-    packagename: packageId,
-    extraresources,
-    packages: userId ? settings.api.client.packages.list[packageId] : null,
-    coins,
-    plesk,
-    pterodactyl: req.session.pterodactyl,
-    extra: theme.settings.variables,
-    db
-  };
-
-  return renderdata;
-}
-
-module.exports.renderData = renderData;
-
 // Load database
 const Database = require("./db.js");
 const db = new Database(settings.database);
 module.exports.db = db;
 
-function getAllJsFiles(dir) {
-  const files = [];
-  const items = fs.readdirSync(dir, { withFileTypes: true });
-
-  for (const item of items) {
-    const fullPath = `${dir}/${item.name}`;
-    if (item.isDirectory()) {
-      files.push(...getAllJsFiles(fullPath));
-    } else if (item.isFile() && item.name.endsWith('.js')) {
-      files.push(fullPath);
-    }
-  }
-
-  return files;
-}
-
 if (cluster.isMaster) {
-  // Display ASCII art and loading spinner
   const asciiArt = fs.readFileSync('./handlers/ascii.txt', 'utf8');
   console.log('\n' + asciiArt + '\n');
 
@@ -103,160 +61,9 @@ if (cluster.isMaster) {
   setTimeout(() => {
     clearInterval(spinner);
     process.stdout.write('\r');
-    startApp();
+    validateModules(settings);
+    startCluster(settings, db);
   }, 2000);
-
-  function startApp() {
-    const moduleFiles = getAllJsFiles('./modules').map(file => file.replace('./modules/', ''));
-    const compatibility = require('./handlers/compatibility');
-    const runtime = typeof Bun !== 'undefined' ? 'Bun' : 'Node.js';
-
-    console.log(chalk.gray(`Running under a ${runtime} runtime environment`));
-    console.log(chalk.gray("Loading modules tree..."));
-    console.log(chalk.gray("Graphene 1.1.0"));
-
-
-    const modulesTable = [];
-    const moduleLoadTimes = {};
-
-    moduleFiles.forEach(file => {
-      let moduleState = 'Initializing';
-      const startTime = process.hrtime();
-
-      try {
-        const module = require('./modules/' + file);
-        const loadTime = process.hrtime(startTime);
-        const loadTimeMs = (loadTime[0] * 1000 + loadTime[1] / 1000000).toFixed(2);
-        moduleLoadTimes[file] = loadTimeMs;
-
-        if (!module.heliactylModule) {
-          console.log(chalk.red(`Module "${file}" has an error: No module manifest was found in the file.`));
-          modulesTable.push({ File: file, Status: '❌ No module manifest', State: 'Error', 'Target Platform': 'N/A', 'Load Time': `${loadTimeMs}ms` });
-          return;
-        }
-
-        const { name, target_platform } = module.heliactylModule;
-        moduleState = 'Loaded';
-
-        // Check version compatibility
-        const versionCheck = compatibility.isCompatible(target_platform, settings.version);
-
-        if (!versionCheck.compatible) {
-          moduleState = 'Version Mismatch';
-          if (versionCheck.details.majorMismatch) {
-            console.log(chalk.red(`Module "${name}" has an error: Major version mismatch (expected: ${settings.version}, found: ${target_platform})`));
-            modulesTable.push({ File: file, Name: name, Status: '❌ Major version mismatch', State: moduleState, 'Target Platform': target_platform });
-          } else if (versionCheck.details.newerMinor) {
-            console.log(chalk.red(`Module "${name}" has an error: Module requires a newer platform version (module: ${target_platform}, platform: ${settings.version})`));
-            modulesTable.push({ File: file, Name: name, Status: '❌ Newer version required', State: moduleState, 'Target Platform': target_platform });
-          }
-          return;
-        }
-
-        // Version is compatible but different
-        if (target_platform !== settings.version) {
-          moduleState = 'Compatible';
-          console.log(chalk.yellow(`Module "${name}" notice: Different but compatible version (platform: ${settings.version}, module: ${target_platform}) in ${moduleLoadTimes[file]}ms`));
-          modulesTable.push({
-            File: file,
-            Name: name,
-            Status: '⚠️ Module loaded (different version)',
-            State: moduleState,
-            'Target Platform': target_platform,
-            'Load Time': `${moduleLoadTimes[file]}ms`
-          });
-          return;
-        }
-
-        moduleState = 'Active';
-        modulesTable.push({
-          File: file,
-          Name: name,
-          Status: '✓ Module loaded!',
-          State: moduleState,
-          'Target Platform': target_platform,
-          'Load Time': `${moduleLoadTimes[file]}ms`
-        });
-        console.log(chalk.green(`Module "${name}" loaded successfully (${target_platform}) in ${moduleLoadTimes[file]}ms`));
-
-      } catch (error) {
-        moduleState = 'Error';
-        console.log(chalk.red(`Module "${file}" failed to load: ${error.message}`));
-        modulesTable.push({ File: file, Status: '❌ Module load failed', State: moduleState, 'Target Platform': 'N/A' });
-      }
-    });
-
-    //console.table( modulesTable);
-
-    const numCPUs = parseInt(settings.clusters) - 1;
-    console.log(chalk.gray(`Starting workers on Heliactyl Next ${settings.version} (${settings.platform_codename})`));
-    console.log(chalk.gray(`Master ${process.pid} is running`));
-    console.log(chalk.gray(`Forking ${numCPUs} workers...`));
-
-    if (numCPUs > 130 || numCPUs < 1) {
-      console.log(chalk.red('Error: Clusters amount was either below 1, or above 128.'));
-      process.exit();
-    }
-
-    let firstWorkerStarted = false;
-
-    for (let i = 0; i < numCPUs; i++) {
-      const worker = cluster.fork();
-      console.log(chalk.cyan(`Creating worker ${i + 1} of ${numCPUs}`));
-
-      if (!firstWorkerStarted) {
-        worker.send({ type: 'FIRST_WORKER' });
-        firstWorkerStarted = true;
-        console.log(chalk.cyan(`Designated primary worker: ${worker.process.pid}`));
-      }
-
-      worker.on('online', () => {
-        console.log(chalk.green(`Worker ${worker.process.pid} is online`));
-      });
-
-      worker.on('message', (msg) => {
-        if (msg.type === 'WEB_SERVER_STARTED') {
-          console.log(chalk.green(`Web server started on worker ${worker.process.pid}`));
-        }
-      });
-    }
-
-    cluster.on('exit', (worker, code, signal) => {
-      console.log(chalk.red(`Worker ${worker.process.pid} died. Forking a new worker...`));
-      cluster.fork();
-    });
-
-    cluster.on('online', (worker) => {
-      const workerTree = Object.values(cluster.workers).map(w => ({
-        id: w.id,
-        pid: w.process.pid,
-        state: w.state,
-      }));
-    });
-
-    const watchDirs = ['./modules', './handlers'];
-
-    watchDirs.forEach(dir => {
-      const watcher = chokidar.watch(dir);
-      watcher.on('change', async (path) => {
-        console.log(chalk.yellow(`File changed: ${path}. Rebooting workers...`));
-
-        if (path.includes('afk.js') || path.includes('modules/afk')) {
-          console.log(chalk.cyan('AFK module modified, clearing AFK sessions...'));
-          await db.set('afkSessions', {});
-          const keys = await db.list('afk_session-*');
-          for (const key of keys) {
-            await db.delete(key);
-          }
-        }
-
-        for (const id in cluster.workers) {
-          cluster.workers[id].kill();
-        }
-      });
-    });
-  }
-
 } else {
   // Worker process
   if (cluster.worker.id === 1) {
@@ -411,11 +218,23 @@ if (cluster.isMaster) {
   app.use(rateLimiters.specific);
 
   const APIFiles = getAllJsFiles('./modules');
+  console.log(`Loading ${APIFiles.length} modules...`);
 
-  APIFiles.forEach((file) => {
-    const APIFile = require(file);
-    APIFile.load(app, db);
-  });
+  for (const file of APIFiles) {
+    try {
+      const absolutePath = path.resolve(file);
+      const APIFile = require(absolutePath);
+
+      if (APIFile.load && typeof APIFile.load === 'function') {
+        APIFile.load(app, db);
+        console.log(chalk.green(`✓ Loaded: ${path.basename(file)}`));
+      } else {
+        console.warn(`⚠ Module ${file} does not export a load function`);
+      }
+    } catch (error) {
+      console.error(`✗ Failed to load ${file}:`, error.message);
+    }
+  }
 
   collectRoutes(app);
 
