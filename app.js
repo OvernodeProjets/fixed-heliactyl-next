@@ -466,9 +466,26 @@ app.all("*", async (req, res) => {
   }
 
   // Check admin requirements
-  if (theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
+  if (Array.isArray(theme.settings.mustbeadmin) && theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
     const data = await renderData(req, theme);
-    res.render(theme.settings.notfound, data);
+
+    // Not admin -> show forbidden
+    if (!req.session.userinfo || !req.session.pterodactyl.root_admin) {
+      const notFound = theme.settings.notFound || '404';
+      res.status(404).render(notFound, data);
+      return;
+    }
+
+    // Admin -> render the requested admin page 
+    const pageName = req._parsedUrl.pathname.slice(1);
+    const pageToRender = theme.settings.pages && theme.settings.pages[pageName];
+    if (typeof pageToRender === 'string' && pageToRender.length > 0) {
+      res.render(pageToRender, data);
+    } else {
+      // fallback to notFound if page not configured
+      const notFound = theme.settings.notFound || '404';
+      res.status(404).render(notFound, data);
+    }
     return;
   }
 

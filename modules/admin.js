@@ -80,7 +80,7 @@ module.exports.load = async function (app, db) {
       `set coins`,
       `${req.session.userinfo.username} set the coins of the user with the ID \`${id}\` to \`${coins}\`.`
     );
-    res.redirect("/admin/coins?success=SETCOINS");
+    res.status(200).json({ message: "Coins set successfully." });
   });
 
   app.get("/addcoins", async (req, res) => {
@@ -124,12 +124,11 @@ module.exports.load = async function (app, db) {
       await db.set("coins-" + id, coins);
     }
 
-    let successredirect = "/admin/coins?success=ADDCOINS";
     discordLog(
       `add coins`,
       `${req.session.userinfo.username} added \`${req.query.coins}\` coins to the user with the ID \`${id}\`'s account.`
     );
-    res.redirect(successredirect + "?err=none");
+    res.status(200).json({ message: "Coins added successfully." });
   });
 
   app.get("/setresources", async (req, res) => {
@@ -226,7 +225,7 @@ module.exports.load = async function (app, db) {
         `set resources`,
         `${req.session.userinfo.username} set the resources of the user with the ID \`${id}\` to:\`\`\`servers: ${servers}\nCPU: ${cpu}%\nMemory: ${ram} MB\nDisk: ${disk} MB\`\`\``
       );
-      return res.redirect(successredirect + "?err=none");
+      res.status(200).json({ message: "Resources set successfully." });
   });
 
   app.get("/addresources", async (req, res) => {
@@ -321,7 +320,7 @@ module.exports.load = async function (app, db) {
         `add resources`,
         `${req.session.userinfo.username} added resources to the user with the ID \`${id}\`:\`\`\`servers: ${servers}\nCPU: ${cpu}%\nMemory: ${ram} MB\nDisk: ${disk} MB\`\`\``
       );
-      return res.redirect(successredirect + "?err=none");
+      return res.status(200).json({ message: "Resources added successfully." });
   });
 
   app.get("/setplan", async (req, res) => {
@@ -370,7 +369,7 @@ module.exports.load = async function (app, db) {
       `set plan`,
       `${req.session.userinfo.username} set the plan of the user with the ID \`${id}\` to \`${package}\`.`
     );
-    return res.redirect(successredirect + "?err=none");
+    return res.status(200).json({ message: "Plan set successfully." });
   });
 
   app.get("/remove_account", async (req, res) => {
@@ -422,74 +421,71 @@ module.exports.load = async function (app, db) {
       `remove account`,
       `${req.session.userinfo.username} removed the account with the ID \`${id}\`.`
     );
-    res.redirect(
-      "/admin?success=REMOVEACCOUNT"
-    );
+    res.status(200).json({ message: "Account removed successfully." });
   });
 
   app.get("/userinfo", async (req, res) => {
-    if (!req.session.pterodactyl) return four0four(req, res);
+    try {
+      if (!req.session.pterodactyl) return four0four(req, res);
 
-    const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
-    if (!PterodactylUser) {
-        four0four(req, res);
-        return;
+      const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
+      if (!PterodactylUser) {
+          four0four(req, res);
+          return;
+      }
+
+      req.session.pterodactyl = PterodactylUser.attributes;
+      if (PterodactylUser.attributes.root_admin !== true) {
+          four0four(req, res);
+          return;
+      }
+
+      const { id } = req.query;
+
+      if (!id) return res.status(400).json({ error: "Missing user ID" });
+
+      const dbUser = await db.get("users-" + id);
+      if (!dbUser) {
+          return res.status(404).json({ error: "User not found in database" });
+      }
+
+      let packagename = await db.get("package-" + id);
+      let package =
+        settings.api.client.packages.list[
+          packagename ? packagename : settings.api.client.packages.default
+        ];
+      if (!package)
+        package = {
+          ram: 0,
+          disk: 0,
+          cpu: 0,
+          servers: 0,
+        };
+
+      package["name"] = packagename;
+
+      const PterodactylUserReq = await getPteroUser(id, db);
+      if (!PterodactylUserReq) {
+          return res.status(404).json({ error: "User not found in Pterodactyl" });
+      }
+
+      res.status(200).json({
+        package: package,
+        extra: (await db.get("extra-" + id)) || {
+          ram: 0,
+          disk: 0, 
+          cpu: 0,
+          servers: 0,
+        },
+        userinfo: PterodactylUserReq,
+        coins: settings.api.client.coins.enabled
+          ? (await db.get("coins-" + id)) ?? 0
+          : null
+      });
+    } catch (error) {
+      console.error("Error in /userinfo:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
-
-    req.session.pterodactyl = PterodactylUser.attributes;
-    if (PterodactylUser.attributes.root_admin !== true) {
-        four0four(req, res);
-        return;
-    }
-
-    const { id } = req.query;
-
-    if (!id) return res.send({ status: "missing id" });
-
-    if (!(await db.get("users-" + id)))
-      return res.send({ status: "invalid id" });
-
-    let packagename = await db.get("package-" + id);
-    let package =
-      settings.api.client.packages.list[
-        packagename ? packagename : settings.api.client.packages.default
-      ];
-    if (!package)
-      package = {
-        ram: 0,
-        disk: 0,
-        cpu: 0,
-        servers: 0,
-      };
-
-    package["name"] = packagename;
-
-    const pterodactylID = await db.get("users-" + id);
-    const PterodactylUserReq = await getPteroUser(pterodactylID, db);
-    if (!PterodactylUserReq) {
-        res.send("An error has occurred while attempting to update your account information and server list.");
-        return;
-    }
-
-    res.send({
-      status: "success",
-      package: package,
-      extra: (await db.get("extra-" + id))
-        ? await db.get("extra-" + id)
-        : {
-            ram: 0,
-            disk: 0,
-            cpu: 0,
-            servers: 0,
-          },
-      userinfo: PterodactylUserReq,
-      coins:
-        settings.api.client.coins.enabled == true
-          ? (await db.get("coins-" + id))
-            ? await db.get("coins-" + id)
-            : 0
-          : null,
-    });
   });
 
   async function four0four(req, res) {
@@ -518,8 +514,8 @@ module.exports.load = async function (app, db) {
     }
 
     indexjs.ratelimits(1);
-    const pterodactylID = await db.get("users-" + discordid);
-    const PterodactylUser = await getPteroUser(pterodactylID, db);
+    
+    const PterodactylUser = await getPteroUser(discordid, db);
     if (!PterodactylUser) {
         res.send("An error has occurred while attempting to update your account information and server list.");
         return;

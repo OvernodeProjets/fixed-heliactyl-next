@@ -1,0 +1,357 @@
+<%- include('../components/top') %>
+<!-- Main Content -->
+<main class="flex-grow container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center w-full mx-auto pb-6">
+        <div class="flex flex-col">
+            <h1 class="text-2xl font-semibold mb-0.5" style="font-family: 'Inter';">Administration Panel</h1>
+            <p class="text-gray-400 text-md">Manage users, resources, and system settings.</p>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <% if (req.query.err === 'none') { %>
+        <div class="mb-6 p-4 bg-green-600 rounded-2xl">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span class="text-white font-semibold">Operation completed successfully!</span>
+            </div>
+        </div>
+    <% } %>
+
+    <!-- Tabs Navigation -->
+    <div class="bg-white/5 rounded-2xl p-1 mb-6">
+        <div class="flex flex-wrap gap-2">
+            <button onclick="switchTab('coins')" id="tab-coins" class="tab-button flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-500 text-white font-medium transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Coins
+            </button>
+            <button onclick="switchTab('resources')" id="tab-resources" class="tab-button flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-gray-300 hover:bg-white/10 font-medium transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
+                </svg>
+                Resources
+            </button>
+            <button onclick="switchTab('users')" id="tab-users" class="tab-button flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-gray-300 hover:bg-white/10 font-medium transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                Users
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content-container">
+        <!-- COINS TAB -->
+        <div id="content-coins" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Set Coins Form -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-indigo-500/20 rounded-lg">
+                            <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white">Set Coins</h2>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Override a user's coin balance with a specific amount.</p>
+                    <form action="/setcoins" method="GET">
+                        <div class="mb-4">
+                            <label for="setcoins-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                            <input type="text" id="setcoins-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="Enter user ID" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="setcoins-amount" class="block text-sm font-medium text-gray-300 mb-2">Coins Amount</label>
+                            <input type="number" id="setcoins-amount" name="coins" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="0" required>
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-500 text-white px-4 py-3 rounded-lg hover:bg-indigo-600 transition-all font-medium shadow-lg shadow-indigo-500/20">Set Coins</button>
+                    </form>
+                </div>
+
+                <!-- Add Coins Form -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-green-500/20 rounded-lg">
+                            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white">Add Coins</h2>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Add coins to a user's existing balance.</p>
+                    <form action="/addcoins" method="GET">
+                        <div class="mb-4">
+                            <label for="addcoins-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                            <input type="text" id="addcoins-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" placeholder="Enter user ID" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="addcoins-amount" class="block text-sm font-medium text-gray-300 mb-2">Coins to Add</label>
+                            <input type="number" id="addcoins-amount" name="coins" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" placeholder="0" required>
+                        </div>
+                        <button type="submit" class="w-full bg-green-500 text-white px-4 py-3 rounded-lg hover:bg-green-600 transition-all font-medium shadow-lg shadow-green-500/20">Add Coins</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESOURCES TAB -->
+        <div id="content-resources" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Set Resources Form -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-indigo-500/20 rounded-lg">
+                            <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white">Set Resources</h2>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Override a user's resource allocation.</p>
+                    <form action="/setresources" method="GET">
+                        <div class="mb-4">
+                            <label for="setresources-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                            <input type="text" id="setresources-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="Enter user ID" required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label for="setresources-ram" class="block text-sm font-medium text-gray-300 mb-2">RAM (MB)</label>
+                                <input type="number" id="setresources-ram" name="ram" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="0" required>
+                            </div>
+                            <div>
+                                <label for="setresources-disk" class="block text-sm font-medium text-gray-300 mb-2">Disk (MB)</label>
+                                <input type="number" id="setresources-disk" name="disk" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="0" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label for="setresources-cpu" class="block text-sm font-medium text-gray-300 mb-2">CPU (%)</label>
+                                <input type="number" id="setresources-cpu" name="cpu" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="0" required>
+                            </div>
+                            <div>
+                                <label for="setresources-servers" class="block text-sm font-medium text-gray-300 mb-2">Servers</label>
+                                <input type="number" id="setresources-servers" name="servers" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="0" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-500 text-white px-4 py-3 rounded-lg hover:bg-indigo-600 transition-all font-medium shadow-lg shadow-indigo-500/20">Set Resources</button>
+                    </form>
+                </div>
+
+                <!-- Add Resources Form -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-green-500/20 rounded-lg">
+                            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white">Add Resources</h2>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Add resources to a user's existing allocation.</p>
+                    <form action="/addresources" method="GET">
+                        <div class="mb-4">
+                            <label for="addresources-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                            <input type="text" id="addresources-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" placeholder="Enter user ID" required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label for="addresources-ram" class="block text-sm font-medium text-gray-300 mb-2">RAM to Add (MB)</label>
+                                <input type="number" id="addresources-ram" name="ram" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" placeholder="0" required>
+                            </div>
+                            <div>
+                                <label for="addresources-disk" class="block text-sm font-medium text-gray-300 mb-2">Disk to Add (MB)</label>
+                                <input type="number" id="addresources-disk" name="disk" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" placeholder="0" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label for="addresources-cpu" class="block text-sm font-medium text-gray-300 mb-2">CPU to Add (%)</label>
+                                <input type="number" id="addresources-cpu" name="cpu" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" placeholder="0" required>
+                            </div>
+                            <div>
+                                <label for="addresources-servers" class="block text-sm font-medium text-gray-300 mb-2">Servers to Add</label>
+                                <input type="number" id="addresources-servers" name="servers" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" placeholder="0" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-green-500 text-white px-4 py-3 rounded-lg hover:bg-green-600 transition-all font-medium shadow-lg shadow-green-500/20">Add Resources</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- USERS TAB -->
+        <div id="content-users" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- User Info Form -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-purple-500/20 rounded-lg">
+                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white">Get User Info</h2>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">View detailed information about a user.</p>
+                    <form action="/userinfo" method="GET" onsubmit="handleUserInfoSubmit(event)" class="userinfo-form">
+                        <div class="mb-6">
+                            <label for="userinfo-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                            <input type="text" id="userinfo-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="Enter user ID" required>
+                        </div>
+                        <button type="submit" class="w-full bg-purple-500 text-white px-4 py-3 rounded-lg hover:bg-purple-600 transition-all font-medium shadow-lg shadow-purple-500/20">Get Info</button>
+                    </form>
+                    <div id="userinfo-result" class="mt-4 hidden">
+                        <div class="border-t border-white/10 pt-4">
+                            <h3 class="text-white font-medium mb-2">User Information</h3>
+                            <pre id="userinfo-data" class="bg-white/5 p-4 rounded-lg text-sm text-gray-300 overflow-auto"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Set Plan Form -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-blue-500/20 rounded-lg">
+                            <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white">Set User Plan</h2>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Assign a subscription plan to a user.</p>
+                    <form action="/setplan" method="GET">
+                        <div class="mb-4">
+                            <label for="setplan-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                            <input type="text" id="setplan-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Enter user ID" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="setplan-package" class="block text-sm font-medium text-gray-300 mb-2">Package Name</label>
+                            <input type="text" id="setplan-package" name="package" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="e.g., premium, basic" required>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-500 text-white px-4 py-3 rounded-lg hover:bg-blue-600 transition-all font-medium shadow-lg shadow-blue-500/20">Set Plan</button>
+                    </form>
+                </div>
+
+                <!-- Remove Account Form -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-red-500/20">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-red-500/20 rounded-lg">
+                            <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white">Remove Account</h2>
+                    </div>
+                    <p class="text-red-400 text-sm mb-4">⚠️ Permanently delete a user account. This action cannot be undone.</p>
+                    <form action="/remove_account" method="GET" onsubmit="return confirm('Are you sure you want to delete this account? This action is irreversible.')">
+                        <div class="mb-6">
+                            <label for="remove-account-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                            <input type="text" id="remove-account-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-red-500/30 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all" placeholder="Enter user ID to delete" required>
+                        </div>
+                        <button type="submit" class="w-full bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-all font-medium shadow-lg shadow-red-500/20">Remove Account</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+function switchTab(tabName) {
+    // Hide all tab contents
+    const contents = document.querySelectorAll('.tab-content');
+    contents.forEach(content => content.classList.add('hidden'));
+    
+    // Remove active state from all buttons
+    const buttons = document.querySelectorAll('.tab-button');
+    buttons.forEach(button => {
+        button.classList.remove('bg-indigo-500', 'text-white', 'shadow-lg', 'shadow-indigo-500/20');
+        button.classList.add('bg-white/5', 'text-gray-300');
+    });
+    
+    // Show selected tab content
+    document.getElementById('content-' + tabName).classList.remove('hidden');
+    
+    // Add active state to selected button
+    const activeButton = document.getElementById('tab-' + tabName);
+    activeButton.classList.remove('bg-white/5', 'text-gray-300');
+    activeButton.classList.add('bg-indigo-500', 'text-white', 'shadow-lg', 'shadow-indigo-500/20');
+}
+</script>
+
+<script>
+// Function to handle form submissions
+function handleFormSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const url = form.action;
+    const formData = new URLSearchParams(new FormData(form));
+
+    fetch(url + '?' + formData.toString())
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            form.reset();
+        })
+        .catch(error => {
+            alert('An error occurred: ' + error);
+        });
+}
+
+// Add submit event listeners to all forms except userinfo
+document.querySelectorAll('form:not(.userinfo-form)').forEach(form => {
+    form.addEventListener('submit', handleFormSubmit);
+});
+
+// Handle userinfo form submission separately
+function handleUserInfoSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const url = form.action;
+    const formData = new URLSearchParams(new FormData(form));
+    
+    const resultContainer = document.getElementById('userinfo-result');
+    const dataContainer = document.getElementById('userinfo-data');
+
+    fetch(url + '?' + formData.toString())
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            // Format the data for display
+            const formattedData = {
+                "Package Info": data.package,
+                "Extra Resources": data.extra,
+                "User Details": data.userinfo ? {
+                    "Username": data.userinfo.attributes?.username || 'N/A',
+                    "Email": data.userinfo.attributes?.email || 'N/A',
+                    "Admin": data.userinfo.attributes?.root_admin ? "Yes" : "No"
+                } : 'User not found',
+                "Coins": data.coins
+            };
+            
+            // Show the result container
+            resultContainer.classList.remove('hidden');
+            
+            // Display the formatted data
+            dataContainer.textContent = JSON.stringify(formattedData, null, 2);
+            dataContainer.classList.remove('text-red-500');
+            dataContainer.classList.add('text-gray-300');
+        })
+        .catch(error => {
+            resultContainer.classList.remove('hidden');
+            dataContainer.textContent = 'Error: ' + error.message;
+            dataContainer.classList.remove('text-gray-300');
+            dataContainer.classList.add('text-red-500');
+        });
+}
+</script>
+<%- include('../components/bottom') %>
