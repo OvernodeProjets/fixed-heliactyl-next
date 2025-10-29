@@ -15,6 +15,8 @@ const chalk = require("chalk");
 const cluster = require("cluster");
 const chokidar = require('chokidar');
 
+const { getPages } = require('./handlers/utils');
+
 global.Buffer = global.Buffer || require("buffer").Buffer;
 process.emitWarning = function () { };
 
@@ -309,7 +311,7 @@ if (cluster.isMaster) {
   // Load express addons.
   const session = require("express-session");
   const sessionStore = require("./handlers/sessionStore");
-  const indexjs = require("./app.js");
+  //const indexjs = require("./app.js"); // ??? ça c'est caca, ne jamais faire
 
   app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -325,7 +327,7 @@ if (cluster.isMaster) {
 
   app.use((err, req, res, next) => {
     if (err.status === 500 && err.message === 'Gateway Timeout') {
-      const theme = indexjs.get(req);
+      const theme = getPages();
       res.status(500).render(theme.settings.internalError, { error: 'Gateway Timeout' });
       return;
     } else {
@@ -446,7 +448,8 @@ if (cluster.isMaster) {
       return res.redirect("/auth?prompt=none");
     }
 
-    const theme = indexjs.get(req);
+    const theme = await getPages();
+    //console.dir(theme, { depth: null, colors: true });
 
     // Check if user is banned
     if (req.session.userinfo) {
@@ -513,17 +516,7 @@ if (cluster.isMaster) {
     }
   });
 
-
-  module.exports.get = function (req) {
-    return {
-      settings: fs.existsSync(`./views/pages.json`) ? JSON.parse(fs.readFileSync(`./views/pages.json`).toString()) : []
-    };
-  };
-
-  module.exports.islimited = async function () {
-    return cache == true ? false : true;
-  };
-
+  /* Une horreur !!
   module.exports.ratelimits = async function (length) {
     const indexjs = require("./app.js");
     if (cache == true) return setTimeout(indexjs.ratelimits, 1);
@@ -531,7 +524,7 @@ if (cluster.isMaster) {
     setTimeout(async () => {
       cache = false;
     }, length * 1000);
-  };
+  };*/
 };
 
 function shimPromiseWithStackCapture() {
