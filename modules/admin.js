@@ -488,11 +488,74 @@ module.exports.load = async function (app, db) {
     }
   });
 
+  app.get("/ban", async (req, res) => {
+      if (!req.session.pterodactyl) return four0four(req, res);
+
+      const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
+      if (!PterodactylUser) {
+          four0four(req, res);
+          return;
+      }
+
+      req.session.pterodactyl = PterodactylUser.attributes;
+      if (PterodactylUser.attributes.root_admin !== true) {
+          four0four(req, res);
+          return;
+      }
+
+      const { id, reason, expiration } = req.query;
+      if (!id) return res.status(400).json({ error: "Missing user ID" });
+
+      const dbUser = await db.get("users-" + id);
+      if (!dbUser) {
+          return res.status(404).json({ error: "User not found in database" });
+      }
+
+      const banData = {
+          reason: reason || "No reason provided",
+          expiration: expiration || null,
+      };
+
+      await db.set(`ban-${id}`, banData);
+
+      discordLog(
+          `ban user`,
+          `${req.session.userinfo.username} banned the user with the ID \`${id}\` for reason: \`${banData.reason}\`, expiration: \`${banData.expiration || 'Permanent'}\`.`
+      );
+      res.status(200).json({ message: "User banned successfully." });
+  });
+
+  app.get("/unban", async (req, res) => {
+      if (!req.session.pterodactyl) return four0four(req, res);
+      const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
+      if (!PterodactylUser) {
+          four0four(req, res);
+          return;
+      }
+      req.session.pterodactyl = PterodactylUser.attributes;
+      if (PterodactylUser.attributes.root_admin !== true) {
+          four0four(req, res);
+          return;
+      }
+      const { id } = req.query;
+      if (!id) return res.status(400).json({ error: "Missing user ID" });
+      const dbUser = await db.get("users-" + id);
+      if (!dbUser) {
+          return res.status(404).json({ error: "User not found in database" });
+      }
+      await db.delete(`ban-${id}`);
+      discordLog(
+          `unban user`,
+          `${req.session.userinfo.username} unbanned the user with the ID \`${id}\`.`
+      );
+      res.status(200).json({ message: "User unbanned successfully." });
+  });
+
   async function four0four(req, res) {
     try {
       const theme = indexjs.get(req);
       const data = await indexjs.renderData(req, theme);
-      res.status(404).render(theme.settings.notFound || "404.ejs", data);
+      res.status(404).render(theme.settings.errors.notFound || "404.ejs", data);
     } catch (err) {
       console.error(
         `App ― An error has occurred on path ${req._parsedUrl.pathname}:`

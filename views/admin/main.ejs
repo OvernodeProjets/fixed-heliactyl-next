@@ -238,6 +238,53 @@
                     </form>
                 </div>
 
+                <!-- Ban User Form -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-yellow-500/20">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-yellow-500/20 rounded-lg">
+                            <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-1.414 1.414M6.343 17.657l-1.414 1.414M21 12h-3M6 12H3m15.364 6.364l-1.414-1.414M6.343 6.343L4.929 4.929M16.95 7.05l-1.414 1.414M7.05 16.95l-1.414 1.414"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white">Ban User</h2>
+                    </div>
+                    <p class="text-yellow-400 text-sm mb-4">⚠️ Temporarily ban a user from accessing the system.</p>
+                    <form action="/ban" method="GET">
+                        <div class="mb-4">
+                            <label for="banuser-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                            <input type="text" id="banuser-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-yellow-500/30 rounded-lg text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all" placeholder="Enter user ID to ban" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="ban-reason" class="block text-sm font-medium text-gray-300 mb-2">Reason</label>
+                            <input type="text" id="ban-reason" name="reason" class="w-full px-4 py-2.5 bg-white/10 border border-yellow-500/30 rounded-lg text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all" placeholder="Reason for ban">
+                        </div>
+                        <div class="mb-6">
+                            <label for="ban-expiration" class="block text-sm font-medium text-gray-300 mb-2">Expiration (optional)</label>
+                            <input type="datetime-local" id="ban-expiration" name="expiration" class="w-full px-4 py-2.5 bg-white/10 border border-yellow-500/30 rounded-lg text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all">
+                        </div>
+                        <button type="submit" class="w-full bg-yellow-600 text-white px-4 py-3 rounded-lg hover:bg-yellow-700 transition-all font-medium shadow-lg shadow-yellow-500/20">Ban User</button>
+                    </form>
+                </div>
+
+                <!-- Unban User Form -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-green-500/20">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-green-500/20 rounded-lg">
+                            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white">Unban User</h2>
+                    </div>
+                    <form action="/unban" method="POST">
+                        <div class="mb-6">
+                            <label for="unban-user-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                            <input type="text" id="unban-user-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-green-500/30 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" placeholder="Enter user ID to unban" required>
+                        </div>
+                        <button type="submit" class="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-all font-medium shadow-lg shadow-green-500/20">Unban User</button>
+                    </form>
+                </div>
+
                 <!-- Remove Account Form -->
                 <div class="bg-white/5 p-6 rounded-2xl border border-red-500/20">
                     <div class="flex items-center gap-3 mb-4">

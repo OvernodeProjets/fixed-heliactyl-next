@@ -446,12 +446,22 @@ app.all("*", async (req, res) => {
     return res.redirect("/auth?prompt=none");
   }
 
+  const theme = indexjs.get(req);
+
+  // Check if user is banned
+  const banData = (await db.get(`ban-${req.session.userinfo.id}`)) || null;
+  if (banData) {
+    return res.render(theme.settings.errors.banned, { 
+      settings,
+      banReason: banData.reason,
+      banExpiration: banData.expiration
+    });
+  }
+
   // Redirect already logged in users away from auth page
   if (req.path === "/auth" && req.session.pterodactyl && req.session.userinfo) {
     return res.redirect("/dashboard");
   }
-
-  const theme = indexjs.get(req);
 
   // AFK session token
   if (settings.api.afk.enabled === true) {
@@ -471,7 +481,7 @@ app.all("*", async (req, res) => {
 
     // Not admin -> show forbidden
     if (!req.session.userinfo || !req.session.pterodactyl.root_admin) {
-      const notFound = theme.settings.notFound || '404';
+      const notFound = theme.settings.errors.notFound || '404';
       res.status(404).render(notFound, data);
       return;
     }
@@ -483,7 +493,7 @@ app.all("*", async (req, res) => {
       res.render(pageToRender, data);
     } else {
       // fallback to notFound if page not configured
-      const notFound = theme.settings.notFound || '404';
+      const notFound = theme.settings.errors.notFound || '404';
       res.status(404).render(notFound, data);
     }
     return;
@@ -497,7 +507,7 @@ app.all("*", async (req, res) => {
   if (pageToRender) {
     res.render(pageToRender, data);
   } else {
-    res.status(404).render(theme.settings.notFound, data);
+    res.status(404).render(theme.settings.errors.notFound, data);
   }
 });
 

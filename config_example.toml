@@ -415,6 +415,8 @@ private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAa
   "add resources" = true
   "set plan" = true
   "remove account" = true
+  "unban user" = true
+  "ban user" = true
   # don't used
   "create coupon" = true
   "revoke coupon" = true
