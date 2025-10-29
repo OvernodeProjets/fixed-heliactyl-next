@@ -20,10 +20,22 @@ const path = require('path');
 const chalk = require("chalk");
 const cluster = require("cluster");
 
+const express = require("express");
+const session = require("express-session");
+const cookieParser = require('cookie-parser');
+const nocache = require('nocache');
+
+const app = express();
+require("express-ws")(app);
+
+const sessionStore = require("./handlers/sessionStore");
+
 const { renderData, getPages } = require('./handlers/theme');
 const { getAllJsFiles } = require('./handlers/utils');
 const { validateModules } = require('./handlers/moduleValidator');
 const { startCluster } = require('./handlers/clusterManager');
+
+const { collectRoutes } = require('./handlers/utils');
 
 global.Buffer = global.Buffer || require("buffer").Buffer;
 process.emitWarning = function () { };
@@ -63,7 +75,7 @@ if (cluster.isMaster) {
     process.stdout.write('\r');
     validateModules(settings);
     startCluster(settings, db);
-  }, 2000);
+  }, 2000); // Simulate loading time, just for fun ?
 } else {
   // Worker process
   if (cluster.worker.id === 1) {
@@ -98,15 +110,8 @@ if (cluster.isMaster) {
   // Replace the global setInterval with our cluster-safe version
   global.setInterval = global.clusterSafeInterval;
 
-  // Load websites.
-  const express = require("express");
-  const cookieParser = require('cookie-parser');
-  const nocache = require('nocache');
-  const app = express();
-  require("express-ws")(app);
-
   // Load the website.
-  module.exports.app = app;
+  module.exports.app = app; // ??? why here
 
   app.set('view engine', 'ejs');
   app.set('trust proxy', true);
@@ -115,10 +120,7 @@ if (cluster.isMaster) {
   app.use(express.text());
   app.use(nocache());
 
-  // Load express addons.
-  const session = require("express-session");
-  const sessionStore = require("./handlers/sessionStore");
-  //const indexjs = require("./app.js"); // ??? ça c'est caca, ne jamais faire
+
 
   app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -218,7 +220,7 @@ if (cluster.isMaster) {
   app.use(rateLimiters.specific);
 
   const APIFiles = getAllJsFiles('./modules');
-  console.log(`Loading ${APIFiles.length} modules...`);
+  console.log(chalk.gray(`Loading ${APIFiles.length} modules...`));
 
   for (const file of APIFiles) {
     try {
@@ -236,25 +238,14 @@ if (cluster.isMaster) {
     }
   }
 
-  collectRoutes(app);
-
-
-  // Add this new function to collect routes
-  function collectRoutes(app) {
-    const routes = [];
-    app._router.stack.forEach((middleware) => {
-      if (middleware.route) {
-        routes.push(middleware.route.path);
-      } else if (middleware.name === 'router') {
-        middleware.handle.stack.forEach((handler) => {
-          if (handler.route) {
-            routes.push(handler.route.path);
-          }
-        });
-      }
-    });
-    return routes;
-  }
+  /* Log all registered routes */
+  /* Uncomment to enable route logging */
+  /*
+  const routes = collectRoutes(app);
+  console.log(chalk.gray(`Registered ${routes.length} routes:`));
+  routes.forEach(route => {
+    console.log(chalk.gray(`- ${route}`));
+  });*/
 
   app.all("*", async (req, res) => {
     // Validate session

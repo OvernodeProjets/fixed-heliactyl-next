@@ -44,11 +44,28 @@ function getAllJsFiles(dir, options = {}) {
     return files;
 }
 
+function collectRoutes(app) {
+    const routes = [];
+    app._router.stack.forEach((middleware) => {
+        if (middleware.route) {
+            routes.push(middleware.route.path);
+        } else if (middleware.name === 'router') {
+            middleware.handle.stack.forEach((handler) => {
+                if (handler.route) {
+                    routes.push(handler.route.path);
+                }
+            });
+        }
+    });
+    return routes;
+}
+
 async function isLimited() {
     return cache == true ? false : true;
 };
 
 module.exports = {
     getAllJsFiles,
+    collectRoutes,
     isLimited
 }
