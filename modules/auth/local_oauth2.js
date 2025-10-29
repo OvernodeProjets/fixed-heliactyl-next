@@ -199,7 +199,7 @@ module.exports.load = async function (app, db) {
           return res.send("An error occurred while attempting to create the account.");
         }
       } catch (fetchError) {
-        console.error("Error fetching existing account:", fetchError.response?.data || fetchError.message);
+        console.error("[AUTH] Error fetching existing account:", fetchError.response?.data || fetchError.message);
         return res.send("An error occurred while attempting to create the account.");
       }
     }
