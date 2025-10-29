@@ -16,7 +16,7 @@ const cluster = require("cluster");
 const chokidar = require('chokidar');
 
 global.Buffer = global.Buffer || require("buffer").Buffer;
-process.emitWarning = function() {};
+process.emitWarning = function () { };
 
 if (typeof btoa === "undefined") {
   global.btoa = (str) => Buffer.from(str, "binary").toString("base64");
@@ -70,7 +70,7 @@ module.exports.db = db;
 function getAllJsFiles(dir) {
   const files = [];
   const items = fs.readdirSync(dir, { withFileTypes: true });
-  
+
   for (const item of items) {
     const fullPath = `${dir}/${item.name}`;
     if (item.isDirectory()) {
@@ -79,7 +79,7 @@ function getAllJsFiles(dir) {
       files.push(fullPath);
     }
   }
-  
+
   return files;
 }
 
@@ -92,12 +92,12 @@ if (cluster.isMaster) {
   let currentFrame = 0;
   const workerId = cluster.isWorker ? "worker" : "master";
   const prefix = chalk.gray.bold(`${workerId}   │   `);
-  
+
   const spinner = setInterval(() => {
     process.stdout.write('\r' + prefix + chalk.gray(spinnerFrames[currentFrame++] + ' Initializing Graphene...'));
     currentFrame %= spinnerFrames.length;
   }, 100);
-  
+
   setTimeout(() => {
     clearInterval(spinner);
     process.stdout.write('\r');
@@ -120,13 +120,13 @@ if (cluster.isMaster) {
     moduleFiles.forEach(file => {
       let moduleState = 'Initializing';
       const startTime = process.hrtime();
-      
+
       try {
         const module = require('./modules/' + file);
         const loadTime = process.hrtime(startTime);
         const loadTimeMs = (loadTime[0] * 1000 + loadTime[1] / 1000000).toFixed(2);
         moduleLoadTimes[file] = loadTimeMs;
-        
+
         if (!module.heliactylModule) {
           console.log(chalk.red(`Module "${file}" has an error: No module manifest was found in the file.`));
           modulesTable.push({ File: file, Status: '❌ No module manifest', State: 'Error', 'Target Platform': 'N/A', 'Load Time': `${loadTimeMs}ms` });
@@ -138,9 +138,9 @@ if (cluster.isMaster) {
 
         // Check version compatibility
         const versionCheck = compatibility.isCompatible(target_platform, settings.version);
-        
+
         if (!versionCheck.compatible) {
-           moduleState = 'Version Mismatch';
+          moduleState = 'Version Mismatch';
           if (versionCheck.details.majorMismatch) {
             console.log(chalk.red(`Module "${name}" has an error: Major version mismatch (expected: ${settings.version}, found: ${target_platform})`));
             modulesTable.push({ File: file, Name: name, Status: '❌ Major version mismatch', State: moduleState, 'Target Platform': target_platform });
@@ -153,30 +153,30 @@ if (cluster.isMaster) {
 
         // Version is compatible but different
         if (target_platform !== settings.version) {
-        moduleState = 'Compatible';
-        console.log(chalk.yellow(`Module "${name}" notice: Different but compatible version (platform: ${settings.version}, module: ${target_platform}) in ${moduleLoadTimes[file]}ms`));
-        modulesTable.push({ 
-          File: file, 
-          Name: name, 
-          Status: '⚠️ Module loaded (different version)', 
-          State: moduleState, 
-          'Target Platform': target_platform,
-          'Load Time': `${moduleLoadTimes[file]}ms` 
-        });
+          moduleState = 'Compatible';
+          console.log(chalk.yellow(`Module "${name}" notice: Different but compatible version (platform: ${settings.version}, module: ${target_platform}) in ${moduleLoadTimes[file]}ms`));
+          modulesTable.push({
+            File: file,
+            Name: name,
+            Status: '⚠️ Module loaded (different version)',
+            State: moduleState,
+            'Target Platform': target_platform,
+            'Load Time': `${moduleLoadTimes[file]}ms`
+          });
           return;
         }
 
         moduleState = 'Active';
-        modulesTable.push({ 
-          File: file, 
-          Name: name, 
-          Status: '✓ Module loaded!', 
-          State: moduleState, 
+        modulesTable.push({
+          File: file,
+          Name: name,
+          Status: '✓ Module loaded!',
+          State: moduleState,
           'Target Platform': target_platform,
           'Load Time': `${moduleLoadTimes[file]}ms`
         });
         console.log(chalk.green(`Module "${name}" loaded successfully (${target_platform}) in ${moduleLoadTimes[file]}ms`));
-        
+
       } catch (error) {
         moduleState = 'Error';
         console.log(chalk.red(`Module "${file}" failed to load: ${error.message}`));
@@ -185,40 +185,40 @@ if (cluster.isMaster) {
     });
 
     //console.table( modulesTable);
-  
+
     const numCPUs = parseInt(settings.clusters) - 1;
     console.log(chalk.gray(`Starting workers on Heliactyl Next ${settings.version} (${settings.platform_codename})`));
     console.log(chalk.gray(`Master ${process.pid} is running`));
     console.log(chalk.gray(`Forking ${numCPUs} workers...`));
-  
+
     if (numCPUs > 130 || numCPUs < 1) {
       console.log(chalk.red('Error: Clusters amount was either below 1, or above 128.'));
       process.exit();
     }
 
     let firstWorkerStarted = false;
-    
+
     for (let i = 0; i < numCPUs; i++) {
       const worker = cluster.fork();
       console.log(chalk.cyan(`Creating worker ${i + 1} of ${numCPUs}`));
-      
+
       if (!firstWorkerStarted) {
         worker.send({ type: 'FIRST_WORKER' });
         firstWorkerStarted = true;
         console.log(chalk.cyan(`Designated primary worker: ${worker.process.pid}`));
       }
-      
+
       worker.on('online', () => {
         console.log(chalk.green(`Worker ${worker.process.pid} is online`));
       });
-      
+
       worker.on('message', (msg) => {
         if (msg.type === 'WEB_SERVER_STARTED') {
           console.log(chalk.green(`Web server started on worker ${worker.process.pid}`));
         }
       });
     }
-  
+
     cluster.on('exit', (worker, code, signal) => {
       console.log(chalk.red(`Worker ${worker.process.pid} died. Forking a new worker...`));
       cluster.fork();
@@ -231,14 +231,14 @@ if (cluster.isMaster) {
         state: w.state,
       }));
     });
-    
+
     const watchDirs = ['./modules', './handlers'];
 
     watchDirs.forEach(dir => {
       const watcher = chokidar.watch(dir);
       watcher.on('change', async (path) => {
         console.log(chalk.yellow(`File changed: ${path}. Rebooting workers...`));
-        
+
         if (path.includes('afk.js') || path.includes('modules/afk')) {
           console.log(chalk.cyan('AFK module modified, clearing AFK sessions...'));
           await db.set('afkSessions', {});
@@ -273,15 +273,15 @@ if (cluster.isMaster) {
   const originalSetInterval = global.setInterval;
 
   // Create a wrapper function for setInterval
-  global.clusterSafeInterval = function(callback, delay) {
+  global.clusterSafeInterval = function (callback, delay) {
     if (cluster.worker.id === 1) {
       return originalSetInterval(callback, delay);
     } else {
       // Return a dummy interval object for non-first workers
       return {
-        unref: () => {},
-        ref: () => {},
-        close: () => {}
+        unref: () => { },
+        ref: () => { },
+        close: () => { }
       };
     }
   };
@@ -315,7 +315,7 @@ if (cluster.isMaster) {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');
-    
+
     res.setHeader('Access-Control-Allow-Origin', '*');
 
     res.setHeader("X-Powered-By", `13rd Gen Heliactyl Next (${settings.platform_codename})`);
@@ -333,7 +333,7 @@ if (cluster.isMaster) {
       return;
     }
   });
-  
+
   app.use(
     session({
       store: sessionStore,
@@ -359,24 +359,24 @@ if (cluster.isMaster) {
     })
   );
 
-app.use(async (req, res, next) => {
-  if (req.ws) {
-    // Skip session handling for WebSocket connections
-    return next();
-  }
-
-  // Check if user is logged in and not accessing the /banned route
-  if (req.session.userinfo?.id) {
-    const userId = req.session.userinfo.id;
-    const coinsKey = await db.get(`coins-${userId}`);
-    
-    if (coinsKey == null) {
-      await db.set('coins-'+userId, 0);
+  app.use(async (req, res, next) => {
+    if (req.ws) {
+      // Skip session handling for WebSocket connections
+      return next();
     }
-  }
-  
-  next();
-});
+
+    // Check if user is logged in and not accessing the /banned route
+    if (req.session.userinfo?.id) {
+      const userId = req.session.userinfo.id;
+      const coinsKey = await db.get(`coins-${userId}`);
+
+      if (coinsKey == null) {
+        await db.set('coins-' + userId, 0);
+      }
+    }
+
+    next();
+  });
 
 
   const listener = app.listen(settings.website.port, async function () {
@@ -384,9 +384,9 @@ app.use(async (req, res, next) => {
     if (cluster.worker.id === 1) {
       await db.set('afkSessions', {});
       const keys = await db.list('afk_session-*');
-        for (const key of keys) {
-          await db.delete(key);
-        }
+      for (const key of keys) {
+        await db.delete(key);
+      }
       console.log(
         chalk.white(chalk.gray('[cluster]') + " Cleared all AFK sessions on startup.")
       );
@@ -404,15 +404,15 @@ app.use(async (req, res, next) => {
 
   const createRateLimiter = require('./handlers/rateLimit.js');
   const rateLimiters = createRateLimiter();
-  
+
   app.use(rateLimiters.global);
   app.use(rateLimiters.specific);
 
   const APIFiles = getAllJsFiles('./modules');
 
-    APIFiles.forEach((file) => {
-      const APIFile = require(file);
-      APIFile.load(app, db);
+  APIFiles.forEach((file) => {
+    const APIFile = require(file);
+    APIFile.load(app, db);
   });
 
   collectRoutes(app);
@@ -435,81 +435,83 @@ app.use(async (req, res, next) => {
     return routes;
   }
 
-app.all("*", async (req, res) => {
-  // Validate session
-  if (
-    req.session.pterodactyl &&
-    req.session.pterodactyl.id !== 
-    (await db.get("users-" + req.session.userinfo.id))
-  ) {
-    req.session.destroy();
-    return res.redirect("/auth?prompt=none");
-  }
-
-  const theme = indexjs.get(req);
-
-  // Check if user is banned
-  const banData = (await db.get(`ban-${req.session.userinfo.id}`)) || null;
-  if (banData) {
-    return res.render(theme.settings.errors.banned, { 
-      settings,
-      banReason: banData.reason,
-      banExpiration: banData.expiration
-    });
-  }
-
-  // Redirect already logged in users away from auth page
-  if (req.path === "/auth" && req.session.pterodactyl && req.session.userinfo) {
-    return res.redirect("/dashboard");
-  }
-
-  // AFK session token
-  if (settings.api.afk.enabled === true) {
-    req.session.arcsessiontoken = Math.random().toString(36).substring(2, 15);
-  }
-
-  // Check authentication requirements
-  if (theme.settings.mustbeloggedin.includes(req._parsedUrl.pathname)) {
-    if (!req.session.userinfo || !req.session.pterodactyl) {
-      return res.redirect("/auth");
+  app.all("*", async (req, res) => {
+    // Validate session
+    if (
+      req.session.pterodactyl &&
+      req.session.pterodactyl.id !==
+      (await db.get("users-" + req.session.userinfo.id))
+    ) {
+      req.session.destroy();
+      return res.redirect("/auth?prompt=none");
     }
-  }
 
-  // Check admin requirements
-  if (Array.isArray(theme.settings.mustbeadmin) && theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
-    const data = await renderData(req, theme);
+    const theme = indexjs.get(req);
 
-    // Not admin -> show forbidden
-    if (!req.session.userinfo || !req.session.pterodactyl.root_admin) {
-      const notFound = theme.settings.errors.notFound || '404';
-      res.status(404).render(notFound, data);
+    // Check if user is banned
+    if (req.session.userinfo) {
+      const banData = (await db.get(`ban-${req.session.userinfo.id}`)) || null;
+      if (banData) {
+        return res.render(theme.settings.errors.banned, {
+          settings,
+          banReason: banData.reason,
+          banExpiration: banData.expiration
+        });
+      }
+    }
+
+    // Redirect already logged in users away from auth page
+    if (req.path === "/auth" && req.session.pterodactyl && req.session.userinfo) {
+      return res.redirect("/dashboard");
+    }
+
+    // AFK session token
+    if (settings.api.afk.enabled === true) {
+      req.session.arcsessiontoken = Math.random().toString(36).substring(2, 15);
+    }
+
+    // Check authentication requirements
+    if (theme.settings.mustbeloggedin.includes(req._parsedUrl.pathname)) {
+      if (!req.session.userinfo || !req.session.pterodactyl) {
+        return res.redirect("/auth");
+      }
+    }
+
+    // Check admin requirements
+    if (Array.isArray(theme.settings.mustbeadmin) && theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
+      const data = await renderData(req, theme);
+
+      // Not admin -> show forbidden
+      if (!req.session.userinfo || !req.session.pterodactyl.root_admin) {
+        const notFound = theme.settings.errors.notFound || '404';
+        res.status(404).render(notFound, data);
+        return;
+      }
+
+      // Admin -> render the requested admin page 
+      const pageName = req._parsedUrl.pathname.slice(1);
+      const pageToRender = theme.settings.pages && theme.settings.pages[pageName];
+      if (typeof pageToRender === 'string' && pageToRender.length > 0) {
+        res.render(pageToRender, data);
+      } else {
+        // fallback to notFound if page not configured
+        const notFound = theme.settings.errors.notFound || '404';
+        res.status(404).render(notFound, data);
+      }
       return;
     }
 
-    // Admin -> render the requested admin page 
     const pageName = req._parsedUrl.pathname.slice(1);
-    const pageToRender = theme.settings.pages && theme.settings.pages[pageName];
-    if (typeof pageToRender === 'string' && pageToRender.length > 0) {
+    const pageToRender = theme.settings.pages[pageName];
+
+    const data = await renderData(req, theme);
+
+    if (pageToRender) {
       res.render(pageToRender, data);
     } else {
-      // fallback to notFound if page not configured
-      const notFound = theme.settings.errors.notFound || '404';
-      res.status(404).render(notFound, data);
+      res.status(404).render(theme.settings.errors.notFound, data);
     }
-    return;
-  }
-
-  const pageName = req._parsedUrl.pathname.slice(1);
-  const pageToRender = theme.settings.pages[pageName];
-
-  const data = await renderData(req, theme);
-
-  if (pageToRender) {
-    res.render(pageToRender, data);
-  } else {
-    res.status(404).render(theme.settings.errors.notFound, data);
-  }
-});
+  });
 
 
   module.exports.get = function (req) {
