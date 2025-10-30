@@ -20,7 +20,6 @@ module.exports.heliactylModule = heliactylModule;
 const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 const fetch = require("node-fetch");
-const indexjs = require("../app.js");
 const adminjs = require("./admin.js");
 const fs = require("fs");
 const getPteroUser = require("../handlers/getPteroUser.js");

@@ -19,7 +19,6 @@ module.exports.heliactylModule = heliactylModule;
 
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
-const indexjs = require("../app.js");
 const adminjs = require("./admin.js");
 const fs = require("fs");
 const ejs = require("ejs");

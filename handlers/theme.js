@@ -1,5 +1,7 @@
 const fs = require('fs').promises;
 const path = require('path');
+const loadConfig = require('./config.js');
+const settings = loadConfig("./config.toml");
 
 const PAGES_PATH = path.join(__dirname, '..', 'views', 'pages.json');
 
@@ -9,7 +11,7 @@ const PAGES_PATH = path.join(__dirname, '..', 'views', 'pages.json');
  * @param {Object} theme - The theme object.
  * @returns {Promise<Object>} The rendered data.
  */
-async function renderData(req, theme) {
+async function renderData(req, theme, db) {
   let userinfo = req.session.userinfo;
   let userId = userinfo ? userinfo.id : null;
   let packageId = userId ? await db.get("package-" + userId) || settings.api.client.packages.default : null;

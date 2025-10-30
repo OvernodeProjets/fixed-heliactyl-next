@@ -120,8 +120,6 @@ if (cluster.isMaster) {
   app.use(express.text());
   app.use(nocache());
 
-
-
   app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
@@ -259,6 +257,7 @@ if (cluster.isMaster) {
     }
 
     const theme = await getPages();
+    console.log(theme);
     //console.dir(theme, { depth: null, colors: true });
 
     // Check if user is banned
@@ -292,7 +291,7 @@ if (cluster.isMaster) {
 
     // Check admin requirements
     if (Array.isArray(theme.settings.mustbeadmin) && theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
-      const data = await renderData(req, theme);
+      const data = await renderData(req, theme, db);
 
       // Not admin -> show forbidden
       if (!req.session.userinfo || !req.session.pterodactyl.root_admin) {
@@ -317,7 +316,7 @@ if (cluster.isMaster) {
     const pageName = req._parsedUrl.pathname.slice(1);
     const pageToRender = theme.settings.pages[pageName];
 
-    const data = await renderData(req, theme);
+    const data = await renderData(req, theme, db);
 
     if (pageToRender) {
       res.render(pageToRender, data);
@@ -325,16 +324,6 @@ if (cluster.isMaster) {
       res.status(404).render(theme.settings.errors.notFound, data);
     }
   });
-
-  /* Une horreur !!
-  module.exports.ratelimits = async function (length) {
-    const indexjs = require("./app.js");
-    if (cache == true) return setTimeout(indexjs.ratelimits, 1);
-    cache = true;
-    setTimeout(async () => {
-      cache = false;
-    }, length * 1000);
-  };*/
 };
 
 function shimPromiseWithStackCapture() {

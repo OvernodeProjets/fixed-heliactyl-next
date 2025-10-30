@@ -23,7 +23,6 @@ const settings = loadConfig("./config.toml");
 const getPteroUser = require('../../handlers/getPteroUser.js');
 
 const fetch = require("node-fetch");
-const indexjs = require("../../app.js");
 const { discordLog } = require("../../handlers/log");
 module.exports.load = async function (app, db) {
   app.get("/github/login", (req, res) => {
@@ -199,8 +198,6 @@ module.exports.load = async function (app, db) {
         email: primaryEmail.email
       };
       
-      let theme = indexjs.get(req);
-
       // Auth notification
       let notifications = await db.get('notifications-' + userinfo.id) || [];
       let notification = {

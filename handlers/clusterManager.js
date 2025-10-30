@@ -9,7 +9,7 @@ function startCluster(settings, db) {
     console.log(chalk.gray(`Master ${process.pid} is running`));
     console.log(chalk.gray(`Forking ${numCPUs} workers...`));
 
-    // Validation du nombre de workers
+    // Validate number of clusters
     if (numCPUs > 130 || numCPUs < 1) {
         console.log(chalk.red('Error: Clusters amount must be between 1 and 128.'));
         process.exit(1);
@@ -17,7 +17,7 @@ function startCluster(settings, db) {
 
     let firstWorkerStarted = false;
 
-    // Créer les workers
+    // Create workers
     for (let i = 0; i < numCPUs; i++) {
         const worker = cluster.fork();
         console.log(chalk.cyan(`Creating worker ${i + 1} of ${numCPUs}`));
@@ -39,13 +39,13 @@ function startCluster(settings, db) {
         });
     }
 
-    // Gérer la mort des workers
+    // Handle worker death
     cluster.on('exit', (worker, code, signal) => {
         console.log(chalk.red(`Worker ${worker.process.pid} died. Forking a new worker...`));
         cluster.fork();
     });
 
-    // File watcher pour hot reload
+    // File watcher for hot reload
     const watchDirs = ['./modules', './handlers'];
     watchDirs.forEach(dir => {
         const watcher = chokidar.watch(dir, {
@@ -56,7 +56,7 @@ function startCluster(settings, db) {
         watcher.on('change', async (filePath) => {
             console.log(chalk.yellow(`File changed: ${filePath}. Rebooting workers...`));
 
-            // Si c'est le module AFK, nettoyer les sessions
+            // If it's the AFK module, clear sessions
             if (filePath.includes('afk.js') || filePath.includes('modules/afk')) {
                 console.log(chalk.cyan('AFK module modified, clearing AFK sessions...'));
                 await db.set('afkSessions', {});
@@ -66,7 +66,7 @@ function startCluster(settings, db) {
                 }
             }
 
-            // Redémarrer tous les workers
+            // Restart all workers
             for (const id in cluster.workers) {
                 cluster.workers[id].kill();
             }

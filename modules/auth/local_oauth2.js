@@ -27,10 +27,6 @@ const { v4: uuidv4 } = require('uuid');
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const fetch = require("node-fetch");
-const indexjs = require("../../app.js");
-const { discordLog } = require("../../handlers/log.js");
-const fs = require("fs");
-const { renderFile } = require("ejs");
 
 // Add Resend API key to your settings
 // todo : move to config file

@@ -26,9 +26,7 @@ if (settings.pterodactyl)
       settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
   }
 
-const fetch = require("node-fetch");
-const fs = require("fs");
-const indexjs = require("../app.js");
+const { getPages, renderData } = require("../handlers/theme.js");
 const adminjs = require("./admin.js");
 const { discordLog } = require("../handlers/log.js");
 const getPteroUser = require("../handlers/getPteroUser");
@@ -553,8 +551,8 @@ module.exports.load = async function (app, db) {
 
   async function four0four(req, res) {
     try {
-      const theme = indexjs.get(req);
-      const data = await indexjs.renderData(req, theme);
+      const theme = getPages(req);
+      const data = await renderData(req, theme, db);
       res.status(404).render(theme.settings.errors.notFound || "404.ejs", data);
     } catch (err) {
       console.error(
@@ -567,16 +565,6 @@ module.exports.load = async function (app, db) {
 
   module.exports.suspend = async function (discordid) {
     if (!settings.api.client.allow.over_resources_suspend) return;
-
-    const canpass = await indexjs.islimited();
-    if (canpass == false) {
-      setTimeout(async function () {
-        adminjs.suspend(discordid);
-      }, 1);
-      return;
-    }
-
-    indexjs.ratelimits(1);
     
     const PterodactylUser = await getPteroUser(discordid, db);
     if (!PterodactylUser) {
@@ -626,7 +614,6 @@ module.exports.load = async function (app, db) {
         PterodactylUser.attributes.relationships.servers.data[i].attributes.limits.cpu;
     }
 
-    indexjs.ratelimits(PterodactylUser.attributes.relationships.servers.data.length);
     if (
       current.ram > plan.ram ||
       current.disk > plan.disk ||
@@ -640,6 +627,8 @@ module.exports.load = async function (app, db) {
       ) {
         const suspendID = PterodactylUser.attributes.relationships.servers.data[i].attributes.id;
         await AppAPI.suspendServer(suspendID);
+        // To avoid rate limits on large suspensions
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
     } else {
       for (
@@ -649,6 +638,7 @@ module.exports.load = async function (app, db) {
       ) {
         const suspendID = PterodactylUser.attributes.relationships.servers.data[i].attributes.id;
         await AppAPI.unsuspendServer(suspendID);
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
     }
   };

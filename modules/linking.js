@@ -20,7 +20,6 @@ module.exports.heliactylModule = heliactylModule;
 const fetch = require('node-fetch');
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
-const indexjs = require("../app.js");
 const log = require("../handlers/log");
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 

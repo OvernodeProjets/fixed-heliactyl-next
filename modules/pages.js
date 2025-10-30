@@ -17,12 +17,8 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const indexjs = require("../app.js");
-const ejs = require("ejs");
+const { getPages, renderData } = require("../handlers/theme.js");
 const express = require("express");
-const loadConfig = require("../handlers/config");
-const settings = loadConfig("./config.toml");
-const fetch = require("node-fetch");
 const path = require("path");
 
 module.exports.load = async function (app, db) {
@@ -37,7 +33,8 @@ module.exports.load = async function (app, db) {
         return res.redirect("/auth?prompt=none");
       }
 
-      let theme = indexjs.get(req);
+      let theme = await getPages(req);
+
       if (
         theme.settings.mustbeloggedin.includes(req._parsedUrl.pathname) &&
         (!req.session.userinfo || !req.session.pterodactyl)
@@ -46,12 +43,12 @@ module.exports.load = async function (app, db) {
       }
 
       if (theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
-        const renderData = await indexjs.renderData(req, theme);
+        const renderData = await renderData(req, theme, db);
         res.render(theme.settings.index, renderData);
         return;
       }
 
-      const renderDataPromise = indexjs.renderData(req, theme);
+      const renderDataPromise = renderData(req, theme, db);
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Database Failure')), 3000)
       );
@@ -61,14 +58,14 @@ module.exports.load = async function (app, db) {
         res.render(theme.settings.index, renderData);
       } catch (error) {
         if (error.message === 'Database Failure') {
-          res.status(500).render("500.ejs", { err: 'Database Failure' });
+          res.status(500).render(theme.settings.errors.internalError, { error: 'Database Failure' });
         } else {
           throw error;
         }
       }
     } catch (err) {
       console.log(err);
-      res.status(500).render("500.ejs", { err });
+      res.status(500).render(theme.settings.errors.internalError, { error: err });
     }
   });
   
