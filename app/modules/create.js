@@ -695,7 +695,7 @@ app.get("/api/server/:id/delete", requireAuth, async (req, res) => {
       return res.send("Could not find server with that ID.");
 
     // Check if the server is suspended
-    const server = await AppAPI.getServer(id);
+    const server = await AppAPI.getServerDetails(id);
 
     if (server.attributes.suspended) {
       return res.redirect("/dashboard?err=SUSPENDED")
