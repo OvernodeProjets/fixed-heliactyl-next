@@ -15,7 +15,6 @@ Heliactyl Next - Avalanche
 
 require("./handlers/console.js")();
 
-const fs = require("fs");
 const path = require('path');
 const chalk = require("chalk");
 const cluster = require("cluster");
@@ -25,17 +24,17 @@ const session = require("express-session");
 const cookieParser = require('cookie-parser');
 const nocache = require('nocache');
 
+const settings = require("./handlers/config")("./config.toml");
+
 const app = express();
 require("express-ws")(app);
 
 const sessionStore = require("./handlers/sessionStore");
 
 const { renderData, getPages } = require('./handlers/theme');
-const { getAllJsFiles } = require('./handlers/utils');
+const { consoleLogo, consoleSpin, getAllJsFiles } = require('./handlers/utils');
 const { validateModules } = require('./handlers/moduleValidator');
 const { startCluster } = require('./handlers/clusterManager');
-
-const { collectRoutes } = require('./handlers/utils');
 
 global.Buffer = global.Buffer || require("buffer").Buffer;
 process.emitWarning = function () { };
@@ -47,32 +46,19 @@ if (typeof atob === "undefined") {
   global.atob = (b64Encoded) => Buffer.from(b64Encoded, "base64").toString("binary");
 }
 
-// Load settings.
-const loadConfig = require("./handlers/config");
-const settings = loadConfig("./config.toml");
-
-// Load database
 const Database = require("./db.js");
 const db = new Database(settings.database);
 module.exports.db = db;
 
 if (cluster.isMaster) {
-  const asciiArt = fs.readFileSync('./handlers/ascii.txt', 'utf8');
-  console.log('\n' + asciiArt + '\n');
+  consoleLogo();
 
-  const spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
-  let currentFrame = 0;
   const workerId = cluster.isWorker ? "worker" : "master";
-  const prefix = chalk.gray.bold(`${workerId}   │   `);
-
-  const spinner = setInterval(() => {
-    process.stdout.write('\r' + prefix + chalk.gray(spinnerFrames[currentFrame++] + ' Initializing Graphene...'));
-    currentFrame %= spinnerFrames.length;
-  }, 100);
+  const spinner  = consoleSpin(workerId);
 
   setTimeout(() => {
     clearInterval(spinner);
-    process.stdout.write('\r');
+    process.stdout.write('\n\n');
     validateModules(settings);
     startCluster(settings, db);
   }, 2000); // Simulate loading time, just for fun ?
@@ -80,9 +66,6 @@ if (cluster.isMaster) {
   // Worker process
   if (cluster.worker.id === 1) {
     console.log(chalk.cyan(`Worker ${process.pid} is designated as the first worker.`));
-    console.log(
-      chalk.gray(`Heliactyl Next ${settings.version} (${settings.platform_codename}) - webserver is now listening on port ${settings.website.port}`)
-    );
   }
 
   // Send ready message to master when worker is ready
@@ -187,7 +170,6 @@ if (cluster.isMaster) {
     next();
   });
 
-
   const listener = app.listen(settings.website.port, async function () {
     /* clear all afk sessions */
     if (cluster.worker.id === 1) {
@@ -202,6 +184,9 @@ if (cluster.isMaster) {
     }
     console.log(
       chalk.white(chalk.gray("[cluster]") + " Cluster state updated: ") + chalk.green('running')
+    );
+    console.log(
+      chalk.gray(`Heliactyl Next ${settings.version} (${settings.platform_codename}) - webserver is now listening on port ${settings.website.port}`)
     );
   }).on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
@@ -238,7 +223,8 @@ if (cluster.isMaster) {
 
   /* Log all registered routes */
   /* Uncomment to enable route logging */
-  /*
+  /*  
+  const { collectRoutes } = require('./handlers/utils');
   const routes = collectRoutes(app);
   console.log(chalk.gray(`Registered ${routes.length} routes:`));
   routes.forEach(route => {

@@ -5,6 +5,32 @@
 
 const fs = require('fs');
 const path = require('path');
+const chalk = require("chalk");
+const settings = require("./config")("./config.toml");
+
+function consoleLogo() {
+    process.stdout.write('='.repeat(60) + '\n');
+    const asciiPath = path.join(__dirname, '../assets', 'ascii.txt');
+    let asciiArt = fs.readFileSync(asciiPath, 'utf8');
+    asciiArt = asciiArt.replace('{version}', `v${settings.version} - ${settings.platform_codename}`);
+
+    process.stdout.write(asciiArt + '\n');
+    process.stdout.write('='.repeat(60) + '\n');
+}
+
+function consoleSpin(workerId) {
+    const spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+    let currentFrame = 0;
+
+    process.stdout.write('\n');
+    const spinner = setInterval(() => {
+        process.stdout.write('\r' + chalk.gray.bold(`${workerId}   │   `) + chalk.gray(spinnerFrames[currentFrame++] + ' Initializing Graphene...'));
+        currentFrame %= spinnerFrames.length;
+    }, 100);
+    process.stdout.write('\n\n');
+
+    return spinner;
+}
 
 function getAllJsFiles(dir, options = {}) {
     const {
@@ -65,6 +91,8 @@ async function isLimited() {
 };
 
 module.exports = {
+    consoleLogo,
+    consoleSpin,
     getAllJsFiles,
     collectRoutes,
     isLimited
