@@ -9,7 +9,7 @@ function validateModules(settings) {
     console.log(chalk.gray("Loading modules tree..."));
     console.log(chalk.gray("Graphene 1.1.0"));
 
-    const moduleFiles = getAllJsFiles('./modules');
+    const moduleFiles = getAllJsFiles('./app/modules');
     const compatibility = require('./compatibility');
 
     console.log(chalk.green(`Validating ${moduleFiles.length} modules...`));

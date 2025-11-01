@@ -10,7 +10,7 @@ const settings = require("./config")("./config.toml");
 
 function consoleLogo() {
     process.stdout.write('='.repeat(60) + '\n');
-    const asciiPath = path.join(__dirname, '../assets', 'ascii.txt');
+    const asciiPath = path.join(__dirname, '../public', 'ascii.txt');
     let asciiArt = fs.readFileSync(asciiPath, 'utf8');
     asciiArt = asciiArt.replace('{version}', `v${settings.version} - ${settings.platform_codename}`);
 

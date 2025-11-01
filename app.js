@@ -13,8 +13,9 @@ Heliactyl Next - Avalanche
 
 "use strict";
 
-require("./handlers/console.js")();
+require("./app/handlers/console.js")();
 
+const fs = require('fs');
 const path = require('path');
 const chalk = require("chalk");
 const cluster = require("cluster");
@@ -22,19 +23,39 @@ const cluster = require("cluster");
 const express = require("express");
 const session = require("express-session");
 const cookieParser = require('cookie-parser');
+const favicon = require('serve-favicon');
 const nocache = require('nocache');
 
-const settings = require("./handlers/config")("./config.toml");
+const settings = require("./app/handlers/config")("./config.toml");
+
+const VIEWS_DIR = path.join(__dirname, 'app', 'views');
+const PUBLIC_DIR = path.join(__dirname, 'app', 'public');
+const FAVICON_PATH = path.join(PUBLIC_DIR, 'favicon.ico');
 
 const app = express();
 require("express-ws")(app);
 
-const sessionStore = require("./handlers/sessionStore");
+app.set('view engine', 'ejs');
+app.set('views', VIEWS_DIR);
 
-const { renderData, getPages } = require('./handlers/theme');
-const { consoleLogo, consoleSpin, getAllJsFiles } = require('./handlers/utils');
-const { validateModules } = require('./handlers/moduleValidator');
-const { startCluster } = require('./handlers/clusterManager');
+app.use(favicon(FAVICON_PATH));
+
+if (fs.existsSync(PUBLIC_DIR)) {
+  const staticOptions = {
+    maxAge: '1d',
+    immutable: true
+  };
+
+  app.use(express.static(PUBLIC_DIR, staticOptions));
+  app.use('/assets', express.static(PUBLIC_DIR, staticOptions));
+}
+
+const sessionStore = require("./app/handlers/sessionStore");
+
+const { renderData, getPages } = require('./app/handlers/theme');
+const { consoleLogo, consoleSpin, getAllJsFiles } = require('./app/handlers/utils');
+const { validateModules } = require('./app/handlers/moduleValidator');
+const { startCluster } = require('./app/handlers/clusterManager');
 
 global.Buffer = global.Buffer || require("buffer").Buffer;
 process.emitWarning = function () { };
@@ -54,11 +75,11 @@ if (cluster.isMaster) {
   consoleLogo();
 
   const workerId = cluster.isWorker ? "worker" : "master";
-  const spinner  = consoleSpin(workerId);
+  const spinner = consoleSpin(workerId);
 
   setTimeout(() => {
     clearInterval(spinner);
-    process.stdout.write('\n\n');
+    process.stdout.write('\r');
     validateModules(settings);
     startCluster(settings, db);
   }, 2000); // Simulate loading time, just for fun ?
@@ -96,7 +117,7 @@ if (cluster.isMaster) {
   // Load the website.
   module.exports.app = app; // ??? why here
 
-  app.set('view engine', 'ejs');
+
   app.set('trust proxy', true);
 
   app.use(cookieParser());
@@ -196,13 +217,13 @@ if (cluster.isMaster) {
     }
   });
 
-  const createRateLimiter = require('./handlers/rateLimit.js');
+  const createRateLimiter = require('./app/handlers/rateLimit.js');
   const rateLimiters = createRateLimiter();
 
   app.use(rateLimiters.global);
   app.use(rateLimiters.specific);
 
-  const APIFiles = getAllJsFiles('./modules');
+  const APIFiles = getAllJsFiles('./app/modules');
   console.log(chalk.gray(`Loading ${APIFiles.length} modules...`));
 
   for (const file of APIFiles) {

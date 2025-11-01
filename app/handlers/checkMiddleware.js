@@ -1,4 +1,4 @@
-const indexjs = require('../app.js');
+const indexjs = require('../../app.js');
 
 const db = indexjs.db;
 
