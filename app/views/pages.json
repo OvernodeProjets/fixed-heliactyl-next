@@ -51,14 +51,15 @@
         "/afk",
         "/staking",
         "/wallet",
-        "/support",
         "/j4r",
+        "/webhosting",
+        "/events/christmas",
+        "/events/halloween",
         "/servers",
         "/server/new",
         "/server/edit",
         "/server/manage",
         "/server/allocations",
-        "/server/commander",
         "/server/backups",
         "/server/plugins",
         "/server/properties",
@@ -72,8 +73,7 @@
         "/server/advanced",
         "/server/worlds",
         "/server/import",
-        "/server/logs",
-        "/server/power"
+        "/server/logs"
     ],
     "mustbeadmin": [
         "/admin"
