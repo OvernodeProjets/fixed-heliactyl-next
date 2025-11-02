@@ -11,7 +11,7 @@
  */
 
 const heliactylModule = {
-  "name": "Extras Module",
+  "name": "Daily Coins Module",
   "target_platform": "3.2.0"
 };
 

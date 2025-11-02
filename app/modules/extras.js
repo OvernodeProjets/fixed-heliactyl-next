@@ -21,9 +21,59 @@ const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 const PterodactylApplicationModule = require('../handlers/ApplicationAPI.js');
+const NodeCache = require("node-cache");
 
 module.exports.load = async function(router, db) {
-  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
+  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key)
+  const myCache = new NodeCache({ stdTTL: 60, checkperiod: 10 });
+
+  router.get("/stats", async (req, res) => {
+    try {
+      const fetchStats = async (endpoint) => {
+        // Check cache first
+        const cacheKey = `stats_${endpoint}`;
+
+        const cachedValue = myCache.get(cacheKey);
+        if (cachedValue !== undefined) {
+          return cachedValue;
+        }
+
+        const response = await fetch(`${settings.pterodactyl.domain}/api/application/${endpoint}?per_page=100000`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${settings.pterodactyl.key}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const total = data.meta.pagination.total;
+
+        // Store in cache
+        myCache.set(cacheKey, total);
+
+        return total;
+      };
+
+        // Fetch all stats in parallel
+      const [users, servers, nodes, locations] = await Promise.all([
+        fetchStats('users'),
+        fetchStats('servers'),
+        fetchStats('nodes'),
+        fetchStats('locations')
+      ]);
+
+      res.json({ users, servers, nodes, locations });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      res.status(500).json({ error: 'An error occurred while fetching stats' });
+    }
+  });
 
   router.get("/panel", async (req, res) => {
     res.redirect(settings.pterodactyl.domain);

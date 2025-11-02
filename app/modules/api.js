@@ -20,74 +20,20 @@ module.exports.heliactylModule = heliactylModule;
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const adminjs = require("./admin.js");
-const fs = require("fs");
-const ejs = require("ejs");
-const fetch = require("node-fetch");
-const NodeCache = require("node-cache");
-const Queue = require("../handlers/Queue.js");
+// todo : logging
 const { discordLog } = require("../handlers/log");
 const getPteroUser = require('../handlers/getPteroUser.js');
-const { requireAuth } = require("../handlers/checkMiddleware.js");
 
 if (settings?.pterodactyl?.domain?.endsWith("/")) {
   settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
 }
 
-module.exports.load = async function (app, db) {
-  const myCache = new NodeCache({ stdTTL: 60, checkperiod: 10 });
- app.get("/stats", async (req, res) => {
-    try {
-      const fetchStats = async (endpoint) => {
-        // Check cache first
-        const cacheKey = `stats_${endpoint}`;
-
-        const cachedValue = myCache.get(cacheKey);
-        if (cachedValue !== undefined) {
-          return cachedValue;
-        }
-
-        const response = await fetch(`${settings.pterodactyl.domain}/api/application/${endpoint}?per_page=100000`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.key}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const total = data.meta.pagination.total;
-
-        // Store in cache
-        myCache.set(cacheKey, total);
-
-        return total;
-      };
-
-        // Fetch all stats in parallel
-      const [users, servers, nodes, locations] = await Promise.all([
-        fetchStats('users'),
-        fetchStats('servers'),
-        fetchStats('nodes'),
-        fetchStats('locations')
-      ]);
-
-      res.json({ users, servers, nodes, locations });
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-      res.status(500).json({ error: 'An error occurred while fetching stats' });
-    }
-  });
-  
+module.exports.load = async function (router, db) {
   /**
    * GET /api
    * Returns the status of the API.
    */
-  app.get("/api", async (req, res) => {
+  router.get("/api", async (req, res) => {
     /* Check that the API key is valid */
     let authentication = await check(req, res);
     if (!authentication ) return;
@@ -100,7 +46,7 @@ module.exports.load = async function (app, db) {
    * GET api/v3/userinfo
    * Returns the user information.
    */
-  app.get("api/v3/userinfo", async (req, res) => {
+  router.get("api/v3/userinfo", async (req, res) => {
     /* Check that the API key is valid */
     let authentication = await check(req, res);
     if (!authentication) return;
@@ -156,7 +102,7 @@ module.exports.load = async function (app, db) {
    * POST api/v3/setcoins
    * Sets the number of coins for a user.
    */
-  app.post("api/v3/setcoins", async (req, res) => {
+  router.post("api/v3/setcoins", async (req, res) => {
     /* Check that the API key is valid */
     let authentication = await check(req, res);
     if (!authentication ) return;
@@ -183,7 +129,7 @@ module.exports.load = async function (app, db) {
     res.send({ status: "success" });
   });
 
-  app.post("/api/v3/addcoins", async (req, res) => {
+  router.post("/api/v3/addcoins", async (req, res) => {
     /* Check that the API key is valid */
     let authentication = await check(req, res);
     if (!authentication ) return;
@@ -215,7 +161,7 @@ module.exports.load = async function (app, db) {
    * POST api/v3/setplan
    * Sets the plan for a user.
    */
-  app.post("api/v3/setplan", async (req, res) => {
+  router.post("api/v3/setplan", async (req, res) => {
     /* Check that the API key is valid */
     let authentication = await check(req, res);
     if (!authentication ) return;
@@ -245,7 +191,7 @@ module.exports.load = async function (app, db) {
    * POST api/v3/setresources
    * Sets the resources for a user.
    */
-  app.post("api/v3/setresources", async (req, res) => {
+  router.post("api/v3/setresources", async (req, res) => {
     /* Check that the API key is valid */
     let authentication = await check(req, res);
     if (!authentication ) return;
