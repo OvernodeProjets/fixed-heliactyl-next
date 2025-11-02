@@ -68,62 +68,38 @@
        cpu = cpu + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.cpu == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.cpu : 0);
     }
     %>
-<% if (req.query.err && req.query.err == "none") { %>
-<div class="my-4 rounded-full shadow-sm border border-white/10 px-3 py-2 pt-2.5">
-<span class="text-white text-xs mt-0.5">
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mb-0.5 text-indigo-300 rounded-full shadow-sm bg-indigo-500/15 p-1.5 mr-2.5 inline-flex">
-  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-</svg>
-Action completed - daily rewards (<%= settings.api.client.coins.daily.amount %> <%= settings.website.currency %>) have been claimed! <code style="font-family: 'JetBrains Mono'" class="text-white/60">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
-</span>
-</div>
-<% } %>
+<%
+const alerts = {
+  "none": `Action completed - daily rewards (${settings.api.client.coins.daily.amount} ${settings.website.currency}) have been claimed!`,
+  "CREATED": "Action completed - provisioning has started for your server, it may take up to 5 minutes to complete.",
+  "MODIFIED": "Action completed - the server's resources have been modified.",
+  "DELETED": "Action completed - the server has been deleted."
+};
+%>
 
-<% if (req.query.err && req.query.err == "CREATED") { %>
+<% if (req.query.err && alerts[req.query.err]) { %>
 <div class="my-4 rounded-full shadow-sm border border-white/10 px-3 py-2 pt-2.5">
-<span class="text-white text-xs mt-0.5">
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mb-0.5 text-indigo-300 rounded-full shadow-sm bg-indigo-500/15 p-1.5 mr-2.5 inline-flex">
-  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-</svg>
-Action completed - provisioning has started for your server, it may take up to 5 minutes to complete. <code style="font-family: 'JetBrains Mono'" class="text-white/60">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
-</span>
+    <span class="text-white text-xs mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mb-0.5 text-indigo-300 rounded-full shadow-sm bg-indigo-500/15 p-1.5 mr-2.5 inline-flex">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+        </svg>
+        <%= alerts[req.query.err] %> 
+        <code style="font-family: 'JetBrains Mono'" class="text-white/60">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
+    </span>
 </div>
-<% } %>
-
-<% if (req.query.err && req.query.err == "MODIFIED") { %>
-<div class="my-4 rounded-full shadow-sm border border-white/10 px-3 py-2 pt-2.5">
-<span class="text-white text-xs mt-0.5">
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mb-0.5 text-indigo-300 rounded-full shadow-sm bg-indigo-500/15 p-1.5 mr-2.5 inline-flex">
-  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-</svg>
-Action completed - the server's resources have been modified. <code style="font-family: 'JetBrains Mono'" class="text-white/60">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
-</span>
-</div>
-<% } %>
-
-<% if (req.query.err && req.query.err == "DELETED") { %>
-<div class="my-4 rounded-full shadow-sm border border-white/10 px-3 py-2 pt-2.5">
-<span class="text-white text-xs mt-0.5">
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mb-0.5 text-indigo-300 rounded-full shadow-sm bg-indigo-500/15 p-1.5 mr-2.5 inline-flex">
-  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-</svg>
-Action completed - the server has been deleted. <code style="font-family: 'JetBrains Mono'" class="text-white/60">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
-</span>
-</div>
-<% } %>
-
-<% if (req.query.err && req.query.err == "PTERODACTYL") { %>
-    <div class="mb-4 rounded-lg bg-amber-500/10 p-4">
-        <div class="flex items-center gap-3">
-            <div class="text-amber-400">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-                </svg>
-            </div>
-            <p class="text-sm font-medium text-amber-400">This location has no available capacity.</p>
+<% } else if (req.query.err && req.query.err === "PTERODACTYL") { %>
+<div class="mb-4 rounded-lg bg-amber-500/10 p-4">
+    <div class="flex items-center gap-3">
+        <div class="text-amber-400">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+            </svg>
         </div>
+        <p class="text-sm font-medium text-amber-400">This location has no available capacity.</p>
     </div>
+</div>
 <% } %>
+
 <div id="dailyCoinsBanner" class="hidden w-full border-l-4 mt-2 mb-8 bg-white/5 border-white/10 rounded-r-2xl">
   <div class="p-6">
     <h2 class="text-white/90 text-lg font-semibold">Your daily reward is available.</h2>
@@ -152,7 +128,7 @@ Action completed - the server has been deleted. <code style="font-family: 'JetBr
                         </p>
                     </div>
                     <div class="mt-6">
-                        <a class="transition hover:scale-95 cursor-pointer font-semibold gap-2 grow-0 items-center justify-center rounded-xl shrink-0 disabled:cursor-not-allowed inline-flex border focus:outline-none px-4 py-[9px] bg-indigo-700 border-indigo-700 text-white hover:bg-indigo-500 hover:border-indigo-500 focus:ring-4 focus:ring-indigo-900 disabled:bg-indigo-900 disabled:border-indigo-900 disabled:text-indigo-400 text-sm" href="/servers/new">
+                        <a class="transition hover:scale-95 cursor-pointer font-semibold gap-2 grow-0 items-center justify-center rounded-xl shrink-0 disabled:cursor-not-allowed inline-flex border focus:outline-none px-4 py-[9px] bg-indigo-700 border-indigo-700 text-white hover:bg-indigo-500 hover:border-indigo-500 focus:ring-4 focus:ring-indigo-900 disabled:bg-indigo-900 disabled:border-indigo-900 disabled:text-indigo-400 text-sm" href="/server/new">
                             <span class="pointer-events-none shrink-0">Get started</span>
                         </a>
                     </div>

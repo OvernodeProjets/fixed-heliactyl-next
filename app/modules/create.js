@@ -134,13 +134,13 @@ router.get("/server/create", requireAuth, async (req, res) => {
     }
 
         if (!req.query.name || !req.query.ram || !req.query.disk || !req.query.cpu || !req.query.egg || !req.query.location) {
-            res.redirect(`/servers/new?err=MISSINGVARIABLE`);
+            res.redirect(`/server/new?err=MISSINGVARIABLE`);
             return;
         }
             try {
                 decodeURIComponent(req.query.name);
             } catch (err) {
-                return res.redirect(`/servers/new?err=COULDNOTDECODENAME`);
+                return res.redirect(`/server/new?err=COULDNOTDECODENAME`);
             }
 
             let packagename = await db.get("package-" + req.session.userinfo.id);
@@ -165,21 +165,21 @@ router.get("/server/create", requireAuth, async (req, res) => {
             }
 
             if (servers2 >= package.servers + extra.servers) {
-                return res.redirect(`/servers/new?err=TOOMUCHSERVERS`);
+                return res.redirect(`/server/new?err=TOOMUCHSERVERS`);
             }
 
             let name = decodeURIComponent(req.query.name);
             if (name.length < 1) {
-                return res.redirect(`/servers/new?err=LITTLESERVERNAME`);
+                return res.redirect(`/server/new?err=LITTLESERVERNAME`);
             }
             if (name.length > 191) {
-                return res.redirect(`/servers/new?err=BIGSERVERNAME`);
+                return res.redirect(`/server/new?err=BIGSERVERNAME`);
             }
 
             let location = req.query.location;
 
             if (Object.entries(settings.api.client.locations).filter((vname) => vname[0] == location).length !== 1) {
-                return res.redirect(`/servers/new?err=INVALIDLOCATION`);
+                return res.redirect(`/server/new?err=INVALIDLOCATION`);
             }
 
             let requiredpackage = Object.entries(settings.api.client.locations).filter((vname) => vname[0] == location)[0][1].package;
@@ -191,48 +191,48 @@ router.get("/server/create", requireAuth, async (req, res) => {
             let egg = req.query.egg;
             let egginfo = settings.api.client.eggs[egg];
             if (!egginfo) {
-                return res.redirect(`/servers/new?err=INVALIDEGG`);
+                return res.redirect(`/server/new?err=INVALIDEGG`);
             }
 
             let ram = parseFloat(req.query.ram);
             let disk = parseFloat(req.query.disk);
             let cpu = parseFloat(req.query.cpu);
             if (isNaN(ram) || isNaN(disk) || isNaN(cpu)) {
-              return res.redirect(`/servers/new?err=NOTANUMBER`);
+              return res.redirect(`/server/new?err=NOTANUMBER`);
             }
                 if (ram2 + ram > package.ram + extra.ram) {
-                    return res.redirect(`/servers/new?err=EXCEEDRAM&num=${package.ram + extra.ram - ram2}`);
+                    return res.redirect(`/server/new?err=EXCEEDRAM&num=${package.ram + extra.ram - ram2}`);
                 }
                 if (disk2 + disk > package.disk + extra.disk) {
-                    return res.redirect(`/servers/new?err=EXCEEDDISK&num=${package.disk + extra.disk - disk2}`);
+                    return res.redirect(`/server/new?err=EXCEEDDISK&num=${package.disk + extra.disk - disk2}`);
                 }
                 if (cpu2 + cpu > package.cpu + extra.cpu) {
-                    return res.redirect(`/servers/new?err=EXCEEDCPU&num=${package.cpu + extra.cpu - cpu2}`);
+                    return res.redirect(`/server/new?err=EXCEEDCPU&num=${package.cpu + extra.cpu - cpu2}`);
                 }
                 if (egginfo.minimum.ram)
                     if (ram < egginfo.minimum.ram) {
-                        return res.redirect(`/servers/new?err=TOOLITTLERAM&num=${egginfo.minimum.ram}`);
+                        return res.redirect(`/server/new?err=TOOLITTLERAM&num=${egginfo.minimum.ram}`);
                     }
                 if (egginfo.minimum.disk)
                     if (disk < egginfo.minimum.disk) {
-                        return res.redirect(`/servers/new?err=TOOLITTLEDISK&num=${egginfo.minimum.disk}`);
+                        return res.redirect(`/server/new?err=TOOLITTLEDISK&num=${egginfo.minimum.disk}`);
                     }
                 if (egginfo.minimum.cpu)
                     if (cpu < egginfo.minimum.cpu) {
-                        return res.redirect(`/servers/new?err=TOOLITTLECPU&num=${egginfo.minimum.cpu}`);
+                        return res.redirect(`/server/new?err=TOOLITTLECPU&num=${egginfo.minimum.cpu}`);
                     }
                 if (egginfo.maximum) {
                     if (egginfo.maximum.ram)
                         if (ram > egginfo.maximum.ram) {
-                            return res.redirect(`/servers/new?err=TOOMUCHRAM&num=${egginfo.maximum.ram}`);
+                            return res.redirect(`/server/new?err=TOOMUCHRAM&num=${egginfo.maximum.ram}`);
                         }
                     if (egginfo.maximum.disk)
                         if (disk > egginfo.maximum.disk) {
-                            return res.redirect(`/servers/new?err=TOOMUCHDISK&num=${egginfo.maximum.disk}`);
+                            return res.redirect(`/server/new?err=TOOMUCHDISK&num=${egginfo.maximum.disk}`);
                         }
                     if (egginfo.maximum.cpu)
                         if (cpu > egginfo.maximum.cpu) {
-                            return res.redirect(`/servers/new?err=TOOMUCHCPU&num=${egginfo.maximum.cpu}`);
+                            return res.redirect(`/server/new?err=TOOMUCHCPU&num=${egginfo.maximum.cpu}`);
                         }
                 }
                 const specs = egginfo.info;
@@ -478,7 +478,7 @@ router.get("/clear-queue", requireAuth, async (req, res) => {
 
           if (!id) return res.send("Missing server id.");
     
-          let redirectlink = "/servers/edit";
+          let redirectlink = "/server/edit";
     
           let checkexist =
             req.session.pterodactyl.relationships.servers.data.filter(
