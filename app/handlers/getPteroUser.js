@@ -3,6 +3,7 @@ const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 const PterodactylApplicationModule = require('../handlers/ApplicationAPI.js');
 
+// todo : cache results to reduce api calls
 module.exports = async (userid, db) => {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
   try {

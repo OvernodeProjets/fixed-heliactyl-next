@@ -28,11 +28,9 @@ const {discordLog} = require("../handlers/log.js");
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 const PterodactylApplicationModule = require('../handlers/ApplicationAPI.js');
 
-if (settings.pterodactyl)
-    if (settings.pterodactyl.domain) {
-        if (settings.pterodactyl.domain.slice(-1) == "/")
-            settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
-    }
+if (settings?.pterodactyl?.domain?.endsWith("/")) {
+  settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
+}
 
 module.exports.load = async function(app, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);

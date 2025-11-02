@@ -86,14 +86,9 @@ function collectRoutes(app) {
     return routes;
 }
 
-async function isLimited() {
-    return cache == true ? false : true;
-};
-
 module.exports = {
     consoleLogo,
     consoleSpin,
     getAllJsFiles,
-    collectRoutes,
-    isLimited
+    collectRoutes
 }

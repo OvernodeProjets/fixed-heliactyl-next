@@ -24,18 +24,17 @@ const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const getPteroUser = require("../../handlers/getPteroUser.js");
 
-if (settings.api.client.oauth2.link.slice(-1) == "/")
-  settings.api.client.oauth2.link = settings.api.client.oauth2.link.slice(
-    0,
-    -1
-  );
+if (settings?.api?.client?.oauth2?.link?.endsWith("/")) {
+  settings.api.client.oauth2.link = settings.api.client.oauth2.link.slice(0, -1);
+}
 
-if (settings.api.client.oauth2.callbackpath.slice(0, 1) !== "/")
-  settings.api.client.oauth2.callbackpath =
-    "/" + settings.api.client.oauth2.callbackpath;
+if (settings?.api?.client?.oauth2?.callbackpath?.slice(0, 1) !== "/") {
+  settings.api.client.oauth2.callbackpath = "/" + settings.api.client.oauth2.callbackpath;
+}
 
-if (settings.pterodactyl.domain.slice(-1) == "/")
+if (settings?.pterodactyl?.domain?.endsWith("/")) {
   settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
+}
 
 const fetch = require("node-fetch");
 const { discordLog } = require("../../handlers/log.js");

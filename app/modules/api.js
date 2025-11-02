@@ -29,6 +29,10 @@ const { discordLog } = require("../handlers/log");
 const getPteroUser = require('../handlers/getPteroUser.js');
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 
+if (settings?.pterodactyl?.domain?.endsWith("/")) {
+  settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
+}
+
 const myCache = new NodeCache({ deleteOnExpire: true, stdTTL: 59 });
 
 module.exports.load = async function (app, db) {
@@ -257,20 +261,6 @@ app.get("/giftcoins", async (req, res) => {
 
     if (!(await db.get("users-" + id)))
       return res.send({ status: "invalid id" });
-
-    if (settings.api.client.oauth2.link.slice(-1) == "/")
-      settings.api.client.oauth2.link =
-        settings.api.client.oauth2.link.slice(0, -1);
-
-    if (settings.api.client.oauth2.callbackpath.slice(0, 1) !== "/")
-      settings.api.client.oauth2.callbackpath =
-        "/" + settings.api.client.oauth2.callbackpath;
-
-    if (settings.pterodactyl.domain.slice(-1) == "/")
-      settings.pterodactyl.domain = settings.pterodactyl.domain.slice(
-        0,
-        -1
-      );
 
     let packagename = await db.get("package-" + id);
     let package =
