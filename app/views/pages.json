@@ -44,17 +44,6 @@
     },
     "mustbeloggedin": [
         "/dashboard",
-        "/store",
-        "/referrals",
-        "/transfer",
-        "/account",
-        "/afk",
-        "/staking",
-        "/wallet",
-        "/j4r",
-        "/webhosting",
-        "/events/christmas",
-        "/events/halloween",
         "/servers",
         "/server/new",
         "/server/edit",
@@ -73,7 +62,18 @@
         "/server/advanced",
         "/server/worlds",
         "/server/import",
-        "/server/logs"
+        "/server/logs",
+        "/wallet",
+        "/webhosting",
+        "/j4r",
+        "/staking",
+        "/store",
+        "/afk",
+        "/referrals",
+        "/transfer",
+        "/account",
+        "/events/christmas",
+        "/events/halloween"
     ],
     "mustbeadmin": [
         "/admin"
