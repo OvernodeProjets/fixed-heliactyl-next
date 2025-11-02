@@ -61,7 +61,7 @@
                         <h2 class="text-lg font-semibold text-white">Set Coins</h2>
                     </div>
                     <p class="text-gray-400 text-sm mb-4">Override a user's coin balance with a specific amount.</p>
-                    <form action="/setcoins" method="GET">
+                    <form action="/api/admin/setcoins" method="GET">
                         <div class="mb-4">
                             <label for="setcoins-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
                             <input type="text" id="setcoins-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="Enter user ID" required>
@@ -85,7 +85,7 @@
                         <h2 class="text-lg font-semibold text-white">Add Coins</h2>
                     </div>
                     <p class="text-gray-400 text-sm mb-4">Add coins to a user's existing balance.</p>
-                    <form action="/addcoins" method="GET">
+                    <form action="/api/admin/addcoins" method="GET">
                         <div class="mb-4">
                             <label for="addcoins-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
                             <input type="text" id="addcoins-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" placeholder="Enter user ID" required>
@@ -114,7 +114,7 @@
                         <h2 class="text-lg font-semibold text-white">Set Resources</h2>
                     </div>
                     <p class="text-gray-400 text-sm mb-4">Override a user's resource allocation.</p>
-                    <form action="/setresources" method="GET">
+                    <form action="/api/admin/setresources" method="GET">
                         <div class="mb-4">
                             <label for="setresources-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
                             <input type="text" id="setresources-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="Enter user ID" required>
@@ -154,7 +154,7 @@
                         <h2 class="text-lg font-semibold text-white">Add Resources</h2>
                     </div>
                     <p class="text-gray-400 text-sm mb-4">Add resources to a user's existing allocation.</p>
-                    <form action="/addresources" method="GET">
+                    <form action="/api/admin/addresources" method="GET">
                         <div class="mb-4">
                             <label for="addresources-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
                             <input type="text" id="addresources-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" placeholder="Enter user ID" required>
@@ -199,7 +199,7 @@
                         <h2 class="text-lg font-semibold text-white">Get User Info</h2>
                     </div>
                     <p class="text-gray-400 text-sm mb-4">View detailed information about a user.</p>
-                    <form action="/userinfo" method="GET" onsubmit="handleUserInfoSubmit(event)" class="userinfo-form">
+                    <form action="/api/admin/userinfo" method="GET" onsubmit="handleUserInfoSubmit(event)" class="userinfo-form">
                         <div class="mb-6">
                             <label for="userinfo-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
                             <input type="text" id="userinfo-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="Enter user ID" required>
@@ -225,7 +225,7 @@
                         <h2 class="text-lg font-semibold text-white">Set User Plan</h2>
                     </div>
                     <p class="text-gray-400 text-sm mb-4">Assign a subscription plan to a user.</p>
-                    <form action="/setplan" method="GET">
+                    <form action="/api/admin/setplan" method="GET">
                         <div class="mb-4">
                             <label for="setplan-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
                             <input type="text" id="setplan-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Enter user ID" required>
@@ -249,7 +249,7 @@
                         <h2 class="text-lg font-semibold text-white">Ban User</h2>
                     </div>
                     <p class="text-yellow-400 text-sm mb-4">⚠️ Temporarily ban a user from accessing the system.</p>
-                    <form action="/ban" method="GET">
+                    <form action="/api/admin/ban" method="GET">
                         <div class="mb-4">
                             <label for="banuser-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
                             <input type="text" id="banuser-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-yellow-500/30 rounded-lg text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all" placeholder="Enter user ID to ban" required>
@@ -276,7 +276,7 @@
                         </div>
                         <h2 class="text-lg font-semibold text-white">Unban User</h2>
                     </div>
-                    <form action="/unban" method="POST">
+                    <form action="/api/admin/unban" method="POST">
                         <div class="mb-6">
                             <label for="unban-user-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
                             <input type="text" id="unban-user-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-green-500/30 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" placeholder="Enter user ID to unban" required>
@@ -296,7 +296,7 @@
                         <h2 class="text-lg font-semibold text-white">Remove Account</h2>
                     </div>
                     <p class="text-red-400 text-sm mb-4">⚠️ Permanently delete a user account. This action cannot be undone.</p>
-                    <form action="/remove_account" method="GET" onsubmit="return confirm('Are you sure you want to delete this account? This action is irreversible.')">
+                    <form action="/api/admin/remove_account" method="GET" onsubmit="return confirm('Are you sure you want to delete this account? This action is irreversible.')">
                         <div class="mb-6">
                             <label for="remove-account-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
                             <input type="text" id="remove-account-id" name="id" class="w-full px-4 py-2.5 bg-white/10 border border-red-500/30 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all" placeholder="Enter user ID to delete" required>

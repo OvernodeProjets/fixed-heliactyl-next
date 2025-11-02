@@ -34,7 +34,7 @@ module.exports.load = async function (app, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
   const requireAdmin = (req, res, next) => requireAuth(req, res, next, true);
 
-  app.get("/setcoins", requireAdmin, async (req, res) => { 
+  app.get("/admin/setcoins", requireAdmin, async (req, res) => { 
     let failredirect = "/admin/coins?err=FAILEDSETCOINS";
 
     let { id, coins } = req.query;
@@ -66,7 +66,7 @@ module.exports.load = async function (app, db) {
     res.status(200).json({ message: "Coins set successfully." });
   });
 
-  app.get("/addcoins", requireAdmin, async (req, res) => {
+  app.get("/admin/addcoins", requireAdmin, async (req, res) => {
     let failredirect = "/admin?err=FAILEDADDCOINS";
 
     let { id, coins } = req.query;
@@ -100,7 +100,7 @@ module.exports.load = async function (app, db) {
     res.status(200).json({ message: "Coins added successfully." });
   });
 
-  app.get("/setresources", requireAdmin, async (req, res) => {
+  app.get("/admin/setresources", requireAdmin, async (req, res) => {
     let { id, ram, disk, cpu, servers } = req.query;
 
     let failredirect = "/admin/resources?err=FAILEDSETRESOURCES";
@@ -182,7 +182,7 @@ module.exports.load = async function (app, db) {
       res.status(200).json({ message: "Resources set successfully." });
   });
 
-  app.get("/addresources", requireAdmin, async (req, res) => {
+  app.get("/admin/addresources", requireAdmin, async (req, res) => {
 
     let { ram, disk, cpu, servers, id } = req.query;
 
@@ -264,7 +264,7 @@ module.exports.load = async function (app, db) {
       return res.status(200).json({ message: "Resources added successfully." });
   });
 
-  app.get("/setplan", requireAdmin, async (req, res) => {
+  app.get("/admin/setplan", requireAdmin, async (req, res) => {
     let { id, package } = req.query;
 
     let failredirect = "/admin?err=FAILEDSETPLAN";
@@ -299,7 +299,7 @@ module.exports.load = async function (app, db) {
     return res.status(200).json({ message: "Plan set successfully." });
   });
 
-  app.get("/remove_account", requireAdmin, async (req, res) => {
+  app.get("/admin/remove_account", requireAdmin, async (req, res) => {
     let { id } = req.query;
 
     // This doesn't delete the account and doesn't touch the renewal system.
@@ -337,7 +337,7 @@ module.exports.load = async function (app, db) {
     res.status(200).json({ message: "Account removed successfully." });
   });
 
-  app.get("/userinfo", requireAdmin, async (req, res) => {
+  app.get("/admin/userinfo", requireAdmin, async (req, res) => {
     try {
       const { id } = req.query;
 
@@ -387,7 +387,7 @@ module.exports.load = async function (app, db) {
     }
   });
 
-  app.get("/ban", requireAdmin, async (req, res) => {
+  app.get("/admin/ban", requireAdmin, async (req, res) => {
       const { id, reason, expiration } = req.query;
       if (!id) return res.status(400).json({ error: "Missing user ID" });
 
@@ -410,7 +410,7 @@ module.exports.load = async function (app, db) {
       res.status(200).json({ message: "User banned successfully." });
   });
 
-  app.get("/unban", requireAdmin, async (req, res) => {
+  app.get("/admin/unban", requireAdmin, async (req, res) => {
       const { id } = req.query;
       if (!id) return res.status(400).json({ error: "Missing user ID" });
       const dbUser = await db.get("users-" + id);
