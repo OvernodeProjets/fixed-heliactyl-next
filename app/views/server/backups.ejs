@@ -210,7 +210,7 @@
     }
 
     function createBackupItem(backup) {
-        console.log(JSON.stringify(backup))
+        //console.log(JSON.stringify(backup))
         const item = document.createElement('div');
         item.className = 'backup-list-item';
         const createdDate = new Date(backup.attributes.created_at).toLocaleString();
