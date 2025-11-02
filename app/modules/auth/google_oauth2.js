@@ -27,7 +27,7 @@ const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js')
 let google;
 let oauth2Client;
 
-module.exports.load = async function (app, db) {
+module.exports.load = async function (router, db) {
   if (!google) {
     google = require('googleapis').google;
   }
@@ -42,7 +42,7 @@ module.exports.load = async function (app, db) {
 
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
 
-  app.get("/google/login", (req, res) => {
+  router.get("/google/login", (req, res) => {
     if (req.query.redirect) req.session.redirect = "/" + req.query.redirect;
 
     const loginAttemptId = crypto.randomBytes(16).toString('hex');
@@ -62,7 +62,7 @@ module.exports.load = async function (app, db) {
     return;
   });
 
-  app.get(settings.api.client.oauth2.google.callbackpath, async (req, res) => {
+  router.get(settings.api.client.oauth2.google.callbackpath.replace(/^\/api/, ''), async (req, res) => {
     if (!req.query.code) return res.redirect(`/auth?error=missing_code`);
     if (!settings.api.client.oauth2.google.enable) return res.redirect("/auth");
 

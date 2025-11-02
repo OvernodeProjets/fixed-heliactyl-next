@@ -24,6 +24,8 @@ const getPteroUser = require('../../handlers/getPteroUser.js');
 
 const fetch = require("node-fetch");
 const { discordLog } = require("../../handlers/log");
+
+// todo : implement that in frontend and review code 
 module.exports.load = async function (app, db) {
   app.get("/github/login", (req, res) => {
     if (req.query.redirect) req.session.redirect = "/" + req.query.redirect;
@@ -37,7 +39,7 @@ module.exports.load = async function (app, db) {
     res.redirect(authUrl);
   });
 
-  app.get(settings.api.client.oauth2.github.callbackpath, async (req, res) => {
+  app.get(settings.api.client.oauth2.github.callbackpath.replace(/^\/api/, ''), async (req, res) => {
     if (!req.query.code) return res.redirect(`/auth`);
 
     if (settings.api.client.oauth2.github.enable == false) return res.redirect("/auth");
