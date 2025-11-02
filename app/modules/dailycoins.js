@@ -46,44 +46,60 @@ module.exports.load = async function(router, db) {
     if (!settings.api.client.coins.daily.enabled) {
       return res.json({ text: 'DISABLED' });
     }
-  
+
+    const userId = req.session.userinfo.id;
+    const cacheKey = `dailystatus-${userId}`;
+
+    if (myCache.has(cacheKey)) {
+      return res.json(myCache.get(cacheKey));
+    }
+
     const per = settings.api.client.coins.daily.per;
-    const lastClaimTimestamp = await db.get("dailycoins-" + req.session.userinfo.id);
+    const lastClaimTimestamp = await db.get("dailycoins-" + userId);
     const lastClaim = lastClaimTimestamp ? new Date(lastClaimTimestamp) : null;
-  
+
     const today = getPeriodStart(new Date(), per);
     const lastPeriod = lastClaim ? getPeriodStart(lastClaim, per) : null;
-  
+
+    let response;
     if (lastPeriod && lastPeriod.getTime() === today.getTime()) {
-      return res.json({ text: '0' }); // Already claimed
+      response = { text: '0' }; // Already claimed
     } else {
-      return res.json({ text: '1' }); // Can claim
+      response = { text: '1' }; // Can claim
     }
+
+    myCache.set(cacheKey, response);
+    return res.json(response);
   });
-  
-  
+
   router.get('/daily-coins', requireAuth, async (req, res) => {
     if (!settings.api.client.coins.daily.enabled) {
       return res.redirect('../dashboard?err=DISABLED');
     }
-  
+
+    const userId = req.session.userinfo.id;
+    const cacheKey = `dailystatus-${userId}`;
+
     const per = settings.api.client.coins.daily.per;
-    const lastClaimTimestamp = await db.get("dailycoins-" + req.session.userinfo.id);
+    const lastClaimTimestamp = await db.get("dailycoins-" + userId);
     const lastClaim = lastClaimTimestamp ? new Date(lastClaimTimestamp) : null;
-  
+
     const today = getPeriodStart(new Date(), per);
     const lastPeriod = lastClaim ? getPeriodStart(lastClaim, per) : null;
-  
+
     if (lastPeriod && lastPeriod.getTime() === today.getTime()) {
       return res.redirect('../dashboard?err=CLAIMED');
     }
-  
-    const coins = (await db.get("coins-" + req.session.userinfo.id)) || 0;
-    await db.set("coins-" + req.session.userinfo.id, coins + settings.api.client.coins.daily.amount);
-  
+
+    const coins = (await db.get("coins-" + userId)) || 0;
+    await db.set("coins-" + userId, coins + settings.api.client.coins.daily.amount);
+
     discordLog('daily coins', `${req.session.userinfo.username} has claimed their daily reward of ${settings.api.client.coins.daily.amount} ${settings.website.currency}.`);
-  
-    await db.set("dailycoins-" + req.session.userinfo.id, today.getTime());
+
+    await db.set("dailycoins-" + userId, today.getTime());
+
+    myCache.del(cacheKey);
+
     return res.redirect('../dashboard?err=none');
   });
 };
