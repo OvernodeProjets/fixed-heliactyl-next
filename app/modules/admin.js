@@ -20,36 +20,21 @@ module.exports.heliactylModule = heliactylModule;
 const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 
-if (settings.pterodactyl)
-  if (settings.pterodactyl.domain) {
-    if (settings.pterodactyl.domain.slice(-1) == "/")
-      settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
-  }
+if (settings?.pterodactyl?.domain?.endsWith("/")) {
+  settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
+}
 
-const { getPages, renderData } = require("../handlers/theme.js");
 const adminjs = require("./admin.js");
 const { discordLog } = require("../handlers/log.js");
 const getPteroUser = require("../handlers/getPteroUser");
 const PterodactylApplicationModule = require('../handlers/ApplicationAPI.js');
+const { requireAuth } = require("../handlers/checkMiddleware.js");
 
 module.exports.load = async function (app, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
+  const requireAdmin = (req, res, next) => requireAuth(req, res, next, true);
 
-  app.get("/setcoins", async (req, res) => {
-    if (!req.session.pterodactyl) return four0four(req, res);
-
-    const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
-    if (!PterodactylUser) {
-        four0four(req, res);
-        return;
-    }
-
-    req.session.pterodactyl = PterodactylUser.attributes;
-    if (PterodactylUser.attributes.root_admin !== true) {
-        four0four(req, res);
-        return;
-    }
-
+  app.get("/setcoins", requireAdmin, async (req, res) => { 
     let failredirect = "/admin/coins?err=FAILEDSETCOINS";
 
     let { id, coins } = req.query;
@@ -81,21 +66,7 @@ module.exports.load = async function (app, db) {
     res.status(200).json({ message: "Coins set successfully." });
   });
 
-  app.get("/addcoins", async (req, res) => {
-    if (!req.session.pterodactyl) return four0four(req, res);
-
-    const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
-    if (!PterodactylUser) {
-        four0four(req, res);
-        return;
-    }
-
-    req.session.pterodactyl = PterodactylUser.attributes;
-    if (PterodactylUser.attributes.root_admin !== true) {
-        four0four(req, res);
-        return;
-    }
-
+  app.get("/addcoins", requireAdmin, async (req, res) => {
     let failredirect = "/admin?err=FAILEDADDCOINS";
 
     let { id, coins } = req.query;
@@ -129,25 +100,10 @@ module.exports.load = async function (app, db) {
     res.status(200).json({ message: "Coins added successfully." });
   });
 
-  app.get("/setresources", async (req, res) => {
-    if (!req.session.pterodactyl) return four0four(req, res);
-
-    const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
-    if (!PterodactylUser) {
-        four0four(req, res);
-        return;
-    }
-
-    req.session.pterodactyl = PterodactylUser.attributes;
-    if (PterodactylUser.attributes.root_admin !== true) {
-        four0four(req, res);
-        return;
-    }
-
+  app.get("/setresources", requireAdmin, async (req, res) => {
     let { id, ram, disk, cpu, servers } = req.query;
 
     let failredirect = "/admin/resources?err=FAILEDSETRESOURCES";
-    let successredirect = "/admin/resources?success=SETRESOURCES";
 
     if (!id) return res.redirect(`${failredirect}?err=MISSINGID`);
 
@@ -226,20 +182,7 @@ module.exports.load = async function (app, db) {
       res.status(200).json({ message: "Resources set successfully." });
   });
 
-  app.get("/addresources", async (req, res) => {
-    if (!req.session.pterodactyl) return four0four(req, res);
-
-    const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
-    if (!PterodactylUser) {
-        four0four(req, res);
-        return;
-    }
-
-    req.session.pterodactyl = PterodactylUser.attributes;
-    if (PterodactylUser.attributes.root_admin !== true) {
-        four0four(req, res);
-        return;
-    }
+  app.get("/addresources", requireAdmin, async (req, res) => {
 
     let { ram, disk, cpu, servers, id } = req.query;
 
@@ -321,21 +264,7 @@ module.exports.load = async function (app, db) {
       return res.status(200).json({ message: "Resources added successfully." });
   });
 
-  app.get("/setplan", async (req, res) => {
-    if (!req.session.pterodactyl) return four0four(req, res);
-
-    const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
-    if (!PterodactylUser) {
-        four0four(req, res);
-        return;
-    }
-
-    req.session.pterodactyl = PterodactylUser.attributes;
-    if (PterodactylUser.attributes.root_admin !== true) {
-        four0four(req, res);
-        return;
-    }
-
+  app.get("/setplan", requireAdmin, async (req, res) => {
     let { id, package } = req.query;
 
     let failredirect = "/admin?err=FAILEDSETPLAN";
@@ -370,21 +299,7 @@ module.exports.load = async function (app, db) {
     return res.status(200).json({ message: "Plan set successfully." });
   });
 
-  app.get("/remove_account", async (req, res) => {
-    if (!req.session.pterodactyl) return four0four(req, res);
-
-    const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
-    if (!PterodactylUser) {
-        four0four(req, res);
-        return;
-    }
-
-    req.session.pterodactyl = PterodactylUser.attributes;
-    if (PterodactylUser.attributes.root_admin !== true) {
-        four0four(req, res);
-        return;
-    }
-
+  app.get("/remove_account", requireAdmin, async (req, res) => {
     let { id } = req.query;
 
     // This doesn't delete the account and doesn't touch the renewal system.
@@ -422,22 +337,8 @@ module.exports.load = async function (app, db) {
     res.status(200).json({ message: "Account removed successfully." });
   });
 
-  app.get("/userinfo", async (req, res) => {
+  app.get("/userinfo", requireAdmin, async (req, res) => {
     try {
-      if (!req.session.pterodactyl) return four0four(req, res);
-
-      const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
-      if (!PterodactylUser) {
-          four0four(req, res);
-          return;
-      }
-
-      req.session.pterodactyl = PterodactylUser.attributes;
-      if (PterodactylUser.attributes.root_admin !== true) {
-          four0four(req, res);
-          return;
-      }
-
       const { id } = req.query;
 
       if (!id) return res.status(400).json({ error: "Missing user ID" });
@@ -486,21 +387,7 @@ module.exports.load = async function (app, db) {
     }
   });
 
-  app.get("/ban", async (req, res) => {
-      if (!req.session.pterodactyl) return four0four(req, res);
-
-      const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
-      if (!PterodactylUser) {
-          four0four(req, res);
-          return;
-      }
-
-      req.session.pterodactyl = PterodactylUser.attributes;
-      if (PterodactylUser.attributes.root_admin !== true) {
-          four0four(req, res);
-          return;
-      }
-
+  app.get("/ban", requireAdmin, async (req, res) => {
       const { id, reason, expiration } = req.query;
       if (!id) return res.status(400).json({ error: "Missing user ID" });
 
@@ -523,18 +410,7 @@ module.exports.load = async function (app, db) {
       res.status(200).json({ message: "User banned successfully." });
   });
 
-  app.get("/unban", async (req, res) => {
-      if (!req.session.pterodactyl) return four0four(req, res);
-      const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
-      if (!PterodactylUser) {
-          four0four(req, res);
-          return;
-      }
-      req.session.pterodactyl = PterodactylUser.attributes;
-      if (PterodactylUser.attributes.root_admin !== true) {
-          four0four(req, res);
-          return;
-      }
+  app.get("/unban", requireAdmin, async (req, res) => {
       const { id } = req.query;
       if (!id) return res.status(400).json({ error: "Missing user ID" });
       const dbUser = await db.get("users-" + id);
@@ -548,20 +424,6 @@ module.exports.load = async function (app, db) {
       );
       res.status(200).json({ message: "User unbanned successfully." });
   });
-
-  async function four0four(req, res) {
-    try {
-      const theme = getPages(req);
-      const data = await renderData(req, theme, db);
-      res.status(404).render(theme.settings.errors.notFound || "404.ejs", data);
-    } catch (err) {
-      console.error(
-        `App ― An error has occurred on path ${req._parsedUrl.pathname}:`
-      );
-      console.error(err);
-      res.status(500).send("Internal Server Error");
-    }
-  }
 
   module.exports.suspend = async function (discordid) {
     if (!settings.api.client.allow.over_resources_suspend) return;

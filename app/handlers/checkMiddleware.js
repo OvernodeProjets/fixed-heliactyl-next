@@ -1,13 +1,26 @@
 const indexjs = require('../../app.js');
+const getPteroUser = require("../handlers/getPteroUser");
 
 const db = indexjs.db;
 
-const requireAuth = (req, res, next) => {
+const requireAuth = async (req, res, next, admin = false) => {
   if (!req.session.userinfo || !req.session.pterodactyl) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
+
+  const user = await getPteroUser(req.session.userinfo.id, db);
+  if (!user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  
+  if (admin && user.attributes.root_admin !== true) {
+    return res.status(403).json({ error: 'Forbidden: admin only' });
+  }
+
+  req.session.pterodactyl = user.attributes;
   next();
 };
+
 
 const ownsServer = async (req, res, next) => {
   const serverId = req.params.id || req.params.serverId || req.params.instanceId;
