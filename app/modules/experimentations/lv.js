@@ -19,6 +19,7 @@ module.exports.heliactylModule = heliactylModule;
 
 const { requireAuth } = require("../../handlers/checkMiddleware.js");
 
+// need to be reimplented
 module.exports.load = async function(app, db) {
   const lvcodes = {}
   const cooldowns = {}
@@ -92,7 +93,7 @@ module.exports.load = async function(app, db) {
   });
 
   // New API endpoint to get the user's limit
-  app.get(`/api/lv/limit`, requireAuth, async (req, res) => {
+  app.get(`/lv/limit`, requireAuth, async (req, res) => {
     const userId = req.session.userinfo.id;
     const limit = dailyLimits[userId] || { count: 0, date: new Date().toDateString() };
     const remaining = 50 - limit.count;

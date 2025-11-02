@@ -27,14 +27,14 @@ module.exports.load = async function (app, db) {
     const getUserGroupsKey = (userId) => `user-${userId}-server-groups`;
 
     // GET all groups for a user
-    app.get("/api/groups", requireAuth, async (req, res) => {
+    app.get("/groups", requireAuth, async (req, res) => {
         const userId = req.session.userinfo.id;
         const groups = await db.get(getUserGroupsKey(userId)) || {};
         res.json(groups);
     });
 
     // CREATE a new group for a user
-    app.post("/api/groups", requireAuth, async (req, res) => {
+    app.post("/groups", requireAuth, async (req, res) => {
         if (!req.body.name) return res.status(400).json({ error: "Group name is required" });
 
         const userId = req.session.userinfo.id;
@@ -47,7 +47,7 @@ module.exports.load = async function (app, db) {
     });
 
     // GET a specific group for a user
-    app.get("/api/groups/:groupId", requireAuth, async (req, res) => {
+    app.get("/groups/:groupId", requireAuth, async (req, res) => {
         const userId = req.session.userinfo.id;
         const groups = await db.get(getUserGroupsKey(userId)) || {};
         const group = groups[req.params.groupId];
@@ -58,7 +58,7 @@ module.exports.load = async function (app, db) {
     });
 
     // UPDATE a group for a user
-    app.put("/api/groups/:groupId", requireAuth, async (req, res) => {
+    app.put("/groups/:groupId", requireAuth, async (req, res) => {
         const userId = req.session.userinfo.id;
         const groups = await db.get(getUserGroupsKey(userId)) || {};
         const group = groups[req.params.groupId];
@@ -72,7 +72,7 @@ module.exports.load = async function (app, db) {
     });
 
     // DELETE a group for a user
-    app.delete("/api/groups/:groupId", requireAuth, async (req, res) => {
+    app.delete("/groups/:groupId", requireAuth, async (req, res) => {
         const userId = req.session.userinfo.id;
         const groups = await db.get(getUserGroupsKey(userId)) || {};
 
@@ -84,7 +84,7 @@ module.exports.load = async function (app, db) {
     });
 
     // ADD a server to a group
-    app.post("/api/groups/:groupId/servers", requireAuth, async (req, res) => {
+    app.post("/groups/:groupId/servers", requireAuth, async (req, res) => {
         if (!req.body.serverId) return res.status(400).json({ error: "Server ID is required" });
 
         const userId = req.session.userinfo.id;
@@ -102,7 +102,7 @@ module.exports.load = async function (app, db) {
     });
 
     // REMOVE a server from a group
-    app.delete("/api/groups/:groupId/servers/:serverId", requireAuth, async (req, res) => {
+    app.delete("/groups/:groupId/servers/:serverId", requireAuth, async (req, res) => {
         const userId = req.session.userinfo.id;
         const groups = await db.get(getUserGroupsKey(userId)) || {};
         const group = groups[req.params.groupId];
