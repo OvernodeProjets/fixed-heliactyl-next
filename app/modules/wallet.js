@@ -17,16 +17,13 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { logTransaction } = require("../handlers/log.js");
 
-module.exports.load = async function (app, db) {
-  const router = express.Router();
-
+module.exports.load = async function (router, db) {
   // Helper function to get user's balance
   const getUserBalance = async (userId, currency) => {
     if (currency === (settings.website.currency)) {

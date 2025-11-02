@@ -18,21 +18,23 @@ const heliactylModule = {
 module.exports.heliactylModule = heliactylModule;
 
 const { requireAuth } = require("../handlers/checkMiddleware.js");
+const loadConfig = require("../handlers/config");
+const settings = loadConfig("./config.toml");
 
 module.exports.load = async function (router, db) {
 router.get('/referrals/generate', requireAuth, async (req, res) => {
   if (!req.query.code) {
-    return res.redirect('../account?err=INVALIDCODE')
+    return res.status(400).json({ error: 'Referral code is required.' });
   }
 
   let referralCode = req.query.code;
   // check if the referral code is less than 16 characters and has no spaces
   if(referralCode.length > 15 || referralCode.includes(" ")) {
-    return res.redirect('../referrals?err=INVALIDCODE')
+    return res.status(400).json({ error: 'Invalid referral code. Must be less than 16 characters and contain no spaces.' });
   }
   // check if the referral code already exists
   if(await db.get(referralCode)){
-    return res.redirect('../referrals?err=ALREADYEXISTS');
+    return res.status(400).json({ error: 'Referral code already exists.' });
   }
   // Save the referral code in the Keyv store along with the user's information
   await db.set(referralCode, {
@@ -41,13 +43,13 @@ router.get('/referrals/generate', requireAuth, async (req, res) => {
   });
 
   // Render the referral code view
-  res.redirect('../referrals?err=none')
+  res.status(200).json({ message: 'Referral code generated successfully.', code: referralCode });
 });
 
 router.get('/referrals/claim', requireAuth, async (req, res) => {
   // Get the referral code from the request body
   if (!req.query.code) {
-    return res.redirect('../account?err=INVALIDCODE')
+    return res.status(400).json({ error: 'Referral code is required.' });
   }
 
   const referralCode = req.query.code;
@@ -56,18 +58,18 @@ router.get('/referrals/claim', requireAuth, async (req, res) => {
   const referral = await db.get(referralCode);
 
   if (!referral) {
-    return res.redirect('../account?err=INVALIDCODE')
+    return res.status(404).json({ error: 'Invalid referral code.' });
   }
 
   // Check if user has already claimed a code
   if (await db.get("referral-" + req.session.userinfo.id) == "1") {
-    return res.redirect('../account?err=CANNOTCLAIM')
+    return res.status(400).json({ error: 'Cannot claim referral code, already claimed.' });
   }
 
   // Check if the referral code was created by the user
   if (referral.userId === req.session.userinfo.id) {
     // Return an error if the referral code was created by the user
-    return res.redirect('../account?err=CANNOTCLAIM')
+    return res.status(400).json({ error: 'Cannot claim your own referral code.' });
   }
 
   // Award the referral bonus to the user who claimed the code
@@ -79,7 +81,7 @@ router.get('/referrals/claim', requireAuth, async (req, res) => {
   db.set("referral-" + req.session.userinfo.id, 1)
 
   // Render the referral claimed view
-  res.redirect('../account?err=none')
+  res.status(200).json({ message: 'Referral code claimed successfully. You have been awarded 250 ' + settings.website.currency + '!' });
 });
 
 };

@@ -58,30 +58,20 @@
     <div class="max-w-4xl mx-auto mt-5">
 
         <!-- Notification Messages -->
-        <% if (req.query.err) { %>
-        <div class="rounded-2xl <%= req.query.err === 'none' ? 'bg-green-800/50' : 'bg-red-800/50' %> p-4 mb-8">
+        <div id="referralMessage" class="rounded-2xl p-4 mb-8 hidden">
             <div class="flex items-center">
-                <svg class="h-5 w-5 <%= req.query.err === 'none' ? 'text-green-400' : 'text-red-400' %> mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                 </svg>
-                <p class="text-sm <%= req.query.err === 'none' ? 'text-green-400' : 'text-red-400' %>">
-                    <% if (req.query.err === 'none') { %>
-                        Successfully created the referral code!
-                    <% } else if (req.query.err === 'ALREADYEXISTS') { %>
-                        The code you provided already exists.
-                    <% } else if (req.query.err === 'INVALIDCODE') { %>
-                        No code was provided or the one you provided was invalid.
-                    <% } %>
-                </p>
+                <p id="referralMessageText" class="text-sm"></p>
             </div>
         </div>
-        <% } %>
 
         <div class="grid gap-8 md:grid-cols-2">
             <!-- Create Referral Code -->
             <div class="bg-white/5 rounded-2xl p-6">
                 <h2 class="text-xl font-semibold mb-4">Create a Referral Code</h2>
-                <form action="/api/referrals/generate" method="get" class="space-y-4">
+                <form id="generateReferralForm" class="space-y-4">
                     <div>
                         <label for="code" class="block text-sm font-medium text-gray-400 mb-1">Your Referral Code</label>
                         <input type="text" name="code" id="code" class="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-white placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter your custom code">
@@ -95,7 +85,7 @@
             <!-- Claim Referral Code -->
             <div class="bg-white/5 rounded-2xl p-6">
                 <h2 class="text-xl font-semibold mb-4">Claim a Referral Code</h2>
-                <form action="/api/referrals/claim" method="get" class="space-y-4">
+                <form id="claimReferralForm" class="space-y-4">
                     <div>
                         <label for="claim-code" class="block text-sm font-medium text-gray-400 mb-1">Friend's Referral Code</label>
                         <input type="text" name="code" id="claim-code" class="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-white placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter code to claim">
@@ -125,5 +115,55 @@
         </div>
     </div>
 </main>
+
+<script>
+const messageBox = document.getElementById('referralMessage');
+const messageText = document.getElementById('referralMessageText');
+const referralSVG = messageBox.querySelector('svg');
+
+function showMessage(message, type) {
+    // type = 'success' | 'error'
+    messageBox.className = `rounded-2xl p-4 mt-4 ${type === 'success' ? 'bg-green-800/50' : 'bg-red-800/50'}`;
+    messageText.className = `text-sm ${type === 'success' ? 'text-green-400' : 'text-red-400'}`;
+    referralSVG.className = `h-5 w-5 mr-3 ${type === 'success' ? 'text-green-400' : 'text-red-400'}`;
+    messageText.textContent = message;
+    messageBox.classList.remove('hidden');
+}
+
+// Create Referral Code
+document.getElementById('generateReferralForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const codeInput = document.getElementById('code');
+    const code = codeInput.value.trim();
+    if(!code) return showMessage('Please enter a referral code.', 'error');
+
+    try {
+        const res = await fetch(`/api/referrals/generate?code=${encodeURIComponent(code)}`, { method: 'GET', headers: { 'Accept': 'application/json' } });
+        const data = await res.json();
+        if(res.ok) showMessage(`${data.message} Code: ${data.code}`, 'success');
+        else showMessage(data.error || 'An error occurred.', 'error');
+    } catch(err) {
+        showMessage('Network error. Please try again.', 'error');
+    }
+});
+
+// Claim Referral Code
+document.getElementById('claimReferralForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const codeInput = document.getElementById('claim-code');
+    const code = codeInput.value.trim();
+    if(!code) return showMessage("Please enter a referral code to claim.", 'error');
+
+    try {
+        const res = await fetch(`/api/referrals/claim?code=${encodeURIComponent(code)}`, { method: 'GET', headers: { 'Accept': 'application/json' } });
+        const data = await res.json();
+        if(res.ok) showMessage(data.message, 'success');
+        else showMessage(data.error || 'An error occurred.', 'error');
+    } catch(err) {
+        showMessage('Network error. Please try again.', 'error');
+    }
+});
+</script>
+
 
 <%- include('./components/bottom') %>
