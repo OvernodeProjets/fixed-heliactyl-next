@@ -25,9 +25,7 @@ module.exports.load = async function (router, db) {
     try {
       if (
         req.path.startsWith("/api") ||
-        req.path.startsWith("/assets") ||
-        req.path.startsWith("/public") ||
-        req.path.startsWith("/cdn")
+        req.path.startsWith("/assets")
       ) {
         return next();
       }
@@ -104,7 +102,7 @@ module.exports.load = async function (router, db) {
     }
   });
 
-  const PUBLIC_DIR = path.join(__dirname, 'app', 'public');
+  const PUBLIC_DIR = path.join(__dirname, '../../', 'app', 'public');
   if (fs.existsSync(PUBLIC_DIR)) {
     const staticOptions = {
       maxAge: '1d',
