@@ -12,7 +12,7 @@
 
 const heliactylModule = {
   "name": "Heliactyl API 3.0 Beta",
-  "target_platform": "3.2.0"
+  "target_platform": "3.2.1"
 };
 
 module.exports.heliactylModule = heliactylModule;
@@ -29,16 +29,21 @@ if (settings?.pterodactyl?.domain?.endsWith("/")) {
 }
 
 module.exports.load = async function (router, db) {
+  const authenticate = async (req, res, next) => {
+    const auth = await check(req, res);
+    if (!auth) return;
+    next();
+  };
+
   /**
    * GET /api
    * Returns the status of the API.
    */
-  router.get("/api", async (req, res) => {
-    /* Check that the API key is valid */
-    let authentication = await check(req, res);
-    if (!authentication ) return;
+  router.get("/api", authenticate, async (req, res) => {
     res.send({
       status: true,
+      version: settings.version,
+      platform_codename: settings.platform_codename,
     });
   });
 
@@ -46,10 +51,7 @@ module.exports.load = async function (router, db) {
    * GET api/v3/userinfo
    * Returns the user information.
    */
-  router.get("api/v3/userinfo", async (req, res) => {
-    /* Check that the API key is valid */
-    let authentication = await check(req, res);
-    if (!authentication) return;
+  router.get("api/v3/userinfo", authenticate, async (req, res) => {
     const { id } = req.query;
 
     if (!id) return res.send({ status: "missing id" });
@@ -102,11 +104,7 @@ module.exports.load = async function (router, db) {
    * POST api/v3/setcoins
    * Sets the number of coins for a user.
    */
-  router.post("api/v3/setcoins", async (req, res) => {
-    /* Check that the API key is valid */
-    let authentication = await check(req, res);
-    if (!authentication ) return;
-
+  router.post("api/v3/setcoins", authenticate, async (req, res) => {
     if (typeof req.body !== "object")
       return res.send({ status: "body must be an object" });
     if (Array.isArray(req.body))
@@ -129,11 +127,7 @@ module.exports.load = async function (router, db) {
     res.send({ status: "success" });
   });
 
-  router.post("/api/v3/addcoins", async (req, res) => {
-    /* Check that the API key is valid */
-    let authentication = await check(req, res);
-    if (!authentication ) return;
-
+  router.post("/api/v3/addcoins", authenticate, async (req, res) => {
     if (typeof req.body !== "object")
       return res.send({ status: "body must be an object" });
     if (Array.isArray(req.body))
@@ -161,11 +155,7 @@ module.exports.load = async function (router, db) {
    * POST api/v3/setplan
    * Sets the plan for a user.
    */
-  router.post("api/v3/setplan", async (req, res) => {
-    /* Check that the API key is valid */
-    let authentication = await check(req, res);
-    if (!authentication ) return;
-
+  router.post("api/v3/setplan", authenticate, async (req, res) => {
     if (!req.body) return res.send({ status: "missing body" });
 
     if (typeof req.body.id !== "string")
@@ -191,11 +181,7 @@ module.exports.load = async function (router, db) {
    * POST api/v3/setresources
    * Sets the resources for a user.
    */
-  router.post("api/v3/setresources", async (req, res) => {
-    /* Check that the API key is valid */
-    let authentication = await check(req, res);
-    if (!authentication ) return;
-
+  router.post("api/v3/setresources", authenticate, async (req, res) => {
     if (!req.body) return res.send({ status: "missing body" });
 
     if (typeof req.body.id !== "string")
@@ -283,20 +269,32 @@ module.exports.load = async function (router, db) {
    * @returns {Object|null} - The settings object if authorized, otherwise null.
    */
   async function check(req, res) {
-    let settings = loadConfig("./config.toml");
-    if (settings.api.client.api.enabled == true) {
-      let auth = req.headers["authorization"];
-      if (auth) {
-        if (auth == "Bearer " + settings.api.client.api.code) {
-          return settings;
-        }
-      } else {
-        res.status(403).send({ status: "forbidden" });
-        return null;
-      }
-    } else {
-      res.status(403).send({ status: "forbidden" });
+    if (!settings.api.client.api.enabled) {
+      res.status(403).json({ 
+        status: "error", 
+        message: "API is disabled" 
+      });
       return null;
     }
+
+    const auth = req.headers["authorization"];
+    
+    if (!auth) {
+      res.status(401).json({ 
+        status: "error", 
+        message: "Missing authorization header" 
+      });
+      return null;
+    }
+
+    if (auth !== "Bearer " + settings.api.client.api.code) {
+      res.status(403).json({ 
+        status: "error", 
+        message: "Invalid API key" 
+      });
+      return null;
+    }
+
+    return true;
   }
 };

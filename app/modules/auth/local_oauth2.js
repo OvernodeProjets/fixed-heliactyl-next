@@ -12,7 +12,7 @@
 
 const heliactylModule = {
   "name": "Local OAuth2 Module",
-  "target_platform": "3.2.0"
+  "target_platform": "3.2.1"
 };
 
 module.exports.heliactylModule = heliactylModule;

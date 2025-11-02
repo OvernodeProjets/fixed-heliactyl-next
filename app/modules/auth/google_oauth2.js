@@ -12,7 +12,7 @@
 
 const heliactylModule = {
   "name": "Google OAuth2 Module",
-  "target_platform": "3.2.0"
+  "target_platform": "3.2.2"
 };
 
 module.exports.heliactylModule = heliactylModule;

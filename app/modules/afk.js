@@ -12,13 +12,13 @@
 
 const heliactylModule = {
   "name": "Store Module",
-  "target_platform": "3.2.0"
+  "target_platform": "3.2.1"
 };
 
 module.exports.heliactylModule = heliactylModule;
 
 const AFKRewardsManager = require('../handlers/AFKRewardsManager');
-const clusterId = process.env.CLUSTER_ID || `cluster-${Math.random().toString(36).substring(7)}`;
+const clusterId = `cluster-${Math.random().toString(36).substring(7)}`;
 
 module.exports.load = function(app, db) {
   const afkManager = new AFKRewardsManager(db);

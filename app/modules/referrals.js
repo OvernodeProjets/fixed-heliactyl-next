@@ -12,7 +12,7 @@
 
 const heliactylModule = {
   "name": "Referrals (legacy) Module",
-  "target_platform": "3.2.0"
+  "target_platform": "3.2.1"
 };
 
 module.exports.heliactylModule = heliactylModule;
