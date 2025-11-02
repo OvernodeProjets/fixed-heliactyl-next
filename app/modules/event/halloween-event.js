@@ -89,7 +89,7 @@ const CANDY_TYPES = [
     { name: "Zombie Brain Jelly Bean", points: 30 }
 ];
 
-module.exports.load = async function(app, db) {
+module.exports.load = async function(router, db) {
     // Initialize or get event data
     async function getOrInitEventData(userId) {
         let eventData = await db.get(`halloween-event-${userId}`);
@@ -183,7 +183,7 @@ module.exports.load = async function(app, db) {
     // API Endpoints
 
     // Get event status and user progress
-    app.get("/api/halloween/status", requireAuth, async (req, res) => {
+    router.get("/halloween/status", requireAuth, async (req, res) => {
         if (!isEventActive()) {
             return res.json({ active: false, message: "The Halloween event is not currently active." });
         }
@@ -203,7 +203,7 @@ module.exports.load = async function(app, db) {
     });
 
     // New API endpoint for Trick or Treat
-    app.post("/api/halloween/trick-or-treat", requireAuth, async (req, res) => {
+    router.post("/halloween/trick-or-treat", requireAuth, async (req, res) => {
         if (!isEventActive()) {
             return res.status(400).json({ error: "The Halloween event is not currently active." });
         }
@@ -226,7 +226,7 @@ module.exports.load = async function(app, db) {
     });
 
     // New API endpoint to exchange candy for points
-    app.post("/api/halloween/exchange-candy", requireAuth, async (req, res) => {
+    router.post("/halloween/exchange-candy", requireAuth, async (req, res) => {
         if (!isEventActive()) {
             return res.status(400).json({ error: "The Halloween event is not currently active." });
         }
@@ -255,7 +255,7 @@ module.exports.load = async function(app, db) {
     });
 
     // Interact with the Haunted Server
-    app.post("/api/halloween/interact", requireAuth, async (req, res) => {
+    router.post("/halloween/interact", requireAuth, async (req, res) => {
         if (!isEventActive()) {
             return res.status(400).json({ error: "The Halloween event is not currently active." });
         }
@@ -280,7 +280,7 @@ module.exports.load = async function(app, db) {
     });
 
     // Claim rewards
-    app.post("/api/halloween/claim-rewards", requireAuth, async (req, res) => {
+    router.post("/halloween/claim-rewards", requireAuth, async (req, res) => {
 
         if (isEventActive()) {
             return res.status(400).json({ error: "You can only claim rewards after the event ends." });
@@ -335,7 +335,7 @@ module.exports.load = async function(app, db) {
     });
 
     // Get leaderboard
-    app.get("/api/halloween/leaderboard", async (req, res) => {
+    router.get("/halloween/leaderboard", async (req, res) => {
 
         const allUsers = await db.get('all-users') || [];
         let leaderboard = [];
