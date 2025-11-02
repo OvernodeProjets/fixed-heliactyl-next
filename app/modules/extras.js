@@ -22,21 +22,21 @@ const settings = loadConfig("./config.toml");
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 const PterodactylApplicationModule = require('../handlers/ApplicationAPI.js');
 
-module.exports.load = async function(app, db) {
+module.exports.load = async function(router, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
 
-  app.get("/panel", async (req, res) => {
+  router.get("/panel", async (req, res) => {
     res.redirect(settings.pterodactyl.domain);
   });
 
   // todo : implement notifications system
-  app.get("/notifications", requireAuth, async (req, res) => {
+  router.get("/notifications", requireAuth, async (req, res) => {
     let notifications = await db.get('notifications-' + req.session.userinfo.id) || [];
 
     res.json(notifications)
   });
 
-  app.get("/api/password/generate", requireAuth, async (req, res) => {
+  router.get("/password/generate", requireAuth, async (req, res) => {
     if (!settings.api.client.allow.change_password) return res.status(403).json({ error: "Password changes are not allowed" });
 
     const newPassword = settings.api.client.passwordgenerator.signup
@@ -54,7 +54,7 @@ module.exports.load = async function(app, db) {
   });
 
   // New endpoint for custom password changes
-  app.post("/api/password/change", requireAuth, async (req, res) => {
+  router.post("/password/change", requireAuth, async (req, res) => {
     if (!settings.api.client.allow.change_password) return res.status(403).json({ error: "Password changes are not allowed" });
 
     const { password, confirmPassword } = req.body;

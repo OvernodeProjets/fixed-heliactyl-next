@@ -39,8 +39,8 @@ if (settings?.pterodactyl?.domain?.endsWith("/")) {
 const fetch = require("node-fetch");
 const { discordLog } = require("../../handlers/log.js");
 
-module.exports.load = async function (app, db) {
-  app.get("/login", async (req, res) => {
+module.exports.load = async function (router, db) {
+  router.get("/discord/login", async (req, res) => {
     if (req.query.redirect) req.session.redirect = "/" + req.query.redirect;
     
     // Generate a unique identifier for this login attempt
@@ -70,7 +70,7 @@ module.exports.load = async function (app, db) {
     return;
   });
 
-app.get("/logout", (req, res) => {
+router.get("/logout", (req, res) => {
   req.session.destroy(err => {
     if (err) {
       console.error("Error during session destruction:", err);
@@ -81,7 +81,7 @@ app.get("/logout", (req, res) => {
   });
 });
 
-  app.get(settings.api.client.oauth2.callbackpath, async (req, res) => {
+  router.get(settings.api.client.oauth2.callbackpath.replace(/^\/api/, ''), async (req, res) => {
     if (!req.query.code) return res.redirect(`/login`);
 
     // Check if the loginAttempt cookie exists
@@ -113,7 +113,7 @@ app.get("/logout", (req, res) => {
       </svg>
     <script>
     history.pushState(null,'Logging in...','/login');
-    location.replace('/submitlogin?code=${encodeURIComponent(
+    location.replace('/api/submitlogin?code=${encodeURIComponent(
       req.query.code.replace(/'/g, "")
     )}');
     </script>
@@ -207,7 +207,7 @@ app.get("/logout", (req, res) => {
 //  }
 //});
 
-  app.get(`/submitlogin`, async (req, res) => {
+  router.get(`/submitlogin`, async (req, res) => {
     let customredirect = req.session.redirect;
     delete req.session.redirect;
     if (!req.query.code) return res.send("Missing code.");

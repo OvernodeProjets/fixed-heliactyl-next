@@ -17,7 +17,6 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const express = require("express");
 const PterodactylClientModule = require("../handlers/ClientAPI.js");
 const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
@@ -35,9 +34,8 @@ const scheduledWorkflowsFilePath = path.join(
   __dirname,
   "../storage/scheduledWorkflows.json"
 );
-module.exports.load = async function (app, db) {
+module.exports.load = async function (router, db) {
 
-  const router = express.Router();
   const pterodactylClient = new PterodactylClientModule(
     settings.pterodactyl.domain,
     settings.pterodactyl.client_key
@@ -1837,7 +1835,6 @@ router.post('/server/:id/renewal/renew', requireAuth, ownsServer, async (req, re
 initializeRenewalSystem(db);
 
   // Use the router with the '/api' prefix
-  app.use("/api", router);
 };
 
 function scheduleWorkflowExecution(instanceId, workflow) {
