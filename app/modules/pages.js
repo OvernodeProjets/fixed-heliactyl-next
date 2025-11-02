@@ -7,67 +7,111 @@
  *                               /____/      
  * 
  *     Heliactyl Next 3.2.0 (Avalanche)
- * 
  */
 
 const heliactylModule = {
   "name": "Pages Module",
   "target_platform": "3.2.0"
 };
-
 module.exports.heliactylModule = heliactylModule;
 
 const { getPages, renderData } = require("../handlers/theme.js");
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 
 module.exports.load = async function (app, db) {
-  app.all("/", async (req, res) => {
+  app.all("*", async (req, res, next) => {
     try {
+      if (
+        req.path.startsWith("/api") ||
+        req.path.startsWith("/assets") ||
+        req.path.startsWith("/public") ||
+        req.path.startsWith("/cdn")
+      ) {
+        return next();
+      }
+
       if (
         req.session.pterodactyl &&
         req.session.pterodactyl.id !==
-          (await db.get("users-" + req.session.userinfo.id))
+        (await db.get("users-" + req.session.userinfo.id))
       ) {
         req.session.destroy();
         return res.redirect("/auth?prompt=none");
       }
 
-      let theme = await getPages(req);
+      const theme = await getPages(req);
+      const settings = require("../handlers/config")("./config.toml");
 
-      if (
-        theme.settings.mustbeloggedin.includes(req._parsedUrl.pathname) &&
-        (!req.session.userinfo || !req.session.pterodactyl)
-      ) {
-        return res.redirect("/auth");
-      }
-
-      if (theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
-        const renderData = await renderData(req, theme, db);
-        res.render(theme.settings.index, renderData);
-        return;
-      }
-
-      const renderDataPromise = renderData(req, theme, db);
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Database Failure')), 3000)
-      );
-
-      try {
-        const renderData = await Promise.race([renderDataPromise, timeoutPromise]);
-        res.render(theme.settings.index, renderData);
-      } catch (error) {
-        if (error.message === 'Database Failure') {
-          res.status(500).render(theme.settings.errors.internalError, { error: 'Database Failure' });
-        } else {
-          throw error;
+      if (req.session.userinfo) {
+        const banData = (await db.get(`ban-${req.session.userinfo.id}`)) || null;
+        if (banData) {
+          return res.render(theme.settings.errors.banned, {
+            settings,
+            banReason: banData.reason,
+            banExpiration: banData.expiration
+          });
         }
       }
+
+      if (req.path === "/auth" && req.session.pterodactyl && req.session.userinfo) {
+        return res.redirect("/dashboard");
+      }
+
+      if (theme.settings.mustbeloggedin.includes(req._parsedUrl.pathname)) {
+        if (!req.session.userinfo || !req.session.pterodactyl) {
+          return res.redirect("/auth");
+        }
+      }
+
+      if (Array.isArray(theme.settings.mustbeadmin) && theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
+        const data = await renderData(req, theme, db);
+
+        if (!req.session.userinfo || !req.session.pterodactyl.root_admin) {
+          const notFound = theme.settings.errors.notFound || '404';
+          return res.status(404).render(notFound, data);
+        }
+
+        const pageName = req._parsedUrl.pathname.slice(1);
+        const pageToRender = theme.settings.pages && theme.settings.pages[pageName];
+        if (typeof pageToRender === 'string' && pageToRender.length > 0) {
+          return res.render(pageToRender, data);
+        } else {
+          const notFound = theme.settings.errors.notFound || '404';
+          return res.status(404).render(notFound, data);
+        }
+      }
+
+      let pageName = req._parsedUrl.pathname.slice(1);
+      const data = await renderData(req, theme, db);
+
+      if (pageName === "" || pageName === "/") {
+        return res.render(theme.settings.index, data);
+      }
+
+      const pageToRender = theme.settings.pages[pageName];
+      if (pageToRender) {
+        res.render(pageToRender, data);
+      } else {
+        res.status(404).render(theme.settings.errors.notFound, data);
+      }
+
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      const theme = await getPages(req);
       res.status(500).render(theme.settings.errors.internalError, { error: err });
     }
   });
-  
-  app.use('/assets', express.static(path.join(__dirname, '../assets')));
+
+  const PUBLIC_DIR = path.join(__dirname, 'app', 'public');
+  if (fs.existsSync(PUBLIC_DIR)) {
+    const staticOptions = {
+      maxAge: '1d',
+      immutable: true
+    };
+
+    app.use(express.static(PUBLIC_DIR, staticOptions));
+    app.use('/assets', express.static(PUBLIC_DIR, staticOptions));
+  }
 };

@@ -40,16 +40,6 @@ app.set('views', VIEWS_DIR);
 
 app.use(favicon(FAVICON_PATH));
 
-if (fs.existsSync(PUBLIC_DIR)) {
-  const staticOptions = {
-    maxAge: '1d',
-    immutable: true
-  };
-
-  app.use(express.static(PUBLIC_DIR, staticOptions));
-  app.use('/assets', express.static(PUBLIC_DIR, staticOptions));
-}
-
 const sessionStore = require("./app/handlers/sessionStore");
 
 const { renderData, getPages } = require('./app/handlers/theme');
@@ -233,7 +223,14 @@ if (cluster.isMaster) {
       const APIFile = require(absolutePath);
 
       if (APIFile.load && typeof APIFile.load === 'function') {
-        APIFile.load(app, db);
+        const router = express.Router();
+
+        APIFile.load(router, db);
+        if (path.basename(file) !== "pages.js") {
+          app.use('/api', router);
+        } else {
+          app.use(router);
+        }
         console.log(chalk.green(`✓ Loaded: ${path.basename(file)} in ${Date.now() - startTime} ms`));
       } else {
         console.warn(`⚠ Module ${file} does not export a load function`);
@@ -253,85 +250,7 @@ if (cluster.isMaster) {
     console.log(chalk.gray(`- ${route}`));
   });*/
 
-  app.all("*", async (req, res) => {
-    // Validate session
-    if (
-      req.session.pterodactyl &&
-      req.session.pterodactyl.id !==
-      (await db.get("users-" + req.session.userinfo.id))
-    ) {
-      req.session.destroy();
-      return res.redirect("/auth?prompt=none");
-    }
-
-    const theme = await getPages();
-    //console.dir(theme, { depth: null, colors: true });
-
-    // Check if user is banned
-    if (req.session.userinfo) {
-      const banData = (await db.get(`ban-${req.session.userinfo.id}`)) || null;
-      if (banData) {
-        return res.render(theme.settings.errors.banned, {
-          settings,
-          banReason: banData.reason,
-          banExpiration: banData.expiration
-        });
-      }
-    }
-
-    // Redirect already logged in users away from auth page
-    if (req.path === "/auth" && req.session.pterodactyl && req.session.userinfo) {
-      return res.redirect("/dashboard");
-    }
-
-    // AFK session token
-    if (settings.api.afk.enabled === true) {
-      req.session.arcsessiontoken = Math.random().toString(36).substring(2, 15);
-    }
-
-    // Check authentication requirements
-    if (theme.settings.mustbeloggedin.includes(req._parsedUrl.pathname)) {
-      if (!req.session.userinfo || !req.session.pterodactyl) {
-        return res.redirect("/auth");
-      }
-    }
-
-    // Check admin requirements
-    if (Array.isArray(theme.settings.mustbeadmin) && theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
-      const data = await renderData(req, theme, db);
-
-      // Not admin -> show forbidden
-      if (!req.session.userinfo || !req.session.pterodactyl.root_admin) {
-        const notFound = theme.settings.errors.notFound || '404';
-        res.status(404).render(notFound, data);
-        return;
-      }
-
-      // Admin -> render the requested admin page 
-      const pageName = req._parsedUrl.pathname.slice(1);
-      const pageToRender = theme.settings.pages && theme.settings.pages[pageName];
-      if (typeof pageToRender === 'string' && pageToRender.length > 0) {
-        res.render(pageToRender, data);
-      } else {
-        // fallback to notFound if page not configured
-        const notFound = theme.settings.errors.notFound || '404';
-        res.status(404).render(notFound, data);
-      }
-      return;
-    }
-
-    const pageName = req._parsedUrl.pathname.slice(1);
-    const pageToRender = theme.settings.pages[pageName];
-
-    const data = await renderData(req, theme, db);
-
-    if (pageToRender) {
-      res.render(pageToRender, data);
-    } else {
-      res.status(404).render(theme.settings.errors.notFound, data);
-    }
-  });
-};
+}
 
 function shimPromiseWithStackCapture() {
   const originalPromise = global.Promise;
