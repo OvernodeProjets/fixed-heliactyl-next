@@ -1,5 +1,6 @@
 const chalk = require('chalk');
 const cluster = require('cluster');
+const path = require('path');
 const chokidar = require('chokidar');
 
 function startCluster(settings, db) {
@@ -45,8 +46,11 @@ function startCluster(settings, db) {
         cluster.fork();
     });
 
-    // File watcher for hot reload
-    const watchDirs = ['./modules', './handlers'];
+    const watchDirs = [
+        path.join(__dirname, '../modules'),
+        path.join(__dirname, '../handlers')
+    ];
+    
     watchDirs.forEach(dir => {
         const watcher = chokidar.watch(dir, {
             ignored: /(^|[\/\\])\../, // Ignore dotfiles
