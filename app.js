@@ -227,13 +227,14 @@ if (cluster.isMaster) {
   console.log(chalk.gray(`Loading ${APIFiles.length} modules...`));
 
   for (const file of APIFiles) {
+    const startTime = Date.now();
     try {
       const absolutePath = path.resolve(file);
       const APIFile = require(absolutePath);
 
       if (APIFile.load && typeof APIFile.load === 'function') {
         APIFile.load(app, db);
-        console.log(chalk.green(`✓ Loaded: ${path.basename(file)}`));
+        console.log(chalk.green(`✓ Loaded: ${path.basename(file)} in ${Date.now() - startTime} ms`));
       } else {
         console.warn(`⚠ Module ${file} does not export a load function`);
       }
