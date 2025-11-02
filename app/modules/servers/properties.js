@@ -18,15 +18,13 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const express = require('express');
 const axios = require('axios');
 const PterodactylClientModule = require('../../handlers/ClientAPI.js');
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js")
 
-module.exports.load = async function(app, db) {
-    const router = express.Router();
+module.exports.load = async function(router, db) {
     const pterodactylClient = new PterodactylClientModule(settings.pterodactyl.domain, settings.pterodactyl.client_key);
 
     // Helper function to parse server.properties content
@@ -141,6 +139,4 @@ module.exports.load = async function(app, db) {
             defaultValue
         });
     });
-
-    app.use('/api', router);
 };

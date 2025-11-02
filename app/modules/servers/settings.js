@@ -17,8 +17,6 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const express = require('express');
-const router = express.Router();
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const WebSocket = require('ws');
@@ -26,7 +24,7 @@ const axios = require('axios');
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js");
 const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
 
-module.exports.load = async function(app, db) {
+module.exports.load = async function(router, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
     
     // PUT /api/server/:id/startup
@@ -60,7 +58,7 @@ module.exports.load = async function(app, db) {
     });
     
     // POST Reinstall server
-    router.post('/api/server/:id/reinstall', requireAuth, ownsServer, async (req, res) => {
+    router.post('/server/:id/reinstall', requireAuth, ownsServer, async (req, res) => {
         try {
             const serverId = req.params.id;
             await axios.post(`${settings.pterodactyl.domain}/api/client/servers/${serverId}/settings/reinstall`, {}, {
@@ -78,7 +76,7 @@ module.exports.load = async function(app, db) {
     });
 
     // POST Rename server
-    router.post('/api/server/:id/rename', requireAuth, ownsServer, async (req, res) => {
+    router.post('/server/:id/rename', requireAuth, ownsServer, async (req, res) => {
         try {
             const serverId = req.params.id;
             const { name } = req.body; // Expecting the new name for the server in the request body

@@ -17,8 +17,6 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const express = require('express');
-const router = express.Router();
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const axios = require('axios');
@@ -26,7 +24,7 @@ const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js")
 const PterodactylClientModule = require("../../handlers/ClientAPI.js");
 const { serverActivityLog } = require('../../handlers/log.js');
 
-module.exports.load = async function(app, db) {
+module.exports.load = async function(router, db) {
   const pterodactylClient = new PterodactylClientModule(
     settings.pterodactyl.domain,
     settings.pterodactyl.client_key
@@ -309,6 +307,4 @@ is_default = true
       res.status(500).json({ error: 'Failed to delete subdomain' });
     }
   });
-
-  app.use('/api', router);
 };

@@ -22,7 +22,7 @@ const loadConfig = require("../../handlers/config");
 const settings = loadConfig("./config.toml");
 const { requireAuth } = require("../../handlers/checkMiddleware");
 
-module.exports.load = async function (app, db) {
+module.exports.load = async function (router, db) {
   // Admin authentication data
   const COOKIE_VALUE = settings.pterodactyl.cookie_admin;
   const token = settings.pterodactyl.transfer_token;
@@ -78,7 +78,7 @@ module.exports.load = async function (app, db) {
     console.log(`Transfer job added to queue for server ${serverId}`);
   }
 
-  app.get("/api/servers/capacity/:node", requireAuth, async (req, res) => {
+  router.get("/servers/capacity/:node", requireAuth, async (req, res) => {
     const { node } = req.params;
     try {
       const allocations = await getAvailableAllocations(node);
@@ -88,7 +88,7 @@ module.exports.load = async function (app, db) {
     }
   });
 
-  app.post("/api/server/transfer", requireAuth, async (req, res) => {
+  router.post("/server/transfer", requireAuth, async (req, res) => {
     const { id, nodeId } = req.body;
 
     if (!id || !nodeId) {

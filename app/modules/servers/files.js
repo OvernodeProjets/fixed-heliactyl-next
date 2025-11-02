@@ -21,12 +21,9 @@ const axios = require("axios");
 const loadConfig = require("../../handlers/config");
 const settings = loadConfig("./config.toml");
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware")
-const express = require("express");
 const { discordLog, serverActivityLog } = require("../../handlers/log");
 
-
-module.exports.load = async function (app, db) {
-const router = express.Router();
+module.exports.load = async function (router, db) {
 
 // GET /api/server/:id/files/download
 router.get('/server/:id/files/download', requireAuth, ownsServer, async (req, res) => {
@@ -378,6 +375,4 @@ router.get(
       }
     }
   );
-
-  app.use('/api', router);
 };
