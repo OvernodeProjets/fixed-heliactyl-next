@@ -38,7 +38,7 @@
   },
   "scripts": {
     "start": "node --no-deprecation app.js",
-    "build:css": "npx @tailwindcss/cli -i ./assets/tw.conf -o ./assets/tailwind.css --watch"
+    "build:css": "npx @tailwindcss/cli -i ./app/public/tw.conf -o ./app/public/tailwind.css --watch"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
