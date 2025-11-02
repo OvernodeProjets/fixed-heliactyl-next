@@ -157,12 +157,13 @@ accountSwitcher = true
     delete = true
 
 # --- OAuth2 Configuration ---
+# IMPORTANT: /api endpoint is required!
   [api.client.oauth2]
   _comment = "Go to https://discord.dev/ and create an application to set up OAuth2. This is required for Heliactyl to work. You must also set the redirect URL to the link below."
   id = "0000000000000000000"
   secret = "aaaaaaaaa0aa00aaaaaaaaaaaaaa0a_a"
   link = "https://example.com"
-  callbackpath = "/auth/discord/callback"
+  callbackpath = "/api/auth/discord/callback" 
   prompt = true
 
     [api.client.oauth2.google]
@@ -170,14 +171,14 @@ accountSwitcher = true
     id = "0000000000000-0aa00a00aaa0a0aa0aaaaa000aaaaaa0.aaaa.aaaaaaaaaaaaaaaaa.aaa"
     secret = "aaaaaa-a0aaaaaa0a0aaaa0aaa0a0a_a0aa"
     link = "https://example.com"
-    callbackpath = "/auth/google/callback"
+    callbackpath = "/api/auth/google/callback"
 
     [api.client.oauth2.github]
     enable = false
     id = "aa00aaa0aAaaaaaaasaA"
     secret = "00aa00000a000000a0aada0000000000aa00000"
     link = "https://example.com"
-    callbackpath = "/auth/github/callback"
+    callbackpath = "/api/auth/github/callback"
 
     [api.client.oauth2.ip]
     "trust x-forwarded-for" = true

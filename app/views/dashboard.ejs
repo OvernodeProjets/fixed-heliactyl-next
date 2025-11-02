@@ -322,7 +322,7 @@ Action completed - the server has been deleted. <code style="font-family: 'JetBr
   // Function to fetch and update statistics
   async function updateStats() {
     try {
-      const response = await fetch('/stats');
+      const response = await fetch('/api/stats');
       const data = await response.json();
       
       // Update the statistics
