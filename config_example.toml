@@ -87,8 +87,6 @@ is_default = false
 
 # Module settings (formerly API)
 [api.client]
-accountSwitcher = true
-
 # --- Client API ---
   [api.client.api]
   enabled = true

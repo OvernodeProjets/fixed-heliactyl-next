@@ -32,8 +32,7 @@ const fetch = require("node-fetch");
 // todo : move to config file
 const RESEND_API_KEY = 're_GqVR7va3_8z8QuYyECBEDYKYdvrf9iqbb';
 
-
-module.exports.load = async function (app, db) {
+module.exports.load = async function (router, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
 
   const verifyCaptcha = async (recaptchaResponse) => {
@@ -91,7 +90,7 @@ module.exports.load = async function (app, db) {
   };
   
   // Registration route
-  app.post("/auth/register", rateLimit, async (req, res) => {
+  router.post("/auth/register", rateLimit, async (req, res) => {
     const { username, email, password, recaptchaResponse } = req.body;
 
     if (!username || !email || !password) {
@@ -217,7 +216,7 @@ module.exports.load = async function (app, db) {
   });
 
   // Login route
-  app.post("/auth/login", rateLimit, async (req, res) => {
+  router.post("/auth/login", rateLimit, async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -268,7 +267,7 @@ module.exports.load = async function (app, db) {
   });
 
   // Password reset request route
-  app.post("/auth/reset-password-request", async (req, res) => {
+  router.post("/auth/reset-password-request", async (req, res) => {
     const { email, recaptchaResponse } = req.body;
 
     if (!email) {
@@ -312,7 +311,7 @@ module.exports.load = async function (app, db) {
   });
 
   // Password reset route
-  app.post("/auth/reset-password", async (req, res) => {
+  router.post("/auth/reset-password", async (req, res) => {
     const { token, newPassword } = req.body;
 
     if (!token || !newPassword) {
@@ -351,7 +350,7 @@ module.exports.load = async function (app, db) {
   });
 
   // Magic link login request
-  app.post("/auth/magic-link", rateLimit, async (req, res) => {
+  router.post("/auth/magic-link", rateLimit, async (req, res) => {
     const { email, recaptchaResponse } = req.body;
 
     if (!email) {
@@ -395,7 +394,7 @@ module.exports.load = async function (app, db) {
   });
 
   // Magic link login verification
-  app.get("/auth/magic-login", async (req, res) => {
+  router.get("/auth/magic-login", async (req, res) => {
     const { token } = req.query;
 
     if (!token) {
@@ -444,6 +443,6 @@ module.exports.load = async function (app, db) {
     notifications.push(notification)
     await db.set('notifications-' + user.id, notifications)
 
-    res.redirect('/dashboard'); // Redirect to dashboard after successful login
+    res.redirect('/dashboard');
   });
 };
