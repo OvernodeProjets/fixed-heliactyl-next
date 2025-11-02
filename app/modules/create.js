@@ -32,17 +32,11 @@ if (settings?.pterodactyl?.domain?.endsWith("/")) {
   settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
 }
 
-module.exports.load = async function(app, db) {
+module.exports.load = async function(router, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
   
-app.get("/updateinfo", requireAuth, async (req, res) => {
+router.get("/updateinfo", requireAuth, async (req, res) => {
     try {
-        const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
-        if (!PterodactylUser) {
-            res.send("An error has occurred while attempting to update your account information and server list.");
-            return;
-        }
-
         // Get user's package and extra resources
         const packagename = await db.get("package-" + req.session.userinfo.id);
         const package = settings.api.client.packages.list[packagename ? packagename : settings.api.client.packages.default];
@@ -133,19 +127,11 @@ app.get("/updateinfo", requireAuth, async (req, res) => {
     }
 });
 
-app.get("/create", requireAuth, async (req, res) => {
+router.get("/server/create", requireAuth, async (req, res) => {
     if (!settings.api.client.allow.server.create) {
       res.redirect("/servers?err=disabled");
       return;
     }
-
-        const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
-        if (!PterodactylUser) {
-            res.send("Heliactyl failed to find an account on the configured panel, try relogging");
-            return;
-        }
-        
-        req.session.pterodactyl = PterodactylUser.attributes;
 
         if (!req.query.name || !req.query.ram || !req.query.disk || !req.query.cpu || !req.query.egg || !req.query.location) {
             res.redirect(`/servers/new?err=MISSINGVARIABLE`);
@@ -415,13 +401,13 @@ async function removeFromQueue(server) {
 //setInterval(processQueue, 5 * 60 * 1000);
 
 // Route to manually process the queue
-app.get("/process-queue", requireAuth, async (req, res) => {
+router.get("/process-queue", requireAuth, async (req, res) => {
   await processQueue();
   res.json({ status: 200, msg: 'Queue processed successfully' });
 });
 
 // Route to remove a server from the queue
-app.get("/queue-remove/:id", requireAuth, async (req, res) => {
+router.get("/queue-remove/:id", requireAuth, async (req, res) => {
   let serverPos = parseInt(req.params.id);
   let userId = req.session.userinfo.id;
 
@@ -458,7 +444,7 @@ app.get("/queue-remove/:id", requireAuth, async (req, res) => {
 });
 
 // Route to clear the entire queue
-app.get("/clear-queue", requireAuth, async (req, res) => {
+router.get("/clear-queue", requireAuth, async (req, res) => {
   try {
       let queuedServers = await db.get("queuedServers") || [];
 
@@ -482,27 +468,21 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
   }
 });
 
-    app.get("/modify", requireAuth, async (req, res) => {
+    router.get("/server/:id/modify", requireAuth, async (req, res) => {
         if (!settings.api.client.allow.server.modify) {
           res.redirect("/servers?err=disabled");
           return;
         }
 
-          if (!req.query.id) return res.send("Missing server id.");
-    
-          const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
-          if (!PterodactylUser) {
-              res.send("An error has occurred while attempting to update your account information and server list.");
-              return;
-          }
-          
-          req.session.pterodactyl = PterodactylUser.attributes;
+        const { id } = req.params;
+
+          if (!id) return res.send("Missing server id.");
     
           let redirectlink = "/servers/edit";
     
           let checkexist =
             req.session.pterodactyl.relationships.servers.data.filter(
-              (name) => name.attributes.id == req.query.id
+              (name) => name.attributes.id == id
             );
           if (checkexist.length !== 1) return res.send("Invalid server id.");
     
@@ -523,7 +503,7 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
             : undefined;
 
           if (!ram || !disk || !cpu) {
-            res.redirect(`${redirectlink}?id=${req.query.id}&err=MISSINGVARIABLE`);
+            res.redirect(`${redirectlink}?id=${id}&err=MISSINGVARIABLE`);
             return;
           }
     
@@ -535,7 +515,7 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
     
             let pterorelationshipsserverdata =
               req.session.pterodactyl.relationships.servers.data.filter(
-                (name) => name.attributes.id.toString() !== req.query.id
+                (name) => name.attributes.id.toString() !== id
               );
     
             let ram2 = 0;
@@ -565,7 +545,7 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
     
             if (!egginfo)
               return res.redirect(
-                `${redirectlink}?id=${req.query.id}&err=MISSINGEGG`
+                `${redirectlink}?id=${id}&err=MISSINGEGG`
               );
     
             let extra = (await db.get("extra-" + req.session.userinfo.id))
@@ -581,52 +561,52 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
     
             if (ram2 + ram > package.ram + extra.ram)
               return res.redirect(
-                `${redirectlink}?id=${req.query.id}&err=EXCEEDRAM&num=${
+                `${redirectlink}?id=${id}&err=EXCEEDRAM&num=${
                   package.ram + extra.ram - ram2
                 }`
               );
             if (disk2 + disk > package.disk + extra.disk)
               return res.redirect(
-                `${redirectlink}?id=${req.query.id}&err=EXCEEDDISK&num=${
+                `${redirectlink}?id=${id}&err=EXCEEDDISK&num=${
                   package.disk + extra.disk - disk2
                 }`
               );
             if (cpu2 + cpu > package.cpu + extra.cpu)
               return res.redirect(
-                `${redirectlink}?id=${req.query.id}&err=EXCEEDCPU&num=${
+                `${redirectlink}?id=${id}&err=EXCEEDCPU&num=${
                   package.cpu + extra.cpu - cpu2
                 }`
               );
             if (egginfo.minimum.ram)
               if (ram < egginfo.minimum.ram)
                 return res.redirect(
-                  `${redirectlink}?id=${req.query.id}&err=TOOLITTLERAM&num=${egginfo.minimum.ram}`
+                  `${redirectlink}?id=${id}&err=TOOLITTLERAM&num=${egginfo.minimum.ram}`
                 );
             if (egginfo.minimum.disk)
               if (disk < egginfo.minimum.disk)
                 return res.redirect(
-                  `${redirectlink}?id=${req.query.id}&err=TOOLITTLEDISK&num=${egginfo.minimum.disk}`
+                  `${redirectlink}?id=${id}&err=TOOLITTLEDISK&num=${egginfo.minimum.disk}`
                 );
             if (egginfo.minimum.cpu)
               if (cpu < egginfo.minimum.cpu)
                 return res.redirect(
-                  `${redirectlink}?id=${req.query.id}&err=TOOLITTLECPU&num=${egginfo.minimum.cpu}`
+                  `${redirectlink}?id=${id}&err=TOOLITTLECPU&num=${egginfo.minimum.cpu}`
                 );
             if (egginfo.maximum) {
               if (egginfo.maximum.ram)
                 if (ram > egginfo.maximum.ram)
                   return res.redirect(
-                    `${redirectlink}?id=${req.query.id}&err=TOOMUCHRAM&num=${egginfo.maximum.ram}`
+                    `${redirectlink}?id=${id}&err=TOOMUCHRAM&num=${egginfo.maximum.ram}`
                   );
               if (egginfo.maximum.disk)
                 if (disk > egginfo.maximum.disk)
                   return res.redirect(
-                    `${redirectlink}?id=${req.query.id}&err=TOOMUCHDISK&num=${egginfo.maximum.disk}`
+                    `${redirectlink}?id=${id}&err=TOOMUCHDISK&num=${egginfo.maximum.disk}`
                   );
               if (egginfo.maximum.cpu)
                 if (cpu > egginfo.maximum.cpu)
                   return res.redirect(
-                    `${redirectlink}?id=${req.query.id}&err=TOOMUCHCPU&num=${egginfo.maximum.cpu}`
+                    `${redirectlink}?id=${id}&err=TOOMUCHCPU&num=${egginfo.maximum.cpu}`
                   );
             }
             } else {
@@ -644,7 +624,7 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
             let serverinfo = await fetch(
               settings.pterodactyl.domain +
                 "/api/application/servers/" +
-                req.query.id +
+                id +
                 "/build",
               {
                 method: "patch",
@@ -662,7 +642,7 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
             );
             if ((await serverinfo.statusText) !== "OK")
               return res.redirect(
-                `${redirectlink}?id=${req.query.id}&err=ERRORONMODIFY`
+                `${redirectlink}?id=${id}&err=ERRORONMODIFY`
               );
             let text = JSON.parse(await serverinfo.text());
             discordLog(
@@ -677,7 +657,7 @@ app.get("/clear-queue", requireAuth, async (req, res) => {
             res.redirect("/dashboard?err=MODIFIED");
       });
 
-app.get("/api/server/:id/delete", requireAuth, async (req, res) => {
+router.get("/server/:id/delete", requireAuth, async (req, res) => {
   const { id } = req.params;
   if (!id) return res.send("Missing id.");
 

@@ -129,7 +129,7 @@ id = req.query.numeric
                     let ram = encodeURIComponent(document.getElementById("ram").value);
                     let disk = encodeURIComponent(document.getElementById("disk").value);
                     let cpu = encodeURIComponent(document.getElementById("cpu").value);
-                    document.location.href = `/modify?id=<%= id %>&ram=${ram*1024}&disk=${disk*1024}&cpu=${cpu*100}`;
+                    document.location.href = `/api/server/<%= id %>/modify?ram=${ram*1024}&disk=${disk*1024}&cpu=${cpu*100}`;
                 };
             </script>
         <% } else { %>

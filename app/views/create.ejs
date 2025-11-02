@@ -414,7 +414,7 @@ async function submitForm() {
     // Use the selected zone ID if available, otherwise use the selected location ID
     let locationId = selectedZone || selectedLocation;
 
-    const url = `/create?name=${name}&egg=${selectedImage}&ram=${ram}&disk=${disk}&cpu=${cpu}&location=${locationId}`;
+    const url = `/api/server/create?name=${name}&egg=${selectedImage}&ram=${ram}&disk=${disk}&cpu=${cpu}&location=${locationId}`;
     
     window.location.href = url;
 }

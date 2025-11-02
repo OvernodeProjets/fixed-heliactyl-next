@@ -462,7 +462,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(data => {
                         if (data.attributes) {
                             alert('Advanced settings updated successfully');
-                            window.location.href = "/updateinfo"
+                            window.location.href = "/api/updateinfo"
                             // Update the input fields with the new values
                             dockerImageInput.value = data.attributes.container.image;
                             startupCommandInput.value = data.attributes.container.startup_command;
