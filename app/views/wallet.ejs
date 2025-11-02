@@ -144,7 +144,7 @@ let transactions = [];
 
 async function fetchTransactions() {
     try {
-        const response = await fetch('/wallet/transactions');
+        const response = await fetch('/api/wallet/transactions');
         const data = await response.json();
         transactions = data.transactions
             .sort((a, b) => b.timestamp - a.timestamp) // Sort by descending date
@@ -253,7 +253,7 @@ function hideTransferModal() {
 // Balance Update
 async function fetchWalletData() {
     try {
-        const response = await fetch('/wallet/balance');
+        const response = await fetch('/api/wallet/balance');
         const data = await response.json();
         document.getElementById('currentBalance').textContent = `${data.balance.toLocaleString()} <%= settings.website.currency %>`;
     } catch (error) {
@@ -280,7 +280,7 @@ document.getElementById('transferForm').addEventListener('submit', async (e) => 
     const amount = document.getElementById('amount').value;
 
     try {
-        const response = await fetch('/wallet/transfer', {
+        const response = await fetch('/api/wallet/transfer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

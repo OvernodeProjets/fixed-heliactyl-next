@@ -52,7 +52,7 @@ module.exports.load = async function (app, db) {
   const MAX_CURRENCY_AMOUNT = 999999999999999; // 1 quadrillion - maximum reasonable amount for our system
   const MIN_CURRENCY_AMOUNT = 1; // Minimum transfer amount
   
-  router.post('/transfer',
+  router.post('/wallet/transfer',
     requireAuth,
     [
       body('receiverId').isString().notEmpty(),
@@ -110,7 +110,7 @@ module.exports.load = async function (app, db) {
   );
 
   // Get balance endpoint updated to include XTC
-  router.get('/balance',
+  router.get('/wallet/balance',
     requireAuth,
     async (req, res) => {
       const userId = req.session.userinfo.id;
@@ -124,7 +124,7 @@ module.exports.load = async function (app, db) {
     }
   );
 
-  router.get('/transactions',
+  router.get('/wallet/transactions',
     requireAuth,
     async (req, res) => {
       const userId = req.session.userinfo.id;
@@ -136,7 +136,5 @@ module.exports.load = async function (app, db) {
         res.status(500).json({ error: "An error occurred while fetching transactions" });
       }
     });
-  
-  app.use('/wallet', router);
 };
 

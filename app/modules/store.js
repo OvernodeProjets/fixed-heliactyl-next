@@ -147,7 +147,7 @@ class Store {
   }
 }
 
-module.exports.load = function(app, db) {
+module.exports.load = function(router, db) {
   
   const store = new Store(db); 
 
@@ -236,11 +236,11 @@ class StoreController {
 }
 
 // Define the routes and bind them to the controller methods
-app.post('/api/store/renewal-bypass', (req, res) => StoreController.handleRenewalBypassPurchase(req, res));
-app.get('/api/store/renewal-bypass', (req, res) => StoreController.checkRenewalBypassStatus(req, res));
+router.post('/store/renewal-bypass', (req, res) => StoreController.handleRenewalBypassPurchase(req, res));
+router.get('/store/renewal-bypass', (req, res) => StoreController.checkRenewalBypassStatus(req, res));
 
   // Buy resource endpoint
-  app.post('/api/store/buy', requireAuth, async (req, res) => {
+  router.post('/store/buy', requireAuth, async (req, res) => {
     try {
       const userId = req.session.userinfo.id;
       const { resourceType, amount } = req.body;
@@ -296,7 +296,7 @@ app.get('/api/store/renewal-bypass', (req, res) => StoreController.checkRenewalB
   });
 
   // Get purchase history endpoint
-  app.get('/api/store/history', requireAuth, async (req, res) => {
+  router.get('/store/history', requireAuth, async (req, res) => {
     try {
       const userId = req.session.userinfo.id;
       const history = await db.get(`purchases-${userId}`) || [];
@@ -309,7 +309,7 @@ app.get('/api/store/renewal-bypass', (req, res) => StoreController.checkRenewalB
   });
 
   // Get current resources endpoint
-  app.get('/api/store/resources', requireAuth, async (req, res) => {
+  router.get('/store/resources', requireAuth, async (req, res) => {
     try {
 
       const userId = req.session.userinfo.id;

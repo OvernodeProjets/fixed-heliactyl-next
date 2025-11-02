@@ -866,8 +866,6 @@ router.get('/server/:id/logs', requireAuth, ownsServer, async (req, res) => {
     }
   );
 
-
-
   // GET workflow
   router.get(
     "/server/:id/workflow",
@@ -940,8 +938,6 @@ router.put('/server/:id/variables', requireAuth, ownsServer, async (req, res) =>
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-
 
   // POST save workflow
   router.post(
@@ -1346,8 +1342,6 @@ router.post('/server/:id/users', requireAuth, ownsServer, async (req, res) => {
     }
   );
 
-
-
 // Add these constants at the top of the file
 const RENEWAL_PERIOD_HOURS = 48;
 const WARNING_THRESHOLD_HOURS = 24; // When to start showing warnings
@@ -1557,8 +1551,6 @@ router.post('/server/:id/renewal/renew', requireAuth, ownsServer, async (req, re
 
 // Initialize the renewal system when the module loads
 initializeRenewalSystem(db);
-
-  // Use the router with the '/api' prefix
 };
 
 function scheduleWorkflowExecution(instanceId, workflow) {

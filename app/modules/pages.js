@@ -20,8 +20,8 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 
-module.exports.load = async function (app, db) {
-  app.all("*", async (req, res, next) => {
+module.exports.load = async function (router, db) {
+  router.all("*", async (req, res, next) => {
     try {
       if (
         req.path.startsWith("/api") ||
@@ -111,7 +111,7 @@ module.exports.load = async function (app, db) {
       immutable: true
     };
 
-    app.use(express.static(PUBLIC_DIR, staticOptions));
-    app.use('/assets', express.static(PUBLIC_DIR, staticOptions));
+    router.use(express.static(PUBLIC_DIR, staticOptions));
+    router.use('/assets', express.static(PUBLIC_DIR, staticOptions));
   }
 };

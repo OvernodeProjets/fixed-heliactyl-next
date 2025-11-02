@@ -20,7 +20,7 @@ module.exports.heliactylModule = heliactylModule;
 const { requireAuth } = require('../handlers/checkMiddleware');
 const { logTransaction } = require('../handlers/log');
 
-module.exports.load = async function (app, db) {
+module.exports.load = async function (router, db) {
   // Configuration
   const DAILY_INTEREST_RATE = 0.05; // 5% daily interest
   const MIN_STAKE_AMOUNT = 10; // Minimum amount to stake
@@ -43,7 +43,6 @@ module.exports.load = async function (app, db) {
     
     return stakedAmount * (Math.pow(1 + effectiveRate, daysStaked) - 1);
   };
-
 
   // Migrate old staking data to new format
   async function migrateStakingData(userId) {
@@ -75,7 +74,7 @@ module.exports.load = async function (app, db) {
   }
 
   // Modified staking endpoint with rate limiting
-  app.post("/stake", requireAuth, async (req, res) => {
+  router.post("/stake", requireAuth, async (req, res) => {
     const { amount, lockPeriod } = req.body;
     const parsedAmount = parseFloat(amount);
     
@@ -130,7 +129,7 @@ module.exports.load = async function (app, db) {
   });
 
   // Modified unstaking endpoint with rate limiting
-  app.post("/unstake", requireAuth, async (req, res) => {
+  router.post("/unstake", requireAuth, async (req, res) => {
     const { positionId } = req.body;
     const userId = req.session.userinfo.id;
     
@@ -194,7 +193,7 @@ module.exports.load = async function (app, db) {
   });
 
   // View staking positions and earnings
-  app.get("/stake/positions", requireAuth, async (req, res) => {
+  router.get("/stake/positions", requireAuth, async (req, res) => {
     const userId = req.session.userinfo.id;
     
     // Migrate old staking data if needed
@@ -233,7 +232,7 @@ module.exports.load = async function (app, db) {
     });
   });
 
-  app.get("/stake/positions/:positionId", requireAuth, async (req, res) => {
+  router.get("/stake/positions/:positionId", requireAuth, async (req, res) => {
     const userId = req.session.userinfo.id;
     const { positionId } = req.params;
     
@@ -286,7 +285,7 @@ module.exports.load = async function (app, db) {
   });
 
   // Claim earnings for a specific position
-  app.post("/stake/claim", requireAuth, async (req, res) => {
+  router.post("/stake/claim", requireAuth, async (req, res) => {
     const { positionId } = req.body;
     const userId = req.session.userinfo.id;
     

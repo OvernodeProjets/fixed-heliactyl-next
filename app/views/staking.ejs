@@ -238,7 +238,7 @@ const userinfo = <%- JSON.stringify(req.session.userinfo) %>
 
 async function checkMigration() {
     try {
-        const response = await fetch('/stake/positions');
+        const response = await fetch("/api/stake/positions");
         const data = await response.json();
         
         if (data.message && data.message.includes('migrated')) {
@@ -254,9 +254,8 @@ async function fetchStakingData() {
         // Start rendering loading state immediately
         renderStakingPositions(null);
         
-        const [positionsResponse, coinsResponse] = await Promise.all([
-            fetch('/stake/positions'),
-            fetch(`/coins-${userinfo.id}`)
+        const [positionsResponse] = await Promise.all([
+            fetch("/api/stake/positions")
         ]);
         
         if (!positionsResponse.ok) {
@@ -382,7 +381,7 @@ function renderStakingPositions(positions) {
 
 async function showPositionActions(positionId) {
     try {
-        const response = await fetch(`/stake/positions/${positionId}`);
+        const response = await fetch(`/api/stake/positions/${positionId}`);
         const position = (await response.json()).position;
         currentPositionId = positionId;
         
@@ -472,7 +471,7 @@ async function confirmUnstake(positionId, isLocked) {
 
 async function claimRewards(positionId) {
     try {
-        const response = await fetch('/stake/claim', {
+        const response = await fetch('/api/stake/claim', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ positionId })
@@ -558,7 +557,7 @@ stakeForm.addEventListener('submit', async (e) => {
     const lockPeriod = document.getElementById('lock-period').value;
     
     try {
-        const response = await fetch('/stake', {
+        const response = await fetch('/api/stake', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ amount, lockPeriod })
