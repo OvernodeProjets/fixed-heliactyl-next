@@ -264,7 +264,6 @@ if (cluster.isMaster) {
     }
 
     const theme = await getPages();
-    console.log(theme);
     //console.dir(theme, { depth: null, colors: true });
 
     // Check if user is banned
