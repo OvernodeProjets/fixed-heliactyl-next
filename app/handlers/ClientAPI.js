@@ -33,6 +33,22 @@ class PterodactylClientModule {
     }
   }
 
+  async getWebSocketCredentials(serverId) {
+    try {
+      const response = await axios.get(`${this.apiUrl}/api/client/servers/${serverId}/websocket`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching WebSocket credentials:', error);
+      throw error;
+    }
+  }
+
   async connectWebSocket(serverId) {
     try {
       const response = await axios.get(`${this.apiUrl}/api/client/servers/${serverId}/websocket`, {
