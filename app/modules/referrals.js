@@ -20,7 +20,7 @@ module.exports.heliactylModule = heliactylModule;
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 
 module.exports.load = async function (app, db) {
-app.get('/generate', requireAuth, async (req, res) => {
+app.get('/referrals/generate', requireAuth, async (req, res) => {
   if (!req.query.code) {
     return res.redirect('../account?err=INVALIDCODE')
   }
@@ -44,7 +44,7 @@ app.get('/generate', requireAuth, async (req, res) => {
   res.redirect('../referrals?err=none')
 });
 
-app.get('/claim', requireAuth, async (req, res) => {
+app.get('/referrals/claim', requireAuth, async (req, res) => {
   // Get the referral code from the request body
   if (!req.query.code) {
     return res.redirect('../account?err=INVALIDCODE')

@@ -144,7 +144,7 @@
 
         async function checkActivationStatus() {
             try {
-                const response = await fetch('/plesk/account');
+                const response = await fetch('/api/plesk/account');
                 if (response.ok) {
                     document.getElementById('activation-section').style.display = 'none';
                     document.getElementById('websites-section').style.display = 'block';
@@ -161,7 +161,7 @@
         async function activateHosting() {
             try {
                 showLoading();
-                const response = await fetch('/plesk/activate', {
+                const response = await fetch('/api/plesk/activate', {
                     method: 'POST'
                 });
                 
@@ -184,7 +184,7 @@
 
         async function loadWebsites() {
             try {
-                const response = await fetch('/plesk/websites');
+                const response = await fetch('/api/plesk/websites');
                 if (response.ok) {
                     const websites = await response.json();
                     const websitesList = document.getElementById('websites-list');
@@ -243,7 +243,7 @@
 
             try {
                 showLoading();
-const response = await fetch('/plesk/websites', {
+                const response = await fetch('/api/plesk/websites', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -293,7 +293,7 @@ const response = await fetch('/plesk/websites', {
 
             try {
                 showLoading();
-                const response = await fetch(`/plesk/websites/${websiteId}`, {
+                const response = await fetch(`/api/plesk/websites/${websiteId}`, {
                     method: 'DELETE'
                 });
 
