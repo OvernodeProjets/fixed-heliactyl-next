@@ -33,79 +33,55 @@ if (settings?.pterodactyl?.domain?.endsWith("/")) {
   settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
 }
 
-const myCache = new NodeCache({ deleteOnExpire: true, stdTTL: 59 });
-
 module.exports.load = async function (app, db) {
-// Simple cache implementation
-const cache = {
-    data: {},
-    timeout: {},
-};
-
-const getCacheItem = (key) => {
-    return cache.data[key];
-};
-
-const setCacheItem = (key, value) => {
-    cache.data[key] = value;
-    
-    // Clear any existing timeout for this key
-    if (cache.timeout[key]) {
-        clearTimeout(cache.timeout[key]);
-    }
-    
-    // Set new timeout to clear the cache after 1 minute
-    cache.timeout[key] = setTimeout(() => {
-        delete cache.data[key];
-        delete cache.timeout[key];
-    }, 60 * 1000); // 1 minute
-};
-
-app.get("/stats", async (req, res) => {
+  const myCache = new NodeCache({ stdTTL: 60, checkperiod: 10 });
+ app.get("/stats", async (req, res) => {
     try {
-        const fetchStats = async (endpoint) => {
-            // Check cache first
-            const cacheKey = `stats_${endpoint}`;
-            const cachedValue = getCacheItem(cacheKey);
-            if (cachedValue !== undefined) {
-                return cachedValue;
-            }
+      const fetchStats = async (endpoint) => {
+        // Check cache first
+        const cacheKey = `stats_${endpoint}`;
 
-            const response = await fetch(`${settings.pterodactyl.domain}/api/application/${endpoint}?per_page=100000`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${settings.pterodactyl.key}`,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-            });
+        const cachedValue = myCache.get(cacheKey);
+        if (cachedValue !== undefined) {
+          return cachedValue;
+        }
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+        const response = await fetch(`${settings.pterodactyl.domain}/api/application/${endpoint}?per_page=100000`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${settings.pterodactyl.key}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
 
-            const data = await response.json();
-            const total = data.meta.pagination.total;
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-            // Store in cache
-            setCacheItem(cacheKey, total);
-            return total;
-        };
+        const data = await response.json();
+        const total = data.meta.pagination.total;
+
+        // Store in cache
+        myCache.set(cacheKey, total);
+
+        return total;
+      };
 
         // Fetch all stats in parallel
-        const [users, servers, nodes, locations] = await Promise.all([
-            fetchStats('users'),
-            fetchStats('servers'),
-            fetchStats('nodes'),
-            fetchStats('locations')
-        ]);
+      const [users, servers, nodes, locations] = await Promise.all([
+        fetchStats('users'),
+        fetchStats('servers'),
+        fetchStats('nodes'),
+        fetchStats('locations')
+      ]);
 
-        res.json({ users, servers, nodes, locations });
+      res.json({ users, servers, nodes, locations });
     } catch (error) {
-        console.error('Error fetching stats:', error);
-        res.status(500).json({ error: 'An error occurred while fetching stats' });
+      console.error('Error fetching stats:', error);
+      res.status(500).json({ error: 'An error occurred while fetching stats' });
     }
-});
+  });
   
   /**
    * GET /api
