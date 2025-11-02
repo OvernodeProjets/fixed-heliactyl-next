@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+        ws = new WebSocket(`${protocol}//${window.location.host}/api/afk/ws`);
 
         ws.onopen = () => {
             console.log('[AFK] Connected to server');

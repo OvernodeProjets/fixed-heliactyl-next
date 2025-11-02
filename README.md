@@ -41,11 +41,11 @@ server {
     ssl_ciphers  HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers on;
 
-    location /ws {
+    location /api/afk/ws {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_pass "http://localhost:<port>/ws";
+        proxy_pass "http://localhost:<port>/api/afk/ws";
     }
 
     location / {
@@ -123,11 +123,11 @@ server {
     ssl_prefer_server_ciphers on;
 
     # WebSocket support
-    location /ws {
+    location /api/afk/ws {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_pass "http://localhost:<port>/ws";
+        proxy_pass "http://localhost:<port>/api/afk/ws";
     }
 
     # Redirect root to auth page

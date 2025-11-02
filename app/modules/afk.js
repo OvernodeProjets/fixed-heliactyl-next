@@ -23,7 +23,7 @@ const clusterId = process.env.CLUSTER_ID || `cluster-${Math.random().toString(36
 module.exports.load = function(app, db) {
   const afkManager = new AFKRewardsManager(db);
 
-  app.ws('/ws', async function(ws, req) {
+  app.ws('/afk/ws', async function(ws, req) {
     if (!req.session.userinfo) {
       ws.close(4001, 'Unauthorized');
       return;
