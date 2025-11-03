@@ -46,6 +46,7 @@ const { renderData, getPages } = require('./app/handlers/theme');
 const { consoleLogo, consoleSpin, getAllJsFiles } = require('./app/handlers/utils');
 const { validateModules } = require('./app/handlers/moduleValidator');
 const { startCluster } = require('./app/handlers/clusterManager');
+const { i18nMiddleware } = require('./app/handlers/i18n');
 
 global.Buffer = global.Buffer || require("buffer").Buffer;
 process.emitWarning = function () { };
@@ -161,6 +162,8 @@ if (cluster.isMaster) {
       verify: undefined,
     })
   );
+
+  app.use(i18nMiddleware);
 
   app.use(async (req, res, next) => {
     if (req.ws) {
