@@ -1,0 +1,72 @@
+{
+  "meta": {
+    "name": "English",
+    "flag": "🇬🇧"
+  },
+  "common": {
+    "welcome": "Welcome",
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "servers": "Servers",
+    "account": "Account",
+    "settings": "Settings",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create"
+  },
+  "dashboard": {
+    "title": "HOME",
+    "subtitle": "View your available resources and an overview of your account",
+    "welcome_title": "Welcome to {{name}}, {{username}}",
+    "welcome_description": "From the dashboard, you can manage and create servers.<br /><br />Upgrade your servers: you can earn free {{currency}} via our Discord <a href=\"{{discord}}\" class=\"text-indigo-300 hover:text-indigo-200 transition\">{{discord}}</a> or through other methods.",
+    "get_started": "Get started",
+    "resources_below_zero": "Your resources are somehow below zero. Please <a href='/api/updateinfo' class='text-amber-300'>click here</a> to fix it or your servers could get suspended. If that doesn't work, try editing your servers to fix it.",
+    "daily_reward": {
+      "title": "Your daily reward is available.",
+      "description": "As a thank you for being a {{name}} user, each day you can claim a reward of {{amount}} ({{currency}})<br />Click the button below to claim your reward!",
+      "claim": "Claim rewards"
+    },
+    "advent_calendar": {
+      "title": "Advent Calendar",
+      "description": "Our advent calendar has started on November 11 and will end on December 25!"
+    },
+    "support": {
+      "title": "Support",
+      "description": "If you need any assistance, feel free to reach out to our support team via Discord or the support ticket system.",
+      "ticket_not_found": "No tickets found."
+    },
+    "resources": {
+      "memory": "Memory",
+      "cpu": "CPU cores",
+      "disk": "Storage (disk space)",
+      "servers": "Server slots"
+    },
+    "stats": {
+      "title": "Platform Statistics",
+      "updated": "Updated every minute",
+      "total_users": "Total Users",
+      "active_servers": "Active Servers",
+      "nodes": "Nodes",
+      "locations": "Locations"
+    },
+    "alerts": {
+      "daily_claimed": "Action completed - daily rewards ({{amount}} {{currency}}) have been claimed!",
+      "server_created": "Action completed - provisioning has started for your server, it may take up to 5 minutes to complete.",
+      "server_modified": "Action completed - the server's resources have been modified.",
+      "server_deleted": "Action completed - the server has been deleted."
+    }
+  },
+  "breadcrumbs": {
+    "home": "Home",
+    "dashboard": "Dashboard"
+  }
+}

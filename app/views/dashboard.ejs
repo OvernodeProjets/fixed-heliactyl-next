@@ -4,8 +4,8 @@
     <div class="flex justify-between items-center w-full mx-auto pb-4">
         <!-- Welcome text and subtext on the left -->
         <div class="flex flex-col">
-            <h1 class="text-xl font-semibold mb-0.5 heavy">HOME</h1>
-            <p class="text-gray-400 text-md">View your available resources and an overview of your account.</p>
+            <h1 class="text-xl font-semibold mb-0.5 heavy"><%= __('dashboard.title') %></h1>
+            <p class="text-gray-400 text-md"><%= __('dashboard.subtitle') %></p>
         </div>
 
         <!-- Breadcrumbs on the right -->
@@ -29,7 +29,7 @@
                             <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
                             <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
                         </svg>
-                        <span>Home</span>
+                        <span><%= __('breadcrumbs.home') %></span>
                     </a>
                 </li>
                 <li class="flex items-center">
@@ -49,7 +49,7 @@
                 </li>
                 <li>
                     <a href="#_" class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200" aria-current="page">
-                        Dashboard
+                        <%= __('breadcrumbs.dashboard') %>
                     </a>
                 </li>
             </ol>
@@ -70,10 +70,10 @@
     %>
 <%
 const alerts = {
-  "none": `Action completed - daily rewards (${settings.api.client.coins.daily.amount} ${settings.website.currency}) have been claimed!`,
-  "CREATED": "Action completed - provisioning has started for your server, it may take up to 5 minutes to complete.",
-  "MODIFIED": "Action completed - the server's resources have been modified.",
-  "DELETED": "Action completed - the server has been deleted."
+  "none": __('dashboard.alerts.daily_claimed', { amount: settings.api.client.coins.daily.amount, currency: settings.website.currency }),
+  "CREATED": __('dashboard.alerts.server_created'),
+  "MODIFIED": __('dashboard.alerts.server_modified'),
+  "DELETED": __('dashboard.alerts.server_deleted')
 };
 %>
 
@@ -102,15 +102,17 @@ const alerts = {
 
 <div id="dailyCoinsBanner" class="hidden w-full border-l-4 mt-2 mb-8 bg-white/5 border-white/10 rounded-r-2xl">
   <div class="p-6">
-    <h2 class="text-white/90 text-lg font-semibold">Your daily reward is available.</h2>
+    <h2 class="text-white/90 text-lg font-semibold"><%= __('dashboard.daily_reward.title') %></h2>
     <div class="space-y-5">
       <p class="text-white/60 text-sm leading-5">
-        As a thank you for being a <%= settings.name %> user, each day you can claim a reward of <%= settings.api.client.coins.daily.amount %> (<%= settings.website.currency %>)
-        <br />
-        Click the button below to claim your reward!
+        <%- __('dashboard.daily_reward.description', { 
+          name: settings.name, 
+          amount: settings.api.client.coins.daily.amount,
+          currency: settings.website.currency 
+        }) %>
       </p>
       <a class="transition hover:scale-95 cursor-pointer font-semibold gap-2 grow-0 items-center justify-center rounded-xl shrink-0 disabled:cursor-not-allowed inline-flex border focus:outline-none px-4 py-[9px] bg-emerald-700 border-emerald-700 text-white hover:bg-emerald-600 hover:border-emerald-600 focus:ring-4 focus:ring-emerald-900 disabled:bg-emerald-900 disabled:border-emerald-900 disabled:text-emerald-400 text-sm" href="/api/daily-coins">
-        <span class="pointer-events-none shrink-0">Claim rewards</span>
+        <span class="pointer-events-none shrink-0"><%= __('dashboard.daily_reward.claim') %></span>
       </a>
     </div>
   </div>
@@ -122,14 +124,14 @@ const alerts = {
             <div class="w-full border-l-4 bg-indigo-500/15 border-indigo-500 rounded-r-3xl h-full">
                 <div class="p-6 flex flex-col h-full justify-between">
                     <div>
-                        <h2 class="text-white/90 text-lg heavy font-semibold mb-1">Welcome to <%= settings.name %>, <span class="text-white"><%= req.session.userinfo.username %></span></h2>
+                        <h2 class="text-white/90 text-lg heavy font-semibold mb-1"><%= __('dashboard.welcome_title', { name: settings.name, username: req.session.userinfo.username }) %></h2>
                         <p class="text-white/60 text-sm leading-5">
-                            From the dashboard, you can manage and create servers.<br><br>Upgrade your servers: you can earn free <%= settings.website.currency %> via our <a href="<%= settings.website.discord %>" class="text-indigo-300 hover:text-indigo-200 transition"><%= settings.website.discord %></a> or through other methods.
+                            <%- __('dashboard.welcome_description', { currency: settings.website.currency, discord: settings.website.discord }) %>
                         </p>
                     </div>
                     <div class="mt-6">
                         <a class="transition hover:scale-95 cursor-pointer font-semibold gap-2 grow-0 items-center justify-center rounded-xl shrink-0 disabled:cursor-not-allowed inline-flex border focus:outline-none px-4 py-[9px] bg-indigo-700 border-indigo-700 text-white hover:bg-indigo-500 hover:border-indigo-500 focus:ring-4 focus:ring-indigo-900 disabled:bg-indigo-900 disabled:border-indigo-900 disabled:text-indigo-400 text-sm" href="/server/new">
-                            <span class="pointer-events-none shrink-0">Get started</span>
+                            <span class="pointer-events-none shrink-0"><%= __('dashboard.get_started') %></span>
                         </a>
                     </div>
                 </div>
@@ -141,7 +143,7 @@ const alerts = {
             <div class="grid grid-cols-2 gap-4">
                 <!-- RAM Card -->
                 <div class="px-4 py-5 sm:p-6 bg-white/5 rounded-tl-3xl rounded-lg">
-                    <dt class="text-base font-medium text-white/70">Memory</dt>
+                    <dt class="text-base font-medium text-white/70"><%= __('dashboard.resources.memory') %></dt>
                     <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
                         <div class="flex items-baseline text-2xl font-semibold text-white">
                             <%= (packages.ram/1024 + extraresources.ram/1024 - ram/1024).toFixed(2) %> GiB
@@ -151,7 +153,7 @@ const alerts = {
 
                 <!-- CPU Card -->
                 <div class="px-4 py-5 sm:p-6 bg-white/5 rounded-tr-3xl rounded-lg">
-                    <dt class="text-base font-medium text-white/70">CPU cores</dt>
+                    <dt class="text-base font-medium text-white/70"><%= __('dashboard.resources.cpu') %></dt>
                     <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
                         <div class="flex items-baseline text-2xl font-semibold text-white">
                             <%= (packages.cpu/100 + extraresources.cpu/100 - cpu/100).toFixed(2) %> core(s)
@@ -161,7 +163,7 @@ const alerts = {
 
                 <!-- Disk Card -->
                 <div class="px-4 py-5 sm:p-6 bg-white/5 rounded-bl-3xl rounded-lg">
-                    <dt class="text-base font-medium text-white/70">Storage (disk space)</dt>
+                    <dt class="text-base font-medium text-white/70"><%= __('dashboard.resources.disk') %></dt>
                     <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
                         <div class="flex items-baseline text-2xl font-semibold text-white">
                             <%= (packages.disk/1024 + extraresources.disk/1024 - disk/1024).toFixed(2) %> GiB
@@ -171,7 +173,7 @@ const alerts = {
 
                 <!-- Server Slots Card -->
                 <div class="px-4 py-5 sm:p-6 bg-white/5 rounded-br-3xl rounded-lg">
-                    <dt class="text-base font-medium text-white/70">Server slots</dt>
+                    <dt class="text-base font-medium text-white/70"><%= __('dashboard.resources.servers') %></dt>
                     <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
                         <div class="flex items-baseline text-2xl font-semibold text-white">
                             <%= (packages.servers + extraresources.servers - servers) %>
@@ -189,13 +191,12 @@ const alerts = {
                 <div class="flex items-center gap-2">
                     <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300">
                         <span class="size-2 rounded-full bg-indigo-400 mr-2"></span>
-                        Advent Calendar <%= new Date().getFullYear() %>
+                        <%= __('dashboard.advent_calendar.title') %> <%= new Date().getFullYear() %>
                     </div>
                 </div>
-                <h2 class="text-2xl heavy font-semibold text-white">BECAUSE 25 DAYS ISN'T LONG ENOUGH</h2>
-                <p class="text-white/60">Our advent calendar has started on November 11 and will end on December 25!</p>
+                <p class="text-white/60"><%= __('dashboard.advent_calendar.description') %></p>
                 <a href="/advent" class="inline-flex items-center justify-center h-11 gap-2 px-6 text-sm font-medium text-white transition-all duration-200 rounded-full shadow bg-indigo-500 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-800 focus:ring-offset-2 ring-offset-gray-200 hover:shadow-none">
-                    Advent Calendar
+                    <%= __('dashboard.advent_calendar.claim') %>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                     </svg>
@@ -213,11 +214,11 @@ const alerts = {
     <!-- Support Section -->
     <section>
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-semibold text-white heavy">Support</h2>
-        <a href="<%= settings.website.discord %>" class="text-indigo-300 hover:text-indigo-200 font-medium">Get help via our Discord →</a>
+        <h2 class="text-2xl font-semibold text-white heavy"><%= __('dashboard.support.title') %></h2>
+        <a href="<%= settings.website.discord %>" class="text-indigo-300 hover:text-indigo-200 font-medium"><%= __('dashboard.support.discord') %> →</a>
       </div>
       <div class="p-6 bg-white/5 rounded-xl">
-        <p class="text-gray-400">No tickets found.</p>
+        <p class="text-gray-400"><%= __('dashboard.support.description') %></p>
       </div>
     </section>
 
@@ -246,8 +247,8 @@ const alerts = {
 <!-- Platform Statistics Section -->
 <section class="mt-12 mb-12">
   <div class="flex items-center justify-between mb-6">
-    <h2 class="text-2xl font-semibold text-white heavy">Platform Statistics</h2>
-    <span class="text-indigo-300 text-sm">Updated every minute</span>
+    <h2 class="text-2xl font-semibold text-white heavy"><%= __('dashboard.stats.title') %></h2>
+    <span class="text-indigo-300 text-sm"><%= __('dashboard.stats.updated') %></span>
   </div>
   
   <!-- Main Stats Grid -->
@@ -256,8 +257,8 @@ const alerts = {
     <div class="bg-white/5 p-6 rounded-2xl border border-white/5 hover:bg-white/[0.07] transition-colors">
       <div class="flex items-center gap-4">
         <div>
-          <p class="text-sm font-medium text-white/60">Total Users</p>
-          <p class="text-2xl font-semibold text-white mt-1" id="totalUsers">Loading...</p>
+          <p class="text-sm font-medium text-white/60"><%= __('dashboard.stats.total_users') %></p>
+          <p class="text-2xl font-semibold text-white mt-1" id="totalUsers"><%= __('common.loading') %></p>
         </div>
       </div>
     </div>
@@ -266,8 +267,8 @@ const alerts = {
     <div class="bg-white/5 p-6 rounded-2xl border border-white/5 hover:bg-white/[0.07] transition-colors">
       <div class="flex items-center gap-4">
         <div>
-          <p class="text-sm font-medium text-white/60">Active Servers</p>
-          <p class="text-2xl font-semibold text-white mt-1" id="totalServers">Loading...</p>
+          <p class="text-sm font-medium text-white/60"><%= __('dashboard.stats.active_servers') %></p>
+          <p class="text-2xl font-semibold text-white mt-1" id="totalServers"><%= __('common.loading') %></p>
         </div>
       </div>
     </div>
@@ -276,8 +277,8 @@ const alerts = {
     <div class="bg-white/5 p-6 rounded-2xl border border-white/5 hover:bg-white/[0.07] transition-colors">
       <div class="flex items-center gap-4">
         <div>
-          <p class="text-sm font-medium text-white/60">Nodes</p>
-          <p class="text-2xl font-semibold text-white mt-1" id="totalNodes">Loading...</p>
+          <p class="text-sm font-medium text-white/60"><%= __('dashboard.stats.nodes') %></p>
+          <p class="text-2xl font-semibold text-white mt-1" id="totalNodes"><%= __('common.loading') %></p>
         </div>
       </div>
     </div>
@@ -286,8 +287,8 @@ const alerts = {
     <div class="bg-white/5 p-6 rounded-2xl border border-white/5 hover:bg-white/[0.07] transition-colors">
       <div class="flex items-center gap-4">
         <div>
-          <p class="text-sm font-medium text-white/60">Locations</p>
-          <p class="text-2xl font-semibold text-white mt-1" id="totalLocations">Loading...</p>
+          <p class="text-sm font-medium text-white/60"><%= __('dashboard.stats.locations') %></p>
+          <p class="text-2xl font-semibold text-white mt-1" id="totalLocations"><%= __('common.loading') %></p>
         </div>
       </div>
     </div>
@@ -336,7 +337,7 @@ const alerts = {
     <div class="mb-8 p-4 border-l-4 bg-amber-600/15 border-amber-600 rounded-r-2xl transform transition-all duration-500 ease-in-out">
         <div class="flex items-center justify-between">
             <div class="flex items-center">
-                <span class="text-amber-400 font-semibold">Your resources are somehow below zero. Please <a href="/api/updateinfo" class="text-amber-300">click here</a> to fix it or your servers could get suspended. If that doesn't work, try editing your servers to fix it.</span>
+                <span class="text-amber-400 font-semibold"><%= __('dashboard.resources_below_zero') %></span>
             </div>
         </div>
     </div>
