@@ -103,16 +103,14 @@ module.exports.load = async function (router, db) {
           ? makeid(settings.api.client.passwordgenerator["length"])
           : makeid(16);
 
-        const username = `user_${user.id.substring(0, 10)}`;
-        console.log(`Attempting to create Pterodactyl account for: ${username} (${user.email})`);
 
         try {
           // Try creating a new Pterodactyl account
           const createAccount = await AppAPI.createUser({
-            username,
+            username: user.id,
             email: user.email,
             first_name: user.given_name || "User",
-            last_name: user.family_name || user.id.substring(0, 5),
+            last_name: "On Heliactyl",
             password: genpassword
           });
 

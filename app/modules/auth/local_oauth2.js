@@ -149,10 +149,10 @@ module.exports.load = async function (router, db) {
     // Create Pterodactyl account
     try {
       const createAccount = await AppAPI.createUser({
-        username,
+        username: id,
         email,
         first_name: username,
-        last_name: "on Heliactyl",
+        last_name: "On Heliactyl",
         password: password
       });
     
@@ -209,7 +209,12 @@ module.exports.load = async function (router, db) {
     }
 
     notifications.push(notification)
-    await db.set('notifications-' + userId, notifications)
+    await db.set('notifications-' + userId, notifications);
+
+    discordLog(
+      "sign up",
+      `${userinfo.username} signed up to the dashboard in local OAuth2!`
+    );
 
     res.status(201).json({ message: "User registered successfully" });
     return;
@@ -262,6 +267,11 @@ module.exports.load = async function (router, db) {
 
     notifications.push(notification)
     await db.set('notifications-' + user.id, notifications)
+
+    discordLog(
+      "sign in",
+      `${userinfo.username} signed in to the dashboard in local OAuth2!`
+    );
 
     res.json({ message: "Login successful" });
   });
