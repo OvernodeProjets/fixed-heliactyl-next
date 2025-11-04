@@ -1,0 +1,463 @@
+{
+  "meta": {
+    "name": "Français",
+    "flag": "🇫🇷"
+  },
+  "common": {
+    "welcome": "Bienvenue",
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "servers": "Serveurs",
+    "account": "Compte",
+    "settings": "Paramètres",
+    "logout": "Se déconnecter",
+    "login": "Se connecter",
+    "register": "S'inscrire",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "processing": "Traitement..."
+  },
+  "dashboard": {
+    "title": "ACCUEIL",
+    "subtitle": "Consultez vos ressources disponibles et un aperçu de votre compte",
+    "welcome_title": "Bienvenue sur {{name}}, {{username}}",
+    "welcome_description": "Depuis le tableau de bord, vous pouvez gérer et créer des serveurs.<br /><br />Améliorez vos serveurs : vous pouvez gagner gratuitement des {{currency}} via notre Discord <a href=\"{{discord}}\" class=\"text-indigo-300 hover:text-indigo-200 transition\">{{discord}}</a> ou par d'autres méthodes.",
+    "get_started": "Commencer",
+    "resources_below_zero": "Vos ressources sont en dessous de zéro. Veuillez <a href='/api/updateinfo' class='text-amber-300'>cliquer ici</a> pour corriger cela, sinon vos serveurs pourraient être suspendus. Si cela ne fonctionne pas, essayez de modifier vos serveurs.",
+    "daily_reward": {
+      "title": "Votre récompense quotidienne est disponible.",
+      "description": "En remerciement d'être utilisateur de {{name}}, chaque jour vous pouvez réclamer une récompense de {{amount}} ({{currency}})<br />Cliquez sur le bouton ci-dessous pour la réclamer !",
+      "claim": "Réclamer les récompenses"
+    },
+    "advent_calendar": {
+      "title": "Calendrier de l'Avent",
+      "description": "Notre calendrier de l'Avent a commencé le 11 novembre et se terminera le 25 décembre !"
+    },
+    "support": {
+      "title": "Support",
+      "description": "Si vous avez besoin d'aide, contactez notre équipe via Discord ou le système de tickets de support.",
+      "ticket_not_found": "Aucun ticket trouvé."
+    },
+    "resources": {
+      "memory": "Mémoire",
+      "cpu": "Cœurs CPU",
+      "disk": "Stockage (espace disque)",
+      "servers": "Emplacements de serveurs"
+    },
+    "stats": {
+      "title": "Statistiques de la plateforme",
+      "updated": "Mis à jour chaque minute",
+      "total_users": "Utilisateurs totaux",
+      "active_servers": "Serveurs actifs",
+      "nodes": "Nœuds",
+      "locations": "Emplacements"
+    },
+    "alerts": {
+      "daily_claimed": "Action effectuée - les récompenses quotidiennes ({{amount}} {{currency}}) ont été réclamées !",
+      "server_created": "Action effectuée - le provisionnement de votre serveur a commencé, cela peut prendre jusqu'à 5 minutes.",
+      "server_modified": "Action effectuée - les ressources du serveur ont été modifiées.",
+      "server_deleted": "Action effectuée - le serveur a été supprimé."
+    }
+  },
+  "breadcrumbs": {
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "user_credentials": "Identifiants utilisateur",
+    "afk_page": "Page AFK",
+    "referrals": "Parrainages",
+    "servers": "Serveurs",
+    "staking": "Staking",
+    "store": "Boutique",
+    "wallet": "Portefeuille"
+  },
+  "account": {
+    "title": "Identifiants SFTP",
+    "subtitle": "Afficher et gérer vos identifiants SFTP.",
+    "user_credentials": "Identifiants utilisateur",
+    "description": "Utilisez ces identifiants pour accéder à certaines actions comme le SFTP.",
+    "new_password": {
+      "title": "Définir un nouveau mot de passe",
+      "placeholder_new": "Nouveau mot de passe",
+      "placeholder_confirm": "Confirmer le mot de passe",
+      "requirements": "Le mot de passe doit contenir :",
+      "requirement_length": "Au moins 8 caractères",
+      "requirement_uppercase": "Une lettre majuscule",
+      "requirement_lowercase": "Une lettre minuscule",
+      "requirement_number": "Un chiffre",
+      "button_generate": "Générer au hasard",
+      "button_set": "Définir le mot de passe"
+    },
+    "messages": {
+      "password_copied": "Mot de passe copié dans le presse‑papiers !",
+      "password_updated": "Mot de passe mis à jour avec succès !",
+      "error_occurred": "Une erreur s'est produite lors de la mise à jour du mot de passe.",
+      "no_password": "Aucun mot de passe disponible : les mots de passe ne sont affichés qu'une seule fois."
+    }
+  },
+  "afk": {
+    "title": "Page AFK",
+    "subtitle": "Gagnez des récompenses gratuites en gardant cette page ouverte.",
+    "connection_status": {
+      "title": "État de la connexion",
+      "connecting": "Connexion...",
+      "connected": "Connecté",
+      "disconnected": "Déconnecté",
+      "already_open": "Page AFK déjà ouverte dans un autre onglet",
+      "session_expired": "Session expirée. Veuillez rafraîchir la page.",
+      "reconnecting": "Reconnexion (Tentative {{attempt}}/{{max}})...",
+      "connection_failed": "Échec de la connexion. Veuillez rafraîchir la page."
+    },
+    "rewards": {
+      "title": "Récompenses AFK",
+      "earning_rate": "Taux de gain",
+      "next_reward": "Prochaine récompense"
+    },
+    "statistics": {
+      "title": "Statistiques de session",
+      "time_active": "Temps actif",
+      "total_earned": "Total gagné"
+    }
+  },
+  "referrals": {
+    "title": "Parrainages",
+    "subtitle": "Parrainez des utilisateurs sur {{name}} pour des récompenses gratuites.",
+    "create": {
+      "title": "Créer un code de parrainage",
+      "label": "Votre code de parrainage",
+      "placeholder": "Entrez votre code personnalisé",
+      "button": "Créer le code"
+    },
+    "claim": {
+      "title": "Réclamer un code de parrainage",
+      "label": "Code de votre ami",
+      "placeholder": "Saisir le code à réclamer",
+      "button": "Réclamer le code"
+    },
+    "benefits": {
+      "title": "Avantages du parrainage",
+      "for_you": "Pour vous",
+      "for_friend": "Pour votre ami",
+      "you_earn": "Pour chaque ami utilisant votre code",
+      "friend_earns": "Quand il réclame votre code"
+    },
+    "messages": {
+      "enter_code": "Veuillez saisir un code de parrainage.",
+      "enter_claim_code": "Veuillez saisir un code à réclamer.",
+      "code_created": "{{message}} Code : {{code}}",
+      "error_occurred": "Une erreur s'est produite.",
+      "network_error": "Erreur réseau. Veuillez réessayer."
+    }
+  },
+  "servers": {
+    "title": "Mes serveurs",
+    "subtitle": "Aperçu de vos serveurs sur {{name}}.",
+    "no_servers": "Aucun serveur trouvé",
+    "get_started": "Commencez par créer votre premier serveur",
+    "shared_servers": "Serveurs partagés",
+    "columns": {
+      "server": "Serveur",
+      "status": "Statut",
+      "memory": "Mémoire",
+      "cpu": "CPU",
+      "ip_address": "Adresse IP"
+    },
+    "status": {
+      "connecting": "Connexion...",
+      "online": "En ligne",
+      "offline": "Hors ligne",
+      "starting": "Démarrage",
+      "stopping": "Arrêt",
+      "unknown": "Inconnu"
+    },
+    "fetching": "Récupération...",
+    "actions": {
+      "new": "Nouveau",
+      "game_server": "Serveur de jeu"
+    },
+    "alerts": {
+      "suspended_title": "Accès refusé",
+      "suspended_body": "Votre serveur a été suspendu. Veuillez contacter le support via notre Discord ({{discord}}) pour plus d'informations."
+    }
+  },
+  "staking": {
+    "title": "Staking",
+    "subtitle": "Gagnez des intérêts composés en stakant vos {{currency}}.",
+    "migration": {
+      "title": "Mise à niveau du système de staking",
+      "description": "Nous avons mis à niveau notre système de staking avec de nouvelles fonctionnalités ! Votre stake existant a été migré automatiquement. Vous avez maintenant accès à :",
+      "feature_1": "Plusieurs positions de staking",
+      "feature_2": "Récompenses plus élevées pour des périodes de verrouillage plus longues",
+      "feature_3": "Intérêts composés"
+    },
+    "balance": {
+      "available": "Solde disponible",
+      "total_staked": "Total staké",
+      "total_earnings": "Gains totaux",
+      "loading": "Chargement..."
+    },
+    "positions": {
+      "title": "Vos positions de staking",
+      "new_stake": "Nouveau stake",
+      "no_positions": "Aucune position active. Commencez à gagner des récompenses en créant un nouveau stake !",
+      "loading": "Chargement des positions...",
+      "error": "Échec du chargement des positions. Veuillez réessayer plus tard.",
+      "staked_amount": "Montant staké",
+      "lock_period": "Période de verrouillage",
+      "current_earnings": "Gains actuels",
+      "unlock_date": "Date de déverrouillage",
+      "manage": "Gérer la position",
+      "claim": "Réclamer {{amount}} {{currency}}",
+      "claim_prefix": "Réclamer",
+      "locked_until": "Verrouillé jusqu'au {{date}}",
+      "locked_until_prefix": "Verrouillé jusqu'au",
+      "days_suffix": "Jours"
+    },
+    "tiers": {
+      "title": "Niveaux de staking",
+      "30d": {
+        "title": "30 jours",
+        "apr": "+20% APR",
+        "description": "Staking court terme avec récompenses flexibles"
+      },
+      "90d": {
+        "title": "90 jours",
+        "apr": "+50% APR",
+        "description": "Staking moyen terme avec récompenses accrues"
+      },
+      "180d": {
+        "title": "180 jours",
+        "apr": "+100% APR",
+        "description": "Staking long terme avec récompenses maximales"
+      }
+    },
+    "modal": {
+      "create_title": "Créer un nouveau stake",
+      "amount_label": "Montant",
+      "minimum": "Stake minimum : 10 {{currency}}",
+      "lock_period_label": "Période de verrouillage",
+      "cancel": "Annuler",
+      "confirm": "Confirmer le stake",
+      "manage_title": "Gérer la position de staking",
+      "apr_bonus": "Bonus APR",
+      "early_warning": "Avertissement de retrait anticipé :",
+      "early_warning_text": "Cette position est encore verrouillée. Retirer maintenant entraînera une pénalité de 50% sur les gains.",
+      "unstake_early": "Retirer maintenant",
+      "unstake": "Retirer la position",
+      "close": "Fermer"
+    },
+    "messages": {
+      "staked_success": "Stake de {{amount}} {{currency}} effectué avec succès",
+      "staked_success_generic": "Stake créé avec succès",
+      "unstaked_success": "Retrait de {{amount}} {{currency}} effectué avec succès",
+      "unstaked_success_generic": "Position retirée avec succès",
+      "claimed_success": "Réclamation de {{amount}} {{currency}} effectuée avec succès",
+      "claimed_success_generic": "Récompenses réclamées avec succès",
+      "confirm_unstake": "Voulez-vous vraiment retirer cette position ?",
+      "confirm_unstake_early": "Voulez-vous vraiment retirer maintenant ? Vous perdrez 50% des gains.",
+      "error_create": "Échec de création du stake",
+      "error_unstake": "Échec du retrait de la position",
+      "error_claim": "Échec de la réclamation des récompenses",
+      "error_load": "Échec du chargement des données de staking"
+    }
+  },
+  "store": {
+    "title": "Boutique",
+    "subtitle": "Gérez vos ressources et abonnements avec {{currency}}",
+    "tabs": {
+      "store": "Boutique",
+      "history": "Historique"
+    },
+    "resources": {
+      "ram": "RAM",
+      "disk": "Disque",
+      "cpu": "CPU",
+      "servers": "Serveurs",
+      "backups": "Sauvegardes",
+      "databases": "Bases de données",
+      "allocations": "Allocations"
+    },
+    "per_unit": {
+      "gb": "/ Go",
+      "percent": "/ %",
+      "server": "/ Serveur",
+      "backup": "/ Sauvegarde",
+      "database": "/ Base de données",
+      "allocation": "/ Allocation"
+    },
+    "purchase": "Acheter",
+    "history_title": "Historique des achats",
+    "history_columns": {
+      "resource": "Ressource",
+      "amount": "Quantité",
+      "cost": "Coût",
+      "date": "Date"
+    },
+    "no_history": "Aucun historique d'achat disponible.",
+    "messages": {
+      "success": "Achat réussi de {{amount}} {{resource}}",
+      "error": "Échec de l'achat de la ressource"
+    },
+    "ui": {
+      "processing": "Traitement...",
+      "resources": "Ressources",
+      "transaction_history": "Historique des transactions",
+      "no_history": "Aucun historique de transaction",
+      "history_will_appear": "Votre historique apparaîtra ici.",
+      "last_7_days": "7 derniers jours",
+      "last_14_days": "14 derniers jours",
+      "last_30_days": "30 derniers jours"
+    },
+    "renewal_bypass": {
+      "title": "Offre spéciale",
+      "success": "Achat du Renewal Bypass réussi !",
+      "cta": "Acheter",
+      "already_purchased": "Déjà acheté",
+      "one_time": "Achat unique",
+      "need_more": "Il vous manque {{amount}} pièces pour acheter ceci.",
+      "headline": "Renewal Bypass",
+      "description": "Ne vous souciez plus des renouvellements hebdomadaires de la boutique ou du renouvellement de votre serveur toutes les 48 heures. Achetez notre Renewal Bypass pour {{price}} pièces et conservez vos ressources et serveurs pour toujours."
+    }
+  },
+  "wallet": {
+    "title": "Portefeuille",
+    "subtitle": "Gérez vos soldes et transactions en {{currency}}.",
+    "balance": {
+      "title": "Votre solde",
+      "loading": "Chargement..."
+    },
+    "send_button": "Envoyer {{currency}}",
+    "transactions": {
+      "title": "Transactions récentes",
+      "columns": {
+        "type": "Type",
+        "amount": "Montant",
+        "from_to": "De/À",
+        "date": "Date"
+      },
+      "types": {
+        "sent": "Envoyé",
+        "received": "Reçu",
+        "purchase": "Achat",
+        "reward": "Récompense"
+      },
+      "no_transactions": "Aucune transaction pour l'instant.",
+      "loading": "Chargement des transactions..."
+    },
+    "modal": {
+      "transfer_title": "Transférer {{currency}}",
+      "recipient_label": "ID de l'utilisateur destinataire",
+      "recipient_placeholder": "Saisir l'ID utilisateur",
+      "amount_label": "Montant",
+      "amount_placeholder": "Saisir le montant",
+      "cancel": "Annuler",
+      "send": "Envoyer {{currency}}"
+    },
+    "messages": {
+      "transfer_success": "Transfert réussi de {{amount}} {{currency}}",
+      "transfer_success_generic": "Transfert réussi !",
+      "transfer_error": "Échec du transfert de {{currency}}",
+      "balance_error": "Échec du chargement du solde",
+      "transfer_failed_prefix": "Échec du transfert :",
+      "transfer_generic_error": "Une erreur s'est produite pendant le transfert. Veuillez réessayer."
+    },
+    "ui": {
+      "show_all": "Afficher toutes les transactions",
+      "transaction_details": "Détails de la transaction",
+      "copied": "Copié !",
+      "type": "Type",
+      "amount": "Montant",
+      "status": "Statut",
+      "transaction_id": "ID de transaction",
+      "sender": "Expéditeur",
+      "receiver": "Destinataire",
+      "description": "Description",
+      "timestamp": "Horodatage",
+      "just_now": "À l'instant",
+      "ago": "il y a",
+      "minute_symbol": "m",
+      "hour_symbol": "h",
+      "day_symbol": "j"
+    }
+  },
+  "website": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs",
+      "status": "Statut",
+      "discord": "Discord",
+      "get_started": "Commencer"
+    },
+    "hero": {
+      "title": "Hébergement de serveurs de jeu premium",
+      "subtitle": "Déployez instantanément vos serveurs de jeu avec notre plateforme puissante et fiable.",
+      "cta_primary": "Commencer gratuitement",
+      "cta_secondary": "Voir les tarifs",
+      "badge": "Hébergement de serveurs de jeu par {{name}}"
+    },
+    "features": {
+      "title": "Pourquoi nous choisir",
+      "instant_deploy": {
+        "title": "Déploiement instantané",
+        "description": "Déployez vos serveurs en quelques secondes avec notre système automatisé"
+      },
+      "high_performance": {
+        "title": "Haute performance",
+        "description": "Propulsé par du matériel de niveau entreprise pour des performances optimales"
+      },
+      "ddos_protection": {
+        "title": "Protection DDoS",
+        "description": "Protection avancée pour garder vos serveurs en ligne 24/7"
+      },
+      "support": {
+        "title": "Support 24/7",
+        "description": "Notre équipe est toujours là pour vous aider à réussir"
+      }
+    },
+    "content": {
+      "developers_pitch": "Conçu pour les développeurs qui ont besoin d'une infrastructure fiable sans complexité"
+    },
+    "pricing": {
+      "title": "Tarification simple et transparente",
+      "subtitle": "Choisissez les ressources dont vous avez besoin",
+      "per_month": "par mois",
+      "get_started": "Commencer",
+      "free_plan": "Offre gratuite",
+      "free_description": "Tout ce dont vous avez besoin pour créer et évoluer",
+      "whats_included": "Inclus",
+      "features": {
+        "ram_cpu": "2 Go de RAM par défaut + 1 cœur CPU",
+        "locations": "{{count}} emplacements",
+        "location": "{{country}}",
+        "ddos": "Protection DDoS",
+        "uptime": "Disponibilité 24/7*"
+      },
+      "always_free": "Toujours gratuit",
+      "price": "0$",
+      "forever": "pour toujours"
+    },
+    "footer": {
+      "copyright": "© {{year}} {{name}}, Propulsé par Heliactyl. Tous droits réservés.",
+      "links": {
+        "terms": "Conditions d'utilisation",
+        "privacy": "Politique de confidentialité"
+      },
+      "sections": {
+        "product": "Produit",
+        "support": "Support",
+        "contact": "Contact"
+      },
+      "about": "{{name}} a été créé pour fournir un hébergement de serveurs de jeu {{scope}}.",
+      "scope_one": "en {{country}}",
+      "scope_many": "à travers {{count}} emplacements"
+    }
+  }
+}
+
+

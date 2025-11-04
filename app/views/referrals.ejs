@@ -4,8 +4,8 @@
     <div class="flex justify-between items-center w-full mx-auto pb-4">
         <!-- Welcome text and subtext on the left -->
         <div class="flex flex-col">
-            <h1 class="text-xl font-semibold mb-0.5 heavy">Referrals</h1>
-            <p class="text-gray-400 text-md">Refer users to <%= settings.name %> for free rewards.</p>
+            <h1 class="text-xl font-semibold mb-0.5 heavy"><%= __('referrals.title') %></h1>
+            <p class="text-gray-400 text-md"><%= __('referrals.subtitle', { name: settings.name }) %></p>
         </div>
 
         <!-- Breadcrumbs on the right -->
@@ -29,7 +29,7 @@
                             <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
                             <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
                         </svg>
-                        <span>Home</span>
+                        <span><%= __('breadcrumbs.home') %></span>
                     </a>
                 </li>
                 <li class="flex items-center">
@@ -49,7 +49,7 @@
                 </li>
                 <li>
                     <a href="#_" class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200" aria-current="page">
-                        Referrals
+                        <%= __('referrals.title') %>
                     </a>
                 </li>
             </ol>
@@ -70,28 +70,28 @@
         <div class="grid gap-8 md:grid-cols-2">
             <!-- Create Referral Code -->
             <div class="bg-white/5 rounded-2xl p-6">
-                <h2 class="text-xl font-semibold mb-4">Create a Referral Code</h2>
+                <h2 class="text-xl font-semibold mb-4"><%= __('referrals.create.title') %></h2>
                 <form id="generateReferralForm" class="space-y-4">
                     <div>
-                        <label for="code" class="block text-sm font-medium text-gray-400 mb-1">Your Referral Code</label>
-                        <input type="text" name="code" id="code" class="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-white placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter your custom code">
+                        <label for="code" class="block text-sm font-medium text-gray-400 mb-1"><%= __('referrals.create.label') %></label>
+                        <input type="text" name="code" id="code" class="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-white placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500" placeholder="<%= __('referrals.create.placeholder') %>">
                     </div>
                     <button type="submit" class="w-full px-4 py-2 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        Create Code
+                        <%= __('referrals.create.button') %>
                     </button>
                 </form>
             </div>
 
             <!-- Claim Referral Code -->
             <div class="bg-white/5 rounded-2xl p-6">
-                <h2 class="text-xl font-semibold mb-4">Claim a Referral Code</h2>
+                <h2 class="text-xl font-semibold mb-4"><%= __('referrals.claim.title') %></h2>
                 <form id="claimReferralForm" class="space-y-4">
                     <div>
-                        <label for="claim-code" class="block text-sm font-medium text-gray-400 mb-1">Friend's Referral Code</label>
-                        <input type="text" name="code" id="claim-code" class="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-white placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter code to claim">
+                        <label for="claim-code" class="block text-sm font-medium text-gray-400 mb-1"><%= __('referrals.claim.label') %></label>
+                        <input type="text" name="code" id="claim-code" class="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-white placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500" placeholder="<%= __('referrals.claim.placeholder') %>">
                     </div>
                     <button type="submit" class="w-full px-4 py-2 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        Claim Code
+                        <%= __('referrals.claim.button') %>
                     </button>
                 </form>
             </div>
@@ -99,17 +99,17 @@
 
         <!-- Referral Benefits -->
         <div class="mt-8 bg-white/5 rounded-2xl p-6">
-            <h2 class="text-xl font-semibold mb-4">Referral Benefits</h2>
+            <h2 class="text-xl font-semibold mb-4"><%= __('referrals.benefits.title') %></h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="rounded-2xl border-white/5 border p-6">
-                    <h3 class="text-lg font-medium mb-2">For You</h3>
+                    <h3 class="text-lg font-medium mb-2"><%= __('referrals.benefits.for_you') %></h3>
                     <p class="text-3xl font-bold text-indigo-400">80 <%= settings.website.currency %></p>
-                    <p class="text-gray-400 mt-2">For every friend who uses your code</p>
+                    <p class="text-gray-400 mt-2"><%= __('referrals.benefits.you_earn') %></p>
                 </div>
                 <div class="rounded-2xl border-white/5 border p-6">
-                    <h3 class="text-lg font-medium mb-2">For Your Friend</h3>
+                    <h3 class="text-lg font-medium mb-2"><%= __('referrals.benefits.for_friend') %></h3>
                     <p class="text-3xl font-bold text-indigo-400">250 <%= settings.website.currency %></p>
-                    <p class="text-gray-400 mt-2">When they claim your referral code</p>
+                    <p class="text-gray-400 mt-2"><%= __('referrals.benefits.friend_earns') %></p>
                 </div>
             </div>
         </div>
@@ -135,15 +135,19 @@ document.getElementById('generateReferralForm').addEventListener('submit', async
     e.preventDefault();
     const codeInput = document.getElementById('code');
     const code = codeInput.value.trim();
-    if(!code) return showMessage('Please enter a referral code.', 'error');
+    if(!code) return showMessage('<%= __("referrals.messages.enter_code") %>', 'error');
 
     try {
         const res = await fetch(`/api/referrals/generate?code=${encodeURIComponent(code)}`, { method: 'GET', headers: { 'Accept': 'application/json' } });
         const data = await res.json();
-        if(res.ok) showMessage(`${data.message} Code: ${data.code}`, 'success');
-        else showMessage(data.error || 'An error occurred.', 'error');
+        if(res.ok) {
+            const tpl = '<%= __("referrals.messages.code_created", { message: "__MSG__", code: "__CODE__" }) %>';
+            const msg = tpl.replace('__MSG__', data.message).replace('__CODE__', data.code);
+            showMessage(msg, 'success');
+        }
+        else showMessage(data.error || '<%= __("referrals.messages.error_occurred") %>', 'error');
     } catch(err) {
-        showMessage('Network error. Please try again.', 'error');
+        showMessage('<%= __("referrals.messages.network_error") %>', 'error');
     }
 });
 
@@ -152,15 +156,15 @@ document.getElementById('claimReferralForm').addEventListener('submit', async (e
     e.preventDefault();
     const codeInput = document.getElementById('claim-code');
     const code = codeInput.value.trim();
-    if(!code) return showMessage("Please enter a referral code to claim.", 'error');
+    if(!code) return showMessage('<%= __("referrals.messages.enter_claim_code") %>', 'error');
 
     try {
         const res = await fetch(`/api/referrals/claim?code=${encodeURIComponent(code)}`, { method: 'GET', headers: { 'Accept': 'application/json' } });
         const data = await res.json();
         if(res.ok) showMessage(data.message, 'success');
-        else showMessage(data.error || 'An error occurred.', 'error');
+        else showMessage(data.error || '<%= __("referrals.messages.error_occurred") %>', 'error');
     } catch(err) {
-        showMessage('Network error. Please try again.', 'error');
+        showMessage('<%= __("referrals.messages.network_error") %>', 'error');
     }
 });
 </script>

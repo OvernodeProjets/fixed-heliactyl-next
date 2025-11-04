@@ -4,8 +4,8 @@
     <div class="flex justify-between items-center w-full mx-auto pb-4">
         <!-- Welcome text and subtext on the left -->
         <div class="flex flex-col">
-            <h1 class="text-xl font-semibold mb-0.5 heavy">SFTP Credentials</h1>
-            <p class="text-gray-400 text-md">View and manage the credentials to your SFTP.</p>
+            <h1 class="text-xl font-semibold mb-0.5 heavy"><%= __('account.title') %></h1>
+            <p class="text-gray-400 text-md"><%= __('account.subtitle') %></p>
         </div>
 
         <!-- Breadcrumbs on the right -->
@@ -19,7 +19,7 @@
                             <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
                             <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
                         </svg>
-                        <span>Home</span>
+                        <span><%= __('breadcrumbs.home') %></span>
                     </a>
                 </li>
                 <li class="flex items-center">
@@ -30,7 +30,7 @@
                 </li>
                 <li>
                     <a href="#_" class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200" aria-current="page">
-                        User Credentials
+                        <%= __('breadcrumbs.user_credentials') %>
                     </a>
                 </li>
             </ol>
@@ -45,8 +45,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                 </svg>
             </div>
-            <h2 class="text-2xl font-bold mb-4">User Credentials</h2>
-            <p class="text-gray-400 mb-6">Use these credentials to access certain actions such as SFTP.</p>
+            <h2 class="text-2xl font-bold mb-4"><%= __('account.user_credentials') %></h2>
+            <p class="text-gray-400 mb-6"><%= __('account.description') %></p>
 
             <!-- Current Credentials -->
             <div class="mb-8">
@@ -54,33 +54,33 @@
                     <input value="<%= req.session.userinfo.email %>" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border placeholder-gray-400 focus:ring-2" disabled>
                 </div>
                 <div class="mb-4 relative">
-                    <input id="current-password" value="<%= req.session.password ? req.session.password : 'No password available: passwords are only shown once.' %>" class="transition ease-in-out delay-100 shadow-sm block w-full placeholder-white/60 sm:text-sm rounded-lg bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border placeholder-gray-400 focus:ring-2" disabled>
+                    <input id="current-password" value="<%= req.session.password ? req.session.password : __('account.messages.no_password') %>" class="transition ease-in-out delay-100 shadow-sm block w-full placeholder-white/60 sm:text-sm rounded-lg bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border placeholder-gray-400 focus:ring-2" disabled>
                 </div>
             </div>
 
             <!-- Password Change Section -->
             <div class="border-t border-white/15 pt-8">
-                <h3 class="text-lg font-semibold mb-4">Set a new password</h3>
+                <h3 class="text-lg font-semibold mb-4"><%= __('account.new_password.title') %></h3>
                 <form id="password-change-form" class="space-y-4">
                     <div>
-                        <input type="password" id="new-password" placeholder="New Password" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 placeholder-white/60 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border placeholder-gray-400 focus:ring-2">
+                        <input type="password" id="new-password" placeholder="<%= __('account.new_password.placeholder_new') %>" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 placeholder-white/60 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border placeholder-gray-400 focus:ring-2">
                     </div>
                     <div>
-                        <input type="password" id="confirm-password" placeholder="Confirm New Password" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg placeholder-white/60 bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border placeholder-gray-400 focus:ring-2">
+                        <input type="password" id="confirm-password" placeholder="<%= __('account.new_password.placeholder_confirm') %>" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg placeholder-white/60 bg-white/5 text-white border-white/5 focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border placeholder-gray-400 focus:ring-2">
                     </div>
                     <p class="text-sm text-white/70 text-left py-2.5">
-                        Password must contain:
-                        <br>• At least 8 characters
-                        <br>• One uppercase letter
-                        <br>• One lowercase letter
-                        <br>• One number
+                        <%= __('account.new_password.requirements') %>
+                        <br>• <%= __('account.new_password.requirement_length') %>
+                        <br>• <%= __('account.new_password.requirement_uppercase') %>
+                        <br>• <%= __('account.new_password.requirement_lowercase') %>
+                        <br>• <%= __('account.new_password.requirement_number') %>
                     </p>
                     <div class="flex justify-between gap-4 mt-6">
                         <button type="button" onclick="window.location.href='../api/password/generate'" class="flex-1 font-medium bg-white/15 text-sm hover:scale-95 text-white px-4 py-2 rounded-xl hover:bg-white/20 transition">
-                            Generate Random
+                            <%= __('account.new_password.button_generate') %>
                         </button>
                         <button type="submit" class="flex-1 font-medium bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm hover:scale-95 hover:bg-indigo-600 transition">
-                            Set Password
+                            <%= __('account.new_password.button_set') %>
                         </button>
                     </div>
                 </form>
@@ -97,7 +97,7 @@
     function copyPassword() {
         const passwordInput = document.getElementById('current-password');
         navigator.clipboard.writeText(passwordInput.value);
-        showStatus('Password copied to clipboard!', 'success');
+        showStatus('<%= __('account.messages.password_copied') %>', 'success');
     }
 
     function showStatus(message, type) {
@@ -140,13 +140,13 @@
             const data = await response.json();
 
             if (response.ok) {
-                showStatus('Password updated successfully!', 'success');
+                showStatus('<%= __("account.messages.password_updated") %>', 'success');
                 setTimeout(() => window.location.reload(), 1500);
             } else {
                 showStatus(data.error, 'error');
             }
         } catch (error) {
-            showStatus('An error occurred while updating the password.', 'error');
+            showStatus('<%= __("account.messages.error_occurred") %>', 'error');
         }
     });
 </script>

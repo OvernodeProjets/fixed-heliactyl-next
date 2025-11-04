@@ -4,8 +4,8 @@
     <!-- Header Section -->
     <div class="flex justify-between items-center w-full mx-auto pb-4">
         <div class="flex flex-col">
-            <h1 class="text-xl font-semibold mb-0.5 heavy">Wallet</h1>
-            <p class="text-gray-400 text-md">Manage your <%= settings.website.currency %> balances and transactions.</p>
+            <h1 class="text-xl font-semibold mb-0.5 heavy"><%= __("wallet.title") %></h1>
+            <p class="text-gray-400 text-md"><%= __("wallet.subtitle", { currency: settings.website.currency }) %></p>
         </div>
 
         <nav aria-label="Breadcrumb" class="inline-flex py-2 px-4 rounded-xl bg-white/5 transition-colors duration-200">
@@ -28,7 +28,7 @@
                             <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
                             <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
                         </svg>
-                        <span>Home</span>
+                        <span><%= __("breadcrumbs.home") %></span>
                     </a>
                 </li>
                 <li class="flex items-center">
@@ -48,7 +48,7 @@
                 </li>
                 <li>
                     <a href="#_" class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200" aria-current="page">
-                        Wallet
+                        <%= __("breadcrumbs.wallet") %>
                     </a>
                 </li>
             </ol>
@@ -58,19 +58,19 @@
     <!-- Balance Overview -->
     <div class="rounded-xl bg-[rgba(23,23,28,0.7)] shadow-lg shadow-black/40 backdrop-blur-md border border-white/5 relative overflow-hidden z-10 backdrop-blur-lg bg-gradient-to-br from-[rgba(17,17,22,0.8)] to-[rgba(28,28,35,0.8)] before:content-[''] before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top_right,rgba(67,56,202,0.12),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.12),transparent_40%)] before:-z-20 after:content-[''] after:absolute after:inset-0 after:bg-gradient-to-br after:from-indigo-600/20 after:to-blue-500/20 after:-z-10 after:opacity-70 p-10 mb-10">
         <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-semibold text-white/95">Your Balance</h2>
+            <h2 class="text-2xl font-semibold text-white/95"><%= __("wallet.balance.title") %></h2>
             <div id="userAddress" class="text-sm bg-black/20 hover:bg-black/30 border border-white/5 transition-all duration-200 rounded-full py-2.5 px-5 cursor-pointer text-white/80 hover:border-white/10">
                 <%= req.session.userinfo.id %>
             </div>
         </div>
         <div class="text-center py-10">
-            <p id="currentBalance" class="text-6xl font-bold mb-10 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent tracking-tight">Loading...</p>
+            <p id="currentBalance" class="text-6xl font-bold mb-10 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent tracking-tight"><%= __("wallet.balance.loading") %></p>
             <div class="flex justify-center space-x-4">
                 <button onclick="showTransferModal()" class="bg-indigo-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 transition-all duration-200 shadow-lg shadow-indigo-900/20 hover:shadow-indigo-900/40 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="size-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M3.105 2.288a.75.75 0 0 0-.826.95l1.414 4.926A1.5 1.5 0 0 0 5.135 9.25h6.115a.75.75 0 0 1 0 1.5H5.135a1.5 1.5 0 0 0-1.442 1.086l-1.414 4.926a.75.75 0 0 0 .826.95 28.897 28.897 0 0 0 15.293-7.155.75.75 0 0 0 0-1.114A28.897 28.897 0 0 0 3.105 2.288Z" />
                     </svg>
-                    Send <%= settings.website.currency %>
+                    <%= __("wallet.send_button", { currency: settings.website.currency }) %>
                 </button>
             </div>
         </div>
@@ -78,13 +78,12 @@
 
     <!-- Recent Transactions -->
     <div class="rounded-xl bg-[rgba(23,23,28,0.7)] shadow-lg shadow-black/40 backdrop-blur-md border border-white/5 p-8 mt-10 mb-8">
-        <h2 class="text-2xl font-semibold mb-6 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Recent Transactions</h2>
+        <h2 class="text-2xl font-semibold mb-6 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent"><%= __("wallet.transactions.title") %></h2>
         <div id="recentTransactions" class="space-y-3 mb-6">
-            <!-- Transactions will be dynamically inserted here -->
         </div>
         <button id="showAllTransactions" class="w-full text-center py-3 text-white/70 hover:text-white transition-all duration-200 border-t border-white/5 hover:border-white/10 mt-4">
             <span class="inline-flex items-center">
-                Show All Transactions
+                <%= __('wallet.ui.show_all') %>
                 <svg xmlns="http://www.w3.org/2000/svg" class="size-4 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 9l6 6 6-6"/>
                 </svg>
@@ -97,7 +96,7 @@
 <div id="transactionModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200 ease-in-out">
     <div id="transactionModalContent" class="bg-[#191c20] p-8 rounded-lg max-w-md w-full transform scale-95 opacity-0 transition-all duration-300 ease-in-out">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-semibold text-white">Transaction Details</h2>
+            <h2 class="text-2xl font-semibold text-white"><%= __('wallet.ui.transaction_details') %></h2>
             <button onclick="hideTransactionModal()" class="text-gray-400 hover:text-white transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -105,7 +104,6 @@
             </button>
         </div>
         <div id="transactionDetails" class="space-y-4">
-            <!-- Content will be dynamically inserted here -->
         </div>
     </div>
 </div>
@@ -113,26 +111,26 @@
 <!-- Transfer Modal -->
 <div id="transferModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200 ease-in-out">
     <div id="modalContent" class="bg-[#191c20] p-8 rounded-lg max-w-md w-full transform scale-95 opacity-0 transition-all duration-300 ease-in-out">
-        <h2 class="text-2xl font-semibold text-white mb-4">Transfer <%= settings.website.currency %></h2>
+        <h2 class="text-2xl font-semibold text-white mb-4"><%= __("wallet.modal.transfer_title", { currency: settings.website.currency }) %></h2>
         <form id="transferForm" class="space-y-4">
             <div>
-                <label for="receiverId" class="block text-sm font-medium text-gray-300">Receiver Address</label>
-                <input type="text" id="receiverId" name="receiverId" required 
+                <label for="receiverId" class="block text-sm font-medium text-gray-300"><%= __("wallet.modal.recipient_label") %></label>
+                <input type="text" id="receiverId" name="receiverId" required placeholder="<%= __("wallet.modal.recipient_placeholder") %>"
                 class="mt-1 block w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div>
-                <label for="amount" class="block text-sm font-medium text-gray-300">Amount</label>
-                <input type="number" id="amount" name="amount" required min="1" step="1" 
+                <label for="amount" class="block text-sm font-medium text-gray-300"><%= __("wallet.modal.amount_label") %></label>
+                <input type="number" id="amount" name="amount" required min="1" step="1" placeholder="<%= __("wallet.modal.amount_placeholder") %>"
                 class="mt-1 block w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div class="flex justify-end space-x-4">
-                <button type="button" onclick="hideTransferModal()" 
+                <button type="button" onclick="hideTransferModal()"
                     class="px-4 py-2 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors">
-                    Cancel
+                    <%= __("wallet.modal.cancel") %>
                 </button>
                 <button type="submit"
                     class="px-4 py-2 bg-indigo-600 text-white rounded-full font-medium hover:bg-indigo-700 transition-colors">
-                    Confirm Transfer
+                    <%= __("wallet.modal.send", { currency: settings.website.currency }) %>
                 </button>
             </div>
         </form>
@@ -164,6 +162,11 @@ function formatDate(timestamp) {
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
 
+    const TXT_AGO = '<%= __("wallet.ui.ago") %>';
+    const SYM_M = '<%= __("wallet.ui.minute_symbol") %>';
+    const SYM_H = '<%= __("wallet.ui.hour_symbol") %>';
+    const SYM_D = '<%= __("wallet.ui.day_symbol") %>';
+
     if (days > 7) {
         return date.toLocaleDateString('en-US', { 
             year: 'numeric',
@@ -171,24 +174,28 @@ function formatDate(timestamp) {
             day: 'numeric'
         });
     } else if (days > 0) {
-        return `${days}d ago`;
+        return `${days}${SYM_D} ${TXT_AGO}`;
     } else if (hours > 0) {
-        return `${hours}h ago`;
+        return `${hours}${SYM_H} ${TXT_AGO}`;
     } else if (minutes > 0) {
-        return `${minutes}m ago`;
+        return `${minutes}${SYM_M} ${TXT_AGO}`;
     } else {
-        return 'Just now';
+        return '<%= __("wallet.ui.just_now") %>';
     }
 }
 
 function displayRecentTransactions() {
     const container = document.getElementById('recentTransactions');
+    const txtNoTransactions = '<%= __("wallet.transactions.no_transactions") %>';
+    const txtReceived = '<%= __("wallet.transactions.types.received") %>';
+    const txtSent = '<%= __("wallet.transactions.types.sent") %>';
+
     container.innerHTML = '';
 
     if (transactions.length === 0) {
         container.innerHTML = `
             <div class="text-center py-8 text-gray-400">
-                <p>No transactions yet</p>
+                <p>${txtNoTransactions}</p>
             </div>
         `;
         return;
@@ -200,19 +207,19 @@ function displayRecentTransactions() {
         const formattedDate = formatDate(transaction.timestamp);
 
         container.innerHTML += `
-            <div class="border border-transparent hover:border-white/5 hover:bg-white/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-black/20 transition-all duration-300 flex items-center justify-between p-4 rounded-lg cursor-pointer" 
+            <div class="border border-transparent hover:border-white/5 hover:bg-white/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-black/20 transition-all duration-300 flex items-center justify-between p-4 rounded-lg cursor-pointer"
                  onclick="showTransactionDetails(${JSON.stringify(transaction).replace(/"/g, '&quot;')})">
                 <div class="flex items-center space-x-4">
                     <div class="flex-shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" class="size-6 ${isReceived ? 'text-emerald-400' : 'text-rose-400'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            ${isReceived ? 
-                            '<path d="M12 3v18M3 11l9 9 9-9"/>' : 
+                            ${isReceived ?
+                            '<path d="M12 3v18M3 11l9 9 9-9"/>' :
                             '<path d="M12 21V3M3 13l9-9 9 9"/>'}
                         </svg>
                     </div>
                     <div class="flex flex-col">
                         <div class="flex items-center space-x-2">
-                            <p class="font-semibold">${isReceived ? 'Received' : 'Sent'} ${transaction.currency}</p>
+                            <p class="font-semibold">${isReceived ? txtReceived : txtSent} ${transaction.currency}</p>
                             <span class="text-xs text-gray-400">${formattedDate}</span>
                         </div>
                         <p class="text-sm text-gray-400 font-mono">${otherParty}</p>
@@ -266,7 +273,7 @@ document.getElementById('userAddress').addEventListener('click', function() {
     const text = this.textContent.trim();
     navigator.clipboard.writeText(text).then(() => {
         const originalText = this.textContent;
-        this.textContent = 'Copied!';
+        this.textContent = '<%= __("wallet.ui.copied") %>';
         setTimeout(() => {
             this.textContent = originalText;
         }, 2000);
@@ -291,16 +298,16 @@ document.getElementById('transferForm').addEventListener('submit', async (e) => 
         const result = await response.json();
 
         if (response.ok) {
-            showSuccess('Transfer successful!');
+            showSuccess('<%= __("wallet.messages.transfer_success_generic") %>');
             hideTransferModal();
             fetchWalletData();
             fetchTransactions();
         } else {
-            showError(`Transfer failed: ${result.error}`);
+            showError('<%= __("wallet.messages.transfer_failed_prefix") %> ' + result.error);
         }
     } catch (error) {
         console.error('Error during transfer:', error);
-        showError('An error occurred during the transfer. Please try again.');
+        showError('<%= __("wallet.messages.transfer_generic_error") %>');
     }
 });
 
@@ -372,7 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div class="flex flex-col">
                             <div class="flex items-center space-x-2">
-                                <p class="font-semibold">${isReceived ? 'Received' : 'Sent'} ${transaction.currency}</p>
+                                <p class="font-semibold">${isReceived ? '<%= __("wallet.transactions.types.received") %>' : '<%= __("wallet.transactions.types.sent") %>'} ${transaction.currency}</p>
                                 <span class="text-xs text-gray-400">${formattedDate}</span>
                             </div>
                             <p class="text-sm text-gray-400 font-mono">${otherParty}</p>
@@ -414,19 +421,19 @@ function showTransactionDetails(transaction) {
     detailsContainer.innerHTML = `
         <div class="bg-white/5 rounded-lg p-6 space-y-4">
             <div class="flex items-center justify-between">
-                <span class="text-gray-400">Type</span>
+                <span class="text-gray-400"><%= __('wallet.ui.type') %></span>
                 <span class="font-semibold ${isReceived ? 'text-emerald-400' : 'text-rose-400'}">
-                    ${isReceived ? 'Received' : 'Sent'}
+                    ${isReceived ? '<%= __("wallet.transactions.types.received") %>' : '<%= __("wallet.transactions.types.sent") %>'}
                 </span>
             </div>
             <div class="flex items-center justify-between">
-                <span class="text-gray-400">Amount</span>
+                <span class="text-gray-400"><%= __('wallet.ui.amount') %></span>
                 <span class="font-semibold ${isReceived ? 'text-emerald-400' : 'text-rose-400'}">
                     ${isReceived ? '+' : '-'}${Math.abs(transaction.amount).toLocaleString()} ${transaction.currency}
                 </span>
             </div>
             <div class="flex items-center justify-between">
-                <span class="text-gray-400">Status</span>
+                <span class="text-gray-400"><%= __('wallet.ui.status') %></span>
                 <span class="px-2 py-1 rounded-full text-xs ${
                     transaction.status === 'completed' ? 'bg-emerald-400/20 text-emerald-400' : 
                     transaction.status === 'pending' ? 'bg-yellow-400/20 text-yellow-400' : 
@@ -436,24 +443,24 @@ function showTransactionDetails(transaction) {
                 </span>
             </div>
             <div class="pt-4 border-t border-white/10">
-                <p class="text-gray-400 text-sm mb-2">Transaction ID</p>
+                <p class="text-gray-400 text-sm mb-2"><%= __('wallet.ui.transaction_id') %></p>
                 <p class="font-mono text-sm bg-white/5 p-2 rounded break-all">${transaction.transactionKey}</p>
             </div>
             <div class="space-y-2">
-                <p class="text-gray-400 text-sm">Sender</p>
+                <p class="text-gray-400 text-sm"><%= __('wallet.ui.sender') %></p>
                 <p class="font-mono text-sm bg-white/5 p-2 rounded break-all">${transaction.senderId}</p>
             </div>
             <div class="space-y-2">
-                <p class="text-gray-400 text-sm">Receiver</p>
+                <p class="text-gray-400 text-sm"><%= __('wallet.ui.receiver') %></p>
                 <p class="font-mono text-sm bg-white/5 p-2 rounded break-all">${transaction.receiverId}</p>
             </div>
             ${transaction.description ? `
             <div class="pt-4 border-t border-white/10">
-                <p class="text-gray-400 text-sm">Description</p>
+                <p class="text-gray-400 text-sm"><%= __('wallet.ui.description') %></p>
                 <p class="text-sm">${transaction.description}</p>
             </div>` : ''}
             <div class="pt-4 border-t border-white/10">
-                <p class="text-gray-400 text-sm">Timestamp</p>
+                <p class="text-gray-400 text-sm"><%= __('wallet.ui.timestamp') %></p>
                 <p class="text-sm">${formattedDate}</p>
             </div>
         </div>

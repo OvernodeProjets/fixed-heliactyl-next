@@ -4,19 +4,18 @@
     <!-- Header Section -->
     <div class="flex justify-between items-center w-full mx-auto pb-4">
         <div class="flex flex-col">
-            <h1 class="text-xl font-semibold mb-0.5 heavy">Store</h1>
-            <p class="text-gray-400 text-md">Manage your resources and subscriptions with <%= settings.website.currency %></p>
+            <h1 class="text-xl font-semibold mb-0.5 heavy"><%= __("store.title") %></h1>
+            <p class="text-gray-400 text-md"><%= __("store.subtitle", { currency: settings.website.currency }) %></p>
         </div>
 
         <nav aria-label="Breadcrumb" class="inline-flex py-2 px-4 rounded-xl bg-white/5 transition-colors duration-200">
             <ol role="list" class="flex items-center space-x-2">
                 <li>
                     <a href="/" class="text-sm flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-colors duration-200">
-                        <!-- Home Icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
                             <path d="M3 9.75L12 3l9 6.75v11.25a1.5 1.5 0 01-1.5 1.5h-6v-7.5a1.5 1.5 0 00-1.5-1.5h-3a1.5 1.5 0 00-1.5 1.5v7.5h-6A1.5 1.5 0 013 21v-11.25z"/>
                         </svg>
-                        <span>Home</span>
+                        <span><%= __("breadcrumbs.home") %></span>
                     </a>
                 </li>
                 <li class="flex items-center">
@@ -26,7 +25,7 @@
                 </li>
                 <li>
                     <a href="#" class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200">
-                        Store
+                        <%= __("breadcrumbs.store") %>
                     </a>
                 </li>
             </ol>
@@ -37,10 +36,10 @@
     <div class="border-b border-white/5 mt-4">
         <nav class="flex space-x-8">
             <button @click="activeTab = 'store'" :class="{'border-indigo-500 text-white': activeTab === 'store', 'border-transparent text-gray-400 hover:text-white': activeTab !== 'store'}" class="border-b-2 py-4 px-1 text-sm font-medium transition-colors duration-200">
-                Store
+                <%= __("store.tabs.store") %>
             </button>
             <button @click="activeTab = 'history'" :class="{'border-indigo-500 text-white': activeTab === 'history', 'border-transparent text-gray-400 hover:text-white': activeTab !== 'history'}" class="border-b-2 py-4 px-1 text-sm font-medium transition-colors duration-200">
-                History
+                <%= __("store.tabs.history") %>
             </button>
         </nav>
     </div>
@@ -71,10 +70,10 @@
             <!-- RAM Card -->
             <div class="bg-white/5 rounded-2xl p-8">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-semibold">RAM</h3>
+                    <h3 class="text-xl font-semibold"><%= __("store.resources.ram") %></h3>
                 </div>
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-lg font-medium"><%= settings.api.client.coins.store.ram.cost %> <%= settings.website.currency %> / GB</span>
+                    <span class="text-lg font-medium"><%= settings.api.client.coins.store.ram.cost %> <%= settings.website.currency %> <%= __("store.per_unit.gb") %></span>
                     <div class="flex items-center">
                         <button @click="decrement('ram')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-l transition">-</button>
                         <input x-model.number="ram" type="number" min="1" max="32" class="bg-black text-white w-16 text-center px-2 py-1 border-t border-b border-white/5">
@@ -89,14 +88,14 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span x-text="isLoading ? 'Processing...' : 'Purchase RAM'"></span>
+                    <span x-text="isLoading ? '<%= __("store.ui.processing") %>' : '<%= __("store.purchase") %> <%= __("store.resources.ram") %>'"></span>
                 </button>
             </div>
 
             <!-- Disk Card -->
             <div class="bg-white/5 rounded-2xl p-8">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-semibold">Disk</h3>
+                    <h3 class="text-xl font-semibold"><%= __("store.resources.disk") %></h3>
                 </div>
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-lg font-medium"><%= settings.api.client.coins.store.disk.cost %> <%= settings.website.currency %> / 5GB</span>
@@ -114,17 +113,17 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span x-text="isLoading ? 'Processing...' : 'Purchase Disk'"></span>
+                    <span x-text="isLoading ? '<%= __("store.ui.processing") %>' : '<%= __("store.purchase") %> <%= __("store.resources.disk") %>'"></span>
                 </button>
             </div>
 
             <!-- CPU Card -->
             <div class="bg-white/5 rounded-2xl p-8">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-semibold">CPU</h3>
+                    <h3 class="text-xl font-semibold"><%= __("store.resources.cpu") %></h3>
                 </div>
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-lg font-medium"><%= settings.api.client.coins.store.cpu.cost %> <%= settings.website.currency %> / Core</span>
+                    <span class="text-lg font-medium"><%= settings.api.client.coins.store.cpu.cost %> <%= settings.website.currency %> <%= __("store.per_unit.percent") %></span>
                     <div class="flex items-center">
                         <button @click="decrement('cpu')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-l transition">-</button>
                         <input x-model.number="cpu" type="number" min="1" max="10" class="bg-black text-white w-16 text-center px-2 py-1 border-t border-b border-white/5">
@@ -139,17 +138,17 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span x-text="isLoading ? 'Processing...' : 'Purchase CPU'"></span>
+                    <span x-text="isLoading ? '<%= __("store.ui.processing") %>' : '<%= __("store.purchase") %> <%= __("store.resources.cpu") %>'"></span>
                 </button>
             </div>
 
             <!-- Servers Card -->
             <div class="bg-white/5 rounded-2xl p-8">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-semibold">Servers</h3>
+                    <h3 class="text-xl font-semibold"><%= __("store.resources.servers") %></h3>
                 </div>
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-lg font-medium"><%= settings.api.client.coins.store.servers.cost %> <%= settings.website.currency %> / Server</span>
+                    <span class="text-lg font-medium"><%= settings.api.client.coins.store.servers.cost %> <%= settings.website.currency %> <%= __("store.per_unit.server") %></span>
                     <div class="flex items-center">
                         <button @click="decrement('servers')" class="bg-white/5 hover:bg-white/10 text-white px-2 py-1 rounded-l transition">-</button>
                         <input x-model.number="servers" type="number" min="1" max="20" class="bg-black text-white w-16 text-center px-2 py-1 border-t border-b border-white/5">
@@ -164,14 +163,14 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span x-text="isLoading ? 'Processing...' : 'Purchase Servers'"></span>
+                    <span x-text="isLoading ? '<%= __("store.ui.processing") %>' : '<%= __("store.purchase") %> <%= __("store.resources.servers") %>'"></span>
                 </button>
             </div>
         </div>
     <!-- Renewal Bypass Promo Section -->
     <div class="bg-white/5 rounded-2xl p-6 mb-8 mt-5">
         <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-semibold text-white/90">Special Offer</h2>
+            <h2 class="text-xl font-semibold text-white/90"><%= __('store.renewal_bypass.title') %></h2>
             <button 
                 @click="purchaseRenewalBypass()" 
                 :disabled="!renewalBypassStatus.canAfford || isLoading || renewalBypassStatus.hasRenewalBypass"
@@ -180,7 +179,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                 </svg>
-                <span x-text="isLoading ? 'Processing...' : renewalBypassStatus.hasRenewalBypass ? 'Already Purchased' : `Purchase (${renewalBypassStatus.price} coins)`"></span>
+                <span x-text="isLoading ? '<%= __("store.ui.processing") %>' : renewalBypassStatus.hasRenewalBypass ? '<%= __("store.renewal_bypass.already_purchased") %>' : `${'<%= __("store.renewal_bypass.cta") %>'} (${renewalBypassStatus.price} coins)`"></span>
             </button>
         </div>
         
@@ -194,14 +193,14 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-white mb-2">Renewal Bypass</h3>
-                        <p class="text-white/80 text-sm mb-4">Never worry about weekly store renewals or renewing your server every 48 hours again. Purchase our Renewal Bypass for <span x-text="renewalBypassStatus.price"></span> coins and keep your resources and servers forever.</p>
+                        <h3 class="text-lg font-semibold text-white mb-2"><%= __('store.renewal_bypass.headline') %></h3>
+                        <p class="text-white/80 text-sm mb-4"><%- __('store.renewal_bypass.description', { price: '<span x-text="renewalBypassStatus.price"></span>' }) %></p>
                         <div class="flex items-center gap-3">
                             <span class="text-2xl font-bold text-white" x-text="`${renewalBypassStatus.price} coins`"></span>
-                            <span class="bg-purple-500/20 text-purple-400 px-3 py-1 rounded-lg text-sm">One-time purchase</span>
+                            <span class="bg-purple-500/20 text-purple-400 px-3 py-1 rounded-lg text-sm"><%= __('store.renewal_bypass.one_time') %></span>
                         </div>
                         <div x-show="!renewalBypassStatus.canAfford && !renewalBypassStatus.hasRenewalBypass" class="mt-3 text-red-400 text-sm">
-                            You need <span x-text="(renewalBypassStatus.price - renewalBypassStatus.currentBalance).toFixed(2)"></span> more coins to purchase this.
+                            <%- __('store.renewal_bypass.need_more', { amount: '<span x-text="(renewalBypassStatus.price - renewalBypassStatus.currentBalance).toFixed(2)"></span>' }) %>
                         </div>
                     </div>
                 </div>
@@ -213,7 +212,7 @@
     <div x-show="activeTab === 'usage'" x-cloak>
         <div class="mt-4 space-y-4">
             <div class="bg-white/5 rounded-2xl p-6">
-                <h3 class="text-lg font-medium mb-4">Resources</h3>
+                <h3 class="text-lg font-medium mb-4"><%= __('store.ui.resources') %></h3>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <template x-for="(data, type) in currentUsage" :key="type">
                         <div class="bg-white/5 rounded-xl p-4">
@@ -247,19 +246,19 @@
                             </div>
                             <div class="grid grid-cols-4 gap-4">
                                 <div class="text-sm">
-                                    <span class="text-gray-400">RAM:</span>
+                                    <span class="text-gray-400"><%= __('store.resources.ram') %>:</span>
                                     <span x-text="formatBytes(usage.resources.ram)"></span>
                                 </div>
                                 <div class="text-sm">
-                                    <span class="text-gray-400">Disk:</span>
+                                    <span class="text-gray-400"><%= __('store.resources.disk') %>:</span>
                                     <span x-text="formatBytes(usage.resources.disk)"></span>
                                 </div>
                                 <div class="text-sm">
-                                    <span class="text-gray-400">CPU:</span>
+                                    <span class="text-gray-400"><%= __('store.resources.cpu') %>:</span>
                                     <span x-text="usage.resources.cpu + '%'"></span>
                                 </div>
                                 <div class="text-sm">
-                                    <span class="text-gray-400">Servers:</span>
+                                    <span class="text-gray-400"><%= __('store.resources.servers') %>:</span>
                                     <span x-text="usage.resources.servers"></span>
                                 </div>
                             </div>
@@ -275,11 +274,11 @@
         <div class="mt-4">
             <div class="bg-white/5 rounded-2xl p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium">Transaction History</h3>
+                    <h3 class="text-lg font-medium"><%= __('store.ui.transaction_history') %></h3>
                     <select x-model="historyDays" @change="fetchBillingHistory()" class="bg-white/5 text-sm rounded-lg px-3 py-2 border border-white/10">
-                        <option value="7">Last 7 days</option>
-                        <option value="14">Last 14 days</option>
-                        <option value="30">Last 30 days</option>
+                        <option value="7"><%= __('store.ui.last_7_days') %></option>
+                        <option value="14"><%= __('store.ui.last_14_days') %></option>
+                        <option value="30"><%= __('store.ui.last_30_days') %></option>
                     </select>
                 </div>
                 <div class="space-y-4">
@@ -291,8 +290,8 @@
                                     <path d="M19 5L5 19M5 5l14 14"></path>
                                 </svg>
                             </div>
-                            <h3 class="text-lg font-medium">No Transaction History</h3>
-                            <p class="text-gray-400 mt-2">Your billing history will appear here.</p>
+                            <h3 class="text-lg font-medium"><%= __('store.ui.no_history') %></h3>
+                            <p class="text-gray-400 mt-2"><%= __('store.ui.history_will_appear') %></p>
                         </div>
                     </template>
 
@@ -391,7 +390,7 @@ function storeBilling() {
                 if (!response.ok) throw new Error(data.error);
 
                 this.showSuccess = true;
-                this.successMessage = 'Successfully purchased renewal bypass!';
+                this.successMessage = '<%= __("store.renewal_bypass.success") %>';
 
                 // Refresh status after purchase
                 await Promise.all([
@@ -478,7 +477,7 @@ function storeBilling() {
             } catch (error) {
                 console.error('Failed to fetch resources:', error);
                 this.showError = true;
-                this.errorMessage = 'Failed to load resources';
+                this.errorMessage = '<%= __("store.messages.error") %>';
             }
         },
 
@@ -512,11 +511,11 @@ function storeBilling() {
 
                 // Sort history by timestamp (newest first)
                 this.billingHistory = data.sort((a, b) => b.timestamp - a.timestamp);
-                this.billingHistoryIsEmpty = data.length = 0;
+                this.billingHistoryIsEmpty = data.length === 0;
             } catch (error) {
                 console.error('Failed to fetch billing history:', error);
                 this.showError = true;
-                this.errorMessage = 'Failed to load billing history';
+                this.errorMessage = '<%= __("store.messages.error") %>';
             }
         },
 

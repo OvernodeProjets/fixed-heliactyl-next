@@ -24,13 +24,13 @@
                     </svg>
                 </div>
                 <div class="ml-3">
-                    <h3 class="text-sm font-medium text-indigo-200">Staking System Upgrade</h3>
+                    <h3 class="text-sm font-medium text-indigo-200"><%= __('staking.migration.title') %></h3>
                     <div class="mt-2 text-sm text-indigo-200">
-                        <p>We've upgraded our staking system with new features! Your existing stake has been automatically migrated. You now have access to:</p>
+                        <p><%= __('staking.migration.description') %></p>
                         <ul class="list-disc list-inside mt-2">
-                            <li>Multiple staking positions</li>
-                            <li>Higher rewards for longer lock periods</li>
-                            <li>Compound interest earnings</li>
+                            <li><%= __('staking.migration.feature_1') %></li>
+                            <li><%= __('staking.migration.feature_2') %></li>
+                            <li><%= __('staking.migration.feature_3') %></li>
                         </ul>
                     </div>
                 </div>
@@ -40,8 +40,8 @@
 
     <div class="flex justify-between items-center w-full mx-auto pb-4">
         <div class="flex flex-col">
-            <h1 class="text-xl font-semibold mb-0.5 heavy">Staking</h1>
-            <p class="text-gray-400 text-md">Earn compound interest rewards by staking your <%= settings.website.currency %>.</p>
+            <h1 class="text-xl font-semibold mb-0.5 heavy"><%= __('staking.title') %></h1>
+            <p class="text-gray-400 text-md"><%= __('staking.subtitle', { currency: settings.website.currency }) %></p>
         </div>
 
         <nav aria-label="Breadcrumb" class="inline-flex py-2 px-4 rounded-xl bg-white/5 transition-colors duration-200">
@@ -64,7 +64,7 @@
                             <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
                             <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
                         </svg>
-                        <span>Home</span>
+                        <span><%= __('breadcrumbs.home') %></span>
                     </a>
                 </li>
                 <li class="flex items-center">
@@ -84,7 +84,7 @@
                 </li>
                 <li>
                     <a href="#_" class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200" aria-current="page">
-                        Staking
+                        <%= __('breadcrumbs.staking') %>
                     </a>
                 </li>
             </ol>
@@ -96,16 +96,16 @@
         <div class="bg-white/5 rounded-2xl p-6 mb-8">
             <div class="grid md:grid-cols-3 gap-6">
                 <div>
-                    <p class="text-gray-400 text-sm">Available Balance</p>
-                    <p class="text-3xl font-bold" id="available-balance">Loading...</p>
+                    <p class="text-gray-400 text-sm"><%= __('staking.balance.available') %></p>
+                    <p class="text-3xl font-bold" id="available-balance"><%= __('staking.balance.loading') %></p>
                 </div>
                 <div>
-                    <p class="text-gray-400 text-sm">Total Staked</p>
-                    <p class="text-3xl font-bold" id="total-staked">Loading...</p>
+                    <p class="text-gray-400 text-sm"><%= __('staking.balance.total_staked') %></p>
+                    <p class="text-3xl font-bold" id="total-staked"><%= __('staking.balance.loading') %></p>
                 </div>
                 <div>
-                    <p class="text-gray-400 text-sm">Total Earnings</p>
-                    <p class="text-3xl font-bold" id="total-earnings">Loading...</p>
+                    <p class="text-gray-400 text-sm"><%= __('staking.balance.total_earnings') %></p>
+                    <p class="text-3xl font-bold" id="total-earnings"><%= __('staking.balance.loading') %></p>
                 </div>
             </div>
         </div>
@@ -113,43 +113,43 @@
         <!-- Staking Positions -->
         <div class="bg-white/5 rounded-2xl p-6 mb-8">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-semibold">Your Staking Positions</h2>
+                <h2 class="text-xl font-semibold"><%= __('staking.positions.title') %></h2>
                 <button id="new-stake-btn" class="px-4 py-2 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-200">
-                    New Stake
+                    <%= __('staking.positions.new_stake') %>
                 </button>
             </div>
             <div id="staking-positions" class="space-y-4">
                 <!-- Positions will be populated here -->
                 <div class="text-center text-gray-400 py-8" id="no-positions-message">
-                    No active staking positions. Start earning rewards by creating a new stake!
+                    <%= __('staking.positions.no_positions') %>
                 </div>
             </div>
         </div>
 
         <!-- APY Tiers -->
         <div class="bg-white/5 rounded-2xl p-6">
-            <h2 class="text-xl font-semibold mb-6">Staking Tiers</h2>
+            <h2 class="text-xl font-semibold mb-6"><%= __('staking.tiers.title') %></h2>
             <div class="grid md:grid-cols-3 gap-6">
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                     <div class="flex justify-between items-center mb-2">
-                        <h3 class="font-medium">30 Days</h3>
-                        <span class="text-indigo-400">+20% APR</span>
+                        <h3 class="font-medium"><%= __('staking.tiers.30d.title') %></h3>
+                        <span class="text-indigo-400"><%= __('staking.tiers.30d.apr') %></span>
                     </div>
-                    <p class="text-sm text-gray-400">Short-term staking with flexible rewards</p>
+                    <p class="text-sm text-gray-400"><%= __('staking.tiers.30d.description') %></p>
                 </div>
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                     <div class="flex justify-between items-center mb-2">
-                        <h3 class="font-medium">90 Days</h3>
-                        <span class="text-indigo-400">+50% APR</span>
+                        <h3 class="font-medium"><%= __('staking.tiers.90d.title') %></h3>
+                        <span class="text-indigo-400"><%= __('staking.tiers.90d.apr') %></span>
                     </div>
-                    <p class="text-sm text-gray-400">Medium-term staking with enhanced rewards</p>
+                    <p class="text-sm text-gray-400"><%= __('staking.tiers.90d.description') %></p>
                 </div>
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                     <div class="flex justify-between items-center mb-2">
-                        <h3 class="font-medium">180 Days</h3>
-                        <span class="text-indigo-400">+100% APR</span>
+                        <h3 class="font-medium"><%= __('staking.tiers.180d.title') %></h3>
+                        <span class="text-indigo-400"><%= __('staking.tiers.180d.apr') %></span>
                     </div>
-                    <p class="text-sm text-gray-400">Long-term staking with maximum rewards</p>
+                    <p class="text-sm text-gray-400"><%= __('staking.tiers.180d.description') %></p>
                 </div>
             </div>
         </div>
@@ -159,39 +159,39 @@
 <!-- New Stake Modal -->
 <div id="stake-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
     <div class="bg-[#191c20] rounded-2xl p-6 w-full max-w-md transform transition-all duration-300 scale-95">
-        <h3 class="text-xl font-semibold mb-6">Create New Stake</h3>
+        <h3 class="text-xl font-semibold mb-6"><%= __('staking.modal.create_title') %></h3>
         <form id="stake-form">
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-400 mb-1">Amount</label>
+                <label class="block text-sm font-medium text-gray-400 mb-1"><%= __('staking.modal.amount_label') %></label>
                 <div class="relative">
                     <input type="number" id="stake-amount" required min="10" step="0.01"
                            class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-indigo-500 focus:border-indigo-500">
                     <span class="absolute right-3 top-2 text-gray-400"><%= settings.website.currency %></span>
                 </div>
-                <p class="mt-1 text-sm text-gray-400">Minimum stake: 10 <%= settings.website.currency %></p>
+                <p class="mt-1 text-sm text-gray-400"><%= __('staking.modal.minimum', { currency: settings.website.currency }) %></p>
             </div>
             <div class="mb-6 relative">
-                <label class="block text-sm font-medium text-gray-400 mb-1">Lock Period</label>
+                <label class="block text-sm font-medium text-gray-400 mb-1"><%= __('staking.modal.lock_period_label') %></label>
                 <select id="lock-period" required
-                        class="w-full px-4 py-3 bg-[#1a1d21] border border-indigo-500/20 rounded-xl text-white 
+                        class="w-full px-4 py-3 bg-[#1a1d21] border border-indigo-500/20 rounded-xl text-white
                                appearance-none cursor-pointer hover:border-indigo-500/40 transition-colors duration-200
                                focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/30 focus:outline-none">
                     <option value="30d" class="py-3 px-4 hover:bg-indigo-500/10 transition-colors duration-200">
                         <div class="flex justify-between items-center">
-                            <span class="font-medium">30 Days</span>
-                            <span class="text-indigo-400">+20% APR</span>
+                            <span class="font-medium"><%= __('staking.tiers.30d.title') %></span>
+                            <span class="text-indigo-400"><%= __('staking.tiers.30d.apr') %></span>
                         </div>
                     </option>
                     <option value="90d" class="py-3 px-4 hover:bg-indigo-500/10 transition-colors duration-200">
                         <div class="flex justify-between items-center">
-                            <span class="font-medium">90 Days</span>
-                            <span class="text-indigo-400">+50% APR</span>
+                            <span class="font-medium"><%= __('staking.tiers.90d.title') %></span>
+                            <span class="text-indigo-400"><%= __('staking.tiers.90d.apr') %></span>
                         </div>
                     </option>
                     <option value="180d" class="py-3 px-4 hover:bg-indigo-500/10 transition-colors duration-200">
                         <div class="flex justify-between items-center">
-                            <span class="font-medium">180 Days</span>
-                            <span class="text-indigo-400">+100% APR</span>
+                            <span class="font-medium"><%= __('staking.tiers.180d.title') %></span>
+                            <span class="text-indigo-400"><%= __('staking.tiers.180d.apr') %></span>
                         </div>
                     </option>
                 </select>
@@ -204,10 +204,10 @@
             </div>
             <div class="flex justify-end space-x-3">
                 <button type="button" id="cancel-stake" class="px-4 py-2 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-colors duration-200">
-                    Cancel
+                    <%= __('staking.modal.cancel') %>
                 </button>
                 <button type="submit" class="px-4 py-2 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-200">
-                    Confirm Stake
+                    <%= __('staking.modal.confirm') %>
                 </button>
             </div>
         </form>
@@ -221,7 +221,7 @@
         <div id="position-modal-content"></div>
         <div class="flex justify-end space-x-3 mt-6">
             <button type="button" class="close-position-modal px-4 py-2 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-colors duration-200">
-                Close
+                <%= __('staking.modal.close') %>
             </button>
             <button type="button" id="position-action-btn" class="px-4 py-2 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-200">
             </button>
@@ -234,7 +234,13 @@ const stakeModal = document.getElementById('stake-modal');
 const positionModal = document.getElementById('position-modal');
 const stakeForm = document.getElementById('stake-form');
 let currentPositionId = null;
-const userinfo = <%- JSON.stringify(req.session.userinfo) %>
+const userinfo = <%- JSON.stringify(req.session.userinfo) %>;
+
+const periodTitles = {
+    '30d': '<%= __("staking.tiers.30d.title") %>',
+    '90d': '<%= __("staking.tiers.90d.title") %>',
+    '180d': '<%= __("staking.tiers.180d.title") %>'
+};
 
 async function checkMigration() {
     try {
@@ -269,13 +275,13 @@ async function fetchStakingData() {
         renderStakingPositions(positionsData.positions);
     } catch (error) {
         console.error('Error fetching staking data:', error);
-        showError('Failed to load staking data');
+        showError('<%= __("staking.messages.error_load") %>');
         // Show error state in positions container
         const container = document.getElementById('staking-positions');
         if (container) {
             container.innerHTML = `
                 <div class="text-center text-red-400 py-8">
-                    Failed to load staking positions. Please try again later.
+                    <%= __("staking.positions.error") %>
                 </div>
             `;
         }
@@ -294,7 +300,16 @@ function updateDashboard(positionsData) {
 function renderStakingPositions(positions) {
     const container = document.getElementById('staking-positions');
     const noPositionsMsg = document.getElementById('no-positions-message');
-    
+
+    const currency = '<%= settings.website.currency %>';
+    const txtStakedAmount = '<%= __("staking.positions.staked_amount") %>';
+    const txtLockPeriod = '<%= __("staking.positions.lock_period") %>';
+    const txtCurrentEarnings = '<%= __("staking.positions.current_earnings") %>';
+    const txtUnlockDate = '<%= __("staking.positions.unlock_date") %>';
+    const txtManage = '<%= __("staking.positions.manage") %>';
+    const txtLoading = '<%= __("staking.positions.loading") %>';
+    const txtNoPositions = '<%= __("staking.positions.no_positions") %>';
+
     // Guard clause for container
     if (!container) {
         console.warn('Staking positions container not found');
@@ -319,7 +334,7 @@ function renderStakingPositions(positions) {
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span class="ml-2">Loading positions...</span>
+                <span class="ml-2">${txtLoading}</span>
             </div>
         `;
         return;
@@ -329,7 +344,7 @@ function renderStakingPositions(positions) {
     if (positions.length === 0) {
         container.innerHTML = `
             <div class="text-center text-gray-400 py-8">
-                No active staking positions. Start earning rewards by creating a new stake!
+                ${txtNoPositions}
             </div>
         `;
         return;
@@ -339,31 +354,31 @@ function renderStakingPositions(positions) {
         <div class="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors duration-200">
             <div class="grid md:grid-cols-4 gap-4">
                 <div>
-                    <p class="text-sm text-gray-400">Staked Amount</p>
-                    <p class="text-lg font-medium">${position.amount.toFixed(2)} <%= settings.website.currency %></p>
+                    <p class="text-sm text-gray-400">${txtStakedAmount}</p>
+                    <p class="text-lg font-medium">${position.amount.toFixed(2)} ${currency}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-400">Lock Period</p>
-                    <p class="text-lg font-medium">${position.lockPeriod.replace('d', ' Days')}</p>
+                    <p class="text-sm text-gray-400">${txtLockPeriod}</p>
+                    <p class="text-lg font-medium">${periodTitles[position.lockPeriod] || position.lockPeriod}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-400">Current Earnings</p>
-                    <p class="text-lg font-medium text-indigo-400">+${position.currentEarnings.toFixed(2)} <%= settings.website.currency %></p>
+                    <p class="text-sm text-gray-400">${txtCurrentEarnings}</p>
+                    <p class="text-lg font-medium text-indigo-400">+${position.currentEarnings.toFixed(2)} ${currency}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-400">Unlock Date</p>
+                    <p class="text-sm text-gray-400">${txtUnlockDate}</p>
                     <p class="text-lg font-medium">${new Date(position.unlockTime).toLocaleDateString()}</p>
                 </div>
             </div>
             <div class="flex justify-end gap-2 mt-4">
-                <button onclick="showPositionActions('${position.positionId}')" 
+                <button onclick="showPositionActions('${position.positionId}')"
                         class="px-4 py-2 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-colors duration-200">
-                    Manage Position
+                    ${txtManage}
                 </button>
                 ${position.currentEarnings > 0 ? `
                     <button onclick="claimRewards('${position.positionId}')"
                             class="px-4 py-2 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-200 hidden">
-                        Claim ${position.currentEarnings.toFixed(2)} <%= settings.website.currency %>
+                        ${'<%= __("staking.positions.claim_prefix") %>'} ${position.currentEarnings.toFixed(2)} ${currency}
                     </button>
                 ` : ''}
             </div>
@@ -372,7 +387,7 @@ function renderStakingPositions(positions) {
                     <svg class="inline-block w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                     </svg>
-                    Locked until ${new Date(position.unlockTime).toLocaleDateString()}
+                    ${'<%= __("staking.positions.locked_until_prefix") %>'} ${new Date(position.unlockTime).toLocaleDateString()}
                 </div>
             ` : ''}
         </div>
@@ -384,30 +399,41 @@ async function showPositionActions(positionId) {
         const response = await fetch(`/api/stake/positions/${positionId}`);
         const position = (await response.json()).position;
         currentPositionId = positionId;
-        
+
+        const currency = '<%= settings.website.currency %>';
+        const txtManageTitle = '<%= __("staking.modal.manage_title") %>';
+        const txtStakedAmount = '<%= __("staking.positions.staked_amount") %>';
+        const txtLockPeriod = '<%= __("staking.positions.lock_period") %>';
+        const txtCurrentEarnings = '<%= __("staking.positions.current_earnings") %>';
+        const txtAPRBonus = '<%= __("staking.modal.apr_bonus") %>';
+        const txtEarlyWarning = '<%= __("staking.modal.early_warning") %>';
+        const txtEarlyWarningText = '<%= __("staking.modal.early_warning_text") %>';
+        const txtUnstakeEarly = '<%= __("staking.modal.unstake_early") %>';
+        const txtUnstake = '<%= __("staking.modal.unstake") %>';
+
         const modalTitle = document.getElementById('position-modal-title');
         const modalContent = document.getElementById('position-modal-content');
         const actionBtn = document.getElementById('position-action-btn');
-        
-        modalTitle.textContent = 'Manage Staking Position';
+
+        modalTitle.textContent = txtManageTitle;
         modalContent.innerHTML = `
             <div class="space-y-4">
                 <div class="bg-white/5 rounded-xl p-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <p class="text-sm text-gray-400">Staked Amount</p>
-                            <p class="text-lg font-medium">${position.amount.toFixed(2)} <%= settings.website.currency %></p>
+                            <p class="text-sm text-gray-400">${txtStakedAmount}</p>
+                            <p class="text-lg font-medium">${position.amount.toFixed(2)} ${currency}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-400">Lock Period</p>
-                            <p class="text-lg font-medium">${position.lockPeriod.replace('d', ' Days')}</p>
+                            <p class="text-sm text-gray-400">${txtLockPeriod}</p>
+                            <p class="text-lg font-medium">${periodTitles[position.lockPeriod] || position.lockPeriod}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-400">Current Earnings</p>
-                            <p class="text-lg font-medium text-indigo-400">+${position.currentEarnings.toFixed(2)} <%= settings.website.currency %></p>
+                            <p class="text-sm text-gray-400">${txtCurrentEarnings}</p>
+                            <p class="text-lg font-medium text-indigo-400">+${position.currentEarnings.toFixed(2)} ${currency}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-400">APR Bonus</p>
+                            <p class="text-sm text-gray-400">${txtAPRBonus}</p>
                             <p class="text-lg font-medium">+${getAPRBonus(position.lockPeriod)}%</p>
                         </div>
                     </div>
@@ -415,20 +441,20 @@ async function showPositionActions(positionId) {
                 ${position.isLocked ? `
                     <div class="bg-indigo-500/20 border border-indigo-500/50 rounded-xl p-4">
                         <p class="text-sm text-indigo-200">
-                            <strong>Early Withdrawal Warning:</strong> This position is still locked. Unstaking now will result in a 50% penalty on earned rewards.
+                            <strong>${txtEarlyWarning}</strong> ${txtEarlyWarningText}
                         </p>
                     </div>
                 ` : ''}
             </div>
         `;
-        
-        actionBtn.textContent = position.isLocked ? 'Unstake Early' : 'Unstake Position';
+
+        actionBtn.textContent = position.isLocked ? txtUnstakeEarly : txtUnstake;
         actionBtn.onclick = () => confirmUnstake(positionId, position.isLocked);
-        
+
         showModal('position-modal');
     } catch (error) {
         console.error('Error fetching position details:', error);
-        showError('Failed to load position details');
+        showError('<%= __("staking.messages.error_load") %>');
     }
 }
 
@@ -442,10 +468,13 @@ function getAPRBonus(lockPeriod) {
 }
 
 async function confirmUnstake(positionId, isLocked) {
-    const confirmMessage = isLocked ?
-        'Are you sure you want to unstake early? You will lose 50% of your earned rewards.' :
-        'Are you sure you want to unstake this position?';
-    
+    const currency = '<%= settings.website.currency %>';
+    const txtConfirmUnstakeEarly = '<%= __("staking.messages.confirm_unstake_early") %>';
+    const txtConfirmUnstake = '<%= __("staking.messages.confirm_unstake") %>';
+    const txtErrorUnstake = '<%= __("staking.messages.error_unstake") %>';
+
+    const confirmMessage = isLocked ? txtConfirmUnstakeEarly : txtConfirmUnstake;
+
     if (confirm(confirmMessage)) {
         try {
             const response = await fetch('/unstake', {
@@ -453,10 +482,10 @@ async function confirmUnstake(positionId, isLocked) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ positionId })
             });
-            
+
             const data = await response.json();
             if (response.ok) {
-                showSuccess(`Successfully unstaked ${data.returned.toFixed(2)} <%= settings.website.currency %>`);
+                showSuccess('<%= __("staking.messages.unstaked_success_generic") %>');
                 hideModal('position-modal');
                 fetchStakingData();
             } else {
@@ -464,29 +493,32 @@ async function confirmUnstake(positionId, isLocked) {
             }
         } catch (error) {
             console.error('Error unstaking position:', error);
-            showError('Failed to unstake position');
+            showError(txtErrorUnstake);
         }
     }
 }
 
 async function claimRewards(positionId) {
+    const currency = '<%= settings.website.currency %>';
+    const txtErrorClaim = '<%= __("staking.messages.error_claim") %>';
+
     try {
         const response = await fetch('/api/stake/claim', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ positionId })
         });
-        
+
         const data = await response.json();
         if (response.ok) {
-            showSuccess(`Successfully claimed ${data.claimedAmount.toFixed(2)} <%= settings.website.currency %>`);
+            showSuccess('<%= __("staking.messages.claimed_success_generic") %>');
             fetchStakingData();
         } else {
             showError(data.error);
         }
     } catch (error) {
         console.error('Error claiming rewards:', error);
-        showError('Failed to claim rewards');
+        showError(txtErrorClaim);
     }
 }
 
@@ -555,17 +587,20 @@ stakeForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const amount = parseFloat(document.getElementById('stake-amount').value);
     const lockPeriod = document.getElementById('lock-period').value;
-    
+
+    const currency = '<%= settings.website.currency %>';
+    const txtErrorCreate = '<%= __("staking.messages.error_create") %>';
+
     try {
         const response = await fetch('/api/stake', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ amount, lockPeriod })
         });
-        
+
         const data = await response.json();
         if (response.ok) {
-            showSuccess(`Successfully staked ${amount.toFixed(2)} <%= settings.website.currency %>`);
+            showSuccess('<%= __("staking.messages.staked_success_generic") %>');
             hideModal('stake-modal');
             stakeForm.reset();
             fetchStakingData();
@@ -574,7 +609,7 @@ stakeForm.addEventListener('submit', async (e) => {
         }
     } catch (error) {
         console.error('Error creating stake:', error);
-        showError('Failed to create stake');
+        showError(txtErrorCreate);
     }
 });
 

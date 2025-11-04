@@ -1,0 +1,463 @@
+{
+  "meta": {
+    "name": "Deutsch",
+    "flag": "🇩🇪"
+  },
+  "common": {
+    "welcome": "Willkommen",
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "servers": "Server",
+    "account": "Konto",
+    "settings": "Einstellungen",
+    "logout": "Abmelden",
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "loading": "Laden...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "processing": "Verarbeitung..."
+  },
+  "dashboard": {
+    "title": "START",
+    "subtitle": "Sehen Sie Ihre verfügbaren Ressourcen und einen Überblick über Ihr Konto",
+    "welcome_title": "Willkommen bei {{name}}, {{username}}",
+    "welcome_description": "Im Dashboard können Sie Server verwalten und erstellen.<br /><br />Upgraden Sie Ihre Server: Sie können kostenlose {{currency}} über unseren Discord <a href=\"{{discord}}\" class=\"text-indigo-300 hover:text-indigo-200 transition\">{{discord}}</a> oder auf anderen Wegen verdienen.",
+    "get_started": "Loslegen",
+    "resources_below_zero": "Ihre Ressourcen sind unter Null. Bitte <a href='/api/updateinfo' class='text-amber-300'>hier klicken</a>, um es zu beheben, sonst könnten Ihre Server gesperrt werden. Falls das nicht hilft, versuchen Sie, Ihre Server zu bearbeiten.",
+    "daily_reward": {
+      "title": "Ihre Tagesbelohnung ist verfügbar.",
+      "description": "Als Dankeschön für die Nutzung von {{name}} können Sie jeden Tag eine Belohnung von {{amount}} ({{currency}}) erhalten.<br />Klicken Sie unten auf den Button, um sie zu beanspruchen!",
+      "claim": "Belohnung abholen"
+    },
+    "advent_calendar": {
+      "title": "Adventskalender",
+      "description": "Unser Adventskalender hat am 11. November begonnen und endet am 25. Dezember!"
+    },
+    "support": {
+      "title": "Support",
+      "description": "Wenn Sie Hilfe benötigen, wenden Sie sich an unser Team über Discord oder das Ticketsystem.",
+      "ticket_not_found": "Keine Tickets gefunden."
+    },
+    "resources": {
+      "memory": "Arbeitsspeicher",
+      "cpu": "CPU‑Kerne",
+      "disk": "Speicher (Festplatte)",
+      "servers": "Server‑Slots"
+    },
+    "stats": {
+      "title": "Plattformstatistiken",
+      "updated": "Aktualisiert jede Minute",
+      "total_users": "Gesamtnutzer",
+      "active_servers": "Aktive Server",
+      "nodes": "Nodes",
+      "locations": "Standorte"
+    },
+    "alerts": {
+      "daily_claimed": "Aktion abgeschlossen – Tagesbelohnung ({{amount}} {{currency}}) abgeholt!",
+      "server_created": "Aktion abgeschlossen – Die Bereitstellung Ihres Servers wurde gestartet. Dies kann bis zu 5 Minuten dauern.",
+      "server_modified": "Aktion abgeschlossen – Serverressourcen wurden geändert.",
+      "server_deleted": "Aktion abgeschlossen – Server wurde gelöscht."
+    }
+  },
+  "breadcrumbs": {
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "user_credentials": "Benutzeranmeldedaten",
+    "afk_page": "AFK‑Seite",
+    "referrals": "Empfehlungen",
+    "servers": "Server",
+    "staking": "Staking",
+    "store": "Shop",
+    "wallet": "Wallet"
+  },
+  "account": {
+    "title": "SFTP‑Zugangsdaten",
+    "subtitle": "Anzeigen und Verwalten Ihrer SFTP‑Zugangsdaten.",
+    "user_credentials": "Benutzeranmeldedaten",
+    "description": "Verwenden Sie diese Zugangsdaten für bestimmte Aktionen wie SFTP.",
+    "new_password": {
+      "title": "Neues Passwort festlegen",
+      "placeholder_new": "Neues Passwort",
+      "placeholder_confirm": "Neues Passwort bestätigen",
+      "requirements": "Das Passwort muss enthalten:",
+      "requirement_length": "Mindestens 8 Zeichen",
+      "requirement_uppercase": "Einen Großbuchstaben",
+      "requirement_lowercase": "Einen Kleinbuchstaben",
+      "requirement_number": "Eine Zahl",
+      "button_generate": "Zufällig generieren",
+      "button_set": "Passwort setzen"
+    },
+    "messages": {
+      "password_copied": "Passwort in die Zwischenablage kopiert!",
+      "password_updated": "Passwort erfolgreich aktualisiert!",
+      "error_occurred": "Beim Aktualisieren des Passworts ist ein Fehler aufgetreten.",
+      "no_password": "Kein Passwort verfügbar: Passwörter werden nur einmal angezeigt."
+    }
+  },
+  "afk": {
+    "title": "AFK‑Seite",
+    "subtitle": "Erhalten Sie kostenlose Belohnungen, wenn diese Seite geöffnet bleibt.",
+    "connection_status": {
+      "title": "Verbindungsstatus",
+      "connecting": "Verbinde...",
+      "connected": "Verbunden",
+      "disconnected": "Getrennt",
+      "already_open": "AFK‑Seite bereits in einem anderen Tab geöffnet",
+      "session_expired": "Sitzung abgelaufen. Bitte Seite neu laden.",
+      "reconnecting": "Wiederverbinden (Versuch {{attempt}}/{{max}})...",
+      "connection_failed": "Verbindung fehlgeschlagen. Bitte Seite neu laden."
+    },
+    "rewards": {
+      "title": "AFK‑Belohnungen",
+      "earning_rate": "Verdienst‑Rate",
+      "next_reward": "Nächste Belohnung"
+    },
+    "statistics": {
+      "title": "Sitzungsstatistiken",
+      "time_active": "Aktive Zeit",
+      "total_earned": "Insgesamt verdient"
+    }
+  },
+  "referrals": {
+    "title": "Empfehlungen",
+    "subtitle": "Empfehlen Sie Nutzer an {{name}} und erhalten Sie kostenlose Belohnungen.",
+    "create": {
+      "title": "Empfehlungscode erstellen",
+      "label": "Ihr Empfehlungscode",
+      "placeholder": "Eigenen Code eingeben",
+      "button": "Code erstellen"
+    },
+    "claim": {
+      "title": "Empfehlungscode einlösen",
+      "label": "Code des Freundes",
+      "placeholder": "Code zum Einlösen eingeben",
+      "button": "Code einlösen"
+    },
+    "benefits": {
+      "title": "Vorteile",
+      "for_you": "Für Sie",
+      "for_friend": "Für Ihren Freund",
+      "you_earn": "Für jeden Freund, der Ihren Code nutzt",
+      "friend_earns": "Wenn er Ihren Code einlöst"
+    },
+    "messages": {
+      "enter_code": "Bitte einen Empfehlungscode eingeben.",
+      "enter_claim_code": "Bitte einen Code zum Einlösen eingeben.",
+      "code_created": "{{message}} Code: {{code}}",
+      "error_occurred": "Ein Fehler ist aufgetreten.",
+      "network_error": "Netzwerkfehler. Bitte erneut versuchen."
+    }
+  },
+  "servers": {
+    "title": "Meine Server",
+    "subtitle": "Übersicht Ihrer Server auf {{name}}.",
+    "no_servers": "Keine Server gefunden",
+    "get_started": "Erstellen Sie Ihren ersten Server",
+    "shared_servers": "Geteilte Server",
+    "columns": {
+      "server": "Server",
+      "status": "Status",
+      "memory": "Speicher",
+      "cpu": "CPU",
+      "ip_address": "IP‑Adresse"
+    },
+    "status": {
+      "connecting": "Verbinde...",
+      "online": "Online",
+      "offline": "Offline",
+      "starting": "Startet",
+      "stopping": "Stoppt",
+      "unknown": "Unbekannt"
+    },
+    "fetching": "Lade...",
+    "actions": {
+      "new": "Neu",
+      "game_server": "Gameserver"
+    },
+    "alerts": {
+      "suspended_title": "Zugriff verweigert",
+      "suspended_body": "Ihr Server wurde gesperrt. Bitte wenden Sie sich für weitere Informationen an unseren Discord ({{discord}})."
+    }
+  },
+  "staking": {
+    "title": "Staking",
+    "subtitle": "Erhalten Sie Zinseszins‑Belohnungen, indem Sie Ihre {{currency}} staken.",
+    "migration": {
+      "title": "Upgrade des Staking‑Systems",
+      "description": "Wir haben unser Staking‑System mit neuen Funktionen verbessert! Ihr bestehendes Stake wurde automatisch migriert. Sie haben jetzt Zugriff auf:",
+      "feature_1": "Mehrere Staking‑Positionen",
+      "feature_2": "Höhere Belohnungen bei längeren Sperrzeiten",
+      "feature_3": "Zinseszins‑Erträge"
+    },
+    "balance": {
+      "available": "Verfügbarer Saldo",
+      "total_staked": "Insgesamt gestaked",
+      "total_earnings": "Gesamterträge",
+      "loading": "Laden..."
+    },
+    "positions": {
+      "title": "Ihre Staking‑Positionen",
+      "new_stake": "Neues Stake",
+      "no_positions": "Keine aktiven Positionen. Starten Sie mit einem neuen Stake!",
+      "loading": "Lade Positionen...",
+      "error": "Positionen konnten nicht geladen werden. Bitte später erneut versuchen.",
+      "staked_amount": "Gestaketer Betrag",
+      "lock_period": "Sperrzeit",
+      "current_earnings": "Aktuelle Erträge",
+      "unlock_date": "Freigabedatum",
+      "manage": "Position verwalten",
+      "claim": "{{amount}} {{currency}} beanspruchen",
+      "claim_prefix": "Beanspruchen",
+      "locked_until": "Gesperrt bis {{date}}",
+      "locked_until_prefix": "Gesperrt bis",
+      "days_suffix": "Tage"
+    },
+    "tiers": {
+      "title": "Staking‑Stufen",
+      "30d": {
+        "title": "30 Tage",
+        "apr": "+20% APR",
+        "description": "Kurzfristiges Staking mit flexiblen Belohnungen"
+      },
+      "90d": {
+        "title": "90 Tage",
+        "apr": "+50% APR",
+        "description": "Mittelfristiges Staking mit erhöhten Belohnungen"
+      },
+      "180d": {
+        "title": "180 Tage",
+        "apr": "+100% APR",
+        "description": "Langfristiges Staking mit maximalen Belohnungen"
+      }
+    },
+    "modal": {
+      "create_title": "Neues Stake erstellen",
+      "amount_label": "Betrag",
+      "minimum": "Mindeststake: 10 {{currency}}",
+      "lock_period_label": "Sperrzeit",
+      "cancel": "Abbrechen",
+      "confirm": "Stake bestätigen",
+      "manage_title": "Staking‑Position verwalten",
+      "apr_bonus": "APR‑Bonus",
+      "early_warning": "Warnung vor vorzeitigem Entsperren:",
+      "early_warning_text": "Diese Position ist noch gesperrt. Ein frühes Entsperren führt zu 50% Abzug der Erträge.",
+      "unstake_early": "Vorzeitig entstaken",
+      "unstake": "Position entstaken",
+      "close": "Schließen"
+    },
+    "messages": {
+      "staked_success": "Erfolgreich {{amount}} {{currency}} gestaked",
+      "staked_success_generic": "Stake erfolgreich erstellt",
+      "unstaked_success": "Erfolgreich {{amount}} {{currency}} entstakt",
+      "unstaked_success_generic": "Position erfolgreich entstakt",
+      "claimed_success": "Erfolgreich {{amount}} {{currency}} beansprucht",
+      "claimed_success_generic": "Belohnungen erfolgreich beansprucht",
+      "confirm_unstake": "Sind Sie sicher, dass Sie diese Position entstaken möchten?",
+      "confirm_unstake_early": "Sind Sie sicher, dass Sie vorzeitig entstaken möchten? Sie verlieren 50% der Erträge.",
+      "error_create": "Stake konnte nicht erstellt werden",
+      "error_unstake": "Position konnte nicht entstakt werden",
+      "error_claim": "Belohnungen konnten nicht beansprucht werden",
+      "error_load": "Staking‑Daten konnten nicht geladen werden"
+    }
+  },
+  "store": {
+    "title": "Shop",
+    "subtitle": "Verwalten Sie Ressourcen und Abos mit {{currency}}",
+    "tabs": {
+      "store": "Shop",
+      "history": "Historie"
+    },
+    "resources": {
+      "ram": "RAM",
+      "disk": "Festplatte",
+      "cpu": "CPU",
+      "servers": "Server",
+      "backups": "Backups",
+      "databases": "Datenbanken",
+      "allocations": "Zuteilungen"
+    },
+    "per_unit": {
+      "gb": "/ GB",
+      "percent": "/ %",
+      "server": "/ Server",
+      "backup": "/ Backup",
+      "database": "/ Datenbank",
+      "allocation": "/ Zuteilung"
+    },
+    "purchase": "Kaufen",
+    "history_title": "Kaufhistorie",
+    "history_columns": {
+      "resource": "Ressource",
+      "amount": "Menge",
+      "cost": "Kosten",
+      "date": "Datum"
+    },
+    "no_history": "Keine Kaufhistorie verfügbar.",
+    "messages": {
+      "success": "Erfolgreich {{amount}} {{resource}} gekauft",
+      "error": "Ressourcenkauf fehlgeschlagen"
+    },
+    "ui": {
+      "processing": "Verarbeitung...",
+      "resources": "Ressourcen",
+      "transaction_history": "Transaktionshistorie",
+      "no_history": "Keine Transaktionshistorie",
+      "history_will_appear": "Ihre Historie wird hier erscheinen.",
+      "last_7_days": "Letzte 7 Tage",
+      "last_14_days": "Letzte 14 Tage",
+      "last_30_days": "Letzte 30 Tage"
+    },
+    "renewal_bypass": {
+      "title": "Sonderangebot",
+      "success": "Renewal Bypass erfolgreich gekauft!",
+      "cta": "Kaufen",
+      "already_purchased": "Bereits gekauft",
+      "one_time": "Einmaliger Kauf",
+      "need_more": "Sie benötigen {{amount}} weitere Coins für diesen Kauf.",
+      "headline": "Renewal Bypass",
+      "description": "Keine wöchentlichen Shop‑Verlängerungen oder 48‑Stunden‑Serververlängerungen mehr. Kaufen Sie unseren Renewal Bypass für {{price}} Coins und behalten Sie Ressourcen und Server für immer."
+    }
+  },
+  "wallet": {
+    "title": "Wallet",
+    "subtitle": "Verwalten Sie Ihre {{currency}}‑Salden und Transaktionen.",
+    "balance": {
+      "title": "Ihr Saldo",
+      "loading": "Laden..."
+    },
+    "send_button": "{{currency}} senden",
+    "transactions": {
+      "title": "Neuste Transaktionen",
+      "columns": {
+        "type": "Typ",
+        "amount": "Betrag",
+        "from_to": "Von/Zu",
+        "date": "Datum"
+      },
+      "types": {
+        "sent": "Gesendet",
+        "received": "Empfangen",
+        "purchase": "Kauf",
+        "reward": "Belohnung"
+      },
+      "no_transactions": "Noch keine Transaktionen.",
+      "loading": "Transaktionen werden geladen..."
+    },
+    "modal": {
+      "transfer_title": "{{currency}} übertragen",
+      "recipient_label": "Empfänger‑Benutzer‑ID",
+      "recipient_placeholder": "Benutzer‑ID eingeben",
+      "amount_label": "Betrag",
+      "amount_placeholder": "Betrag eingeben",
+      "cancel": "Abbrechen",
+      "send": "{{currency}} senden"
+    },
+    "messages": {
+      "transfer_success": "Erfolgreich {{amount}} {{currency}} übertragen",
+      "transfer_success_generic": "Übertragung erfolgreich!",
+      "transfer_error": "Übertragung von {{currency}} fehlgeschlagen",
+      "balance_error": "Saldo konnte nicht geladen werden",
+      "transfer_failed_prefix": "Übertragung fehlgeschlagen:",
+      "transfer_generic_error": "Während der Übertragung ist ein Fehler aufgetreten. Bitte erneut versuchen."
+    },
+    "ui": {
+      "show_all": "Alle Transaktionen anzeigen",
+      "transaction_details": "Transaktionsdetails",
+      "copied": "Kopiert!",
+      "type": "Typ",
+      "amount": "Betrag",
+      "status": "Status",
+      "transaction_id": "Transaktions‑ID",
+      "sender": "Absender",
+      "receiver": "Empfänger",
+      "description": "Beschreibung",
+      "timestamp": "Zeitstempel",
+      "just_now": "Gerade eben",
+      "ago": "her",
+      "minute_symbol": "m",
+      "hour_symbol": "h",
+      "day_symbol": "d"
+    }
+  },
+  "website": {
+    "nav": {
+      "features": "Funktionen",
+      "pricing": "Preise",
+      "status": "Status",
+      "discord": "Discord",
+      "get_started": "Loslegen"
+    },
+    "hero": {
+      "title": "Premium‑Gameserver‑Hosting",
+      "subtitle": "Stellen Sie Ihre Gameserver sofort mit unserer leistungsstarken, zuverlässigen Plattform bereit.",
+      "cta_primary": "Kostenlos starten",
+      "cta_secondary": "Preise ansehen",
+      "badge": "Gameserver‑Hosting von {{name}}"
+    },
+    "features": {
+      "title": "Warum wir",
+      "instant_deploy": {
+        "title": "Sofortige Bereitstellung",
+        "description": "Bereitstellung in Sekunden dank automatisiertem System"
+      },
+      "high_performance": {
+        "title": "Hohe Leistung",
+        "description": "Unternehmens‑Hardware für optimale Performance"
+      },
+      "ddos_protection": {
+        "title": "DDoS‑Schutz",
+        "description": "Erweiterter Schutz, damit Ihre Server 24/7 online bleiben"
+      },
+      "support": {
+        "title": "24/7 Support",
+        "description": "Unser Team hilft Ihnen jederzeit zum Erfolg"
+      }
+    },
+    "content": {
+      "developers_pitch": "Für Entwickler gebaut, die zuverlässige Infrastruktur ohne Komplexität brauchen"
+    },
+    "pricing": {
+      "title": "Einfache, transparente Preise",
+      "subtitle": "Wählen Sie die benötigten Ressourcen",
+      "per_month": "pro Monat",
+      "get_started": "Loslegen",
+      "free_plan": "Kostenloser Tarif",
+      "free_description": "Alles, was Sie zum Erstellen und Skalieren brauchen",
+      "whats_included": "Enthalten",
+      "features": {
+        "ram_cpu": "2 GB Standard‑RAM + 1 CPU‑Kern",
+        "locations": "{{count}} Standorte",
+        "location": "{{country}}",
+        "ddos": "DDoS‑Schutz",
+        "uptime": "24/7* Verfügbarkeit"
+      },
+      "always_free": "Immer kostenlos",
+      "price": "0€",
+      "forever": "für immer"
+    },
+    "footer": {
+      "copyright": "© {{year}} {{name}}, Angetrieben von Heliactyl. Alle Rechte vorbehalten.",
+      "links": {
+        "terms": "Nutzungsbedingungen",
+        "privacy": "Datenschutz"
+      },
+      "sections": {
+        "product": "Produkt",
+        "support": "Support",
+        "contact": "Kontakt"
+      },
+      "about": "{{name}} wurde erstellt, um Gameserver‑Hosting {{scope}} bereitzustellen.",
+      "scope_one": "in {{country}}",
+      "scope_many": "an {{count}} Standorten"
+    }
+  }
+}
+
+

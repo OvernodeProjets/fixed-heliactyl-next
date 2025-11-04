@@ -50,15 +50,15 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
                 </div>
                 
                 <div class="hidden lg:flex lg:gap-x-12">
-                    <a href="#features" class="text-sm font-semibold text-gray-900 hover:text-indigo-900">Features</a>
-                    <a href="#pricing" class="text-sm font-semibold text-gray-900 hover:text-indigo-900">Pricing</a>
-                    <a href="<%= settings.website.status %>" class="text-sm font-semibold text-gray-900 hover:text-indigo-900">Status</a>
-                    <a href="<%= settings.website.discord %>" class="text-sm font-semibold text-gray-900 hover:text-indigo-900">Discord</a>
+                    <a href="#features" class="text-sm font-semibold text-gray-900 hover:text-indigo-900"><%= __("website.nav.features") %></a>
+                    <a href="#pricing" class="text-sm font-semibold text-gray-900 hover:text-indigo-900"><%= __("website.nav.pricing") %></a>
+                    <a href="<%= settings.website.status %>" class="text-sm font-semibold text-gray-900 hover:text-indigo-900"><%= __("website.nav.status") %></a>
+                    <a href="<%= settings.website.discord %>" class="text-sm font-semibold text-gray-900 hover:text-indigo-900"><%= __("website.nav.discord") %></a>
                 </div>
 
                 <div class="hidden lg:flex lg:flex-1 lg:justify-end">
                     <a href="/auth" class="rounded-lg bg-gray-950 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800">
-                        Get started
+                        <%= __("website.nav.get_started") %>
                     </a>
                 </div>
 
@@ -72,12 +72,12 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
             <!-- Mobile menu -->
             <div x-show="isOpen" class="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg rounded-b-xl">
                 <div class="px-4 py-6 space-y-4">
-                    <a href="#features" class="block text-sm font-semibold text-gray-900">Features</a>
-                    <a href="#pricing" class="block text-sm font-semibold text-gray-900">Pricing</a>
-                    <a href="<%= settings.website.status %>" class="block text-sm font-semibold text-gray-900">Status</a>
-                    <a href="<%= settings.website.discord %>" class="block text-sm font-semibold text-gray-900">Discord</a>
+                    <a href="#features" class="block text-sm font-semibold text-gray-900"><%= __("website.nav.features") %></a>
+                    <a href="#pricing" class="block text-sm font-semibold text-gray-900"><%= __("website.nav.pricing") %></a>
+                    <a href="<%= settings.website.status %>" class="block text-sm font-semibold text-gray-900"><%= __("website.nav.status") %></a>
+                    <a href="<%= settings.website.discord %>" class="block text-sm font-semibold text-gray-900"><%= __("website.nav.discord") %></a>
                     <a href="/auth" class="block w-full text-center rounded-lg bg-gray-950 px-4 py-2 text-sm font-semibold text-white">
-                        Get started
+                        <%= __("website.nav.get_started") %>
                     </a>
                 </div>
             </div>
@@ -89,17 +89,17 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div class="mx-auto max-w-2xl text-center">
                 <div class="mb-8 inline-flex items-center rounded-full px-4 py-1">
-                    <span class="text-sm font-medium text-gray-900">Game servers hosting by <%= settings.name %></span>
+                    <span class="text-sm font-medium text-gray-900"><%= __('website.hero.badge', { name: settings.name }) %></span>
                 </div>
                 <h1 class="heavy text-5xl sm:text-6xl font-bold tracking-tight text-gray-900">
-                    Game servers.<br>Made simple.
+                    <%= __("website.hero.title") %>
                 </h1>
                 <p class="mt-6 text-lg leading-8 text-gray-600">
-                    Deploy your game servers instantly <% if (locationCount === 1) { %>in <%= firstLocation.country %><% } else { %>across <%= locationCount %> locations<% } %>. Powered by <%= settings.name %>'s enterprise infrastructure.
+                    <%= __("website.hero.subtitle") %>
                 </p>
                 <div class="mt-10 flex items-center justify-center gap-x-6">
                     <a href="/auth" class="rounded-lg bg-gray-950 px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800">
-                        Get started
+                        <%= __("website.hero.cta_primary") %>
                     </a>
                 </div>
             </div>
@@ -112,10 +112,10 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div class="mx-auto max-w-2xl text-center">
                 <h2 class="heavy text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                    Everything you need to scale
+                    <%= __("website.features.title") %>
                 </h2>
                 <p class="mt-6 text-lg leading-8 text-gray-600">
-                    Built for developers who need reliable infrastructure without the complexity
+                    <%= __('website.content.developers_pitch') %>
                 </p>
             </div>
             <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
@@ -127,10 +127,10 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
                                     <path d="M5 12h14M12 5l7 7-7 7"/>
                                 </svg>
                             </div>
-                            Low Latency Network
+                            <%= __("website.features.high_performance.title") %>
                         </dt>
                         <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
-                            <p class="flex-auto">Premium infrastructure with ultra-low latency for optimal gaming experience</p>
+                            <p class="flex-auto"><%= __("website.features.high_performance.description") %></p>
                         </dd>
                     </div>
                     <div class="flex flex-col">
@@ -140,10 +140,10 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
                                     <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                                 </svg>
                             </div>
-                            Enterprise Security
+                            <%= __("website.features.ddos_protection.title") %>
                         </dt>
                         <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
-                            <p class="flex-auto">Built-in DDoS protection and monitoring</p>
+                            <p class="flex-auto"><%= __("website.features.ddos_protection.description") %></p>
                         </dd>
                     </div>
                     <div class="flex flex-col">
@@ -153,10 +153,10 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                                 </svg>
                             </div>
-                            Instant Deployment
+                            <%= __("website.features.instant_deploy.title") %>
                         </dt>
                         <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
-                            <p class="flex-auto">Get your game server up and running in seconds with our automated deployment system</p>
+                            <p class="flex-auto"><%= __("website.features.instant_deploy.description") %></p>
                         </dd>
                     </div>
                 </dl>
@@ -168,19 +168,19 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
     <section id="pricing" class="py-24">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div class="mx-auto max-w-2xl sm:text-center">
-                <h2 class="heavy text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Simple, transparent pricing</h2>
+                <h2 class="heavy text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"><%= __("website.pricing.title") %></h2>
                 <p class="mt-6 text-lg leading-8 text-gray-600">
-                    No credit card required. No hidden fees. Just free, forever.
+                    <%= __("website.pricing.subtitle") %>
                 </p>
             </div>
             <div class="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-gray-200 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
                 <div class="p-8 sm:p-10 lg:flex-auto">
-                    <h3 class="text-2xl font-bold tracking-tight text-gray-900">Free Plan</h3>
+                    <h3 class="text-2xl font-bold tracking-tight text-gray-900"><%= __("website.pricing.free_plan") %></h3>
                     <p class="mt-6 text-base leading-7 text-gray-600">
-                        Everything you need to build and scale your applications
+                        <%= __("website.pricing.free_description") %>
                     </p>
                     <div class="mt-10 flex items-center gap-x-4">
-                        <h4 class="flex-none text-sm font-semibold leading-6 text-indigo-600">What's included</h4>
+                        <h4 class="flex-none text-sm font-semibold leading-6 text-indigo-600"><%= __("website.pricing.whats_included") %></h4>
                         <div class="h-px flex-auto bg-gray-100"></div>
                     </div>
                     <ul role="list" class="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-gray-600 sm:grid-cols-2 sm:gap-6">
@@ -188,38 +188,38 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
                             <svg class="h-6 w-5 flex-none text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
-                            2GB default RAM + 1 CPU core
+                            <%= __("website.pricing.features.ram_cpu") %>
                         </li>
                         <li class="flex gap-x-3">
                             <svg class="h-6 w-5 flex-none text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
-                            <% if (locationCount === 1) { %><%= firstLocation.country %><% } else { %><%= locationCount %> Locations<% } %>
+                            <% if (locationCount === 1) { %><%= __("website.pricing.features.location", { country: firstLocation.country }) %><% } else { %><%= __("website.pricing.features.locations", { count: locationCount }) %><% } %>
                         </li>
                         <li class="flex gap-x-3">
                             <svg class="h-6 w-5 flex-none text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
-                            DDoS protection
+                            <%= __("website.pricing.features.ddos") %>
                         </li>
                         <li class="flex gap-x-3">
                             <svg class="h-6 w-5 flex-none text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
-                            24/7* Uptime
+                            <%= __("website.pricing.features.uptime") %>
                         </li>
                     </ul>
                 </div>
                 <div class="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
                     <div class="rounded-2xl bg-gray-50 py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
                         <div class="mx-auto max-w-xs px-8">
-                            <p class="text-base font-semibold text-gray-600">Always free</p>
+                            <p class="text-base font-semibold text-gray-600"><%= __("website.pricing.always_free") %></p>
                             <p class="mt-6 flex items-baseline justify-center gap-x-2">
-                                <span class="text-5xl font-bold tracking-tight text-gray-900">$0</span>
-                                <span class="text-sm font-semibold leading-6 tracking-wide text-gray-600">forever</span>
+                                <span class="text-5xl font-bold tracking-tight text-gray-900"><%= __("website.pricing.price") %></span>
+                                <span class="text-sm font-semibold leading-6 tracking-wide text-gray-600"><%= __("website.pricing.forever") %></span>
                             </p>
                             <a href="/auth" class="mt-10 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition hover:scale-95 focus-visible:outline-indigo-600">
-                                Get started
+                                <%= __("website.pricing.get_started") %>
                             </a>
                         </div>
                     </div>
@@ -236,7 +236,11 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
                 <div class="space-y-8">
                     <img class="h-12 invert" src="/assets/logo-text.png" alt="<%= settings.name %> Logo">
                     <p class="text-sm leading-6 text-gray-300">
-                        <%= settings.name %> has been created to provide game servers hosting <% if (locationCount === 1) { %>in <%= firstLocation.country %><% } else { %>across <%= locationCount %> locations<% } %>.
+                        <% if (locationCount === 1) { %>
+                            <%= __('website.footer.about', { name: settings.name, scope: __('website.footer.scope_one', { country: firstLocation.country }) }) %>
+                        <% } else { %>
+                            <%= __('website.footer.about', { name: settings.name, scope: __('website.footer.scope_many', { count: locationCount }) }) %>
+                        <% } %>
                     </p>
                     <div class="flex space-x-6">
                         <a href="<%= settings.website.discord %>" class="text-white/70 hover:text-white transition">
@@ -256,27 +260,27 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
                 <div class="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
                     <div class="md:grid md:grid-cols-2 md:gap-8">
                         <div>
-                            <h3 class="text-sm font-semibold leading-6 text-white">Product</h3>
+                            <h3 class="text-sm font-semibold leading-6 text-white"><%= __("website.footer.sections.product") %></h3>
                             <ul role="list" class="mt-6 space-y-4">
                                 <li>
-                                    <a href="#features" class="text-sm leading-6 text-gray-300 hover:text-white">Features</a>
+                                    <a href="#features" class="text-sm leading-6 text-gray-300 hover:text-white"><%= __("website.nav.features") %></a>
                                 </li>
                                 <li>
-                                    <a href="#pricing" class="text-sm leading-6 text-gray-300 hover:text-white">Pricing</a>
+                                    <a href="#pricing" class="text-sm leading-6 text-gray-300 hover:text-white"><%= __("website.nav.pricing") %></a>
                                 </li>
                                 <li>
-                                    <a href="<%= settings.website.status %>" class="text-sm leading-6 text-gray-300 hover:text-white">Status</a>
+                                    <a href="<%= settings.website.status %>" class="text-sm leading-6 text-gray-300 hover:text-white"><%= __("website.nav.status") %></a>
                                 </li>
                             </ul>
                         </div>
                         <div class="mt-10 md:mt-0">
-                            <h3 class="text-sm font-semibold leading-6 text-white">Support</h3>
+                            <h3 class="text-sm font-semibold leading-6 text-white"><%= __("website.footer.sections.support") %></h3>
                             <ul role="list" class="mt-6 space-y-4">
                                 <li>
-                                    <a href="<%= settings.website.discord %>" class="text-sm leading-6 text-gray-300 hover:text-white">Discord</a>
+                                    <a href="<%= settings.website.discord %>" class="text-sm leading-6 text-gray-300 hover:text-white"><%= __("website.nav.discord") %></a>
                                 </li>
                                 <li>
-                                    <a href="mailto:support@<%= settings.website.domain %>" class="text-sm leading-6 text-gray-300 hover:text-white">Contact</a>
+                                    <a href="mailto:support@<%= settings.website.domain %>" class="text-sm leading-6 text-gray-300 hover:text-white"><%= __("website.footer.sections.contact") %></a>
                                 </li>
                             </ul>
                         </div>
@@ -284,7 +288,7 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
                 </div>
             </div>
             <div class="mt-16 border-t border-gray-900/10 pt-8 sm:mt-20 lg:mt-24">
-                <p class="text-xs leading-5 text-white/80">&copy; <%= new Date().getFullYear() %> <%= settings.name %>, Powered by Heliactyl. All rights reserved.</p>
+                <p class="text-xs leading-5 text-white/80"><%= __("website.footer.copyright", { year: new Date().getFullYear(), name: settings.name }) %></p>
             </div>
         </div>
     </footer>

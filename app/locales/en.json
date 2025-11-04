@@ -21,7 +21,8 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
-    "create": "Create"
+    "create": "Create",
+    "processing": "Processing..."
   },
   "dashboard": {
     "title": "HOME",
@@ -67,6 +68,394 @@
   },
   "breadcrumbs": {
     "home": "Home",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "user_credentials": "User Credentials",
+    "afk_page": "AFK Page",
+    "referrals": "Referrals",
+    "servers": "Servers",
+    "staking": "Staking",
+    "store": "Store",
+    "wallet": "Wallet"
+  },
+  "account": {
+    "title": "SFTP Credentials",
+    "subtitle": "View and manage the credentials to your SFTP.",
+    "user_credentials": "User Credentials",
+    "description": "Use these credentials to access certain actions such as SFTP.",
+    "new_password": {
+      "title": "Set a new password",
+      "placeholder_new": "New Password",
+      "placeholder_confirm": "Confirm New Password",
+      "requirements": "Password must contain:",
+      "requirement_length": "At least 8 characters",
+      "requirement_uppercase": "One uppercase letter",
+      "requirement_lowercase": "One lowercase letter",
+      "requirement_number": "One number",
+      "button_generate": "Generate Random",
+      "button_set": "Set Password"
+    },
+    "messages": {
+      "password_copied": "Password copied to clipboard!",
+      "password_updated": "Password updated successfully!",
+      "error_occurred": "An error occurred while updating the password.",
+      "no_password": "No password available: passwords are only shown once."
+    }
+  },
+  "afk": {
+    "title": "AFK Page",
+    "subtitle": "Earn free rewards for keeping this page open.",
+    "connection_status": {
+      "title": "Connection Status",
+      "connecting": "Connecting...",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "already_open": "AFK page already open in another tab",
+      "session_expired": "Session expired. Please refresh the page.",
+      "reconnecting": "Reconnecting (Attempt {{attempt}}/{{max}})...",
+      "connection_failed": "Connection failed. Please refresh the page."
+    },
+    "rewards": {
+      "title": "AFK Rewards",
+      "earning_rate": "Earning Rate",
+      "next_reward": "Next Reward"
+    },
+    "statistics": {
+      "title": "Session Statistics",
+      "time_active": "Time Active",
+      "total_earned": "Total Earned"
+    }
+  },
+  "referrals": {
+    "title": "Referrals",
+    "subtitle": "Refer users to {{name}} for free rewards.",
+    "create": {
+      "title": "Create a Referral Code",
+      "label": "Your Referral Code",
+      "placeholder": "Enter your custom code",
+      "button": "Create Code"
+    },
+    "claim": {
+      "title": "Claim a Referral Code",
+      "label": "Friend's Referral Code",
+      "placeholder": "Enter code to claim",
+      "button": "Claim Code"
+    },
+    "benefits": {
+      "title": "Referral Benefits",
+      "for_you": "For You",
+      "for_friend": "For Your Friend",
+      "you_earn": "For every friend who uses your code",
+      "friend_earns": "When they claim your referral code"
+    },
+    "messages": {
+      "enter_code": "Please enter a referral code.",
+      "enter_claim_code": "Please enter a referral code to claim.",
+      "code_created": "{{message}} Code: {{code}}",
+      "error_occurred": "An error occurred.",
+      "network_error": "Network error. Please try again."
+    }
+  },
+  "servers": {
+    "title": "My Servers",
+    "subtitle": "Overview of your servers on {{name}}.",
+    "no_servers": "No servers found",
+    "get_started": "Get started by creating your first server",
+    "shared_servers": "Shared Servers",
+    "columns": {
+      "server": "Server",
+      "status": "Status",
+      "memory": "Memory",
+      "cpu": "CPU",
+      "ip_address": "IP Address"
+    },
+    "status": {
+      "connecting": "Connecting...",
+      "online": "Online",
+      "offline": "Offline",
+      "starting": "Starting",
+      "stopping": "Stopping",
+      "unknown": "Unknown"
+    },
+    "fetching": "Fetching...",
+    "actions": {
+      "new": "New",
+      "game_server": "Game server"
+    },
+    "alerts": {
+      "suspended_title": "Access Denied",
+      "suspended_body": "Your server has been suspended. Please contact support via our Discord ({{discord}}) for more information."
+    }
+  },
+  "staking": {
+    "title": "Staking",
+    "subtitle": "Earn compound interest rewards by staking your {{currency}}.",
+    "migration": {
+      "title": "Staking System Upgrade",
+      "description": "We've upgraded our staking system with new features! Your existing stake has been automatically migrated. You now have access to:",
+      "feature_1": "Multiple staking positions",
+      "feature_2": "Higher rewards for longer lock periods",
+      "feature_3": "Compound interest earnings"
+    },
+    "balance": {
+      "available": "Available Balance",
+      "total_staked": "Total Staked",
+      "total_earnings": "Total Earnings",
+      "loading": "Loading..."
+    },
+    "positions": {
+      "title": "Your Staking Positions",
+      "new_stake": "New Stake",
+      "no_positions": "No active staking positions. Start earning rewards by creating a new stake!",
+      "loading": "Loading positions...",
+      "error": "Failed to load staking positions. Please try again later.",
+      "staked_amount": "Staked Amount",
+      "lock_period": "Lock Period",
+      "current_earnings": "Current Earnings",
+      "unlock_date": "Unlock Date",
+      "manage": "Manage Position",
+      "claim": "Claim {{amount}} {{currency}}",
+      "claim_prefix": "Claim",
+      "locked_until": "Locked until {{date}}",
+      "locked_until_prefix": "Locked until",
+      "days_suffix": "Days"
+    },
+    "tiers": {
+      "title": "Staking Tiers",
+      "30d": {
+        "title": "30 Days",
+        "apr": "+20% APR",
+        "description": "Short-term staking with flexible rewards"
+      },
+      "90d": {
+        "title": "90 Days",
+        "apr": "+50% APR",
+        "description": "Medium-term staking with enhanced rewards"
+      },
+      "180d": {
+        "title": "180 Days",
+        "apr": "+100% APR",
+        "description": "Long-term staking with maximum rewards"
+      }
+    },
+    "modal": {
+      "create_title": "Create New Stake",
+      "amount_label": "Amount",
+      "minimum": "Minimum stake: 10 {{currency}}",
+      "lock_period_label": "Lock Period",
+      "cancel": "Cancel",
+      "confirm": "Confirm Stake",
+      "manage_title": "Manage Staking Position",
+      "apr_bonus": "APR Bonus",
+      "early_warning": "Early Withdrawal Warning:",
+      "early_warning_text": "This position is still locked. Unstaking now will result in a 50% penalty on earned rewards.",
+      "unstake_early": "Unstake Early",
+      "unstake": "Unstake Position",
+      "close": "Close"
+    },
+    "messages": {
+      "staked_success": "Successfully staked {{amount}} {{currency}}",
+      "staked_success_generic": "Stake created successfully",
+      "unstaked_success": "Successfully unstaked {{amount}} {{currency}}",
+      "unstaked_success_generic": "Position unstaked successfully",
+      "claimed_success": "Successfully claimed {{amount}} {{currency}}",
+      "claimed_success_generic": "Rewards claimed successfully",
+      "confirm_unstake": "Are you sure you want to unstake this position?",
+      "confirm_unstake_early": "Are you sure you want to unstake early? You will lose 50% of your earned rewards.",
+      "error_create": "Failed to create stake",
+      "error_unstake": "Failed to unstake position",
+      "error_claim": "Failed to claim rewards",
+      "error_load": "Failed to load staking data"
+    }
+  },
+  "store": {
+    "title": "Store",
+    "subtitle": "Manage your resources and subscriptions with {{currency}}",
+    "tabs": {
+      "store": "Store",
+      "history": "History"
+    },
+    "resources": {
+      "ram": "RAM",
+      "disk": "Disk",
+      "cpu": "CPU",
+      "servers": "Servers",
+      "backups": "Backups",
+      "databases": "Databases",
+      "allocations": "Allocations"
+    },
+    "per_unit": {
+      "gb": "/ GB",
+      "percent": "/ %",
+      "server": "/ Server",
+      "backup": "/ Backup",
+      "database": "/ Database",
+      "allocation": "/ Allocation"
+    },
+    "purchase": "Purchase",
+    "history_title": "Purchase History",
+    "history_columns": {
+      "resource": "Resource",
+      "amount": "Amount",
+      "cost": "Cost",
+      "date": "Date"
+    },
+    "no_history": "No purchase history available.",
+    "messages": {
+      "success": "Successfully purchased {{amount}} {{resource}}",
+      "error": "Failed to purchase resource"
+    },
+    "ui": {
+      "processing": "Processing...",
+      "resources": "Resources",
+      "transaction_history": "Transaction History",
+      "no_history": "No Transaction History",
+      "history_will_appear": "Your billing history will appear here.",
+      "last_7_days": "Last 7 days",
+      "last_14_days": "Last 14 days",
+      "last_30_days": "Last 30 days"
+    },
+    "renewal_bypass": {
+      "title": "Special Offer",
+      "success": "Successfully purchased renewal bypass!",
+      "cta": "Purchase",
+      "already_purchased": "Already Purchased",
+      "one_time": "One-time purchase",
+      "need_more": "You need {{amount}} more coins to purchase this.",
+      "headline": "Renewal Bypass",
+      "description": "Never worry about weekly store renewals or renewing your server every 48 hours again. Purchase our Renewal Bypass for {{price}} coins and keep your resources and servers forever."
+    }
+  },
+  "wallet": {
+    "title": "Wallet",
+    "subtitle": "Manage your {{currency}} balances and transactions.",
+    "balance": {
+      "title": "Your Balance",
+      "loading": "Loading..."
+    },
+    "send_button": "Send {{currency}}",
+    "transactions": {
+      "title": "Recent Transactions",
+      "columns": {
+        "type": "Type",
+        "amount": "Amount",
+        "from_to": "From/To",
+        "date": "Date"
+      },
+      "types": {
+        "sent": "Sent",
+        "received": "Received",
+        "purchase": "Purchase",
+        "reward": "Reward"
+      },
+      "no_transactions": "No transactions yet.",
+      "loading": "Loading transactions..."
+    },
+    "modal": {
+      "transfer_title": "Transfer {{currency}}",
+      "recipient_label": "Recipient User ID",
+      "recipient_placeholder": "Enter user ID",
+      "amount_label": "Amount",
+      "amount_placeholder": "Enter amount",
+      "cancel": "Cancel",
+      "send": "Send {{currency}}"
+    },
+    "messages": {
+      "transfer_success": "Successfully transferred {{amount}} {{currency}}",
+      "transfer_success_generic": "Transfer successful!",
+      "transfer_error": "Failed to transfer {{currency}}",
+      "balance_error": "Failed to load balance",
+      "transfer_failed_prefix": "Transfer failed:",
+      "transfer_generic_error": "An error occurred during the transfer. Please try again."
+    },
+    "ui": {
+      "show_all": "Show All Transactions",
+      "transaction_details": "Transaction Details",
+      "copied": "Copied!",
+      "type": "Type",
+      "amount": "Amount",
+      "status": "Status",
+      "transaction_id": "Transaction ID",
+      "sender": "Sender",
+      "receiver": "Receiver",
+      "description": "Description",
+      "timestamp": "Timestamp",
+      "just_now": "Just now",
+      "ago": "ago",
+      "minute_symbol": "m",
+      "hour_symbol": "h",
+      "day_symbol": "d"
+    }
+  },
+  "website": {
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "status": "Status",
+      "discord": "Discord",
+      "get_started": "Get started"
+    },
+    "hero": {
+      "title": "Premium Game Server Hosting",
+      "subtitle": "Deploy your game servers instantly with our powerful and reliable hosting platform.",
+      "cta_primary": "Get Started Free",
+      "cta_secondary": "View Pricing",
+      "badge": "Game servers hosting by {{name}}"
+    },
+    "features": {
+      "title": "Why Choose Us",
+      "instant_deploy": {
+        "title": "Instant Deployment",
+        "description": "Deploy your servers in seconds with our automated system"
+      },
+      "high_performance": {
+        "title": "High Performance",
+        "description": "Powered by enterprise-grade hardware for optimal performance"
+      },
+      "ddos_protection": {
+        "title": "DDoS Protection",
+        "description": "Advanced protection to keep your servers online 24/7"
+      },
+      "support": {
+        "title": "24/7 Support",
+        "description": "Our team is always here to help you succeed"
+      }
+    },
+    "content": {
+      "developers_pitch": "Built for developers who need reliable infrastructure without the complexity"
+    },
+    "pricing": {
+      "title": "Simple, Transparent Pricing",
+      "subtitle": "Choose the resources you need",
+      "per_month": "per month",
+      "get_started": "Get Started",
+      "free_plan": "Free Plan",
+      "free_description": "Everything you need to build and scale your applications",
+      "whats_included": "What's included",
+      "features": {
+        "ram_cpu": "2GB default RAM + 1 CPU core",
+        "locations": "{{count}} Locations",
+        "location": "{{country}}",
+        "ddos": "DDoS protection",
+        "uptime": "24/7* Uptime"
+      },
+      "always_free": "Always free",
+      "price": "$0",
+      "forever": "forever"
+    },
+    "footer": {
+      "copyright": "© {{year}} {{name}}, Powered by Heliactyl. All rights reserved.",
+      "links": {
+        "terms": "Terms of Service",
+        "privacy": "Privacy Policy"
+      },
+      "sections": {
+        "product": "Product",
+        "support": "Support",
+        "contact": "Contact"
+      },
+      "about": "{{name}} has been created to provide game servers hosting {{scope}}.",
+      "scope_one": "in {{country}}",
+      "scope_many": "across {{count}} locations"
+    }
   }
 }
