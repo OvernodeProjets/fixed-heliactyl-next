@@ -339,20 +339,44 @@ module.exports.load = async function (app, db) {
 
   app.get("/admin/userinfo", requireAdmin, async (req, res) => {
     try {
-      const { id } = req.query;
+      const { id, email } = req.query;
 
-      if (!id) return res.status(400).json({ error: "Missing user ID" });
+      if (!id && !email) {
+        return res.status(400).json({ error: "Missing user ID or email" });
+      }
+      let userId;
+      if (email) {
+        let userByEmail = await db.get("user-" + email);
 
-      const dbUser = await db.get("users-" + id);
-      if (!dbUser) {
+        if (!userByEmail) {
+          const allUserKeys = await db.list("user-*");
+          for (const key of allUserKeys) {
+            const userEmail = key.substring("user-".length);
+            if (userEmail.toLowerCase().includes(email.toLowerCase())) {
+              userByEmail = await db.get(key);
+              if (userByEmail) break;
+            }
+          }
+        }
+        
+        if (!userByEmail) {
           return res.status(404).json({ error: "User not found in database" });
+        }
+        userId = userByEmail.id;
+      } else {
+        const pterodactylId = await db.get("users-" + id);
+        if (!pterodactylId) {
+          return res.status(404).json({ error: "User not found in database" });
+        }
+        userId = id;
       }
 
-      let packagename = await db.get("package-" + id);
+      let packagename = await db.get("package-" + userId);
       let package =
         settings.api.client.packages.list[
           packagename ? packagename : settings.api.client.packages.default
         ];
+
       if (!package)
         package = {
           ram: 0,
@@ -363,26 +387,27 @@ module.exports.load = async function (app, db) {
 
       package["name"] = packagename;
 
-      const PterodactylUserReq = await getPteroUser(id, db);
+      const PterodactylUserReq = await getPteroUser(userId, db);
       if (!PterodactylUserReq) {
-          return res.status(404).json({ error: "User not found in Pterodactyl" });
+        return res.status(404).json({ error: "User not found in Pterodactyl" });
       }
 
       res.status(200).json({
+        id: userId,
         package: package,
-        extra: (await db.get("extra-" + id)) || {
+        extra: (await db.get("extra-" + userId)) || {
           ram: 0,
-          disk: 0, 
+          disk: 0,
           cpu: 0,
           servers: 0,
         },
         userinfo: PterodactylUserReq,
         coins: settings.api.client.coins.enabled
-          ? (await db.get("coins-" + id)) ?? 0
+          ? (await db.get("coins-" + userId)) ?? 0
           : null
       });
     } catch (error) {
-      console.error("Error in /userinfo:", error);
+      console.error("Error in /admin/userinfo:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
