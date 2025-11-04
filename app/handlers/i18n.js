@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const chalk = require('chalk');
 
 class I18nManager {
   constructor(defaultLocale = 'en') {
@@ -25,14 +26,14 @@ class I18nManager {
       try {
         this.locales[locale] = JSON.parse(fs.readFileSync(filePath, 'utf8'));
         this.availableLocales.push(locale);
-        console.log(`[i18n] Loaded locale: ${locale}`);
+        console.log(chalk.gray(`[i18n] Loaded locale: ${locale}`));
       } catch (error) {
-        console.error(`[i18n] Error loading locale ${locale}:`, error);
+        console.error(chalk.red(`[i18n] Error loading locale ${locale}:`), error);
       }
     });
 
     if (this.availableLocales.length === 0) {
-      console.warn('[i18n] No locales found, creating default English locale');
+      console.warn(chalk.yellow('[i18n] No locales found, creating default English locale'));
       this.createDefaultLocale();
     }
   }
@@ -48,7 +49,7 @@ class I18nManager {
     const selectedLocale = this.locales[locale] || this.locales[this.defaultLocale];
     
     if (!selectedLocale) {
-      console.warn(`[i18n] No translations available for locale: ${locale}`);
+      console.warn(chalk.yellow(`[i18n] No translations available for locale: ${locale}`));
       return key;
     }
 
@@ -65,7 +66,7 @@ class I18nManager {
     }
 
     if (!value) {
-      console.warn(`[i18n] Translation not found for key: ${key} in locale: ${locale}`);
+      console.warn(chalk.yellow(`[i18n] Translation not found for key: ${key} in locale: ${locale}`));
       return key;
     }
 
