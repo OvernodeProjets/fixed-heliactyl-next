@@ -49,7 +49,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
                     <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
                 </svg>                
-                <%= __('server.transfer.back_to_list') %>
+                <%= __('website.transfer.back_to_list') %>
                 </a>
             </span>
             </div>
@@ -64,13 +64,13 @@
                     <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
                 </svg>
                 <div class="ml-3">
-                    <h3 class="text-lg font-semibold text-amber-500"><%= __('server.transfer.experimental_title') %></h3>
-                    <p class="mt-2 text-sm text-gray-300"><%= __('server.transfer.experimental_desc') %></p>
+                    <h3 class="text-lg font-semibold text-amber-500"><%= __('website.transfer.experimental_title') %></h3>
+                    <p class="mt-2 text-sm text-gray-300"><%= __('website.transfer.experimental_desc') %></p>
                     <ul class="mt-2 text-sm text-gray-300 list-disc list-inside space-y-1">
-                        <li><%= __('server.transfer.risk_1') %></li>
-                        <li><%= __('server.transfer.risk_2') %></li>
-                        <li><%= __('server.transfer.risk_3') %></li>
-                        <li><%= __('server.transfer.risk_4') %></li>
+                        <li><%= __('website.transfer.risk_1') %></li>
+                        <li><%= __('website.transfer.risk_2') %></li>
+                        <li><%= __('website.transfer.risk_3') %></li>
+                        <li><%= __('website.transfer.risk_4') %></li>
                     </ul>
                 </div>
             </div>
@@ -78,7 +78,7 @@
 
         <!-- Transfer Server Section -->
         <div class="bg-white/5 rounded-xl p-6 mt-8">
-            <h2 class="text-xl font-semibold mb-4 text-white"><%= __('server.transfer.title') %></h2>
+            <h2 class="text-xl font-semibold mb-4 text-white"><%= __('website.transfer.title') %></h2>
             
             <!-- Node Selection -->
             <div class="space-y-6">
@@ -91,10 +91,10 @@
             <!-- Transfer Button -->
             <div class="mt-8 flex flex-col items-center justify-center space-y-4">
                 <p class="text-sm text-gray-400 text-center max-w-lg">
-                    <%= __('server.transfer.ack') %>
+                    <%= __('website.transfer.ack') %>
                 </p>
                 <button id="transfer-server" class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-full hover:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
-                    <%= __('server.transfer.button') %>
+                    <%= __('website.transfer.button') %>
                 </button>
             </div>
         </div>
@@ -122,10 +122,10 @@
                 <div class="w-full border-t border-white/10 my-6"></div>
                 <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4 w-full">
                     <button id="modal-cancel" class="w-full sm:w-auto bg-white/10 hover:bg-white/15 text-white font-medium py-2 px-6 rounded-lg transition">
-                        <%= __('server.transfer.modal_cancel') %>
+                        <%= __('website.transfer.modal_cancel') %>
                     </button>
                     <button id="modal-confirm" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-black font-medium py-2 px-6 rounded-lg transition flex items-center justify-center min-w-[160px]">
-                        <span id="modal-confirm-text"><%= __('server.transfer.modal_continue') %></span>
+                        <span id="modal-confirm-text"><%= __('website.transfer.modal_continue') %></span>
                     </button>
                 </div>
             </div>
@@ -265,7 +265,7 @@
                 cancelButton.disabled = true;
                 confirmButton.classList.add('opacity-50', 'cursor-not-allowed');
                 cancelButton.classList.add('opacity-50', 'cursor-not-allowed');
-                confirmText.textContent = '<%= __('server.transfer.modal_transferring') %>';
+                confirmText.textContent = '<%= __('website.transfer.modal_transferring') %>';
             } else {
                 warningIcon.classList.remove('hidden');
                 loadingIcon.classList.add('hidden');
@@ -273,18 +273,18 @@
                 cancelButton.disabled = false;
                 confirmButton.classList.remove('opacity-50', 'cursor-not-allowed');
                 cancelButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                confirmText.textContent = '<%= __('server.transfer.modal_continue') %>';
+                confirmText.textContent = '<%= __('website.transfer.modal_continue') %>';
             }
         }
 
         // Precompiled templates to avoid EJS object literals inside JS
-        const confirmTpl = <%- JSON.stringify(__('server.transfer.confirm_text', { nodeId: '__NODE__' })) %>;
-        const failedTpl = <%- JSON.stringify(__('server.transfer.failed_text', { error: '__ERR__' })) %>;
+        const confirmTpl = <%- JSON.stringify(__('website.transfer.confirm_text', { nodeId: '__NODE__' })) %>;
+        const failedTpl = <%- JSON.stringify(__('website.transfer.failed_text', { error: '__ERR__' })) %>;
 
         document.getElementById('transfer-server').addEventListener('click', () => {
             if (selectedNodeId) {
                 showConfirmationModal(
-                    '<%= __('server.transfer.confirm_title') %>',
+                    '<%= __('website.transfer.confirm_title') %>',
                     confirmTpl.replace('__NODE__', String(selectedNodeId)),
                     () => {
                         setModalLoading(true);
@@ -303,14 +303,14 @@
                             setModalLoading(false);
                             if (response.ok) {
                                 showConfirmationModal(
-                                    '<%= __('server.transfer.initiated_title') %>',
-                                    '<%= __('server.transfer.initiated_text') %>',
+                                    '<%= __('website.transfer.initiated_title') %>',
+                                    '<%= __('website.transfer.initiated_text') %>',
                                     () => window.location.reload()
                                 );
                             } else {
                                 return response.json().then(error => {
                                 showConfirmationModal(
-                                    '<%= __('server.transfer.failed_title') %>',
+                                    '<%= __('website.transfer.failed_title') %>',
                                     failedTpl.replace('__ERR__', JSON.stringify(error)),
                                         () => {}
                                     );
@@ -321,8 +321,8 @@
                             setModalLoading(false);
                             console.error('Error:', error);
                             showConfirmationModal(
-                                '<%= __('server.transfer.error_title') %>',
-                                '<%= __('server.transfer.error_text') %>',
+                                '<%= __('website.transfer.error_title') %>',
+                                '<%= __('website.transfer.error_text') %>',
                                 () => {}
                             );
                         });

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= locale %>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
+    <title><%= __('auth.register.title') %> - <%= settings.name %></title>
     <link rel="stylesheet" href="../assets/tailwind.css">
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
@@ -101,30 +101,30 @@
             <div class="flex justify-center mb-8">
                 <img src="/assets/logo-text.png" class="h-8">
             </div>
-            <h2 class="text-center text-2xl tracking-tight font-semibold text-gray-800">Create an account</h2>
-            <p class="text-gray-600 text-center mt-1 text-sm">Welcome to the ecosystem!</p>
+            <h2 class="text-center text-2xl tracking-tight font-semibold text-gray-800"><%= __('auth.register.heading') %></h2>
+            <p class="text-gray-600 text-center mt-1 text-sm"><%= __('auth.register.subtitle') %></p>
 
             <!-- Registration Form -->
             <form id="registerForm" class="mt-8 space-y-4">
                 <div>
                     <input type="text" id="username" name="username"
                         class="transition w-full py-2 px-4 font-medium text-sm bg-gray-200 rounded-full border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
-                        placeholder="Username" required>
+                        placeholder="<%= __('auth.register.username_ph') %>" required>
                 </div>
                 <div>
                     <input type="email" id="email" name="email"
                         class="transition w-full py-2 px-4 font-medium text-sm bg-gray-200 rounded-full border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
-                        placeholder="Email" required>
+                        placeholder="<%= __('auth.register.email_ph') %>" required>
                 </div>
                 <div>
                     <input type="password" id="password" name="password"
                         class="transition w-full py-2 px-4 font-medium text-sm bg-gray-200 rounded-full border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
-                        placeholder="Password" required>
+                        placeholder="<%= __('auth.register.password_ph') %>" required>
                 </div>
                 <div>
                     <input type="password" id="confirmPassword" name="confirmPassword"
                         class="transition w-full py-2 px-4 font-medium text-sm bg-gray-200 rounded-full border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
-                        placeholder="Confirm Password" required>
+                        placeholder="<%= __('auth.register.confirm_password_ph') %>" required>
                 </div>
                 <% if(settings.security.enableCaptcha) { %>
                     <div class="flex justify-center">
@@ -133,15 +133,14 @@
                     <% } %>
                         <button style="box-shadow: inset 0px 4px 5px -3px rgba(55,65,81,1);" type="submit"
                             class="hover:scale-95 w-full py-2.5 px-4 bg-gray-800 hover:bg-gray-700 transition text-white rounded-full transition font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center">
-                            Register
+                            <%= __('auth.register.btn') %>
                             <span class="spinner" id="registerSpinner"></span>
                         </button>
             </form>
 
             <div class="mt-6 text-center transition hover:scale-95">
                 <a href="../auth" id="loginLink"
-                    class="hover:bg-indigo-600/5 rounded-full px-4 py-1.5 transition hover:scale-95 text-sm text-indigo-600 hover:text-indigo-800 transition font-medium">Already
-                    have an account? Sign in</a>
+                    class="hover:bg-indigo-600/5 rounded-full px-4 py-1.5 transition hover:scale-95 text-sm text-indigo-600 hover:text-indigo-800 transition font-medium"><%= __('auth.register.have_account') %></a>
             </div>
         </div>
     </main>
@@ -149,7 +148,7 @@
     <!-- Toast Notification -->
     <div id="toast"
         class="fixed z-50 bottom-2 right-2 font-medium bg-red-500 text-white px-6 py-2.5 rounded-l-xl rounded-t-xl rounded-br-md shadow-lg transition-opacity duration-300 opacity-0 pointer-events-none">
-        Error message goes here
+        
     </div>
 
     <script>
@@ -184,14 +183,14 @@
                     const recaptchaResponse = grecaptcha.getResponse();
 
                     if (!recaptchaResponse) {
-                        showToast('Please complete the reCAPTCHA.');
+                        showToast('<%= __('auth.register.errors.recaptcha_required') %>');
                         registerSpinner.style.display = 'none';
                         return;
                     }
                 }
 
                 if (password !== confirmPassword) {
-                    showToast('Passwords do not match.');
+                    showToast('<%= __('auth.register.errors.passwords_no_match') %>');
                     registerSpinner.style.display = 'none';
                     return;
                 }
@@ -213,17 +212,17 @@
                     const data = await response.json();
 
                     if (response.ok) {
-                        showToast('Registration successful!', 'success');
+                        showToast('<%= __('auth.register.success.registered') %>', 'success');
                         setTimeout(() => {
                             window.location.href = '/auth';
                         }, 2000);
                     } else {
-                        showToast(data.error || 'Registration failed. Please try again.');
+                        showToast(data.error || '<%= __('auth.register.errors.failed') %>');
                         registerForm.classList.add('error-shake');
                         setTimeout(() => registerForm.classList.remove('error-shake'), 1000);
                     }
                 } catch (error) {
-                    showToast('An error occurred. Please try again later.');
+                    showToast('<%= __('auth.register.errors.generic') %>');
                 } finally {
                     registerSpinner.style.display = 'none';
                     if (captchaEnabled) grecaptcha.reset();

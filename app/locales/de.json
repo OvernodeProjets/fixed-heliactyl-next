@@ -1055,6 +1055,109 @@
       "network_activity": "Netzwerkaktivität"
     }
   }
+  ,
+  "auth": {
+    "login": {
+      "html_lang": "<%= locale %>",
+      "title": "Anmelden",
+      "welcome": "Willkommen zurück!",
+      "subtitle": "Melden Sie sich bei Ihrem Konto an.",
+      "email_ph": "E‑Mail",
+      "password_ph": "Passwort",
+      "sign_in": "Anmelden",
+      "send_magic_link": "Magic‑Link senden",
+      "or_continue": "Oder fortfahren mit",
+      "google": "Mit Google anmelden",
+      "discord": "Mit Discord anmelden",
+      "or": "oder",
+      "create_account": "Konto erstellen",
+      "modal_title": "Menschliche Verifizierung",
+      "modal_btn": "Ich bin kein Roboter oder KI‑Sprachmodell.",
+      "errors": {
+        "account_creation_failed": "Konto konnte nicht erstellt werden. Bitte Support kontaktieren oder erneut versuchen.",
+        "server_error": "Serverfehler. Bitte später erneut versuchen.",
+        "generic": "Bei der Anmeldung ist ein Fehler aufgetreten.",
+        "recaptcha_required": "Bitte reCAPTCHA ausfüllen",
+        "email_required": "Bitte E‑Mail‑Adresse eingeben.",
+        "login_failed": "Anmeldung fehlgeschlagen. Bitte erneut versuchen.",
+        "generic_error": "Es ist ein Fehler aufgetreten. Bitte später erneut versuchen.",
+        "request_failed": "Anfrage konnte nicht verarbeitet werden. Bitte erneut versuchen."
+      },
+      "success": {
+        "welcome_back": "Willkommen zurück!",
+        "magic_link_sent": "Magic‑Link gesendet! Bitte E‑Mail prüfen.",
+        "reset_link_sent": "Link zum Zurücksetzen gesendet! Bitte E‑Mail prüfen."
+      }
+    },
+    "register": {
+      "html_lang": "<%= locale %>",
+      "title": "Registrieren",
+      "heading": "Konto erstellen",
+      "subtitle": "Willkommen im Ökosystem!",
+      "username_ph": "Benutzername",
+      "email_ph": "E‑Mail",
+      "password_ph": "Passwort",
+      "confirm_password_ph": "Passwort bestätigen",
+      "btn": "Registrieren",
+      "have_account": "Bereits ein Konto? Anmelden",
+      "errors": {
+        "recaptcha_required": "Bitte reCAPTCHA ausfüllen.",
+        "passwords_no_match": "Passwörter stimmen nicht überein.",
+        "failed": "Registrierung fehlgeschlagen. Bitte erneut versuchen.",
+        "generic": "Es ist ein Fehler aufgetreten. Bitte später erneut versuchen."
+      },
+      "success": {
+        "registered": "Registrierung erfolgreich!"
+      }
+    },
+    "reset": {
+      "html_lang": "<%= locale %>",
+      "title": "Passwort zurücksetzen",
+      "heading": "Passwort zurücksetzen",
+      "subtitle": "Geben Sie unten Ihr neues Passwort ein",
+      "new_password_ph": "Neues Passwort",
+      "confirm_new_password_ph": "Neues Passwort bestätigen",
+      "btn": "Passwort zurücksetzen",
+      "remember": "Passwort noch im Kopf?",
+      "login": "Anmelden",
+      "copyright": "Alle Rechte vorbehalten.",
+      "errors": {
+        "passwords_no_match": "Passwörter stimmen nicht überein.",
+        "failed": "Passwort konnte nicht zurückgesetzt werden. Bitte erneut versuchen.",
+        "generic": "Es ist ein Fehler aufgetreten. Bitte später erneut versuchen."
+      },
+      "success": {
+        "reset": "Passwort erfolgreich zurückgesetzt!"
+      }
+    }
+  }
+  ,
+  "errors": {
+    "common": {
+      "go_home": "Zur Startseite",
+      "error_log_label": "Fehlerprotokoll",
+      "account_details_label": "Kontodetails"
+    },
+    "404": {
+      "title": "404",
+      "heading": "Seite nicht gefunden",
+      "description": "Ups! Die gesuchte Seite existiert nicht.",
+      "fallback_log": "Die angeforderte Ressource wurde auf diesem Server nicht gefunden."
+    },
+    "500": {
+      "title": "500",
+      "heading": "Interner Serverfehler",
+      "description": "Ups! Auf unserer Seite ist etwas schiefgelaufen.",
+      "fallback_log": "Interner Serverfehler"
+    },
+    "banned": {
+      "title": "Konto gesperrt",
+      "description": "Ihr Konto wurde wegen Verstoßes gegen unsere Nutzungsbedingungen gesperrt.",
+      "reason": "Grund",
+      "expiration": "Ablauf",
+      "permanent": "Dauerhaft"
+    }
+  }
 }
 
 
