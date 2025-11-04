@@ -1,11 +1,11 @@
-<%- include('./components/top') %>
+<%- include('../components/top') %>
 
 <main class="flex-grow container mx-auto px-4 py-8">
     <div class="flex justify-between items-center w-full mx-auto pb-4">
         <!-- Welcome text and subtext on the left -->
         <div class="flex flex-col">
-            <h1 class="text-xl font-semibold mb-0.5 heavy">Edit Server</h1>
-            <p class="text-gray-400 text-md">Update the resources of your <%= settings.name %> server!</p>
+            <h1 class="text-xl font-semibold mb-0.5 heavy"><%= __('server.edit.title') %></h1>
+            <p class="text-gray-400 text-md"><%= __('server.edit.subtitle', { name: settings.name }) %></p>
         </div>
 
         <!-- Breadcrumbs on the right -->
@@ -29,7 +29,7 @@
                             <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
                             <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
                         </svg>
-                        <span>Home</span>
+                        <span><%= __('breadcrumbs.home') %></span>
                     </a>
                 </li>
                 <li class="flex items-center">
@@ -49,7 +49,7 @@
                 </li>
                 <li>
                     <a href="#_" class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200" aria-current="page">
-                        Edit Server
+                        <%= __('server.edit.breadcrumb_edit') %>
                     </a>
                 </li>
             </ol>
@@ -60,8 +60,8 @@
         <div class="bg-white/5 px-4 py-5 border-b border-white/10 rounded-t-2xl sm:px-6">
             <div class="sm:flex sm:items-start sm:justify-between">
                 <div>
-                    <h3 class="text-lg leading-6 font-medium text-white">Edit Server</h3>
-                    <p class="mt-1 text-sm text-gray-300">After purchasing extra resources, you can apply them here by editing the server.</p>
+                    <h3 class="text-lg leading-6 font-medium text-white"><%= __('server.edit.panel_title') %></h3>
+                    <p class="mt-1 text-sm text-gray-300"><%= __('server.edit.panel_subtitle') %></p>
                 </div>
             </div>
         </div>
@@ -96,7 +96,7 @@ id = req.query.numeric
                 %>
                 <div class="grid grid-cols-3 gap-6">
                     <div class="col-span-3 sm:col-span-2">
-                        <label for="ram" class="block text-sm font-medium text-gray-400">Memory (GiB)</label>
+                        <label for="ram" class="block text-sm font-medium text-gray-400"><%= __('server.edit.ram_label') %></label>
                         <div class="mt-1 flex rounded-xl shadow-sm">
                             <input type="text" name="ram" id="ram" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-full bg-white/10 border-white/10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-2 py-1 border placeholder-gray-400 focus:ring-2" placeholder="<%= (packages ? packages.ram : 0)/1024 + extraresources.ram/1024 - ram/1024 + serverinfo.attributes.limits.memory/1024 %>" value="<%= (packages ? packages.ram : 0)/1024 + extraresources.ram/1024 - ram/1024 + serverinfo.attributes.limits.memory/1024 %>">
                         </div>
@@ -105,7 +105,7 @@ id = req.query.numeric
 
                 <div class="grid grid-cols-3 gap-6">
                     <div class="col-span-3 sm:col-span-2">
-                        <label for="cpu" class="block text-sm font-medium text-gray-400">CPU cores</label>
+                        <label for="cpu" class="block text-sm font-medium text-gray-400"><%= __('server.edit.cpu_label') %></label>
                         <div class="mt-1 flex rounded-xl shadow-sm">
                             <input type="text" name="cpu" id="cpu" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-full bg-white/10 border-white/10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-2 py-1 border placeholder-gray-400 focus:ring-2" value="<%= (packages ? packages.cpu/100 : 0) + extraresources.cpu/100 - cpu/100 + serverinfo.attributes.limits.cpu/100 %>" placeholder="<%= (packages ? packages.cpu/100 : 0) + extraresources.cpu/100 - cpu/100 + serverinfo.attributes.limits.cpu/100 %>">
                         </div>
@@ -114,14 +114,14 @@ id = req.query.numeric
 
                 <div class="grid grid-cols-3 gap-6">
                     <div class="col-span-3 sm:col-span-2">
-                        <label for="disk" class="block text-sm font-medium text-gray-400">Storage (GiB)</label>
+                        <label for="disk" class="block text-sm font-medium text-gray-400"><%= __('server.edit.disk_label') %></label>
                         <div class="mt-1 flex rounded-xl shadow-sm">
                             <input type="text" name="disk" id="disk" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-full bg-white/10 border-white/10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-2 py-1 border placeholder-gray-400 focus:ring-2" placeholder="<%= (packages ? packages.disk : 0)/1024 + extraresources.disk/1024 - disk/1024 + serverinfo.attributes.limits.disk/1024 %>" value="<%= (packages ? packages.disk : 0)/1024 + extraresources.disk/1024 - disk/1024 + serverinfo.attributes.limits.disk/1024 %>">
                         </div>
                     </div>
                 </div><br><br>
                 <button onclick="submitForm()" class="transition ease-in-out delay-100 group relative flex w-auto justify-center rounded-full border border-transparent py-2 px-4 text-sm font-medium text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Apply Changes to Server
+                    <%= __('server.common.apply_changes') %>
                 </button>
             </div>
             <script>
@@ -133,12 +133,12 @@ id = req.query.numeric
                 };
             </script>
         <% } else { %>
-            <p class="text-white">Could not find server with the provided ID.</p>
+            <p class="text-white"><%= __('server.edit.not_found') %></p>
         <% } %>
     <% } else { %>
-        <p class="text-white">Missing server ID.</p>
+        <p class="text-white"><%= __('server.edit.missing_id') %></p>
     <% } %>
     </div>
 </main>
 
-<%- include('./components/bottom') %>
+<%- include('../components/bottom') %>

@@ -174,7 +174,7 @@ display:none;
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
                 <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
               </svg>                
-              Back to server list
+              <%= __('server.manage.back_to_list') %>
             </a>
           </span>
         </div>
@@ -280,15 +280,15 @@ display:none;
         <div class="lg:col-span-3 space-y-6">
             
             <div class="card rounded-xl p-6">
-                <h2 class="text-xl font-semibold heavy">Console</h2>
-                <span class="text-gray-300 text-sm mt-1 mb-4">Send commands to your server, view important logs and more.</span>
+                <h2 class="text-xl font-semibold heavy"><%= __('server.manage.console') %></h2>
+                <span class="text-gray-300 text-sm mt-1 mb-4"><%= __('server.manage.console_hint') %></span>
                 <div class="border-t border-white/5 mt-4"></div>
                 <div style="height: 30rem;" id="console-output" class="bg-black/20 p-4 rounded-xl border border-white/5 shadow-sm scrollbar-hide mt-4 overflow-y-auto mb-4 font-mono text-sm">
                 </div>
                 <div class="flex border-t border-white/5 pt-4">
                     <input type="text" id="console-input" class="flex-grow border-none bg-transparent text-white py-2 focus:border-white/5 focus:outline-none focus:ring-2 focus:ring-transparent transition placeholder-white/30" placeholder="container@<%= settings.name %>~">
                     <button id="send-command" class="bg-indigo-500/15 hover:bg-indigo-500/20 text-indigo-200 font-medium py-2 px-2 sm:px-4 rounded-xl transition duration-300 flex items-center">
-                        <span class="hidden sm:inline mr-1">Send command</span>
+                        <span class="hidden sm:inline mr-1"><%= __('server.manage.send_command') %></span>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                         </svg>
@@ -298,7 +298,7 @@ display:none;
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-white/5 rounded-l-2xl rounded-lg p-6">
-                    <h3 class="text-sm font-semibold mb-2 text-white/60">CPU Usage</h3>
+                    <h3 class="text-sm font-semibold mb-2 text-white/60"><%= __('server.manage.cpu_usage') %></h3>
                     <div class="flex items-center">
                         <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
                             <div class="bg-indigo-500 h-2 rounded-full transition-all" id="cpu-usage-bar" style="width: 0%"></div>
@@ -307,7 +307,7 @@ display:none;
                     </div>
                 </div>
                 <div class="bg-white/5 rounded-lg p-6">
-                    <h3 class="text-sm font-semibold mb-2 text-white/60">Memory Usage</h3>
+                    <h3 class="text-sm font-semibold mb-2 text-white/60"><%= __('server.manage.memory_usage') %></h3>
                     <div class="flex items-center">
                         <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
                             <div class="bg-indigo-500 h-2 rounded-full transition-all" id="ram-usage-bar" style="width: 0%"></div>
@@ -316,7 +316,7 @@ display:none;
                     </div>
                 </div>
                 <div class="bg-white/5 rounded-lg p-6">
-                    <h3 class="text-sm font-semibold mb-2 text-white/60">Disk Usage</h3>
+                    <h3 class="text-sm font-semibold mb-2 text-white/60"><%= __('server.manage.disk_usage') %></h3>
                     <div class="flex items-center">
                         <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
                             <div class="bg-indigo-500 h-2 rounded-full transition-all" id="disk-usage-bar" style="width: 0%"></div>
@@ -325,7 +325,7 @@ display:none;
                     </div>
                 </div>
                 <div class="bg-white/5 rounded-r-2xl rounded-lg p-6">
-                    <h3 class="text-sm font-semibold mb-2 text-white/60">Network (Outbound)</h3>
+                    <h3 class="text-sm font-semibold mb-2 text-white/60"><%= __('server.manage.network_out') %></h3>
                     <div class="flex items-center">
                         <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
                             <div class="bg-indigo-500 h-2 rounded-full transition-all" id="network-usage-bar" style="width: 0%"></div>
@@ -338,8 +338,8 @@ display:none;
             <div class="card rounded-xl p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h2 class="text-xl font-semibold heavy">Server Renewal</h2>
-                        <span class="text-gray-300 text-sm mt-1">Your server needs to be renewed every 48 hours to prevent automatic shutdown</span>
+                        <h2 class="text-xl font-semibold heavy"><%= __('server.manage.renewal_title') %></h2>
+                        <span class="text-gray-300 text-sm mt-1"><%= __('server.manage.renewal_subtitle') %></span>
                     </div>
                     <div id="renewal-badge" class="hidden px-3 py-1 rounded-full text-sm font-medium">
                     </div>
@@ -354,15 +354,15 @@ display:none;
                                 </svg>
                             </div>
                             <div>
-                                <div class="text-sm text-gray-400">Next Renewal</div>
-                                <div id="renewal-time" class="text-lg font-medium">Loading...</div>
+                                <div class="text-sm text-gray-400"><%= __('server.manage.next_renewal') %></div>
+                                <div id="renewal-time" class="text-lg font-medium"><%= __('server.manage.loading') %></div>
                             </div>
                         </div>
                         <button id="renew-server" disabled class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-xl transition duration-300 hover-scale hidden">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline-block mr-1 mb-0.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                             </svg>
-                            Renew Now
+                            <%= __('server.manage.renew_now') %>
                         </button>
                     </div>
                     <div class="mt-4">
@@ -377,10 +377,10 @@ display:none;
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2 text-indigo-500">
                           <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
                         </svg>
-                        Why do I need to renew my server?
+                        <%= __('server.manage.why_renew') %>
                     </div>
                     <p class="ml-6">
-                        To ensure optimal resource allocation and prevent inactive servers from consuming resources, all servers must be renewed every 48 hours. Servers that aren't renewed will be automatically stopped until renewed. This helps us maintain good performance for active users and reduce unnecessary resource usage.
+                        <%= __('server.manage.why_renew_text') %>
                     </p>
                 </div>
             
@@ -390,10 +390,10 @@ display:none;
                           <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                           <path stroke-linecap="round" stroke-linejoin="round" d="M15.91 11.672a.375.375 0 0 1 0 .656l-5.603 3.113a.375.375 0 0 1-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112Z" />
                         </svg>
-                        When can I renew?
+                        <%= __('server.manage.when_renew') %>
                     </div>
                     <p class="ml-6">
-                        At the 24 hour mark you can renew your server (a button will pop up). It's as simple as just clicking "Renew Now" and that's it.
+                        <%= __('server.manage.when_renew_text') %>
                     </p>
                 </div>
             </div>
@@ -509,7 +509,7 @@ function fetchServerDetails() {
             if (serverName) serverName.textContent = data.attributes.name;
             if (serverNameCard) serverNameCard.textContent = data.attributes.name;
             if (serverNameBreadcrumb) serverNameBreadcrumb.textContent = data.attributes.name;
-            if (serverDescription) serverDescription.textContent = data.attributes.description || "No description set.";
+            if (serverDescription) serverDescription.textContent = data.attributes.description || "<%= __('server.manage.no_description') %>";
             nodeName = data.attributes.node;
             if (nodeElement) nodeElement.textContent = nodeName;
             const limitConfigs = {
@@ -1032,9 +1032,9 @@ async function checkRenewalStatus() {
         
         // Update time remaining
         if (data.timeRemaining.hours <= 0 && data.timeRemaining.minutes <= 0) {
-            renewalTime.innerHTML = `<span class="text-red-500">Expired</span>`;
+            renewalTime.innerHTML = `<span class="text-red-500"><%= __('server.manage.expired') %></span>`;
         } else {
-            renewalTime.textContent = `${data.timeRemaining.hours}h ${data.timeRemaining.minutes}m remaining`;
+            renewalTime.textContent = `${data.timeRemaining.hours}h ${data.timeRemaining.minutes}m <%= __('server.manage.remaining_suffix') %>`;
         }
         
         // Show/hide renew button and update status
@@ -1046,17 +1046,17 @@ async function checkRenewalStatus() {
             
             if (data.isExpired) {
                 renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-red-600 text-white';
-                renewalBadge.textContent = 'Expired';
+                renewalBadge.textContent = '<%= __('server.manage.expired') %>';
             } else if (data.timeRemaining.hours <= 6) {
                 renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-yellow-600 text-white';
-                renewalBadge.textContent = 'Renewal Required Soon';
+                renewalBadge.textContent = '<%= __('server.manage.renewal_required_soon') %>';
             } else {
                 renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-indigo-500 text-white';
-                renewalBadge.textContent = 'Renewal Available';
+                renewalBadge.textContent = '<%= __('server.manage.renewal_available') %>';
             }
             } else if (data.timeRemaining.hours >= 50) {
                 renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-emerald-600 text-white';
-                renewalBadge.textContent = 'Renewal Bypass';
+                renewalBadge.textContent = '<%= __('server.manage.renewal_bypass') %>';
         } else {
             renewButton.classList.add('hidden');
             renewalBadge.classList.add('hidden');
@@ -1104,15 +1104,15 @@ document.getElementById('renew-server').addEventListener('click', async () => {
         });
         
         if (response.ok) {
-            showAlert('success', 'Server Renewed', 'Your server has been successfully renewed for another 48 hours.');
+            showAlert('success', '<%= __('server.manage.renewed_success') %>', '');
             await checkRenewalStatus();
         } else {
             const data = await response.json();
-            showAlert('error', 'Renewal Failed', data.error || 'Failed to renew server. Please try again.');
+            showAlert('error', '<%= __('server.manage.renew_failed') %>', data.error || '<%= __('server.manage.renew_failed_text') %>');
         }
     } catch (error) {
         console.error('Error renewing server:', error);
-        showAlert('error', 'Renewal Failed', 'An error occurred while renewing the server.');
+        showAlert('error', '<%= __('server.manage.renew_failed') %>', '<%= __('server.manage.renew_failed_text') %>');
     } finally {
         const button = document.getElementById('renew-server');
         button.disabled = false;

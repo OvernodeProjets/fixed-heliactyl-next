@@ -1,4 +1,4 @@
-<%- include('./components/top') %>
+<%- include('../components/top') %>
 <!-- Main Content -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.css" integrity="sha512-MpdEaY2YQ3EokN6lCD6bnWMl5Gwk7RjBbpKLovlrH6X+DRokrPRAF3zQJl1hZUiLXfo2e9MrOt+udOnHCAmi5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <main class="flex-grow container mx-auto px-4 py-8">
@@ -7,7 +7,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 mb-0.5 inline-flex mr-1.5">
   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
 </svg>
-Back to server list
+<%= __('server.common.back_to_list') %>
 </a>
     </div>
 
@@ -35,7 +35,7 @@ Back to server list
         </div>
         <div class="ml-3">
           <h3 class="text-sm font-medium text-red-300">
-            Error Creating Server
+            <%= __('server.create.error_title') %>
           </h3>
           <div class="mt-2 text-sm text-red-200">
             <p>
@@ -76,7 +76,7 @@ Back to server list
                 <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                     <div class="sm:col-span-3">
                         <label for="name" class="block text-sm text-white/70">
-                            Server Name
+                            <%= __('server.create.name_label') %>
                         </label>
                         <div class="mt-1">
                         <input 
@@ -92,7 +92,7 @@ Back to server list
 
                     <div class="sm:col-span-6">
                         <label class="block text-sm text-white/70 mb-4">
-                            Location
+                            <%= __('server.create.location_label') %>
                         </label>
                         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             <% const locations = Object.entries(settings.api.client.locations || {}).map(([id, location]) => ({
@@ -164,20 +164,20 @@ Back to server list
 
 <div class="sm:col-span-6">
   <label class="block text-sm text-white/70 mb-4">
-    Server Image
+    <%= __('server.create.image_label') %>
   </label>
   <div class="mb-4 flex items-center space-x-4">
     <div class="relative flex-grow">
-      <input type="text" id="image-search" placeholder="Search images..." class="w-full py-2 px-4 text-sm rounded-lg rounded-l-xl bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500 placeholder-white/60 transition">
+      <input type="text" id="image-search" placeholder="<%= __('server.create.search_images') %>" class="w-full py-2 px-4 text-sm rounded-lg rounded-l-xl bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500 placeholder-white/60 transition">
       <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
       </svg>
     </div>
     <div class="relative inline-block text-left">
       <select id="category-select" class="appearance-none bg-white/5 border border-white/5 text-white py-2 px-4 pr-8 rounded-lg rounded-r-2xl focus:outline-none focus:ring-2 text-sm focus:ring-indigo-500 focus:border-transparent">
-        <option value="all">All Categories</option>
-        <option value="Game Servers">Game Servers</option>
-        <option value="Generic">Generic</option>
+        <option value="all"><%= __('server.create.all_categories') %></option>
+        <option value="Game Servers"><%= __('server.create.category_game') %></option>
+        <option value="Generic"><%= __('server.create.category_generic') %></option>
       </select>
     </div>
   </div>
@@ -201,7 +201,7 @@ Back to server list
                     <p class="text-sm font-medium text-white">
                         <%= image.display %>
                         <% if (image.free) { %>
-                            <span class="ml-1.5 inline-flex items-center rounded-md bg-green-800/30 px-2 py-1 text-xs font-medium text-green-300 ring-1 ring-inset ring-green-600/20">Free</span>
+                            <span class="ml-1.5 inline-flex items-center rounded-md bg-green-800/30 px-2 py-1 text-xs font-medium text-green-300 ring-1 ring-inset ring-green-600/20"><%= __('server.create.free') %></span>
                         <% } %>
                     </p>
                     <p class="text-sm text-gray-400 truncate"><%= image.category %></p>
@@ -232,7 +232,7 @@ Back to server list
 
                     <div class="sm:col-span-2">
                         <label for="ram" class="block text-sm text-white/70">
-                            RAM (GB)
+                            <%= __('server.create.ram_label') %>
                         </label>
                         <div class="mt-1">
                             <input type="number" name="ram" id="ram" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border border-white/10 placeholder-gray-400 focus:ring-2" value="<%= ((packages ? packages.ram : 0)/1024 + extraresources.ram/1024 - ram/1024).toFixed(2) %>">
@@ -241,7 +241,7 @@ Back to server list
 
                     <div class="sm:col-span-2">
                         <label for="cpu" class="block text-sm text-white/70">
-                            CPU (%)
+                            <%= __('server.create.cpu_label') %>
                         </label>
                         <div class="mt-1">
                             <input type="number" name="cpu" id="cpu" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border border-white/10 placeholder-gray-400 focus:ring-2" value="<%= (packages ? packages.cpu : 0) + extraresources.cpu - cpu %>">
@@ -250,7 +250,7 @@ Back to server list
 
                     <div class="sm:col-span-2">
                         <label for="disk" class="block text-sm text-white/70">
-                            Disk (GB)
+                            <%= __('server.create.disk_label') %>
                         </label>
                         <div class="mt-1">
                             <input type="number" name="disk" id="disk" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border border-white/10 placeholder-gray-400 focus:ring-2" value="<%= ((packages ? packages.disk : 0)/1024 + extraresources.disk/1024 - disk/1024).toFixed(2) %>">
@@ -260,7 +260,7 @@ Back to server list
             </form>
         </div>
         <button onclick="submitForm()" class="hover:scale-95 transition ease-in-out mt-5 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-full mt-2 text-white bg-indigo-500 transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Create
+            <%= __('server.common.create') %>
         </button>
     </div>
 
@@ -506,4 +506,4 @@ alertify.set('notifier','position', 'top-right');
     }
 </style>
 </main>
-<%- include('./components/bottom') %>
+<%- include('../components/bottom') %>

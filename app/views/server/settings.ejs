@@ -49,7 +49,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
                 <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
               </svg>                
-              Back to server list
+              <%= __('server.settings.back_to_list') %>
             </a>
           </span>
         </div>
@@ -62,16 +62,16 @@
     <div class="bg-white/5 rounded-xl overflow-hidden">
         <div class="bg-white/5 px-6 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <h2 class="text-lg font-semibold text-white">SFTP Access</h2>
+                <h2 class="text-lg font-semibold text-white"><%= __('server.settings.sftp_access') %></h2>
             </div>
             <div class="flex items-center">
-                <span class="px-3 py-1 text-xs rounded-full bg-indigo-500/20 text-indigo-300">Recommended</span>
+                <span class="px-3 py-1 text-xs rounded-full bg-indigo-500/20 text-indigo-300"><%= __('server.settings.recommended') %></span>
             </div>
         </div>
         <div class="p-6 space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-black/20 rounded-lg p-4">
-                    <div class="text-sm text-gray-400 mb-2">SFTP Host</div>
+                    <div class="text-sm text-gray-400 mb-2"><%= __('server.settings.sftp_host') %></div>
                     <div class="flex items-center space-x-2">
                         <code class="flex-1 text-white bg-black/30 rounded px-3 py-2" id="sftp-host"></code>
                         <button onclick="copyToClipboard('sftp-host')" class="text-gray-400 hover:text-white transition">
@@ -82,7 +82,7 @@
                     </div>
                 </div>
                 <div class="bg-black/20 rounded-lg p-4">
-                    <div class="text-sm text-gray-400 mb-2">SFTP Username</div>
+                    <div class="text-sm text-gray-400 mb-2"><%= __('server.settings.sftp_username') %></div>
                     <div class="flex items-center space-x-2">
                         <code class="flex-1 text-white bg-black/30 rounded px-3 py-2" id="sftp-username"></code>
                         <button onclick="copyToClipboard('sftp-username')" class="text-gray-400 hover:text-white transition">
@@ -94,7 +94,7 @@
                 </div>
             </div>
             <div class="text-sm text-gray-400">
-                <p class="mt-2">Password can be found under "SFTP Credentials" in the main sidebar</p>
+                <p class="mt-2"><%= __('server.settings.password_hint') %></p>
             </div>
         </div>
     </div>
@@ -103,14 +103,14 @@
     <div class="bg-white/5 rounded-xl overflow-hidden">
         <div class="bg-white/5 px-6 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <h2 class="text-lg font-semibold text-white">Rename Server</h2>
+                <h2 class="text-lg font-semibold text-white"><%= __('server.settings.rename_title') %></h2>
             </div>
         </div>
         <div class="p-6">
             <div class="flex space-x-4">
-                <input type="text" id="server-name-input" class="flex-1 p-3 bg-black/20 text-white border border-transparent rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition" placeholder="Enter new server name">
+                <input type="text" id="server-name-input" class="flex-1 p-3 bg-black/20 text-white border border-transparent rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition" placeholder="<%= __('server.settings.rename_placeholder') %>">
                 <button id="rename-server" class="bg-indigo-500 text-sm hover:bg-indigo-600 text-white font-medium px-6 rounded-xl flex items-center space-x-2 transition duration-200 hover:scale-95">
-                    <span>Rename</span>
+                    <span><%= __('server.settings.rename_button') %></span>
                 </button>
             </div>
         </div>
@@ -120,7 +120,7 @@
     <div class="bg-white/5 rounded-xl overflow-hidden">
         <div class="bg-white/5 px-6 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <h2 class="text-lg font-semibold text-white">Reinstall Server</h2>
+                <h2 class="text-lg font-semibold text-white"><%= __('server.settings.reinstall_title') %></h2>
             </div>
         </div>
         <div class="p-6 space-y-4">
@@ -131,14 +131,14 @@
                     </svg>
 
                     <div class="flex-1">
-                        <h3 class="text-md font-medium text-amber-400">Warning</h3>
-                        <p class="mt-1 text-gray-300 text-sm">This action will completely reset your server to its default state. All files, databases, and configurations will be permanently deleted.</p>
+                        <h3 class="text-md font-medium text-amber-400"><%= __('server.settings.warning') %></h3>
+                        <p class="mt-1 text-gray-300 text-sm"><%= __('server.settings.warning_text') %></p>
                     </div>
                 </div>
             </div>
             <div class="flex justify-end">
                 <button id="reinstall-server" class="bg-amber-500 hover:bg-amber-600 text-sm text-white font-medium px-6 py-2 rounded-xl flex items-center space-x-2 transition duration-200 hover:scale-95">
-                    <span>Reinstall</span>
+                    <span><%= __('server.settings.reinstall_button') %></span>
                 </button>
             </div>
         </div>
@@ -150,7 +150,7 @@
     <div class="bg-white/5 rounded-xl overflow-hidden">
         <div class="bg-white/5 px-6 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <h2 class="text-lg font-semibold text-white">Delete Server</h2>
+                <h2 class="text-lg font-semibold text-white"><%= __('server.settings.delete_title') %></h2>
             </div>
         </div>
         <div class="p-6 space-y-4">
@@ -160,8 +160,8 @@
   <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
 </svg>
                     <div class="flex-1">
-                        <h3 class="text-md font-medium text-red-400">Danger Zone</h3>
-                        <p class="mt-1 text-sm text-gray-300">This action is irreversible. All server data, including files, databases, and configurations, will be permanently deleted. The server's resources will be returned to your account.</p>
+                        <h3 class="text-md font-medium text-red-400"><%= __('server.settings.danger_zone') %></h3>
+                        <p class="mt-1 text-sm text-gray-300"><%= __('server.settings.danger_text') %></p>
                     </div>
                 </div>
             </div>
@@ -170,7 +170,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
   <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.25-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z" />
 </svg>
-                    <span>Delete Server</span>
+                    <span><%= __('server.settings.delete_button') %></span>
                 </button>
             </div>
         </div>
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('sftp-username').textContent = `<%= req.session.pterodactyl.username %>.${data.attributes.identifier}`;
             document.getElementById('server-name').textContent = data.attributes.name;
             document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
-            document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
+            document.getElementById('server-description').textContent = data.attributes.description || "<%= __('server.settings.no_description') %>";
         });
 });
 </script>
@@ -209,11 +209,11 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="bg-white/5 rounded-xl p-6 mt-8">
         <!-- Docker Image Selection -->
         <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-300 mb-2">Docker Image</label>
+            <label class="block text-sm font-medium text-gray-300 mb-2"><%= __('server.settings.docker_image') %></label>
             <div class="space-y-4">
                 <div class="flex gap-4">
                     <select id="image-category" class="flex-1 p-3 bg-white/5 text-white border border-transparent rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition">
-                        <option value="">Select Category</option>
+                        <option value=""><%= __('server.settings.select_category') %></option>
                         <option value="java">Java</option>
                         <option value="games">Games</option>
                         <option value="nodejs">NodeJS</option>
@@ -221,18 +221,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         <option value="golang">Golang</option>
                         <option value="base">Base OS</option>
                     </select>
-                    <input type="text" id="image-search" placeholder="Search images..." class="flex-1 p-3 bg-white/5 text-white border border-transparent rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition">
+                    <input type="text" id="image-search" placeholder="<%= __('server.settings.search_images') %>" class="flex-1 p-3 bg-white/5 text-white border border-transparent rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition">
                 </div>
                 <div id="docker-images" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
             </div>
-            <input type="text" id="docker-image" class="w-full p-3 mt-4 bg-white/5 text-white border border-transparent rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition" placeholder="Docker Image">
+            <input type="text" id="docker-image" class="w-full p-3 mt-4 bg-white/5 text-white border border-transparent rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition" placeholder="<%= __('server.settings.docker_image_placeholder') %>">
         </div>
 
         <!-- Startup Command with Help -->
         <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-300 mb-2">Startup Command</label>
+            <label class="block text-sm font-medium text-gray-300 mb-2"><%= __('server.settings.startup_command') %></label>
             <div class="relative">
-                <input type="text" id="startup-command" class="w-full p-3 bg-white/5 text-white border border-transparent rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition" placeholder="Startup Command">
+                <input type="text" id="startup-command" class="w-full p-3 bg-white/5 text-white border border-transparent rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition" placeholder="<%= __('server.settings.startup_placeholder') %>">
                 <button id="show-startup-help" class="absolute right-3 top-3 text-gray-400 hover:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </button>
             </div>
             <div id="startup-help" class="hidden mt-4 p-4 bg-black/20 rounded-lg">
-                <h4 class="font-medium text-white mb-2">Common Variables:</h4>
+                <h4 class="font-medium text-white mb-2"><%= __('server.settings.common_variables') %></h4>
                 <ul class="text-gray-300 space-y-2 text-sm">
                     <li><code class="bg-black/20 px-2 py-1 rounded">{{SERVER_MEMORY}}</code> - Allocated memory in MB</li>
                     <li><code class="bg-black/20 px-2 py-1 rounded">{{SERVER_IP}}</code> - Server IP address</li>
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <li><code class="bg-black/20 px-2 py-1 rounded">{{SERVER_JARFILE}}</code> - Main server file</li>
                 </ul>
                 <div class="mt-4">
-                    <h4 class="font-medium text-white mb-2">Common Examples:</h4>
+                    <h4 class="font-medium text-white mb-2"><%= __('server.settings.common_examples') %></h4>
                     <div class="space-y-2 text-sm text-gray-300">
                         <p><strong>Minecraft (Java):</strong><br>
                         <code class="bg-black/20 px-2 py-1 rounded">java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}</code></p>
@@ -261,13 +261,13 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         </div>
 
-        <button id="update-advanced-settings" class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-full hover:scale-95 transition">Update Advanced Settings</button>
+        <button id="update-advanced-settings" class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-full hover:scale-95 transition"><%= __('server.settings.update_advanced') %></button>
     </div>
 <% } else { %>
     <!-- Server Delete -->
     <div class="bg-white/5 rounded-xl p-6 mt-8">
-        <h2 class="text-xl font-semibold mb-4 text-white">SFTP Access</h2>
-        <p class="text-gray-300 mb-4">Since you are a subuser, you need to use the server owner's SFTP credentials. Please ask them to provide you with them.</p>
+        <h2 class="text-xl font-semibold mb-4 text-white"><%= __('server.settings.subuser_sftp_title') %></h2>
+        <p class="text-gray-300 mb-4"><%= __('server.settings.subuser_sftp_text') %></p>
     </div>
 <% } %>
 </main>
@@ -278,8 +278,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <h3 class="text-xl font-semibold mb-4 text-white" id="modal-title"></h3>
         <p class="text-gray-300 mb-4" id="modal-message"></p>
         <div class="flex justify-end space-x-4">
-            <button id="modal-cancel" class="bg-zinc-600 hover:bg-zinc-700 text-white font-medium py-2 px-4 rounded-lg transition">Cancel</button>
-            <button id="modal-confirm" class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition">Confirm</button>
+            <button id="modal-cancel" class="bg-zinc-600 hover:bg-zinc-700 text-white font-medium py-2 px-4 rounded-lg transition"><%= __('server.settings.modal_cancel') %></button>
+            <button id="modal-confirm" class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition"><%= __('server.settings.modal_confirm') %></button>
         </div>
     </div>
 </div>
@@ -445,8 +445,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const newStartupCommand = startupCommandInput.value;
 
             showConfirmationModal(
-                'Update Advanced Settings',
-                'Are you sure you want to update the Docker image and startup command? This may require a server restart and could very easily go wrong if you do not know what you are doing. After performing this action, you will be automatically re-logged in. This is so we can fetch the latest Docker image settings from your server.',
+                '<%= __('server.settings.confirm_update_title') %>',
+                '<%= __('server.settings.confirm_update_text') %>',
                 function() {
                     fetch(`/api/server/${Numeric}/startup`, {
                         method: 'PUT',
@@ -461,18 +461,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(response => response.json())
                     .then(data => {
                         if (data.attributes) {
-                            alert('Advanced settings updated successfully');
+                            alert('<%= __('server.settings.update_success') %>');
                             window.location.href = "/api/updateinfo"
                             // Update the input fields with the new values
                             dockerImageInput.value = data.attributes.container.image;
                             startupCommandInput.value = data.attributes.container.startup_command;
                         } else {
-                            alert('Failed to update advanced settings');
+                            alert('<%= __('server.settings.update_failed') %>');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('An error occurred while updating advanced settings');
+                        alert('<%= __('server.settings.update_error') %>');
                     });
                 }
             );
@@ -485,8 +485,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const newName = document.getElementById('server-name-input').value;
         if (newName) {
             showConfirmationModal(
-                'Rename Server',
-                `Are you sure you want to rename the server to "${newName}"?`,
+                '<%= __('server.settings.rename_confirm_title') %>',
+                '<%= __('server.settings.rename_confirm_text', { name: "__NAME__" }) %>'.replace('__NAME__', newName),
                 () => {
                     fetch(`/api/server/${serverId}/rename`, {
                         method: 'POST',
@@ -497,16 +497,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     })
                     .then(response => {
                         if (response.ok) {
-                            alert('Server renamed successfully');
+                            alert('<%= __('server.settings.rename_success') %>');
                             // Update the server name in the UI
                             document.getElementById('server-name').textContent = newName;
                         } else {
-                            alert('Failed to rename server');
+                            alert('<%= __('server.settings.rename_failed') %>');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('An error occurred while renaming the server');
+                        alert('<%= __('server.settings.rename_error') %>');
                     });
                 }
             );
@@ -516,8 +516,8 @@ document.addEventListener('DOMContentLoaded', function() {
  // Update the reinstall server event listener
 document.getElementById('reinstall-server').addEventListener('click', () => {
     showConfirmationModal(
-        'Reinstall Server',
-        'Are you sure you want to reinstall the server? This action cannot be undone and all data will be lost.',
+        '<%= __('server.settings.reinstall_confirm_title') %>',
+        '<%= __('server.settings.reinstall_confirm_text') %>',
         () => {
             fetch(`/api/server/${serverId}/reinstall`, {
                 method: 'POST',
@@ -533,13 +533,13 @@ document.getElementById('reinstall-server').addEventListener('click', () => {
                 return response.json();
             })
             .then(data => {
-                alert('Server reinstallation initiated');
+                alert('<%= __('server.settings.reinstall_started') %>');
                 // Optionally refresh the page or update UI
                 window.location.reload();
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Done!')
+                alert('<%= __('server.settings.reinstall_error') %>')
             });
         }
     );
@@ -549,8 +549,8 @@ document.getElementById('reinstall-server').addEventListener('click', () => {
     // Delete server
     document.getElementById('delete-server').addEventListener('click', () => {
         showConfirmationModal(
-            'Delete Server',
-            'Are you sure you want to delete the server? This action cannot be undone and all data will be lost.',
+            '<%= __('server.settings.delete_confirm_title') %>',
+            '<%= __('server.settings.delete_confirm_text') %>',
             () => {
                 window.location.href = `/api/server/${req.query.numeric}/delete`
             }

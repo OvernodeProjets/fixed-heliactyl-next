@@ -31,7 +31,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
                 <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
               </svg>                
-              Back to server list
+              <%= __('server.logs.back_to_list') %>
             </a>
           </span>
         </div>
@@ -42,15 +42,15 @@
     <div class="bg-white/5 rounded-xl p-6 mt-6">
         <div class="flex justify-between items-center mb-6">
             <div>
-                <h2 class="text-xl font-semibold text-white">Activity Logs</h2>
-                <p class="text-gray-400 text-sm mt-1">Track all actions performed on your server</p>
+                <h2 class="text-xl font-semibold text-white"><%= __('server.logs.title') %></h2>
+                <p class="text-gray-400 text-sm mt-1"><%= __('server.logs.subtitle') %></p>
             </div>
             <div class="flex space-x-2">
                 <select id="page-size" class="bg-white/5 border-none text-sm text-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
-                    <option value="10">10 per page</option>
-                    <option value="20" selected>20 per page</option>
-                    <option value="50">50 per page</option>
-                    <option value="100">100 per page</option>
+                    <option value="10"><%= __('server.logs.per_page.ten') %></option>
+                    <option value="20" selected><%= __('server.logs.per_page.twenty') %></option>
+                    <option value="50"><%= __('server.logs.per_page.fifty') %></option>
+                    <option value="100"><%= __('server.logs.per_page.hundred') %></option>
                 </select>
             </div>
         </div>
@@ -69,20 +69,20 @@
 
         <!-- Empty State -->
         <div id="empty-state" class="hidden text-center py-12 text-gray-400">
-            No activity logs found
+            <%= __('server.logs.empty') %>
         </div>
 
         <!-- Pagination -->
         <div id="pagination" class="hidden mt-6 flex justify-between items-center">
             <div class="text-sm text-gray-400">
-                Showing <span id="showing-range">0-0</span> of <span id="total-items">0</span> items
+                <%= __('server.logs.showing') %> <span id="showing-range">0-0</span> <%= __('server.logs.of') %> <span id="total-items">0</span> <%= __('server.logs.items') %>
             </div>
             <div class="flex space-x-2">
                 <button id="prev-page" class="bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
-                    Previous
+                    <%= __('server.logs.previous') %>
                 </button>
                 <button id="next-page" class="bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
-                    Next
+                    <%= __('server.logs.next') %>
                 </button>
             </div>
         </div>
@@ -100,7 +100,7 @@ function loadServerDetails() {
         .then(response => response.json())
         .then(data => {
             document.getElementById('server-name').textContent = data.attributes.name;
-            document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
+            document.getElementById('server-description').textContent = data.attributes.description || "<%= __('server.logs.no_description') %>";
         })
         .catch(error => console.error('Error loading server details:', error));
 }
@@ -167,7 +167,7 @@ function createActivityItem(activity) {
                 </div>
             </div>
             <button class="details-button bg-white/5 hover:bg-white/10 text-sm text-gray-400 px-3 py-1 rounded-lg transition">
-                Details
+                <%= __('server.logs.details') %>
             </button>
         </div>
         <div class="activity-details hidden mt-4 ml-14 text-sm text-gray-400 bg-black/20 p-3 rounded-lg">
@@ -180,7 +180,7 @@ function createActivityItem(activity) {
     const detailsSection = item.querySelector('.activity-details');
     detailsButton.addEventListener('click', () => {
         detailsSection.classList.toggle('hidden');
-        detailsButton.textContent = detailsSection.classList.contains('hidden') ? 'Details' : 'Hide';
+        detailsButton.textContent = detailsSection.classList.contains('hidden') ? '<%= __('server.logs.details') %>' : '<%= __('server.logs.hide') %>';
     });
 
     return item;
@@ -228,7 +228,7 @@ function loadActivityLogs() {
         })
         .catch(error => {
             console.error('Error loading activity logs:', error);
-            emptyState.textContent = 'Error loading activity logs';
+            emptyState.textContent = '<%= __('server.logs.error_loading') %>';
             emptyState.classList.remove('hidden');
         })
         .finally(() => {

@@ -52,7 +52,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
                 <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
               </svg>                
-              Back to server list
+              <%= __('server.plugins.back_to_list') %>
             </a>
           </span>
         </div>
@@ -63,7 +63,7 @@
     <!-- Search Bar -->
     <div class="mb-6">
         <div class="relative">
-            <input type="text" id="search-input" placeholder="Search plugins..." class="w-full bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+            <input type="text" id="search-input" placeholder="<%= __('server.plugins.search_placeholder') %>" class="w-full bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
             <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
             </svg>
@@ -93,7 +93,7 @@ fetch(`/api/server/${serverId}`)
     .then(data => {
         document.getElementById('server-name').textContent = data.attributes.name;
         document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
-        document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
+        document.getElementById('server-description').textContent = data.attributes.description || "<%= __('server.plugins.no_description') %>";
     });
     
 const pluginList = document.getElementById('plugin-list');
@@ -110,7 +110,7 @@ async function fetchPlugins(searchQuery = '') {
         displayPlugins(plugins);
     } catch (error) {
         console.error('Error fetching plugins:', error);
-        pluginList.innerHTML = '<p class="text-red-500">Error loading plugins. Please try again later.</p>';
+        pluginList.innerHTML = '<p class="text-red-500"><%= __('server.plugins.error_loading') %></p>';
     } finally {
         hideLoading();
     }
@@ -136,13 +136,13 @@ function displayPlugins(plugins) {
                 <img src="data:image/jpeg;base64,${plugin.icon.data}" alt="${plugin.name}" class="w-12 h-12 rounded-lg mr-4">
                 <div>
                     <h3 class="text-lg font-semibold" truncate>${truncateName(plugin.name)}</h3>
-                    <p class="text-sm text-gray-400">${plugin.rating.average} stars rating</p>
+                    <p class="text-sm text-gray-400">${plugin.rating.average} <%= __('server.plugins.rating_suffix') %></p>
                 </div>
             </div>
-            <p class="text-sm mb-4 flex-grow">${plugin.tag || 'No description available.'}</p>
+            <p class="text-sm mb-4 flex-grow">${plugin.tag || '<%= __('server.plugins.no_description') %>'}</p>
             <div class="flex justify-between items-center mt-auto">
-                <span class="text-xs text-gray-400">${plugin.downloads.toLocaleString()} downloads</span>
-                <button onclick="window.location.href='https://spigotmc.org/${plugin.file.url}'" class="bg-neutral-600 hover:bg-neutral-700 text-white text-sm py-1.5 px-3 rounded-lg transition">External Download</button>
+                <span class="text-xs text-gray-400">${plugin.downloads.toLocaleString()} <%= __('server.plugins.downloads_suffix') %></span>
+                <button onclick="window.location.href='https://spigotmc.org/${plugin.file.url}'" class="bg-neutral-600 hover:bg-neutral-700 text-white text-sm py-1.5 px-3 rounded-lg transition"><%= __('server.plugins.external_download') %></button>
             </div>
         `;
         } else {
@@ -151,13 +151,13 @@ function displayPlugins(plugins) {
                 <img src="data:image/jpeg;base64,${plugin.icon.data}" alt="${plugin.name}" class="w-12 h-12 rounded-lg mr-4">
                 <div>
                     <h3 class="text-lg font-semibold" truncate>${truncateName(plugin.name)}</h3>
-                    <p class="text-sm text-gray-400">${plugin.rating.average} stars rating</p>
+                    <p class="text-sm text-gray-400">${plugin.rating.average} <%= __('server.plugins.rating_suffix') %></p>
                 </div>
             </div>
-            <p class="text-sm mb-4 flex-grow">${plugin.tag || 'No description available.'}</p>
+            <p class="text-sm mb-4 flex-grow">${plugin.tag || '<%= __('server.plugins.no_description') %>'}</p>
             <div class="flex justify-between items-center mt-auto">
-                <span class="text-xs text-gray-400">${plugin.downloads.toLocaleString()} downloads</span>
-                <button onclick="installPlugin('${plugin.id}', this)" class="install-button bg-indigo-500 hover:bg-indigo-700 text-white text-sm py-1.5 px-3 rounded-lg transition">Install/Reinstall</button>
+                <span class="text-xs text-gray-400">${plugin.downloads.toLocaleString()} <%= __('server.plugins.downloads_suffix') %></span>
+                <button onclick="installPlugin('${plugin.id}', this)" class="install-button bg-indigo-500 hover:bg-indigo-700 text-white text-sm py-1.5 px-3 rounded-lg transition"><%= __('server.plugins.install') %></button>
             </div>
         `;
         }
@@ -184,13 +184,13 @@ async function installPlugin(pluginId, button) {
         });
         const result = await response.json();
         if (response.ok) {
-            alert('Plugin installed successfully! You will need to restart your server for it to take effect.');
+            alert('<%= __('server.plugins.installed_success') %>');
         } else {
-            alert(`Failed to install plugin: ${result.error}`);
+            alert(`<%= __('server.plugins.install_failed_prefix') %> ${result.error}`);
         }
     } catch (error) {
         console.error('Error installing plugin:', error);
-        alert('An error occurred while installing the plugin. Please try again later.');
+        alert('<%= __('server.plugins.install_error') %>');
     } finally {
         button.disabled = false;
         button.innerHTML = originalText;

@@ -43,7 +43,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
                         <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
                     </svg>
-                    Back to server list
+                    <%= __('server.statistics.back_to_list') %>
                 </a>
             </span>
         </div>
@@ -55,7 +55,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
         <!-- CPU Usage -->
         <div class="bg-white/5 rounded-xl p-6">
-            <h3 class="text-gray-400 text-sm font-medium">CPU Usage</h3>
+            <h3 class="text-gray-400 text-sm font-medium"><%= __('server.statistics.cpu_usage') %></h3>
             <div class="mt-2 flex items-baseline">
                 <p class="text-2xl font-semibold text-white" id="cpu-usage">0%</p>
                 <p class="ml-2 text-sm text-gray-400" id="cpu-trend"></p>
@@ -67,7 +67,7 @@
 
         <!-- Memory Usage -->
         <div class="bg-white/5 rounded-xl p-6">
-            <h3 class="text-gray-400 text-sm font-medium">Memory Usage</h3>
+            <h3 class="text-gray-400 text-sm font-medium"><%= __('server.statistics.memory_usage') %></h3>
             <div class="mt-2 flex items-baseline">
                 <p class="text-2xl font-semibold text-white" id="memory-usage">0 MB</p>
                 <p class="ml-2 text-sm text-gray-400" id="memory-total"></p>
@@ -79,7 +79,7 @@
 
         <!-- Network Traffic -->
         <div class="bg-white/5 rounded-xl p-6">
-            <h3 class="text-gray-400 text-sm font-medium">Network Traffic</h3>
+            <h3 class="text-gray-400 text-sm font-medium"><%= __('server.statistics.network_traffic') %></h3>
             <div class="mt-2 flex items-baseline">
                 <p class="text-2xl font-semibold text-white" id="network-usage">0 B/s</p>
                 <p class="ml-2 text-sm text-gray-400 hidden" id="network-trend"></p>
@@ -91,7 +91,7 @@
 
         <!-- Disk Usage -->
         <div class="bg-white/5 rounded-xl p-6">
-            <h3 class="text-gray-400 text-sm font-medium">Disk Usage</h3>
+            <h3 class="text-gray-400 text-sm font-medium"><%= __('server.statistics.disk_usage') %></h3>
             <div class="mt-2 flex items-baseline">
                 <p class="text-2xl font-semibold text-white" id="disk-usage">0 MB</p>
                 <p class="ml-2 text-sm text-gray-400 hidden" id="disk-total"></p>
@@ -105,13 +105,13 @@
     <!-- Detailed Charts -->
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div class="bg-white/5 rounded-xl p-6">
-            <h2 class="text-lg font-medium text-white mb-4">Resource Usage</h2>
+            <h2 class="text-lg font-medium text-white mb-4"><%= __('server.statistics.resource_usage') %></h2>
             <div class="h-[240px]">
                 <canvas id="resource-chart"></canvas>
             </div>
         </div>
         <div class="bg-white/5 rounded-xl p-6">
-            <h2 class="text-lg font-medium text-white mb-4">Network Activity</h2>
+            <h2 class="text-lg font-medium text-white mb-4"><%= __('server.statistics.network_activity') %></h2>
             <div class="h-[240px]">
                 <canvas id="network-detail-chart"></canvas>
             </div>
@@ -418,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             document.getElementById('server-name').textContent = data.attributes.name;
             document.getElementById('server-description').textContent = 
-                data.attributes.description || 'No description set.';
+                data.attributes.description || '<%= __('server.statistics.no_description') %>';
         });
 
     // Connect WebSocket

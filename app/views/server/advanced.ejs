@@ -84,7 +84,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
                 <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
               </svg>                
-              Back to server list
+              <%= __('server.advanced.back_to_list') %>
             </a>
           </span>
         </div>
@@ -93,19 +93,19 @@
     <%- include('../components/server') %>
 
     <div class="bg-white/5 rounded-xl p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4 flex items-center">Pterodactyl Panel <span class="ml-4 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Not Recommended</span></h2>
-        <p class="text-gray-400">It is not recommended to use Pterodactyl as it lacks a lot of the features available on the normal panel, has stability issues and is considered "legacy".</p>
+        <h2 class="text-xl font-semibold mb-4 flex items-center"><%= __('server.advanced.ptero_title') %> <span class="ml-4 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"><%= __('server.advanced.ptero_badge') %></span></h2>
+        <p class="text-gray-400"><%= __('server.advanced.ptero_desc') %></p>
 
         <br>
         <!-- if they want to continue -->
     <a href="/api/panel" class="inline-block bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-xl hover:scale-95 transition">
-        Go to Panel
+        <%= __('server.advanced.go_to_panel') %>
     </a>
-    <p class="text-gray-400 mt-4">The credentials for your Pterodactyl account can be found on the <a href="/account" class="text-indigo-300 hover:text-indigo-200 transition">SFTP credentials</a> page.</p>
+    <p class="text-gray-400 mt-4"><%= __('server.advanced.ptero_creds') %> <a href="/account" class="text-indigo-300 hover:text-indigo-200 transition"><%= __('server.advanced.sftp_credentials') %></a> <%= __('server.advanced.page') %></p>
     </div>
 
     <div class="bg-white/5 rounded-xl p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4">Advanced Settings</h2>
+        <h2 class="text-xl font-semibold mb-4"><%= __('server.advanced.title') %></h2>
         <div id="variables-list" class="space-y-4">
             <!-- Variables will be populated here -->
         </div>
@@ -115,18 +115,25 @@
 <!-- Edit Variable Modal -->
 <div id="edit-variable-modal" class="modal-overlay z-50">
     <div class="modal-content w-full max-w-md">
-        <h3 class="text-xl font-semibold mb-4" id="modal-title">Edit Variable</h3>
+        <h3 class="text-xl font-semibold mb-4" id="modal-title"><%= __('server.advanced.edit_variable') %></h3>
         <input type="text" id="variable-name" class="w-full p-2 mb-2 bg-white/5 border-none outline-none ring-none transition focus:ring-2 focus:ring-indigo-500 text-white rounded" readonly>
-        <input type="text" id="variable-value" class="w-full p-2 mb-4 bg-white/5 border-none outline-none ring-none transition focus:ring-2 focus:ring-indigo-500 text-white rounded" placeholder="Variable Value">
+        <input type="text" id="variable-value" class="w-full p-2 mb-4 bg-white/5 border-none outline-none ring-none transition focus:ring-2 focus:ring-indigo-500 text-white rounded" placeholder="<%= __('server.advanced.variable_value') %>">
         <div class="flex justify-end">
-            <button id="close-modal" class="bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-2 px-4 rounded-full hover:scale-95 transition mr-2">Cancel</button>
-            <button id="save-variable" class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-full hover:scale-95 transition">Save Changes</button>
+            <button id="close-modal" class="bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-2 px-4 rounded-full hover:scale-95 transition mr-2"><%= __('server.advanced.cancel') %></button>
+            <button id="save-variable" class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-full hover:scale-95 transition"><%= __('server.advanced.save_changes') %></button>
         </div>
     </div>
 </div>
 
 <script>
     const serverId = new URLSearchParams(window.location.search).get('id');
+    const t = {
+        noDescription: <%- JSON.stringify(__('server.advanced.no_description')) %>,
+        edit: <%- JSON.stringify(__('server.advanced.edit')) %>,
+        editVariable: <%- JSON.stringify(__('server.advanced.edit_variable')) %>,
+        currentValue: <%- JSON.stringify(__('server.advanced.current_value')) %>,
+        updateError: <%- JSON.stringify(__('server.advanced.update_error')) %>
+    };
     let currentVariables = [];
 
     fetch(`/api/server/${serverId}`)
@@ -134,7 +141,7 @@
         .then(data => {
             document.getElementById('server-name').textContent = data.attributes.name;
             document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
-            document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
+            document.getElementById('server-description').textContent = data.attributes.description || t.noDescription;
         });
 
     function loadVariables() {
@@ -165,11 +172,11 @@
                     <p class="text-sm text-gray-400">${variable.description}</p>
                 </div>
                 <button class="edit-variable bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-1.5 px-4 rounded-full transition" data-key="${variable.env_variable}">
-                    Edit
+                    ${t.edit}
                 </button>
             </div>
             <div class="mt-2">
-                <span class="text-sm font-medium text-gray-400">Current Value:</span>
+                <span class="text-sm font-medium text-gray-400">${t.currentValue}</span>
                 <span class="text-sm ml-2">${variable.server_value}</span>
             </div>
         `;
@@ -185,7 +192,7 @@
         const nameInput = document.getElementById('variable-name');
         const valueInput = document.getElementById('variable-value');
 
-        document.getElementById('modal-title').textContent = `Edit ${variable.name}`;
+        document.getElementById('modal-title').textContent = `${t.editVariable} ${variable.name}`;
         nameInput.value = variable.env_variable;
         valueInput.value = variable.server_value;
 
@@ -217,7 +224,7 @@
         })
         .catch(error => {
             console.error('Error updating variable:', error);
-            alert('An error occurred while updating the variable. Please try again.');
+            alert(t.updateError);
         });
     });
 

@@ -38,7 +38,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 mr-2 h-5 w-5 text-indigo-200">
                 <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
               </svg>                
-              Back to server list
+              <%= __('server.subdomains.back_to_list') %>
             </a>
           </span>
         </div>
@@ -50,14 +50,14 @@
     <div class="bg-white/5 rounded-xl p-6">
         <div class="flex justify-between items-center mb-6">
             <div>
-                <h2 class="text-xl font-semibold text-white">Subdomains</h2>
-                <p class="text-gray-400 text-sm mt-1">Add custom domains to your server (Maximum 2)</p>
+                <h2 class="text-xl font-semibold text-white"><%= __('server.subdomains.title') %></h2>
+                <p class="text-gray-400 text-sm mt-1"><%= __('server.subdomains.subtitle') %></p>
             </div>
             <button id="create-subdomain" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 hover:scale-95">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                 </svg>
-                Add Domain
+                <%= __('server.subdomains.add_domain') %>
             </button>
         </div>
 
@@ -81,8 +81,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
                 </svg>
             </div>
-            <h3 class="mt-4 text-lg font-medium text-white">No domains configured</h3>
-            <p class="mt-2 text-gray-400">Add a custom domain to make your server easier to remember</p>
+            <h3 class="mt-4 text-lg font-medium text-white"><%= __('server.subdomains.empty_title') %></h3>
+            <p class="mt-2 text-gray-400"><%= __('server.subdomains.empty_desc') %></p>
         </div>
     </div>
 </main>
@@ -90,12 +90,12 @@
 <!-- Create Subdomain Modal -->
 <div id="create-subdomain-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
     <div class="bg-[#1a1c20] rounded-xl p-6 w-full max-w-md">
-        <h3 class="text-xl font-semibold text-white mb-4">Add Custom Domain</h3>
+        <h3 class="text-xl font-semibold text-white mb-4"><%= __('server.subdomains.modal_title') %></h3>
         <div class="space-y-4">
             <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Domain Selection</label>
+                <label class="block text-sm font-medium text-gray-300 mb-2"><%= __('server.subdomains.domain_selection') %></label>
                 <select id="domain-select" class="w-full p-3 bg-black/20 text-white border border-transparent rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition mb-4">
-                    <option value="">Select a domain</option>
+                    <option value=""><%= __('server.subdomains.select_domain') %></option>
                     <% settings.cloudflare.domains.forEach(function(domain) { %>
                         <% if (domain.enabled) { %>
                             <option value="<%= domain.name %>" <%= domain.is_default ? 'selected' : '' %>>.<%= domain.domain %></option>
@@ -104,17 +104,17 @@
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Subdomain Name</label>
+                <label class="block text-sm font-medium text-gray-300 mb-2"><%= __('server.subdomains.subdomain_name') %></label>
                 <div class="flex items-center">
-                    <input type="text" id="subdomain-input" class="flex-1 p-3 bg-black/20 text-white border border-transparent rounded-l-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition" placeholder="Enter subdomain">
-                    <span id="domain-suffix" class="bg-black/30 text-gray-400 py-3 px-4 rounded-r-lg border-l border-white/10">Select a domain</span>
+                    <input type="text" id="subdomain-input" class="flex-1 p-3 bg-black/20 text-white border border-transparent rounded-l-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition" placeholder="<%= __('server.subdomains.subdomain_placeholder') %>">
+                    <span id="domain-suffix" class="bg-black/30 text-gray-400 py-3 px-4 rounded-r-lg border-l border-white/10"><%= __('server.subdomains.suffix_placeholder') %></span>
                 </div>
-                <p class="mt-2 text-sm text-gray-400">Only letters, numbers, and hyphens allowed</p>
+                <p class="mt-2 text-sm text-gray-400"><%= __('server.subdomains.rules') %></p>
             </div>
         </div>
         <div class="mt-6 flex justify-end space-x-3">
-            <button id="cancel-create" class="px-4 py-2 bg-zinc-600 hover:bg-zinc-700 text-white rounded-lg transition">Cancel</button>
-<button id="confirm-create" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition">Create</button>
+            <button id="cancel-create" class="px-4 py-2 bg-zinc-600 hover:bg-zinc-700 text-white rounded-lg transition"><%= __('server.subdomains.cancel') %></button>
+<button id="confirm-create" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition"><%= __('server.subdomains.create') %></button>
         </div>
     </div>
 </div>
@@ -134,11 +134,11 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById('server-name').textContent = data.attributes.name;
-                document.getElementById('server-description').textContent = data.attributes.description || "No description set.";
+            document.getElementById('server-description').textContent = data.attributes.description || "<%= __('server.subdomains.errors.load_details') %>";
             })
             .catch(error => {
                 console.error('Error fetching server details:', error);
-                showToast('Failed to load server details', 'error');
+                showToast('<%= __('server.subdomains.errors.load_details') %>', 'error');
             });
     }
 
@@ -182,7 +182,7 @@
             })
             .catch(error => {
                 console.error('Error loading subdomains:', error);
-                showToast('Failed to load subdomains', 'error');
+                showToast('<%= __('server.subdomains.errors.load_subdomains') %>', 'error');
             })
             .finally(() => {
                 document.getElementById('subdomains-loading').classList.add('hidden');
@@ -202,14 +202,14 @@ function createSubdomainCard(subdomain) {
             <div class="space-y-1">
                 <div class="flex items-center space-x-2">
                     <h3 class="text-white font-medium">${subdomain.name}.${subdomain.domain}</h3>
-                    <span class="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-300">Active</span>
+                    <span class="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-300"><%= __('server.subdomains.active') %></span>
                     ${domainBadge}
                 </div>
                 <p class="text-sm text-gray-400 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
                     </svg>
-                    Created: ${(new Date(subdomain.createdAt)).toDateString()}
+                    <%= __('server.subdomains.created_at') %> ${(new Date(subdomain.createdAt)).toDateString()}
                 </p>
             </div>
             <button onclick="deleteSubdomain('${subdomain.name}', '${subdomain.domain}')" class="text-red-400 hover:text-red-300 transition">
@@ -244,17 +244,17 @@ function createSubdomainCard(subdomain) {
         const selectedDomain = document.getElementById('domain-select').value;
         
         if (!subdomain) {
-            showToast('Please enter a subdomain name', 'error');
+            showToast('<%= __('server.subdomains.errors.enter_subdomain') %>', 'error');
             return;
         }
 
         if (!selectedDomain) {
-            showToast('Please select a domain', 'error');
+            showToast('<%= __('server.subdomains.errors.select_domain') %>', 'error');
             return;
         }
 
         if (!/^[a-z0-9-]+$/i.test(subdomain)) {
-            showToast('Invalid subdomain format', 'error');
+            showToast('<%= __('server.subdomains.errors.invalid_format') %>', 'error');
             return;
         }
 
@@ -269,35 +269,35 @@ function createSubdomainCard(subdomain) {
             })
         })
         .then(response => {
-            if (!response.ok) throw new Error('Failed to create subdomain');
+            if (!response.ok) throw new Error('<%= __('server.subdomains.errors.create_failed') %>');
             return response.json();
         })
         .then(data => {
             modal.classList.add('hidden');
             document.getElementById('subdomain-input').value = '';
-            showToast('Domain added successfully', 'success');
+            showToast('<%= __('server.subdomains.success.create') %>', 'success');
             loadSubdomains();
         })
         .catch(error => {
             console.error('Error:', error);
-            showToast(error.message || 'Failed to create subdomain', 'error');
+            showToast(error.message || '<%= __('server.subdomains.errors.create_failed') %>', 'error');
         });
     }
 
 function deleteSubdomain(subdomain, domain) {
-    if (!confirm(`Are you sure you want to delete ${subdomain}.${domain}?`)) return;
+    if (!confirm('<%= __('server.subdomains.confirm_delete', { fqdn: "__FQDN__" }) %>'.replace('__FQDN__', `${subdomain}.${domain}`))) return;
 
     fetch(`/api/server/${serverId}/subdomains/${subdomain}`, {
         method: 'DELETE'
     })
     .then(response => {
-        if (!response.ok) throw new Error('Failed to delete subdomain');
-        showToast('Domain deleted successfully', 'success');
+        if (!response.ok) throw new Error('<%= __('server.subdomains.errors.delete_failed') %>');
+        showToast('<%= __('server.subdomains.success.delete') %>', 'success');
         loadSubdomains();
     })
     .catch(error => {
         console.error('Error:', error);
-        showToast('Failed to delete subdomain', 'error');
+        showToast('<%= __('server.subdomains.errors.delete_failed') %>', 'error');
     });
 }
 

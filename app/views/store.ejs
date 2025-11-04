@@ -81,7 +81,7 @@
                     </div>
                 </div>
                 <p class="text-sm text-gray-400 mb-4">
-                    Total cost: <span x-text="formatCost(ram * <%= settings.api.client.coins.store.ram.cost %>)"></span> <%= settings.website.currency %>
+                    <%= __('store.ui.total_cost') %>: <span x-text="formatCost(ram * <%= settings.api.client.coins.store.ram.cost %>)"></span> <%= settings.website.currency %>
                 </p>
                 <button @click="purchaseResource('ram')" :disabled="isLoading" class="w-full bg-indigo-500 font-medium text-white py-2 rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center">
                     <svg x-show="isLoading" class="animate-spin w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -106,7 +106,7 @@
                     </div>
                 </div>
                 <p class="text-sm text-gray-400 mb-4">
-                    Total cost: <span x-text="formatCost(disk * <%= settings.api.client.coins.store.disk.cost %>)"></span> <%= settings.website.currency %>
+                    <%= __('store.ui.total_cost') %>: <span x-text="formatCost(disk * <%= settings.api.client.coins.store.disk.cost %>)"></span> <%= settings.website.currency %>
                 </p>
                 <button @click="purchaseResource('disk')" :disabled="isLoading" class="w-full bg-indigo-500 font-medium text-white py-2 rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center">
                     <svg x-show="isLoading" class="animate-spin w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -131,7 +131,7 @@
                     </div>
                 </div>
                 <p class="text-sm text-gray-400 mb-4">
-                    Total cost: <span x-text="formatCost(cpu * <%= settings.api.client.coins.store.cpu.cost %>)"></span> <%= settings.website.currency %>
+                    <%= __('store.ui.total_cost') %>: <span x-text="formatCost(cpu * <%= settings.api.client.coins.store.cpu.cost %>)"></span> <%= settings.website.currency %>
                 </p>
                 <button @click="purchaseResource('cpu')" :disabled="isLoading" class="w-full bg-indigo-500 font-medium text-white py-2 rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center">
                     <svg x-show="isLoading" class="animate-spin w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -156,7 +156,7 @@
                     </div>
                 </div>
                 <p class="text-sm text-gray-400 mb-4">
-                    Total cost: <span x-text="formatCost(servers * <%= settings.api.client.coins.store.servers.cost %>)"></span> <%= settings.website.currency %>
+                    <%= __('store.ui.total_cost') %>: <span x-text="formatCost(servers * <%= settings.api.client.coins.store.servers.cost %>)"></span> <%= settings.website.currency %>
                 </p>
                 <button @click="purchaseResource('servers')" :disabled="isLoading" class="w-full bg-indigo-500 font-medium text-white py-2 rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center">
                     <svg x-show="isLoading" class="animate-spin w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
