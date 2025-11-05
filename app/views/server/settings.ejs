@@ -552,7 +552,7 @@ document.getElementById('reinstall-server').addEventListener('click', () => {
             '<%= __('server.settings.delete_confirm_title') %>',
             '<%= __('server.settings.delete_confirm_text') %>',
             () => {
-                window.location.href = `/api/server/${req.query.numeric}/delete`
+                window.location.href = `/api/server/<%= req.query.numeric %>/delete`;
             }
         );
     });
