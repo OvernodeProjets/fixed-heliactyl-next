@@ -23,6 +23,8 @@ const settings = loadConfig("./config.toml");
 
 module.exports.load = async function (router, db) {
 router.get('/referrals/generate', requireAuth, async (req, res) => {
+  if (!settings.api.client.coins.referral.enabled) return res.status(403).json({ error: 'Referral system is disabled.' });
+  
   if (!req.query.code) {
     return res.status(400).json({ error: 'Referral code is required.' });
   }
@@ -47,6 +49,8 @@ router.get('/referrals/generate', requireAuth, async (req, res) => {
 });
 
 router.get('/referrals/claim', requireAuth, async (req, res) => {
+  if (!settings.api.client.coins.referral.enabled) return res.status(403).json({ error: 'Referral system is disabled.' });
+  
   // Get the referral code from the request body
   if (!req.query.code) {
     return res.status(400).json({ error: 'Referral code is required.' });
