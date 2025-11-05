@@ -705,6 +705,109 @@
     }
   }
   ,
+  "errors": {
+    "common": {
+      "go_home": "Retour à l’accueil",
+      "error_log_label": "Journal d’erreur",
+      "account_details_label": "Détails du compte"
+    },
+    "404": {
+      "title": "404",
+      "heading": "Page introuvable",
+      "description": "Oups ! La page que vous recherchez n’existe pas.",
+      "fallback_log": "La ressource demandée est introuvable sur ce serveur."
+    },
+    "500": {
+      "title": "500",
+      "heading": "Erreur interne du serveur",
+      "description": "Oups ! Un problème est survenu de notre côté.",
+      "fallback_log": "Erreur interne du serveur"
+    },
+    "banned": {
+      "title": "Compte suspendu",
+      "description": "Votre compte a été suspendu pour non‑respect de nos conditions d’utilisation.",
+      "reason": "Raison",
+      "expiration": "Expiration",
+      "permanent": "Permanent"
+    }
+  }
+  ,
+  "auth": {
+    "login": {
+      "html_lang": "<%= locale %>",
+      "title": "Connexion",
+      "welcome": "Bon retour !",
+      "subtitle": "Connectez‑vous à votre compte.",
+      "email_ph": "Email",
+      "password_ph": "Mot de passe",
+      "sign_in": "Se connecter",
+      "send_magic_link": "Envoyer un lien magique",
+      "or_continue": "Ou continuer avec",
+      "google": "Se connecter avec Google",
+      "discord": "Se connecter avec Discord",
+      "or": "ou",
+      "create_account": "Créer un compte",
+      "modal_title": "Vérification humaine",
+      "modal_btn": "Je ne suis pas un robot ni un modèle d’IA.",
+      "errors": {
+        "account_creation_failed": "Échec de création du compte. Réessayez ou contactez le support.",
+        "server_error": "Erreur serveur. Réessayez plus tard.",
+        "generic": "Une erreur s’est produite lors de l’authentification.",
+        "recaptcha_required": "Veuillez compléter le reCAPTCHA",
+        "email_required": "Veuillez saisir votre adresse email.",
+        "login_failed": "Échec de connexion. Réessayez.",
+        "generic_error": "Une erreur s’est produite. Réessayez plus tard.",
+        "request_failed": "Échec du traitement de la requête. Réessayez."
+      },
+      "success": {
+        "welcome_back": "Bon retour !",
+        "magic_link_sent": "Lien magique envoyé ! Consultez votre email.",
+        "reset_link_sent": "Lien de réinitialisation envoyé ! Consultez votre email."
+      }
+    },
+    "register": {
+      "html_lang": "<%= locale %>",
+      "title": "Inscription",
+      "heading": "Créer un compte",
+      "subtitle": "Bienvenue dans l’écosystème !",
+      "username_ph": "Nom d’utilisateur",
+      "email_ph": "Email",
+      "password_ph": "Mot de passe",
+      "confirm_password_ph": "Confirmer le mot de passe",
+      "btn": "S’inscrire",
+      "have_account": "Vous avez déjà un compte ? Se connecter",
+      "errors": {
+        "recaptcha_required": "Veuillez compléter le reCAPTCHA.",
+        "passwords_no_match": "Les mots de passe ne correspondent pas.",
+        "failed": "Échec de l’inscription. Réessayez.",
+        "generic": "Une erreur s’est produite. Réessayez plus tard."
+      },
+      "success": {
+        "registered": "Inscription réussie !"
+      }
+    },
+    "reset": {
+      "html_lang": "<%= locale %>",
+      "title": "Réinitialiser le mot de passe",
+      "heading": "Réinitialisez votre mot de passe",
+      "subtitle": "Saisissez votre nouveau mot de passe ci‑dessous",
+      "new_password_ph": "Nouveau mot de passe",
+      "confirm_new_password_ph": "Confirmer le nouveau mot de passe",
+      "btn": "Réinitialiser le mot de passe",
+      "remember": "Vous souvenez‑vous de votre mot de passe ?",
+      "login": "Connexion",
+      "copyright": "Tous droits réservés.",
+      "errors": {
+        "passwords_no_match": "Les mots de passe ne correspondent pas.",
+        "failed": "Échec de la réinitialisation. Réessayez.",
+        "generic": "Une erreur s’est produite. Réessayez plus tard."
+      },
+      "success": {
+        "reset": "Mot de passe réinitialisé avec succès !"
+      }
+    }
+  }
+  ,
   "server": {
     "common": {
       "back_to_list": "Retour à la liste des serveurs",

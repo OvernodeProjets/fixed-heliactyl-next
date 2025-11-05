@@ -1079,4 +1079,107 @@
       "network_activity": "Network Activity"
     }
   }
+  ,
+  "errors": {
+    "common": {
+      "go_home": "Go back to homepage",
+      "error_log_label": "Error Log",
+      "account_details_label": "Account Details"
+    },
+    "404": {
+      "title": "404",
+      "heading": "Page Not Found",
+      "description": "Oops! The page you are looking for does not exist.",
+      "fallback_log": "The requested resource could not be found on this server."
+    },
+    "500": {
+      "title": "500",
+      "heading": "Internal Server Error",
+      "description": "Oops! Something went wrong on our end.",
+      "fallback_log": "Internal Server Error"
+    },
+    "banned": {
+      "title": "Account Suspended",
+      "description": "Your account has been suspended due to a violation of our terms of service.",
+      "reason": "Reason",
+      "expiration": "Expiration",
+      "permanent": "Permanent"
+    }
+  }
+  ,
+  "auth": {
+    "login": {
+      "html_lang": "<%= locale %>",
+      "title": "Login",
+      "welcome": "Welcome back!",
+      "subtitle": "Sign in to your account.",
+      "email_ph": "Email",
+      "password_ph": "Password",
+      "sign_in": "Sign in",
+      "send_magic_link": "Send a Magic Link",
+      "or_continue": "Or continue with",
+      "google": "Sign in with Google",
+      "discord": "Sign in with Discord",
+      "or": "or",
+      "create_account": "Create an account",
+      "modal_title": "Human verification",
+      "modal_btn": "I'm not a robot or AI language model.",
+      "errors": {
+        "account_creation_failed": "Failed to create account. Please try again or contact support.",
+        "server_error": "A server error occurred. Please try again later.",
+        "generic": "An error occurred during authentication. Please try again.",
+        "recaptcha_required": "Please complete the reCAPTCHA",
+        "email_required": "Please enter your email address.",
+        "login_failed": "Login failed. Please try again.",
+        "generic_error": "An error occurred. Please try again later.",
+        "request_failed": "Failed to process request. Please try again."
+      },
+      "success": {
+        "welcome_back": "Welcome back!",
+        "magic_link_sent": "Magic link sent! Check your email.",
+        "reset_link_sent": "Password reset link sent! Check your email."
+      }
+    },
+    "register": {
+      "html_lang": "<%= locale %>",
+      "title": "Register",
+      "heading": "Create an account",
+      "subtitle": "Welcome to the ecosystem!",
+      "username_ph": "Username",
+      "email_ph": "Email",
+      "password_ph": "Password",
+      "confirm_password_ph": "Confirm Password",
+      "btn": "Register",
+      "have_account": "Already have an account? Sign in",
+      "errors": {
+        "recaptcha_required": "Please complete the reCAPTCHA.",
+        "passwords_no_match": "Passwords do not match.",
+        "failed": "Registration failed. Please try again.",
+        "generic": "An error occurred. Please try again later."
+      },
+      "success": {
+        "registered": "Registration successful!"
+      }
+    },
+    "reset": {
+      "html_lang": "<%= locale %>",
+      "title": "Reset Password",
+      "heading": "Reset Your Password",
+      "subtitle": "Enter your new password below",
+      "new_password_ph": "New Password",
+      "confirm_new_password_ph": "Confirm New Password",
+      "btn": "Reset Password",
+      "remember": "Remember your password?",
+      "login": "Login",
+      "copyright": "All rights reserved.",
+      "errors": {
+        "passwords_no_match": "Passwords do not match.",
+        "failed": "Password reset failed. Please try again.",
+        "generic": "An error occurred. Please try again later."
+      },
+      "success": {
+        "reset": "Password reset successful!"
+      }
+    }
+  }
 }

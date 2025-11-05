@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= locale %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= settings.name %> - Account Suspended</title>
+    <title><%= settings.name %> - <%= __('errors.banned.title') %></title>
     <link rel="stylesheet" href="./assets/tailwind.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <style>
@@ -21,7 +21,7 @@
             position: relative;
         }
         .error-code::before {
-            content: "Account Details";
+            content: "<%= __('errors.common.account_details_label') %>";
             position: absolute;
             top: -12px;
             left: 1rem;
@@ -42,21 +42,21 @@
                 <img src="./assets/logo-text.png" class="h-12" alt="Logo">
             </div>
 
-            <h1 class="text-center text-4xl tracking-tight font-bold text-gray-900 mb-4">Account Suspended</h1>
+            <h1 class="text-center text-4xl tracking-tight font-bold text-gray-900 mb-4"><%= __('errors.banned.title') %></h1>
             <p class="text-gray-600 text-center mt-1 text-sm mb-4">
-                Your account has been suspended due to a violation of our terms of service.
+                <%= __('errors.banned.description') %>
             </p>
 
             <div class="error-code bg-gray-200/50 text-sm text-gray-700">
 <pre><code>
-Reason: <%= banReason %>
-Expiration: <%= banExpiration ? new Date(banExpiration).toLocaleString() : 'Permanent' %>
+<%= __('errors.banned.reason') %>: <%= banReason %>
+<%= __('errors.banned.expiration') %>: <%= banExpiration ? new Date(banExpiration).toLocaleString() : __('errors.banned.permanent') %>
 </code></pre>
             </div>
 
             <div class="mt-8 text-center">
                 <a href="/" class="hover:bg-gray-800 bg-gray-700 text-white font-medium py-2 px-4 rounded-full transition hover:scale-95">
-                    Go back to homepage
+                    <%= __('errors.common.go_home') %>
                 </a>
             </div>
         </div>
