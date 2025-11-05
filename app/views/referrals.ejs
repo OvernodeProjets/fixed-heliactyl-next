@@ -103,12 +103,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="rounded-2xl border-white/5 border p-6">
                     <h3 class="text-lg font-medium mb-2"><%= __('referrals.benefits.for_you') %></h3>
-                    <p class="text-3xl font-bold text-indigo-400">80 <%= settings.website.currency %></p>
+                    <p class="text-3xl font-bold text-indigo-400"><%= settings.api.client.coins.referral.owner %> <%= settings.website.currency %></p>
                     <p class="text-gray-400 mt-2"><%= __('referrals.benefits.you_earn') %></p>
                 </div>
                 <div class="rounded-2xl border-white/5 border p-6">
                     <h3 class="text-lg font-medium mb-2"><%= __('referrals.benefits.for_friend') %></h3>
-                    <p class="text-3xl font-bold text-indigo-400">250 <%= settings.website.currency %></p>
+                    <p class="text-3xl font-bold text-indigo-400"><%= settings.api.client.coins.referral.referee %> <%= settings.website.currency %></p>
                     <p class="text-gray-400 mt-2"><%= __('referrals.benefits.friend_earns') %></p>
                 </div>
             </div>

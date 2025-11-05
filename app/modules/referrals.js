@@ -76,12 +76,12 @@ router.get('/referrals/claim', requireAuth, async (req, res) => {
   const ownercoins = await db.get("coins-" + referral.userId);
   const usercoins = await db.get("coins-" + req.session.userinfo.id);
 
-  db.set("coins-" + referral.userId, ownercoins + 80)
-  db.set("coins-" + req.session.userinfo.id, usercoins + 250)
+  db.set("coins-" + referral.userId, ownercoins + settings.api.client.coins.referral.owner)
+  db.set("coins-" + req.session.userinfo.id, usercoins + settings.api.client.coins.referral.referee)
   db.set("referral-" + req.session.userinfo.id, 1)
 
   // Render the referral claimed view
-  res.status(200).json({ message: 'Referral code claimed successfully. You have been awarded 250 ' + settings.website.currency + '!' });
+  res.status(200).json({ message: 'Referral code claimed successfully. You have been awarded ' + settings.api.client.coins.referral.referee + ' ' + settings.website.currency + '!' });
 });
 
 };

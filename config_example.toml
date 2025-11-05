@@ -330,6 +330,11 @@ free = true
   amount = 150
   per = "day"
 
+  [api.client.coins.referral]
+  enabled = true
+  owner = 80
+  referee = 250
+
     [api.client.coins.store]
     enabled = true
 
