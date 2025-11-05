@@ -87,7 +87,7 @@ const alerts = {
         <code style="font-family: 'JetBrains Mono'" class="text-white/60">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
     </span>
 </div>
-<% } else if (req.query.err && req.query.err === "PTERODACTYL") { %>
+<% } else if (req.query.err && req.query.err === "PTERODACTYL" && req.query.data) { %>
 <div class="mb-4 rounded-lg bg-amber-500/10 p-4">
     <div class="flex items-center gap-3">
         <div class="text-amber-400">
@@ -96,6 +96,7 @@ const alerts = {
             </svg>
         </div>
         <p class="text-sm font-medium text-amber-400">This location has no available capacity.</p>
+        <p class="text-sm text-amber-300"><%= JSON.parse(decodeURIComponent(req.query.data)).errors[0].detail %></p>
     </div>
 </div>
 <% } %>

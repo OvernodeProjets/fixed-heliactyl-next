@@ -271,12 +271,19 @@ router.get("/server/create", requireAuth, async (req, res) => {
                 Authorization: `Bearer ${settings.pterodactyl.key}`,
                 Accept: "application/json",
             },
-            body: JSON.stringify(await serverSpecs),
+            body: JSON.stringify(serverSpecs),
         }
     );
     if (!serverinfo.ok) {
         const errorData = await serverinfo.json();
-        console.error("Pterodactyl API Error:", errorData);
+        const text = await serverinfo.text();
+        console.error("Pterodactyl API Raw Response:", text);
+        try {
+          const parsed = JSON.parse(text);
+          console.error("Parsed Error:", parsed);
+        } catch {
+          console.error("Could not parse JSON response");
+        }
 
         // Encode the error response for the URL
         const encodedError = encodeURIComponent(JSON.stringify(errorData));
