@@ -197,44 +197,32 @@ router.get("/server/create", requireAuth, async (req, res) => {
             let ram = parseFloat(req.query.ram);
             let disk = parseFloat(req.query.disk);
             let cpu = parseFloat(req.query.cpu);
-            if (isNaN(ram) || isNaN(disk) || isNaN(cpu)) {
-              return res.redirect(`/server/new?err=NOTANUMBER`);
+            // Validate number inputs
+            const validateResource = (value, type, current, max, min) => {
+                if (isNaN(value)) return 'NOTANUMBER';
+                if (current + value > max) return `EXCEED${type}&num=${max - current}`;
+                if (min && value < min) return `TOOLITTLE${type}&num=${min}`;
+                if (egginfo.maximum?.[type.toLowerCase()] && value > egginfo.maximum[type.toLowerCase()]) 
+                    return `TOOMUCH${type}&num=${egginfo.maximum[type.toLowerCase()]}`;
+                return null;
+            };
+
+            const resources = [
+                { value: ram, type: 'RAM', current: ram2, max: package.ram + extra.ram, min: egginfo.minimum.ram },
+                { type: 'DISK', value: disk, current: disk2, max: package.disk + extra.disk, min: egginfo.minimum.disk },
+                { type: 'CPU', value: cpu, current: cpu2, max: package.cpu + extra.cpu, min: egginfo.minimum.cpu }
+            ];
+
+            for (const resource of resources) {
+                const error = validateResource(
+                    resource.value,
+                    resource.type,
+                    resource.current,
+                    resource.max,
+                    resource.min
+                );
+                if (error) return res.redirect(`/server/new?err=${error}`);
             }
-                if (ram2 + ram > package.ram + extra.ram) {
-                    return res.redirect(`/server/new?err=EXCEEDRAM&num=${package.ram + extra.ram - ram2}`);
-                }
-                if (disk2 + disk > package.disk + extra.disk) {
-                    return res.redirect(`/server/new?err=EXCEEDDISK&num=${package.disk + extra.disk - disk2}`);
-                }
-                if (cpu2 + cpu > package.cpu + extra.cpu) {
-                    return res.redirect(`/server/new?err=EXCEEDCPU&num=${package.cpu + extra.cpu - cpu2}`);
-                }
-                if (egginfo.minimum.ram)
-                    if (ram < egginfo.minimum.ram) {
-                        return res.redirect(`/server/new?err=TOOLITTLERAM&num=${egginfo.minimum.ram}`);
-                    }
-                if (egginfo.minimum.disk)
-                    if (disk < egginfo.minimum.disk) {
-                        return res.redirect(`/server/new?err=TOOLITTLEDISK&num=${egginfo.minimum.disk}`);
-                    }
-                if (egginfo.minimum.cpu)
-                    if (cpu < egginfo.minimum.cpu) {
-                        return res.redirect(`/server/new?err=TOOLITTLECPU&num=${egginfo.minimum.cpu}`);
-                    }
-                if (egginfo.maximum) {
-                    if (egginfo.maximum.ram)
-                        if (ram > egginfo.maximum.ram) {
-                            return res.redirect(`/server/new?err=TOOMUCHRAM&num=${egginfo.maximum.ram}`);
-                        }
-                    if (egginfo.maximum.disk)
-                        if (disk > egginfo.maximum.disk) {
-                            return res.redirect(`/server/new?err=TOOMUCHDISK&num=${egginfo.maximum.disk}`);
-                        }
-                    if (egginfo.maximum.cpu)
-                        if (cpu > egginfo.maximum.cpu) {
-                            return res.redirect(`/server/new?err=TOOMUCHCPU&num=${egginfo.maximum.cpu}`);
-                        }
-                }
                 const specs = egginfo.info;
 
                 const serverSpecs = {
@@ -564,60 +552,29 @@ router.get("/clear-queue", requireAuth, async (req, res) => {
                   servers: 0,
                 };
 
-            if (package.ram + extra.ram - ram2 + ram > 0) {
-    
-            if (ram2 + ram > package.ram + extra.ram)
-              return res.redirect(
-                `${redirectlink}?id=${id}&err=EXCEEDRAM&num=${
-                  package.ram + extra.ram - ram2
-                }`
-              );
-            if (disk2 + disk > package.disk + extra.disk)
-              return res.redirect(
-                `${redirectlink}?id=${id}&err=EXCEEDDISK&num=${
-                  package.disk + extra.disk - disk2
-                }`
-              );
-            if (cpu2 + cpu > package.cpu + extra.cpu)
-              return res.redirect(
-                `${redirectlink}?id=${id}&err=EXCEEDCPU&num=${
-                  package.cpu + extra.cpu - cpu2
-                }`
-              );
-            if (egginfo.minimum.ram)
-              if (ram < egginfo.minimum.ram)
-                return res.redirect(
-                  `${redirectlink}?id=${id}&err=TOOLITTLERAM&num=${egginfo.minimum.ram}`
+            const validateResource = (value, type, current, max, min) => {
+                if (current + value > max) return `EXCEED${type}&num=${max - current}`;
+                if (min && value < min) return `TOOLITTLE${type}&num=${min}`;
+                if (egginfo.maximum?.[type.toLowerCase()] && value > egginfo.maximum[type.toLowerCase()]) 
+                    return `TOOMUCH${type}&num=${egginfo.maximum[type.toLowerCase()]}`;
+                return null;
+            };
+
+            const resources = [
+                { value: ram, type: 'RAM', current: ram2, max: package.ram + extra.ram, min: egginfo.minimum.ram },
+                { value: disk, type: 'DISK', current: disk2, max: package.disk + extra.disk, min: egginfo.minimum.disk },
+                { value: cpu, type: 'CPU', current: cpu2, max: package.cpu + extra.cpu, min: egginfo.minimum.cpu }
+            ];
+
+            for (const resource of resources) {
+                const error = validateResource(
+                    resource.value,
+                    resource.type,
+                    resource.current,
+                    resource.max,
+                    resource.min
                 );
-            if (egginfo.minimum.disk)
-              if (disk < egginfo.minimum.disk)
-                return res.redirect(
-                  `${redirectlink}?id=${id}&err=TOOLITTLEDISK&num=${egginfo.minimum.disk}`
-                );
-            if (egginfo.minimum.cpu)
-              if (cpu < egginfo.minimum.cpu)
-                return res.redirect(
-                  `${redirectlink}?id=${id}&err=TOOLITTLECPU&num=${egginfo.minimum.cpu}`
-                );
-            if (egginfo.maximum) {
-              if (egginfo.maximum.ram)
-                if (ram > egginfo.maximum.ram)
-                  return res.redirect(
-                    `${redirectlink}?id=${id}&err=TOOMUCHRAM&num=${egginfo.maximum.ram}`
-                  );
-              if (egginfo.maximum.disk)
-                if (disk > egginfo.maximum.disk)
-                  return res.redirect(
-                    `${redirectlink}?id=${id}&err=TOOMUCHDISK&num=${egginfo.maximum.disk}`
-                  );
-              if (egginfo.maximum.cpu)
-                if (cpu > egginfo.maximum.cpu)
-                  return res.redirect(
-                    `${redirectlink}?id=${id}&err=TOOMUCHCPU&num=${egginfo.maximum.cpu}`
-                  );
-            }
-            } else {
-                if (ram2 + ram > 4096 || cpu2 + cpu > 100) return res.send('Max is 4096MB RAM, 100% CPU when your servers are in the negative')
+                if (error) return res.redirect(`${redirectlink}?id=${id}&err=${error}`);
             }
     
             let limits = {
