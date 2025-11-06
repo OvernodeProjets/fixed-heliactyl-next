@@ -1109,7 +1109,6 @@
   ,
   "auth": {
     "login": {
-      "html_lang": "<%= locale %>",
       "title": "Login",
       "welcome": "Welcome back!",
       "subtitle": "Sign in to your account.",
@@ -1141,7 +1140,6 @@
       }
     },
     "register": {
-      "html_lang": "<%= locale %>",
       "title": "Register",
       "heading": "Create an account",
       "subtitle": "Welcome to the ecosystem!",
@@ -1162,7 +1160,6 @@
       }
     },
     "reset": {
-      "html_lang": "<%= locale %>",
       "title": "Reset Password",
       "heading": "Reset Your Password",
       "subtitle": "Enter your new password below",

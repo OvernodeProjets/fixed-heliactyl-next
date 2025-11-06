@@ -734,7 +734,6 @@
   ,
   "auth": {
     "login": {
-      "html_lang": "<%= locale %>",
       "title": "Connexion",
       "welcome": "Bon retour !",
       "subtitle": "Connectez‑vous à votre compte.",
@@ -766,7 +765,6 @@
       }
     },
     "register": {
-      "html_lang": "<%= locale %>",
       "title": "Inscription",
       "heading": "Créer un compte",
       "subtitle": "Bienvenue dans l’écosystème !",
@@ -787,7 +785,6 @@
       }
     },
     "reset": {
-      "html_lang": "<%= locale %>",
       "title": "Réinitialiser le mot de passe",
       "heading": "Réinitialisez votre mot de passe",
       "subtitle": "Saisissez votre nouveau mot de passe ci‑dessous",
