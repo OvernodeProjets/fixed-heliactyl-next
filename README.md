@@ -189,5 +189,7 @@ npm run build:css - builds TailwindCSS, required for making changes to the UI
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-Copyright (c) 2017 - 2025 Altare Technologies Inc
+```
+Copyright (c) 2017 - 2025 Foundry Technologies Inc
 Copyright (c) 2022 - 2025 Overnode
+```
