@@ -178,7 +178,6 @@ Make sure to:
 3. Generate SSL certificates for both domains
 4. Create separate nginx config files for each domain
 5. Enable the configurations and restart nginx
-```
 
 ## Development Tools
 
