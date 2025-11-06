@@ -1,11 +1,24 @@
-# Heliactyl • The modern client panel for Pterodactyl
+# Fixed Heliactyl Next • The **most secure & modern** Pterodactyl dashboard
 
-![GitHub commit](https://img.shields.io/github/last-commit/OvernodeProjets/fixed-heliactyl-next) ![GitHub Release](https://img.shields.io/github/v/release/OvernodeProjets/fixed-heliactyl-next) ![GitHub issues](https://img.shields.io/github/issues/OvernodeProjets/fixed-heliactyl-next) ![GitHub license](https://img.shields.io/github/license/OvernodeProjets/fixed-heliactyl-next)
+![Last Commit](https://img.shields.io/github/last-commit/OvernodeProjets/fixed-heliactyl-next?color=brightgreen)
+![GitHub Release](https://img.shields.io/github/v/release/OvernodeProjets/fixed-heliactyl-next)
+![Issues](https://img.shields.io/github/issues/OvernodeProjets/fixed-heliactyl-next)
+![License](https://img.shields.io/github/license/OvernodeProjets/fixed-heliactyl-next)
+![Dev Branch](https://img.shields.io/badge/status-dev-orange)
+
+> **Dev version only • No stable release yet • Help us build it!**
+
+**Fixed Heliactyl Next** is an **early development fork** of **[Heliactyl Next 3](https://github.com/Heliactyl-Archive/the-library/blob/a9214cda2801ef8effe9db23e26daf5175c62437/README.md?plain=1#L119)**.
+It aims to fix critical bugs from older Heliactyl Next 3 versions and improve overall performance and usability.
+
+Currently used by **2–5 hosting providers** in testing — **100% free & open-source**.  
+Join us to shape the next stable release!
 
 > [!WARNING]  
-> Heliactyl 19 is not compatible with `settings.json` files. You can keep the same `database.sqlite / heliactyl.db` though without having any issues.
+> Fixed Heliactyl Next 3 is **not compatible** with `settings.json` old generation files.  
+> You can keep the same `database.sqlite` / `heliactyl.db` without issues.
 
-Heliactyl is a high-performance client area for the Pterodactyl Panel. It allows your users to create, edit and delete servers, and also earn coins which can be used to upgrade their servers.
+Heliactyl is a high-performance client area for the Pterodactyl Panel. It allows your users to create, edit and delete servers, and earn coins to upgrade their resources.
 
 ## Get started
 

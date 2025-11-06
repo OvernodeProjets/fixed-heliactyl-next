@@ -106,7 +106,6 @@ module.exports.load = async function (router, db) {
     }
   );
 
-  // Get balance endpoint updated to include XTC
   router.get('/wallet/balance',
     requireAuth,
     async (req, res) => {
@@ -134,4 +133,3 @@ module.exports.load = async function (router, db) {
       }
     });
 };
-
