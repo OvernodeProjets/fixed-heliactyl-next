@@ -79,27 +79,39 @@ module.exports.load = async function(router, db) {
 
     const userId = req.session.userinfo.id;
     const cacheKey = `dailystatus-${userId}`;
+    const processingKey = `processing-${userId}`;
 
-    const per = settings.api.client.coins.daily.per;
-    const lastClaimTimestamp = await db.get("dailycoins-" + userId);
-    const lastClaim = lastClaimTimestamp ? new Date(lastClaimTimestamp) : null;
-
-    const today = getPeriodStart(new Date(), per);
-    const lastPeriod = lastClaim ? getPeriodStart(lastClaim, per) : null;
-
-    if (lastPeriod && lastPeriod.getTime() === today.getTime()) {
-      return res.redirect('../dashboard?err=CLAIMED');
+    const success = myCache.set(processingKey, true, 10, true);
+    if (!success) {
+      return res.redirect('../dashboard?err=PROCESSING');
     }
 
-    const coins = (await db.get("coins-" + userId)) || 0;
-    await db.set("coins-" + userId, coins + settings.api.client.coins.daily.amount);
+    try {
+      const currentCoins = await db.get("coins-" + userId) || 0;
+      const lastClaimTimestamp = await db.get("dailycoins-" + userId);
 
-    discordLog('daily coins', `${req.session.userinfo.username} has claimed their daily reward of ${settings.api.client.coins.daily.amount} ${settings.website.currency}.`);
-
-    await db.set("dailycoins-" + userId, today.getTime());
-
-    myCache.del(cacheKey);
-
-    return res.redirect('../dashboard?err=none');
+      const lastClaim = lastClaimTimestamp ? new Date(lastClaimTimestamp) : null;
+      const today = getPeriodStart(new Date(), per);
+      const lastPeriod = lastClaim ? getPeriodStart(lastClaim, per) : null;
+    
+      if (lastPeriod && lastPeriod.getTime() === today.getTime()) {
+        myCache.del(processingKey);
+        return res.redirect('../dashboard?err=CLAIMED');
+      }
+  
+      await Promise.all([
+        db.set("coins-" + userId, currentCoins + settings.api.client.coins.daily.amount),
+        db.set("dailycoins-" + userId, today.getTime())
+      ]);
+    
+      myCache.del(cacheKey);
+      myCache.del(processingKey);
+    
+      discordLog('daily coins', `${req.session.userinfo.username} has claimed their daily reward of ${settings.api.client.coins.daily.amount} ${settings.website.currency}.`);
+      return res.redirect('../dashboard?err=none');
+    } catch (error) {
+      myCache.del(processingKey);
+      return res.redirect('../dashboard?err=ERROR');
+    }
   });
 };
