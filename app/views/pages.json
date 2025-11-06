@@ -6,6 +6,7 @@
         "internalError": "error/500.ejs"
     },
     "pages": {
+        "website": "website.ejs",
         "dashboard": "dashboard.ejs",
         "auth": "auth/auth.ejs",
         "auth/register": "auth/register.ejs",
