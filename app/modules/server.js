@@ -1266,7 +1266,6 @@ const RENEWAL_PERIOD_HOURS = 48;
 const WARNING_THRESHOLD_HOURS = 24; // When to start showing warnings
 const CHECK_INTERVAL_MINUTES = 5; // How often to check for expired servers
 
-// Add this to the module.exports.load function
 async function initializeRenewalSystem(db) {
   // Start the background task to check for expired servers
   setInterval(async () => {

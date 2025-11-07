@@ -105,10 +105,6 @@ if (cluster.isMaster) {
   // Replace the global setInterval with our cluster-safe version
   global.setInterval = global.clusterSafeInterval;
 
-  // Load the website.
-  module.exports.app = app; // ??? why here
-
-
   app.set('trust proxy', true);
 
   app.use(cookieParser());
