@@ -7,7 +7,7 @@
       <h1 class="text-2xl font-semibold mb-0.5" style="font-family: 'Inter';">System Updates</h1>
       <p class="text-gray-400 text-md">Check and install updates for your application.</p>
     </div>
-    <button onclick="checkUpdates()" class="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg transition-all font-medium shadow-md shadow-white/10">
+    <button onclick="checkUpdates()" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg transition-all font-medium shadow-md shadow-white/10">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
       </svg>
@@ -45,6 +45,51 @@
     </div>
   </div>
 
+    <!-- Update Status -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="p-2 bg-white/10 rounded-lg">
+          <svg class="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-white">Last Check</h3>
+          <p id="last-check" class="text-gray-400 text-sm">Loading...</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="p-2 bg-white/10 rounded-lg">
+          <svg class="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-white">Current Version</h3>
+          <p id="current-version" class="text-gray-400 text-sm">Loading...</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="p-2 bg-white/10 rounded-lg">
+          <svg class="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-white">Last Update</h3>
+          <p id="last-update" class="text-gray-400 text-sm">Loading...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Loading State -->
   <div id="loading-state" class="hidden">
     <div class="bg-white/5 p-6 rounded-2xl border border-white/10 text-center">
@@ -65,6 +110,7 @@
 </main>
 
 <script>
+const locale = navigator.language || 'en-US';
 function switchTab(tabName) {
   const tabs = {
     'coins': '/admin',
@@ -77,6 +123,39 @@ function switchTab(tabName) {
   }
 }
 
+function updateLastCheck() {
+  const lastCheck = document.getElementById('last-check');
+  const now = new Date();
+  // use browser's locale
+  lastCheck.textContent = now.toLocaleDateString(locale, { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+async function updateSystemInfo() {
+  try {
+    const response = await fetch('/api/admin/updates/info');
+    const info = await response.json();
+    
+    document.getElementById('current-version').textContent = info.currentVersion;
+    document.getElementById('last-update').textContent = info.lastUpdate 
+      ? new Date(info.lastUpdate).toLocaleDateString(locale, { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric'
+        })
+      : 'No updates installed';
+  } catch (error) {
+    console.error('Error fetching system info:', error);
+    document.getElementById('current-version').textContent = 'Error';
+    document.getElementById('last-update').textContent = 'Error';
+  }
+}
+
 async function checkUpdates() {
   const container = document.getElementById('updates-container');
   const loadingState = document.getElementById('loading-state');
@@ -84,6 +163,9 @@ async function checkUpdates() {
   // Show loading state
   loadingState.classList.remove('hidden');
   container.innerHTML = '';
+  
+  // Update last check timestamp
+  updateLastCheck();
   
   try {
     const response = await fetch('/api/admin/updates/check');
@@ -115,7 +197,6 @@ async function checkUpdates() {
       const updateCard = document.createElement('div');
       updateCard.className = 'bg-white/5 p-6 rounded-2xl border border-white/10';
       
-      const typeColor = update.type === 'release' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400';
       const typeIcon = update.type === 'release' 
         ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>'
         : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
@@ -123,8 +204,8 @@ async function checkUpdates() {
       updateCard.innerHTML = `
         <div class="flex items-start justify-between mb-4">
           <div class="flex items-center gap-3">
-            <div class="p-2 ${typeColor} rounded-lg">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="p-2 bg-white/10 rounded-lg">
+              <svg class="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 ${typeIcon}
               </svg>
             </div>
@@ -133,7 +214,7 @@ async function checkUpdates() {
               <p class="text-gray-400 text-sm">Version ${update.version}</p>
             </div>
           </div>
-          <span class="px-3 py-1 text-xs font-semibold rounded-lg ${typeColor}">
+          <span class="px-3 py-1 text-xs font-semibold rounded-lg bg-white/10 text-white">
             ${update.type.toUpperCase()}
           </span>
         </div>
@@ -145,7 +226,7 @@ async function checkUpdates() {
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
-            ${new Date(update.date).toLocaleDateString('fr-FR', { 
+            ${new Date(update.date).toLocaleDateString(locale, { 
               year: 'numeric', 
               month: 'long', 
               day: 'numeric' 
@@ -153,7 +234,7 @@ async function checkUpdates() {
           </div>
           <button 
             onclick="installUpdate('${update.version}')" 
-            class="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg transition-all font-medium shadow-md shadow-white/10"
+            class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-lg transition-all font-medium shadow-md shadow-white/10"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
@@ -215,8 +296,11 @@ async function installUpdate(version) {
   }
 }
 
-// Check for updates when the page loads
-checkUpdates();
+// Initialize the page
+document.addEventListener('DOMContentLoaded', async () => {
+  await updateSystemInfo();
+  checkUpdates();
+});
 </script>
 
 <%- include('../components/bottom') %>

@@ -33,7 +33,7 @@ const { requireAuth } = require("../handlers/checkMiddleware.js");
 
 module.exports.load = async function (app, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
-  const requireAdmin = (req, res, next) => requireAuth(req, res, next, true);
+  const requireAdmin = (req, res, next) => requireAuth(req, res, next, true, db);
 
   app.get("/admin/setcoins", requireAdmin, async (req, res) => { 
     let failredirect = "/admin/coins?err=FAILEDSETCOINS";
@@ -453,7 +453,9 @@ module.exports.load = async function (app, db) {
 
   app.get("/admin/updates/check", requireAdmin, async (req, res) => {
     try {
-      const updates = await updateManager.checkForUpdates();
+      const ignoreCache = req.query.force === 'true';
+      const updates = await updateManager.checkForUpdates(ignoreCache);
+
       res.json(updates);
     } catch (error) {
       console.error("Error checking for updates:", error);
@@ -461,20 +463,51 @@ module.exports.load = async function (app, db) {
     }
   });
 
+  app.get("/admin/updates/info", requireAdmin, async (req, res) => {
+    try {
+      const lastUpdate = await db.get("system-lastUpdate");
+      const lastCheck = updateManager.cache.lastCheck;
+
+      res.json({
+        currentVersion: settings.version,
+        lastUpdate: lastUpdate,
+        lastCheck: lastCheck
+      });
+    } catch (error) {
+      console.error("Error getting update info:", error);
+      res.status(500).json({ error: "Failed to get update information" });
+    }
+  });
+
   app.post("/admin/updates/install", requireAdmin, async (req, res) => {
     try {
       const { version } = req.body;
-      const updates = await updateManager.checkForUpdates();
+      const updates = await updateManager.checkForUpdates(true);
       const updateToInstall = updates.find(u => u.version === version);
       
       if (!updateToInstall) {
         return res.status(404).json({ error: "Update not found" });
       }
 
-      const result = await updateManager.installUpdate(updateToInstall);
+      discordLog(
+        'install update',
+        `${req.session.userinfo.username} has started installing the update ${version}`
+      );
+
+      const result = await updateManager.installUpdate(updateToInstall, db);
+
+      discordLog(
+        'update installed',
+        `${req.session.userinfo.username} has successfully installed the update ${version}. Backup created: ${result.backupPath}`
+      );
+
       res.json(result);
     } catch (error) {
       console.error("Error installing update:", error);
+      discordLog(
+        'update failed',
+        `Failed to install update: ${error.message}`
+      );
       res.status(500).json({ error: "Failed to install update" });
     }
   });

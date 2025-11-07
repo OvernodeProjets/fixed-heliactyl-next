@@ -41,6 +41,7 @@ app.set('views', VIEWS_DIR);
 app.use(favicon(FAVICON_PATH));
 
 const sessionStore = require("./app/handlers/sessionStore");
+const updateManager = require('./app/handlers/updateManager');
 
 const { renderData, getPages } = require('./app/handlers/theme');
 const { consoleLogo, consoleSpin, getAllJsFiles } = require('./app/handlers/utils');
@@ -60,7 +61,6 @@ if (typeof atob === "undefined") {
 
 const Database = require("./db.js");
 const db = new Database(settings.database);
-module.exports.db = db;
 
 if (cluster.isMaster) {
   consoleLogo();
@@ -73,6 +73,7 @@ if (cluster.isMaster) {
     process.stdout.write('\r');
     validateModules(settings);
     startCluster(settings, db);
+    updateManager.initialize(db);
   }, 2000); // Simulate loading time, just for fun ?
 } else {
   // Worker process
