@@ -1,9 +1,6 @@
-const indexjs = require('../../app.js');
 const getPteroUser = require("../handlers/getPteroUser");
 
-const db = indexjs.db;
-
-const requireAuth = async (req, res, next, admin = false) => {
+const requireAuth = async (req, res, next, admin = false, db) => {
   if (!req.session.userinfo || !req.session.pterodactyl) {
     return res.status(401).json({ error: 'Unauthorized' });
   }

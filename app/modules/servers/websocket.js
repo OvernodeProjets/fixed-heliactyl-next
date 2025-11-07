@@ -24,11 +24,12 @@ const PterodactylClientModule = require("../../handlers/ClientAPI.js");
 
 module.exports.load = async function(router, db) {
   const ClientAPI = new PterodactylClientModule(settings.pterodactyl.domain, settings.pterodactyl.client_key);
+  const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
   // GET WebSocket credentials
   router.get(
     "/server/:id/websocket",
-    requireAuth,
+    authMiddleware,
     ownsServer,
     async (req, res) => {
       try {
@@ -61,7 +62,7 @@ module.exports.load = async function(router, db) {
   );
 
   // GET server details
-  router.get("/server/:id", requireAuth, ownsServer, async (req, res) => {
+  router.get("/server/:id", authMiddleware, ownsServer, async (req, res) => {
     try {
       const serverId = req.params.id;
       const serverDetails = await ClientAPI.getServerDetails(serverId);

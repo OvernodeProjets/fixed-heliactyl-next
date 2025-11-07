@@ -21,6 +21,7 @@ const { requireAuth } = require('../handlers/checkMiddleware');
 const { logTransaction } = require('../handlers/log');
 
 module.exports.load = async function (router, db) {
+  const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
   // Configuration
   const DAILY_INTEREST_RATE = 0.05; // 5% daily interest
   const MIN_STAKE_AMOUNT = 10; // Minimum amount to stake
@@ -74,7 +75,7 @@ module.exports.load = async function (router, db) {
   }
 
   // Modified staking endpoint with rate limiting
-  router.post("/stake", requireAuth, async (req, res) => {
+  router.post("/stake", authMiddleware, async (req, res) => {
     const { amount, lockPeriod } = req.body;
     const parsedAmount = parseFloat(amount);
     
@@ -129,7 +130,7 @@ module.exports.load = async function (router, db) {
   });
 
   // Modified unstaking endpoint with rate limiting
-  router.post("/unstake", requireAuth, async (req, res) => {
+  router.post("/unstake", authMiddleware, async (req, res) => {
     const { positionId } = req.body;
     const userId = req.session.userinfo.id;
     
@@ -193,7 +194,7 @@ module.exports.load = async function (router, db) {
   });
 
   // View staking positions and earnings
-  router.get("/stake/positions", requireAuth, async (req, res) => {
+  router.get("/stake/positions", authMiddleware, async (req, res) => {
     const userId = req.session.userinfo.id;
     
     // Migrate old staking data if needed
@@ -232,7 +233,7 @@ module.exports.load = async function (router, db) {
     });
   });
 
-  router.get("/stake/positions/:positionId", requireAuth, async (req, res) => {
+  router.get("/stake/positions/:positionId", authMiddleware, async (req, res) => {
     const userId = req.session.userinfo.id;
     const { positionId } = req.params;
     
@@ -285,7 +286,7 @@ module.exports.load = async function (router, db) {
   });
 
   // Claim earnings for a specific position
-  router.post("/stake/claim", requireAuth, async (req, res) => {
+  router.post("/stake/claim", authMiddleware, async (req, res) => {
     const { positionId } = req.body;
     const userId = req.session.userinfo.id;
     

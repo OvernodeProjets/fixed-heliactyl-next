@@ -35,6 +35,7 @@ const scheduledWorkflowsFilePath = path.join(
   "../storage/scheduledWorkflows.json"
 );
 module.exports.load = async function (router, db) {
+  const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
   const pterodactylClient = new PterodactylClientModule(
     settings.pterodactyl.domain,
@@ -114,7 +115,7 @@ async function isValidWorld(fileData, serverId) {
 
 
 // Worlds endpoints
-router.get('/server/:id/worlds', requireAuth, ownsServer, async (req, res) => {
+router.get('/server/:id/worlds', authMiddleware, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     
@@ -200,7 +201,7 @@ router.get('/server/:id/worlds', requireAuth, ownsServer, async (req, res) => {
   }
 });
 
-router.post('/server/:id/worlds/import', requireAuth, ownsServer, async (req, res) => {
+router.post('/server/:id/worlds/import', authMiddleware, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const { worldName } = req.body;
@@ -252,7 +253,7 @@ router.post('/server/:id/worlds/import', requireAuth, ownsServer, async (req, re
   }
 });
 
-router.post('/server/:id/worlds/import/complete', requireAuth, ownsServer, async (req, res) => {
+router.post('/server/:id/worlds/import/complete', authMiddleware, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const { worldName, fileName } = req.body;
@@ -444,7 +445,7 @@ router.post('/server/:id/worlds/import/complete', requireAuth, ownsServer, async
   }
 });
 
-router.delete('/server/:id/worlds/:worldName', requireAuth, ownsServer, async (req, res) => {
+router.delete('/server/:id/worlds/:worldName', authMiddleware, ownsServer, async (req, res) => {
   try {
     const { id: serverId, worldName } = req.params;
 
@@ -506,7 +507,7 @@ router.delete('/server/:id/worlds/:worldName', requireAuth, ownsServer, async (r
 });
 
 // POST /api/server/:id/allocations - Assign new allocation
-router.post('/server/:id/allocations', requireAuth, ownsServer, async (req, res) => {
+router.post('/server/:id/allocations', authMiddleware, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
 
@@ -595,7 +596,7 @@ router.post('/server/:id/allocations', requireAuth, ownsServer, async (req, res)
   loadScheduledWorkflows();
 
 // GET /api/server/:id/logs - Get server activity logs
-router.get('/server/:id/logs', requireAuth, ownsServer, async (req, res) => {
+router.get('/server/:id/logs', authMiddleware, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const page = parseInt(req.query.page) || 1;
@@ -678,7 +679,7 @@ router.get('/server/:id/logs', requireAuth, ownsServer, async (req, res) => {
   // GET /api/server/:id/backups
   router.get(
     "/server/:id/backups",
-    requireAuth,
+    authMiddleware,
     ownsServer,
     async (req, res) => {
       try {
@@ -704,7 +705,7 @@ router.get('/server/:id/logs', requireAuth, ownsServer, async (req, res) => {
   // POST /api/server/:id/backups
   router.post(
     "/server/:id/backups",
-    requireAuth,
+    authMiddleware,
     ownsServer,
     async (req, res) => {
       try {
@@ -731,7 +732,7 @@ router.get('/server/:id/logs', requireAuth, ownsServer, async (req, res) => {
   // GET /api/server/:id/backups/:backupId/download
   router.get(
     "/server/:id/backups/:backupId/download",
-    requireAuth,
+    authMiddleware,
     ownsServer,
     async (req, res) => {
       try {
@@ -758,7 +759,7 @@ router.get('/server/:id/logs', requireAuth, ownsServer, async (req, res) => {
   // DELETE /api/server/:id/backups/:backupId
   router.delete(
     "/server/:id/backups/:backupId",
-    requireAuth,
+    authMiddleware,
     ownsServer,
     async (req, res) => {
       try {
@@ -784,7 +785,7 @@ router.get('/server/:id/logs', requireAuth, ownsServer, async (req, res) => {
 
   router.post(
     "/plugins/install/:serverId",
-    requireAuth,
+    authMiddleware,
     ownsServer,
     async (req, res) => {
       const { serverId } = req.params;
@@ -869,7 +870,7 @@ router.get('/server/:id/logs', requireAuth, ownsServer, async (req, res) => {
   // GET workflow
   router.get(
     "/server/:id/workflow",
-    requireAuth,
+    authMiddleware,
     ownsServer,
     async (req, res) => {
       try {
@@ -892,7 +893,7 @@ router.get('/server/:id/logs', requireAuth, ownsServer, async (req, res) => {
   );
 
 // GET /api/server/:id/variables
-router.get('/server/:id/variables', requireAuth, ownsServer, async (req, res) => {
+router.get('/server/:id/variables', authMiddleware, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const response = await axios.get(
@@ -912,7 +913,7 @@ router.get('/server/:id/variables', requireAuth, ownsServer, async (req, res) =>
 });
 
 // PUT /api/server/:id/variables
-router.put('/server/:id/variables', requireAuth, ownsServer, async (req, res) => {
+router.put('/server/:id/variables', authMiddleware, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const { key, value } = req.body;
@@ -942,7 +943,7 @@ router.put('/server/:id/variables', requireAuth, ownsServer, async (req, res) =>
   // POST save workflow
   router.post(
     "/server/:instanceId/workflow/save-workflow",
-    requireAuth,
+    authMiddleware,
     ownsServer,
     async (req, res) => {
       const { instanceId } = req.params;
@@ -980,7 +981,7 @@ router.put('/server/:id/variables', requireAuth, ownsServer, async (req, res) =>
   );
 
 // Add new endpoint to show servers where the user is a subuser
-router.get('/subuser-servers', requireAuth, async (req, res) => {
+router.get('/subuser-servers', authMiddleware, async (req, res) => {
   try {
     const userId = req.session.pterodactyl.username;
     console.log(`Fetching subuser servers for user ${userId}`);
@@ -1058,7 +1059,7 @@ async function updateSubuserInfo(serverId, serverOwnerId) {
   }
 }
 
-router.post('/sync-user-servers', requireAuth, async (req, res) => {
+router.post('/sync-user-servers', authMiddleware, async (req, res) => {
   try {
     const userId = req.session.pterodactyl.id;
     console.log(`Syncing servers for user ${userId}`);
@@ -1114,7 +1115,7 @@ async function addUserToAllUsersList(userId) {
 }
 
 // Update the existing /server/:id/users endpoint to call updateSubuserInfo
-router.get('/server/:id/users', requireAuth, ownsServer, async (req, res) => {
+router.get('/server/:id/users', authMiddleware, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const response = await axios.get(
@@ -1138,7 +1139,7 @@ router.get('/server/:id/users', requireAuth, ownsServer, async (req, res) => {
   }
 });
 
-router.post('/server/:id/users', requireAuth, ownsServer, async (req, res) => {
+router.post('/server/:id/users', authMiddleware, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const { email } = req.body;
@@ -1209,7 +1210,7 @@ router.post('/server/:id/users', requireAuth, ownsServer, async (req, res) => {
 });
 
   // DELETE /api/server/:id/users/:subuser - Delete User
-  router.delete('/server/:id/users/:subuser', requireAuth, ownsServer, async (req, res) => {
+  router.delete('/server/:id/users/:subuser', authMiddleware, ownsServer, async (req, res) => {
     try {
       const { id: serverId, subuser: subuserId } = req.params;
       await axios.delete(
@@ -1232,7 +1233,7 @@ router.post('/server/:id/users', requireAuth, ownsServer, async (req, res) => {
   // POST Set server power state
   router.post(
     "/server/:id/power",
-    requireAuth,
+    authMiddleware,
     ownsServer,
     async (req, res) => {
       try {
@@ -1395,7 +1396,7 @@ async function handleExpiredServer(db, serverId) {
 }
 
 // Add these routes to the router
-router.get('/server/:id/renewal/status', requireAuth, ownsServer, async (req, res) => {
+router.get('/server/:id/renewal/status', authMiddleware, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const renewalStatus = await getRenewalStatus(db, serverId, req.session.userinfo.id);
@@ -1426,7 +1427,7 @@ router.get('/server/:id/renewal/status', requireAuth, ownsServer, async (req, re
 });
 
 // And update the renewal endpoint validation in the POST route:
-router.post('/server/:id/renewal/renew', requireAuth, ownsServer, async (req, res) => {
+router.post('/server/:id/renewal/renew', authMiddleware, ownsServer, async (req, res) => {
   try {
     const serverId = req.params.id;
     const currentStatus = await getRenewalStatus(db, serverId);

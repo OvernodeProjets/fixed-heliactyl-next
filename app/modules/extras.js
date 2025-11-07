@@ -26,6 +26,7 @@ const NodeCache = require("node-cache");
 module.exports.load = async function(router, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key)
   const myCache = new NodeCache({ stdTTL: 60, checkperiod: 10 });
+  const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
   router.get("/stats", async (req, res) => {
     try {
@@ -80,13 +81,13 @@ module.exports.load = async function(router, db) {
   });
 
   // todo : implement notifications system
-  router.get("/notifications", requireAuth, async (req, res) => {
+  router.get("/notifications", authMiddleware, async (req, res) => {
     let notifications = await db.get('notifications-' + req.session.userinfo.id) || [];
 
     res.json(notifications)
   });
 
-  router.get("/password/generate", requireAuth, async (req, res) => {
+  router.get("/password/generate", authMiddleware, async (req, res) => {
     if (!settings.api.client.allow.change_password) return res.status(403).json({ error: "Password changes are not allowed" });
 
     const newPassword = settings.api.client.passwordgenerator.signup
@@ -104,7 +105,7 @@ module.exports.load = async function(router, db) {
   });
 
   // New endpoint for custom password changes
-  router.post("/password/change", requireAuth, async (req, res) => {
+  router.post("/password/change", authMiddleware, async (req, res) => {
     if (!settings.api.client.allow.change_password) return res.status(403).json({ error: "Password changes are not allowed" });
 
     const { password, confirmPassword } = req.body;

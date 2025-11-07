@@ -25,6 +25,7 @@ const NodeCache = require("node-cache");
 
 module.exports.load = async function(router, db) {
   const myCache = new NodeCache({ deleteOnExpire: true, stdTTL: 59 });
+  const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
   function getPeriodStart(date, per) {
     const d = new Date(date);
@@ -42,7 +43,7 @@ module.exports.load = async function(router, db) {
     return d;
   }
 
-  router.get('/dailystatus', requireAuth, async (req, res) => {
+  router.get('/dailystatus', authMiddleware, async (req, res) => {
     if (!settings.api.client.coins.daily.enabled) {
       return res.json({ text: 'DISABLED' });
     }
@@ -72,7 +73,7 @@ module.exports.load = async function(router, db) {
     return res.json(response);
   });
 
-  router.get('/daily-coins', requireAuth, async (req, res) => {
+  router.get('/daily-coins', authMiddleware, async (req, res) => {
     if (!settings.api.client.coins.daily.enabled) {
       return res.redirect('../dashboard?err=DISABLED');
     }

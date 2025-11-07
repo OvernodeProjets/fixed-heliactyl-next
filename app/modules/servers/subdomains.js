@@ -25,6 +25,7 @@ const PterodactylClientModule = require("../../handlers/ClientAPI.js");
 const { serverActivityLog } = require('../../handlers/log.js');
 
 module.exports.load = async function(router, db) {
+  const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
   const pterodactylClient = new PterodactylClientModule(
     settings.pterodactyl.domain,
     settings.pterodactyl.client_key
@@ -205,7 +206,7 @@ is_default = true
   }
 
   // Updated router endpoints
-  router.post('/server/:id/subdomains', requireAuth, ownsServer, async (req, res) => {
+  router.post('/server/:id/subdomains', authMiddleware, ownsServer, async (req, res) => {
     try {
       const serverId = req.params.id;
       const { subdomain } = req.body;
@@ -247,7 +248,7 @@ is_default = true
     }
   });
 
-  router.get('/server/:id/subdomains', requireAuth, ownsServer, async (req, res) => {
+  router.get('/server/:id/subdomains', authMiddleware, ownsServer, async (req, res) => {
     try {
       const serverId = req.params.id;
       const subdomains = await getServerSubdomains(serverId);
@@ -259,7 +260,7 @@ is_default = true
     }
   });
 
-  router.delete('/server/:id/subdomains/:subdomain', requireAuth, ownsServer, async (req, res) => {
+  router.delete('/server/:id/subdomains/:subdomain', authMiddleware, ownsServer, async (req, res) => {
     try {
       const serverId = req.params.id;
       const subdomainToDelete = req.params.subdomain;

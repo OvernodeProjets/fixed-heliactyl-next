@@ -282,10 +282,11 @@ class AdventCalendarManager {
 }
 
 module.exports.load = function(router, db) {
+  const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
   const adventCalendar = new AdventCalendarManager(db);
 
   // Claim daily reward
-  router.post('/advent/claim/:day', requireAuth, async (req, res) => {
+  router.post('/advent/claim/:day', authMiddleware, async (req, res) => {
     try {
       const userId = req.session.userinfo.id;
       const day = parseInt(req.params.day);
@@ -303,7 +304,7 @@ module.exports.load = function(router, db) {
   });
 
   // Get user's calendar
-  router.get('/advent/calendar', requireAuth, async (req, res) => {
+  router.get('/advent/calendar', authMiddleware, async (req, res) => {
     try {
       if (!adventCalendar.isValidDate()) {
         return res.status(400).json({ error: 'Advent Calendar event is not active' });

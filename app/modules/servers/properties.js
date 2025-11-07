@@ -25,6 +25,7 @@ const settings = loadConfig("./config.toml");
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js")
 
 module.exports.load = async function(router, db) {
+    const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
     const pterodactylClient = new PterodactylClientModule(settings.pterodactyl.domain, settings.pterodactyl.client_key);
 
     // Helper function to parse server.properties content
@@ -42,7 +43,7 @@ module.exports.load = async function(router, db) {
     };
 
     // GET server properties
-    router.get('/server/:id/properties', requireAuth, ownsServer, async (req, res) => {
+    router.get('/server/:id/properties', authMiddleware, ownsServer, async (req, res) => {
         try {
             const serverId = req.params.id;
             const response = await axios.get(`${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/contents`, {
@@ -63,7 +64,7 @@ module.exports.load = async function(router, db) {
     });
 
     // PUT update server properties
-    router.put('/server/:id/properties', requireAuth, ownsServer, async (req, res) => {
+    router.put('/server/:id/properties', authMiddleware, ownsServer, async (req, res) => {
         try {
             const serverId = req.params.id;
             const updatedProperties = req.body;

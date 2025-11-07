@@ -21,7 +21,7 @@ const { i18n } = require('../handlers/i18n');
 const { requireAuth } = require('../handlers/checkMiddleware');
 
 module.exports.load = async function(router, db) {
-    const requireAdmin = (req, res, next) => requireAuth(req, res, next, true);
+  const requireAdmin = (req, res, next) => requireAuth(req, res, next, true, db);
   // GET available locales
   router.get('/locales', async (req, res) => {
     try {

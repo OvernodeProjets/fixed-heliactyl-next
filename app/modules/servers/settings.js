@@ -25,10 +25,11 @@ const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js")
 const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
 
 module.exports.load = async function(router, db) {
+  const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
     
     // PUT /api/server/:id/startup
-    router.put('/server/:serverId/startup', requireAuth, async (req, res) => {
+    router.put('/server/:serverId/startup', authMiddleware, async (req, res) => {
       try {
         const serverId = req.params.serverId;
         const { startup, environment, egg, image, skip_scripts } = req.body;
@@ -58,7 +59,7 @@ module.exports.load = async function(router, db) {
     });
     
     // POST Reinstall server
-    router.post('/server/:id/reinstall', requireAuth, ownsServer, async (req, res) => {
+    router.post('/server/:id/reinstall', authMiddleware, ownsServer, async (req, res) => {
         try {
             const serverId = req.params.id;
             await axios.post(`${settings.pterodactyl.domain}/api/client/servers/${serverId}/settings/reinstall`, {}, {
@@ -76,7 +77,7 @@ module.exports.load = async function(router, db) {
     });
 
     // POST Rename server
-    router.post('/server/:id/rename', requireAuth, ownsServer, async (req, res) => {
+    router.post('/server/:id/rename', authMiddleware, ownsServer, async (req, res) => {
         try {
             const serverId = req.params.id;
             const { name } = req.body; // Expecting the new name for the server in the request body

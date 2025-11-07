@@ -21,11 +21,12 @@ const { requireAuth } = require("../../handlers/checkMiddleware.js");
 
 // need to be reimplented
 module.exports.load = async function(app, db) {
+  const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
   const lvcodes = {}
   const cooldowns = {}
   const dailyLimits = {}
 
-  app.get(`/lv/gen`, requireAuth, async (req, res) => {
+  app.get(`/lv/gen`, authMiddleware, async (req, res) => {
     // Check for the presence of specific cookies
     const requiredCookies = ["x5385", "x4634", "g9745", "h2843"];
     const hasCookie = requiredCookies.some(cookieName => req.cookies[cookieName] !== undefined);
@@ -74,7 +75,7 @@ module.exports.load = async function(app, db) {
     res.redirect(lvurl);
   });
 
-  app.get(`/afkredeem`, requireAuth, async (req, res) => {
+  app.get(`/afkredeem`, authMiddleware, async (req, res) => {
     const code = req.query.code;
     if (!code) return res.send('An error occurred with your browser!');
     if (!req.headers.referer || !req.headers.referer.includes('linkvertise.com')) return res.redirect('/afk?err=BYPASSER');
@@ -93,7 +94,7 @@ module.exports.load = async function(app, db) {
   });
 
   // New API endpoint to get the user's limit
-  app.get(`/lv/limit`, requireAuth, async (req, res) => {
+  app.get(`/lv/limit`, authMiddleware, async (req, res) => {
     const userId = req.session.userinfo.id;
     const limit = dailyLimits[userId] || { count: 0, date: new Date().toDateString() };
     const remaining = 50 - limit.count;

@@ -87,6 +87,7 @@ function generateFtpUsername(domain) {
 }
 
 module.exports.load = async function (router, db) {
+  const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
   const checkPleskEnabled = async (req, res, next) => {
     if (!settings.api.client.plesk.enabled || settings.api.client.plesk.enabled === false) {
       return res.redirect('/dashboard');
@@ -95,7 +96,7 @@ module.exports.load = async function (router, db) {
   };
 
   // Activate Plesk account
-  router.post("/plesk/activate", requireAuth, checkPleskEnabled, async (req, res) => {
+  router.post("/plesk/activate", authMiddleware, checkPleskEnabled, async (req, res) => {
     try {
       const userId = req.session.userinfo.id;
       const userEmail = req.session.userinfo.email;
@@ -153,7 +154,7 @@ module.exports.load = async function (router, db) {
   });
 
   // Create website
-  router.post("/plesk/websites", requireAuth, checkPleskEnabled, async (req, res) => {
+  router.post("/plesk/websites", authMiddleware, checkPleskEnabled, async (req, res) => {
     try {
       const { domain } = req.body;
       const userId = req.session.userinfo.id;
@@ -276,7 +277,7 @@ module.exports.load = async function (router, db) {
   });
 
   // Get website details
-  router.get("/plesk/websites/:id", requireAuth, checkPleskEnabled, async (req, res) => {
+  router.get("/plesk/websites/:id", authMiddleware, checkPleskEnabled, async (req, res) => {
     try {
       const userId = req.session.userinfo.id;
       const websiteId = req.params.id;
@@ -300,7 +301,7 @@ module.exports.load = async function (router, db) {
   });
 
   // List websites
-  router.get("/plesk/websites", requireAuth, checkPleskEnabled, async (req, res) => {
+  router.get("/plesk/websites", authMiddleware, checkPleskEnabled, async (req, res) => {
     try {
       const userId = req.session.userinfo.id;
       
@@ -338,7 +339,7 @@ module.exports.load = async function (router, db) {
   });
 
   // Delete website
-  router.delete("/plesk/websites/:id", requireAuth, checkPleskEnabled, async (req, res) => {
+  router.delete("/plesk/websites/:id", authMiddleware, checkPleskEnabled, async (req, res) => {
     try {
       const userId = req.session.userinfo.id;
       const domainId = req.params.id;
@@ -370,7 +371,7 @@ module.exports.load = async function (router, db) {
   });
 
   // Get account information
-  router.get("/plesk/account", requireAuth, checkPleskEnabled, async (req, res) => {
+  router.get("/plesk/account", authMiddleware, checkPleskEnabled, async (req, res) => {
     try {
       const userId = req.session.userinfo.id;
       

@@ -24,6 +24,8 @@ const settings = loadConfig("./config.toml");
 const { logTransaction } = require("../handlers/log.js");
 
 module.exports.load = async function (router, db) {
+  const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
+
   // Helper function to get user's balance
   const getUserBalance = async (userId, currency) => {
     if (currency === (settings.website.currency)) {
@@ -50,7 +52,7 @@ module.exports.load = async function (router, db) {
   const MIN_CURRENCY_AMOUNT = 1; // Minimum transfer amount
   
   router.post('/wallet/transfer',
-    requireAuth,
+    authMiddleware,
     [
       body('receiverId').isString().notEmpty(),
       body('amount').isInt({ min: MIN_CURRENCY_AMOUNT, max: MAX_CURRENCY_AMOUNT }),
@@ -107,7 +109,7 @@ module.exports.load = async function (router, db) {
   );
 
   router.get('/wallet/balance',
-    requireAuth,
+    authMiddleware,
     async (req, res) => {
       const userId = req.session.userinfo.id;
       try {
@@ -121,7 +123,7 @@ module.exports.load = async function (router, db) {
   );
 
   router.get('/wallet/transactions',
-    requireAuth,
+    authMiddleware,
     async (req, res) => {
       const userId = req.session.userinfo.id;
       try {

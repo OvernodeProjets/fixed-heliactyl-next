@@ -34,8 +34,9 @@ if (settings?.pterodactyl?.domain?.endsWith("/")) {
 
 module.exports.load = async function(router, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
+  const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
   
-router.get("/updateinfo", requireAuth, async (req, res) => {
+router.get("/updateinfo", authMiddleware, async (req, res) => {
     try {
         // Get user's package and extra resources
         const packagename = await db.get("package-" + req.session.userinfo.id);
@@ -127,7 +128,7 @@ router.get("/updateinfo", requireAuth, async (req, res) => {
     }
 });
 
-router.get("/server/create", requireAuth, async (req, res) => {
+router.get("/server/create", authMiddleware, async (req, res) => {
     if (!settings.api.client.allow.server.create) {
       res.redirect("/servers?err=disabled");
       return;
@@ -396,13 +397,13 @@ async function removeFromQueue(server) {
 //setInterval(processQueue, 5 * 60 * 1000);
 
 // Route to manually process the queue
-router.get("/process-queue", requireAuth, async (req, res) => {
+router.get("/process-queue", authMiddleware, async (req, res) => {
   await processQueue();
   res.json({ status: 200, msg: 'Queue processed successfully' });
 });
 
 // Route to remove a server from the queue
-router.get("/queue-remove/:id", requireAuth, async (req, res) => {
+router.get("/queue-remove/:id", authMiddleware, async (req, res) => {
   let serverPos = parseInt(req.params.id);
   let userId = req.session.userinfo.id;
 
@@ -439,7 +440,7 @@ router.get("/queue-remove/:id", requireAuth, async (req, res) => {
 });
 
 // Route to clear the entire queue
-router.get("/clear-queue", requireAuth, async (req, res) => {
+router.get("/clear-queue", authMiddleware, async (req, res) => {
   try {
       let queuedServers = await db.get("queuedServers") || [];
 
@@ -463,7 +464,7 @@ router.get("/clear-queue", requireAuth, async (req, res) => {
   }
 });
 
-    router.get("/server/:id/modify", requireAuth, async (req, res) => {
+    router.get("/server/:id/modify", authMiddleware, async (req, res) => {
         if (!settings.api.client.allow.server.modify) {
           res.redirect("/servers?err=disabled");
           return;
@@ -621,7 +622,7 @@ router.get("/clear-queue", requireAuth, async (req, res) => {
             res.redirect("/dashboard?err=MODIFIED");
       });
 
-router.get("/server/:id/delete", requireAuth, async (req, res) => {
+router.get("/server/:id/delete", authMiddleware, async (req, res) => {
   const { id } = req.params;
   if (!id) return res.send("Missing id.");
 
