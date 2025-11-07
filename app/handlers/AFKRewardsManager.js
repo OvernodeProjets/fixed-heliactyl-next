@@ -1,5 +1,6 @@
 const loadConfig = require("./config");
 const settings = loadConfig("./config.toml");
+const { logTransaction } = require("./log");
 
 class AFKRewardsManager {
   constructor(db) {
@@ -8,6 +9,7 @@ class AFKRewardsManager {
     this.INTERVAL_MS = 60000;
     this.timeouts = new Map();
     this.stateTimeouts = new Map();
+    this.sessionStartTimes = new Map();
   }
 
   async hasActiveSession(userId) {
@@ -25,11 +27,13 @@ class AFKRewardsManager {
 
   async createSession(userId, clusterId) {
     try {
+      const startTime = Date.now();
+      this.sessionStartTimes.set(userId, startTime);
       await this.db.set(`afk_session-${userId}`, {
         clusterId,
-        lastReward: Date.now(),
-        lastUpdate: Date.now(),
-        createdAt: Date.now()
+        lastReward: startTime,
+        lastUpdate: startTime,
+        createdAt: startTime
       });
     } catch (error) {
       console.error(`[ERROR] Failed to create session for ${userId}:`, error);
@@ -119,7 +123,7 @@ class AFKRewardsManager {
     updateState();
   }
 
-  cleanup(userId) {
+  async cleanup(userId) {
     // Clear reward timeout
     const timeout = this.timeouts.get(userId);
     if (timeout) {
@@ -132,6 +136,35 @@ class AFKRewardsManager {
     if (stateTimeout) {
       clearTimeout(stateTimeout);
       this.stateTimeouts.delete(userId);
+    }
+
+    try {
+      // Calculate total time and coins earned
+      const startTime = this.sessionStartTimes.get(userId);
+      if (startTime) {
+        const totalTimeMs = Date.now() - startTime;
+        const totalMinutes = Math.floor(totalTimeMs / this.INTERVAL_MS);
+        const totalCoinsEarned = totalMinutes * this.COINS_PER_MINUTE;
+
+        // Get current balance
+        const currentBalance = await this.db.get(`coins-${userId}`) || 0;
+
+        // Log the AFK session transaction
+        if (totalCoinsEarned > 0) {
+          await logTransaction(
+            this.db,
+            userId,
+            'credit',
+            totalCoinsEarned,
+            currentBalance + totalCoinsEarned,
+            { description: `AFK rewards for ${totalMinutes} minutes`, senderId: 'afk-rewards', receiverId: userId }
+          );
+        }
+
+        this.sessionStartTimes.delete(userId);
+      }
+    } catch (error) {
+      console.error(`[ERROR] Failed to log AFK session for ${userId}:`, error);
     }
 
     // Remove session from database

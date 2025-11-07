@@ -61,7 +61,7 @@ function startCluster(settings, db) {
             console.log(chalk.yellow(`File changed: ${filePath}. Rebooting workers...`));
 
             // If it's the AFK module, clear sessions
-            if (filePath.includes('afk.js') || filePath.includes('modules/afk')) {
+            if (filePath.includes('afk.js') || filePath.includes('AFKRewardsManager.js')) {
                 console.log(chalk.cyan('AFK module modified, clearing AFK sessions...'));
                 await db.set('afkSessions', {});
                 const keys = await db.list('afk_session-');
