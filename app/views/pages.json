@@ -35,6 +35,7 @@
         "j4r": "j4r.ejs",
         "staking": "staking.ejs",
         "admin": "admin/main.ejs",
+        "admin/updates": "admin/updates.ejs",
         "store": "store.ejs",
         "afk": "afk.ejs",
         "referrals": "referrals.ejs",
@@ -77,6 +78,7 @@
         "/events/halloween"
     ],
     "mustbeadmin": [
-        "/admin"
+        "/admin",
+        "/admin/updates"
     ]
 }

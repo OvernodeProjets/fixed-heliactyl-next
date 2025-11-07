@@ -386,6 +386,16 @@ enableCaptcha = false
 recaptchaSiteKey = "0aa0aaaaaaaaaaaaaaa0aaaaaaaaaaaaaa0aaa0aa"
 recaptchaServerKey = "0aa0aaaaaaaaaaaaaaa0aaaaaaaaaaaaaa0aaa0aa"
 
+# ------------------------------------------------------
+# Update Configuration
+# ------------------------------------------------------
+[update]
+enabled = true              # Enable or disable the update checker
+checkReleases = true       # Check for new releases
+checkCommits = false       # Check for new commits (development updates)
+autoInstall = false        # Automatically install updates
+checkInterval = 3600000    # Check interval in milliseconds (default: 1 hour)
+
 # ======================================================
 # Logging System
 # ======================================================

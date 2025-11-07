@@ -18,6 +18,7 @@ const heliactylModule = {
 module.exports.heliactylModule = heliactylModule;
 
 const loadConfig = require("../handlers/config");
+const updateManager = require("../handlers/updateManager");
 const settings = loadConfig("./config.toml");
 
 if (settings?.pterodactyl?.domain?.endsWith("/")) {
@@ -448,6 +449,34 @@ module.exports.load = async function (app, db) {
           `${req.session.userinfo.username} unbanned the user with the ID \`${id}\`.`
       );
       res.status(200).json({ message: "User unbanned successfully." });
+  });
+
+  app.get("/admin/updates/check", requireAdmin, async (req, res) => {
+    try {
+      const updates = await updateManager.checkForUpdates();
+      res.json(updates);
+    } catch (error) {
+      console.error("Error checking for updates:", error);
+      res.status(500).json({ error: "Failed to check for updates" });
+    }
+  });
+
+  app.post("/admin/updates/install", requireAdmin, async (req, res) => {
+    try {
+      const { version } = req.body;
+      const updates = await updateManager.checkForUpdates();
+      const updateToInstall = updates.find(u => u.version === version);
+      
+      if (!updateToInstall) {
+        return res.status(404).json({ error: "Update not found" });
+      }
+
+      const result = await updateManager.installUpdate(updateToInstall);
+      res.json(result);
+    } catch (error) {
+      console.error("Error installing update:", error);
+      res.status(500).json({ error: "Failed to install update" });
+    }
   });
 
   module.exports.suspend = async function (discordid) {

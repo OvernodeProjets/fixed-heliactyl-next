@@ -1,0 +1,222 @@
+<%- include('../components/top') %>
+<!-- Main Content -->
+<main class="flex-grow container mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="flex justify-between items-center w-full mx-auto pb-6">
+    <div class="flex flex-col">
+      <h1 class="text-2xl font-semibold mb-0.5" style="font-family: 'Inter';">System Updates</h1>
+      <p class="text-gray-400 text-md">Check and install updates for your application.</p>
+    </div>
+    <button onclick="checkUpdates()" class="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg transition-all font-medium shadow-md shadow-white/10">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+      </svg>
+      Check for Updates
+    </button>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="bg-white/5 rounded-2xl p-1 mb-6">
+    <div class="flex flex-wrap gap-2">
+      <button onclick="switchTab('coins')" class="tab-button flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-gray-300 hover:bg-white/10 font-medium transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        Coins
+      </button>
+      <button onclick="switchTab('resources')" class="tab-button flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-gray-300 hover:bg-white/10 font-medium transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
+        </svg>
+        Resources
+      </button>
+      <button onclick="switchTab('users')" class="tab-button flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-gray-300 hover:bg-white/10 font-medium transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>
+        Users
+      </button>
+      <button class="tab-button flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 text-white font-medium transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        Updates
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="loading-state" class="hidden">
+    <div class="bg-white/5 p-6 rounded-2xl border border-white/10 text-center">
+      <div class="flex items-center justify-center gap-3">
+        <svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-white font-medium">Checking for updates...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Updates Container -->
+  <div id="updates-container" class="grid grid-cols-1 gap-6">
+    <!-- Updates will be displayed here -->
+  </div>
+</main>
+
+<script>
+function switchTab(tabName) {
+  const tabs = {
+    'coins': '/admin',
+    'resources': '/admin',
+    'users': '/admin'
+  };
+  
+  if (tabs[tabName]) {
+    window.location.href = tabs[tabName];
+  }
+}
+
+async function checkUpdates() {
+  const container = document.getElementById('updates-container');
+  const loadingState = document.getElementById('loading-state');
+  
+  // Show loading state
+  loadingState.classList.remove('hidden');
+  container.innerHTML = '';
+  
+  try {
+    const response = await fetch('/api/admin/updates/check');
+    const updates = await response.json();
+    
+    // Hide loading state
+    loadingState.classList.add('hidden');
+    
+    if (updates.length === 0) {
+      container.innerHTML = `
+        <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+          <div class="flex items-center gap-3">
+            <div class="p-2 bg-green-500/20 rounded-lg">
+              <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-white">System Up to Date</h3>
+              <p class="text-gray-400 text-sm">Your application is running the latest version.</p>
+            </div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+    
+    updates.forEach(update => {
+      const updateCard = document.createElement('div');
+      updateCard.className = 'bg-white/5 p-6 rounded-2xl border border-white/10';
+      
+      const typeColor = update.type === 'release' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400';
+      const typeIcon = update.type === 'release' 
+        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>'
+        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+      
+      updateCard.innerHTML = `
+        <div class="flex items-start justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="p-2 ${typeColor} rounded-lg">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                ${typeIcon}
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white">${update.name}</h3>
+              <p class="text-gray-400 text-sm">Version ${update.version}</p>
+            </div>
+          </div>
+          <span class="px-3 py-1 text-xs font-semibold rounded-lg ${typeColor}">
+            ${update.type.toUpperCase()}
+          </span>
+        </div>
+        
+        <p class="text-gray-300 mb-4 leading-relaxed">${update.description}</p>
+        
+        <div class="flex items-center justify-between pt-4 border-t border-white/10">
+          <div class="flex items-center gap-2 text-gray-400 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            ${new Date(update.date).toLocaleDateString('fr-FR', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </div>
+          <button 
+            onclick="installUpdate('${update.version}')" 
+            class="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg transition-all font-medium shadow-md shadow-white/10"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            Install Update
+          </button>
+        </div>
+      `;
+      
+      container.appendChild(updateCard);
+    });
+    
+  } catch (error) {
+    loadingState.classList.add('hidden');
+    container.innerHTML = `
+      <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-red-500/20 rounded-lg">
+            <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-white">Error</h3>
+            <p class="text-gray-400 text-sm">Failed to check for updates. Please try again later.</p>
+          </div>
+        </div>
+      </div>
+    `;
+    console.error('Error checking for updates:', error);
+  }
+}
+
+async function installUpdate(version) {
+  if (!confirm('⚠️ Are you sure you want to install this update?\n\nA backup will be created before updating.\nThe application will restart after installation.')) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/admin/updates/install', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ version })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      alert('✅ Update installed successfully!\n\nThe application will now restart.');
+      window.location.reload();
+    } else {
+      alert('❌ Failed to install update:\n\n' + result.message);
+    }
+  } catch (error) {
+    console.error('Error installing update:', error);
+    alert('❌ Failed to install update. Check the console for details.');
+  }
+}
+
+// Check for updates when the page loads
+checkUpdates();
+</script>
+
+<%- include('../components/bottom') %>
