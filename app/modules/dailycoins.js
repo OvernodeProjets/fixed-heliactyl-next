@@ -87,6 +87,7 @@ module.exports.load = async function(router, db) {
     }
 
     try {
+      const per = settings.api.client.coins.daily.per;
       const currentCoins = await db.get("coins-" + userId) || 0;
       const lastClaimTimestamp = await db.get("dailycoins-" + userId);
 
@@ -110,6 +111,7 @@ module.exports.load = async function(router, db) {
       discordLog('daily coins', `${req.session.userinfo.username} has claimed their daily reward of ${settings.api.client.coins.daily.amount} ${settings.website.currency}.`);
       return res.redirect('../dashboard?err=none');
     } catch (error) {
+      console.log('Error processing daily coins claim:', error);
       myCache.del(processingKey);
       return res.redirect('../dashboard?err=ERROR');
     }
