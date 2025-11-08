@@ -187,6 +187,8 @@ class StoreController {
       // Log the purchase
       const purchase = await store.logPurchase(userId, 'renewal_bypass', 1, RENEWAL_BYPASS_PRICE);
 
+      discordLog(`renewal bypass`, `${req.session.userinfo.username} purchased renewal bypass for ${RENEWAL_BYPASS_PRICE} coins.`);
+
       res.json({
         success: true,
         purchase,
