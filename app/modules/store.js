@@ -156,7 +156,7 @@ class StoreController {
   static async handleRenewalBypassPurchase(req, res) {
     try {
       if (!req.session.userinfo) {
-        return this.sendError(res, 401, 'Unauthorized');
+        return res.status(401).json({ error: 'Unauthorized' });
       }
 
       const userId = req.session.userinfo.id;
@@ -164,7 +164,7 @@ class StoreController {
       // Check if user already has renewal bypass
       const hasRenewalBypass = await db.get(`renewbypass-${userId}`);
       if (hasRenewalBypass) {
-        return this.sendError(res, 400, 'Renewal bypass already purchased');
+        return res.status(400).json({ error: 'Renewal bypass already purchased' });
       }
 
       // Get user's current coins
@@ -172,7 +172,7 @@ class StoreController {
       
       // Check if user has enough coins
       if (userCoins < RENEWAL_BYPASS_PRICE) {
-        return this.sendError(res, 402, {
+        return res.status(402).json({
           error: 'Insufficient funds',
           required: RENEWAL_BYPASS_PRICE,
           balance: userCoins
@@ -196,18 +196,18 @@ class StoreController {
 
     } catch (error) {
       console.error('[ERROR] Renewal bypass purchase failed:', error);
-      return this.handleUnexpectedError(res, error);
+      return res.status(500).json({ error: 'Internal server error' });
     }
   }
 
   static async checkRenewalBypassStatus(req, res) {
     try {
       if (!req.session.userinfo) {
-        return this.sendError(res, 401, 'Unauthorized');
+        return res.status(401).json({ error: 'Unauthorized' });
       }
 
       const userId = req.session.userinfo.id;
-      const hasRenewalBypass = await db.get(`renewbypass-${userId}`);
+      const hasRenewalBypass = (await db.get(`renewbypass-${userId}`)) || false;
       const currentBalance = await db.get(`coins-${userId}`) || 0;
 
       res.json({
