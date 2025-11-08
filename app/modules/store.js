@@ -224,11 +224,6 @@ class StoreController {
     }
   }
 
-  // Utility to handle errors
-  static sendError(res, status, message) {
-    return res.status(status).json({ error: message });
-  }
-
   // Utility to handle unexpected errors
   static handleUnexpectedError(res, error) {
     if (error.name === 'BillingError') {

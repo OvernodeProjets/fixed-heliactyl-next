@@ -168,7 +168,7 @@ class AFKRewardsManager {
     }
 
     // Remove session from database
-    this.removeSession(userId);
+    await this.removeSession(userId);
   }
 }
 

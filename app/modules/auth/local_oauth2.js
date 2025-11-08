@@ -53,22 +53,6 @@ module.exports.load = async function (router, db) {
     }
   };
 
-  // todo : remove that
-  const rateLimit = (req, res, next) => {
-    if (!req.session.lastAuthAttempt) {
-      req.session.lastAuthAttempt = Date.now();
-      return next();
-    }
-
-    const timeElapsed = Date.now() - req.session.lastAuthAttempt;
-    if (timeElapsed < 1000) {
-      return res.status(429).json({ error: "Too many requests. Please try again in " + (1000 - timeElapsed) + " ms." });
-    }
-
-    req.session.lastAuthAttempt = Date.now();
-    next();
-  };
-
   const sendEmail = async (to, subject, html) => {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -90,7 +74,7 @@ module.exports.load = async function (router, db) {
   };
   
   // Registration route
-  router.post("/auth/register", rateLimit, async (req, res) => {
+  router.post("/auth/register", async (req, res) => {
     const { username, email, password, recaptchaResponse } = req.body;
 
     if (!username || !email || !password) {
@@ -221,7 +205,7 @@ module.exports.load = async function (router, db) {
   });
 
   // Login route
-  router.post("/auth/login", rateLimit, async (req, res) => {
+  router.post("/auth/login", async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -360,7 +344,7 @@ module.exports.load = async function (router, db) {
   });
 
   // Magic link login request
-  router.post("/auth/magic-link", rateLimit, async (req, res) => {
+  router.post("/auth/magic-link", async (req, res) => {
     const { email, recaptchaResponse } = req.body;
 
     if (!email) {
