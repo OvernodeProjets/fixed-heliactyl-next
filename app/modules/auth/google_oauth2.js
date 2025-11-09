@@ -21,8 +21,9 @@ const crypto = require('crypto');
 const axios = require('axios');
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
-const { discordLog } = require("../../handlers/log");
+const { discordLog, addNotification } = require("../../handlers/log");
 const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
+const { getPteroUser } = require('../../handlers/getPteroUser.js');
 
 let google;
 let oauth2Client;
@@ -43,7 +44,9 @@ module.exports.load = async function (router, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
 
   router.get("/google/login", (req, res) => {
-    if (req.query.redirect) req.session.redirect = "/" + req.query.redirect;
+    const { redirect } = req.query;
+    
+    if (redirect) req.session.redirect = "/" + redirect;
 
     const loginAttemptId = crypto.randomBytes(16).toString('hex');
     res.cookie('loginAttempt', loginAttemptId, { httpOnly: true, maxAge: 5 * 60 * 1000 });
@@ -63,13 +66,14 @@ module.exports.load = async function (router, db) {
   });
 
   router.get(settings.api.client.oauth2.google.callbackpath.replace(/^\/api/, ''), async (req, res) => {
-    if (!req.query.code) return res.redirect(`/auth?error=missing_code`);
+    const { code } = req.query;
+    if (!code) return res.redirect(`/auth?error=missing_code`);
     if (!settings.api.client.oauth2.google.enable) return res.redirect("/auth");
 
     res.clearCookie('loginAttempt');
 
     try {
-      const { tokens } = await oauth2Client.getToken(req.query.code);
+      const { tokens } = await oauth2Client.getToken(code);
       oauth2Client.setCredentials(tokens);
 
       const oauth2 = google.oauth2({
@@ -123,12 +127,13 @@ module.exports.load = async function (router, db) {
           req.session.newaccount = true;
           req.session.password = genpassword;
 
-          await db.set('notifications-' + user.id, [{
-            action: "user:sign up",
-            name: "Account created via Google OAuth2",
-            ip: req.ip,
-            timestamp: new Date().toISOString()
-          }]);
+          await addNotification(
+            db,
+            user.id,
+            "user:sign up",
+            "Account created via Google OAuth2",
+             req.ip
+          );
 
           discordLog("sign in", `${user.name} signed in with Google!`);
 
@@ -165,31 +170,25 @@ module.exports.load = async function (router, db) {
       }
 
       // Fetch and cache user info from Pterodactyl
-      const cacheAccountResponse = await axios.get(
-        `${settings.pterodactyl.domain}/api/application/users/${await db.get("users-" + user.id)}?include=servers`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${settings.pterodactyl.key}`
-          }
-        }
-      );
-
-      const cacheaccountinfo = cacheAccountResponse.data;
-      req.session.pterodactyl = cacheaccountinfo.attributes;
+      const PterodactylUser = await getPteroUser(userinfo.id, db);
+      if (!PterodactylUser) {
+          res.send("An error has occurred while attempting to update your account information and server list.");
+          return;
+      }
+      
+      req.session.pterodactyl = PterodactylUser.attributes;
 
       user.username = user.name.replace(/[^a-zA-Z0-9_\-\.]/g, '').substring(0, 20);
       req.session.userinfo = user;
 
       // Auth notification
-      const notifications = (await db.get('notifications-' + user.id)) || [];
-      notifications.push({
-        action: "user:auth",
-        name: "Sign in from new location",
-        ip: req.ip,
-        timestamp: new Date().toISOString()
-      });
-      await db.set('notifications-' + user.id, notifications);
+      await addNotification(
+        db,
+        user.id,
+        "user:auth",
+        "Signed in with Google OAuth2",
+        req.ip
+      );
 
       discordLog("sign in", `${user.name} logged in to the dashboard with Google!`);
 
