@@ -83,6 +83,7 @@ const discordLog = async (action, message = '', fields = [], isPublic = false) =
       await axios.post(settings.logging.public, embed, {
         headers: { 'Content-Type': 'application/json' },
       });
+      return;
     } catch (e) {
       console.error('Public log failed:', e.message);
     }
