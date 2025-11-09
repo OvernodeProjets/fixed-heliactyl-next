@@ -1104,6 +1104,10 @@
       "reason": "Reason",
       "expiration": "Expiration",
       "permanent": "Permanent"
+    },
+    "antialt": {
+      "title": "Account Flagged for Alts",
+      "description": "Your account has been flagged for potentially using alts (which violates {{name}}'s User Agreement). Please contact support to resolve this, and read our User Agreement before continuing. You can still log in from the original / main account, it has not been blocked."
     }
   }
   ,

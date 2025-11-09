@@ -1153,6 +1153,10 @@
       "reason": "Grund",
       "expiration": "Ablauf",
       "permanent": "Dauerhaft"
+    },
+    "antialt": {
+      "title": "Konto wegen Alternativkonten markiert",
+      "description": "Ihr Konto wurde aufgrund der möglichen Nutzung früherer Konten gesperrt (was gegen die Nutzungsbedingungen von {{name}} verstößt). Bitte wenden Sie sich an den Kundendienst, um dieses Problem zu beheben, und lesen Sie unsere Nutzungsbedingungen, bevor Sie fortfahren. Sie können sich weiterhin über Ihr ursprüngliches/Hauptkonto anmelden, dieses wurde nicht gesperrt."
     }
   }
 }

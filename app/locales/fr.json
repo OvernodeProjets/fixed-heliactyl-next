@@ -729,6 +729,10 @@
       "reason": "Raison",
       "expiration": "Expiration",
       "permanent": "Permanent"
+    },
+    "antialt": {
+      "title": "Compte bloqué pour double compte",
+      "description": "Votre compte a été bloqué pour utilisation potentielle de comptes alternatifs (ce qui viole le contrat d'utilisateur de {{name}}). Veuillez contacter le support pour résoudre ce problème et lire notre contrat d'utilisateur avant de continuer. Vous pouvez toujours vous connecter avec le compte original / principal, il n'a pas été bloqué."
     }
   }
   ,
