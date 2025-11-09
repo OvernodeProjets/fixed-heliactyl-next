@@ -73,7 +73,6 @@ if (cluster.isMaster) {
     process.stdout.write('\r');
     validateModules(settings);
     startCluster(settings, db);
-    updateManager.initialize(db);
   }, 2000); // Simulate loading time, just for fun ?
 } else {
   // Worker process
@@ -192,6 +191,11 @@ if (cluster.isMaster) {
       console.log(
         chalk.white(chalk.gray('[cluster]') + " Cleared all AFK sessions on startup.")
       );
+      try {
+        await updateManager.initialize(db);
+      } catch (error) {
+        console.error(`[Worker ${process.pid}] Failed to initialize UpdateManager:`, error);
+      }
     }
     console.log(
       chalk.white(chalk.gray("[cluster]") + " Cluster state updated: ") + chalk.green('running')
