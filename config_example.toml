@@ -14,7 +14,7 @@ timezone = "Europe/Paris"
 # ------------------------------------------------------
 platform_codename = "Avalanche 2" 
 platform_level = 74 
-version = "3.2.0"
+version = "3.2.1-beta.1"
 
 # ------------------------------------------------------
 # General Settings

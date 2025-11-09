@@ -6,7 +6,7 @@
  *  /_/ /_/\___/_/_/\__,_/\___/\__/\__, /_/   
  *                               /____/      
  * 
- *     Heliactyl Next 3.2.0 (Avalanche)
+ *     Heliactyl Next 3.2.1-beta.1 (Avalanche)
  */
 
 const heliactylModule = {
