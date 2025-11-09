@@ -91,7 +91,6 @@
     --color-black: #000;
     --color-white: #fff;
     --spacing: 0.25rem;
-    --breakpoint-2xl: 96rem;
     --container-xs: 20rem;
     --container-sm: 24rem;
     --container-md: 28rem;
@@ -1398,6 +1397,9 @@
   .bg-\[\#1a1f2a\] {
     background-color: #1a1f2a;
   }
+  .bg-\[\#1e1f23\] {
+    background-color: #1e1f23;
+  }
   .bg-\[\#191c20\] {
     background-color: #191c20;
   }
@@ -2202,6 +2204,9 @@
   }
   .whitespace-pre-wrap {
     white-space: pre-wrap;
+  }
+  .text-\[\#B1AFBE\] {
+    color: #B1AFBE;
   }
   .text-amber-300 {
     color: var(--color-amber-300);

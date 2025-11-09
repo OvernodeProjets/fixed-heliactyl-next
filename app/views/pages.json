@@ -3,7 +3,8 @@
     "errors": {
         "banned": "error/banned.ejs",
         "notFound": "error/404.ejs",
-        "internalError": "error/500.ejs"
+        "internalError": "error/500.ejs",
+        "antialt": "error/antialt.ejs"
     },
     "pages": {
         "website": "website.ejs",

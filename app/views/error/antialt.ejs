@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="<%= locale %>">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= settings.name %> - <%= __('errors.antialt.title') %></title>
+    <link rel="stylesheet" href="../../../assets/tailwind.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <main class="flex-grow flex items-center justify-center p-8">
+        <div class="py-8 px-6 md:py-12 md:px-8 max-w-xl w-full">
+            <div class="flex justify-center mb-8">
+                <img src="../../../assets/logo-text.png" class="h-12" alt="Logo">
+            </div>
+
+            <h1 class="text-center text-4xl tracking-tight font-bold text-gray-900 mb-4"><%= __('errors.banned.title') %></h1>
+            <p class="text-gray-600 text-center mt-1 text-sm mb-4">
+                <%= __('errors.antialt.description') %>
+            </p>
+            <div class="mt-8 text-center">
+                <a href="/" class="hover:bg-gray-800 bg-gray-700 text-white font-medium py-2 px-4 rounded-full transition hover:scale-95">
+                    <%= __('errors.common.go_home') %>
+                </a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
