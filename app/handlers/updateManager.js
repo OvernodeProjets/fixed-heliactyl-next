@@ -10,7 +10,6 @@ const chalk = require('chalk');
 class UpdateManager extends EventEmitter {
     constructor() {
         super();
-        
         this.repoOwner = 'OvernodeProjets';
         this.repoName = 'fixed-heliactyl-next';
         this.updateConfig = settings.update || {
@@ -20,13 +19,11 @@ class UpdateManager extends EventEmitter {
             autoInstall: false,
             checkInterval: 1800000 // 30 minutes
         };
-        
         this.cache = {
             updates: null,
             lastCheck: 0,
             cacheTimeout: 300000 // 5 minutes cache
         };
-
         this.db = null;
         this._initialized = false;
     }
@@ -69,7 +66,8 @@ class UpdateManager extends EventEmitter {
 
     async performInitialCheck() {
         if (!this._initialized || !this.db) {
-            throw new Error('[UpdateManager] Not initialized');
+            console.warn('[UpdateManager] Not initialized, cannot perform initial check.');
+            return; // Exit early
         }
 
         console.log(chalk.grey('[UpdateManager] Performing initial update check...'));
@@ -85,7 +83,8 @@ class UpdateManager extends EventEmitter {
 
     schedulePeriodicChecks() {
         if (!this._initialized || !this.db) {
-            throw new Error('[UpdateManager] Not initialized');
+            console.warn('[UpdateManager] Not initialized, cannot schedule periodic checks.');
+            return; // Exit early
         }
 
         console.log(chalk.grey('[UpdateManager] Setting up periodic checks...'));
