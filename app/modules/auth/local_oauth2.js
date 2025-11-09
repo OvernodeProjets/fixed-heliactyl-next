@@ -183,17 +183,13 @@ module.exports.load = async function (router, db) {
       }
     }
 
-    // Auth notification
-    let notifications = await db.get('notifications-' + userId) || [];
-    let notification = {
-      "action": "user:sign in",
-      "name": "Account created via Local OAuth2",
-      "ip": req.ip,
-      "timestamp": new Date().toISOString()
-    }
-
-    notifications.push(notification)
-    await db.set('notifications-' + userId, notifications);
+    await addNotification(
+      db,
+      userId,
+      "user:sign-in",
+      "Account created via Local OAuth2",
+      req.ip
+    );
 
     discordLog(
       "sign up",
@@ -240,17 +236,13 @@ module.exports.load = async function (router, db) {
 
     req.session.pterodactyl = PterodactylUser.attributes;
 
-    // Auth notification
-    let notifications = await db.get('notifications-' + user.id) || [];
-    let notification = {
-      "action": "user:auth",
-      "name": "Sign in from new location",
-      "ip": req.ip,
-      "timestamp": new Date().toISOString()
-    }
-
-    notifications.push(notification)
-    await db.set('notifications-' + user.id, notifications)
+    await addNotification(
+      db,
+      user.id,
+      "user:sign-in",
+      "Sign in from new location",
+      req.ip
+    );
 
     discordLog(
       "sign in",
@@ -425,17 +417,15 @@ module.exports.load = async function (router, db) {
     // Delete the used magic token
     await db.delete(`magic-${token}`);
 
-    // Auth notification
-    let notifications = await db.get('notifications-' + user.id) || [];
-    let notification = {
-      "action": "user:auth",
-      "name": "Sign in using magic link",
-      "ip": req.ip,
-      "timestamp": new Date().toISOString()
-    }
+    await addNotification(
+      db,
+      user.id,
+      "user:sign-in",
+      "Sign in using magic link",
+      req.ip
+    );
 
-    notifications.push(notification)
-    await db.set('notifications-' + user.id, notifications)
+    discordLog("sign in", `${user.username} signed in to the dashboard using a magic link!`);
 
     res.redirect('/dashboard');
   });

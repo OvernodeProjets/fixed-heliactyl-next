@@ -166,17 +166,13 @@ module.exports.load = async function (app, db) {
             }
           }
 
-          // Sign in notification
-          let notifications = await db.get('notifications-' + userinfo.id) || [];
-            let notification = {
-            "action": "user:sign in",
-            "name": "User sign in",
-            "ip": req.ip,
-            "timestamp": new Date().toISOString()
-          }
-
-          notifications.push(notification)
-          await db.set('notifications-' + userinfo.id, notifications)
+          await addNotification(
+            db,
+            userinfo.id,
+            "user:sign-in",
+            "Sign in from new account created with GitHub OAuth2",
+            req.ip
+          );
 
           discordLog("sign in", `${userinfo.login} signed in to the dashboard with GitHub!`);
         } else {
@@ -199,18 +195,14 @@ module.exports.load = async function (app, db) {
         id: userinfo.id.toString(),
         email: primaryEmail.email
       };
-      
-      // Auth notification
-      let notifications = await db.get('notifications-' + userinfo.id) || [];
-      let notification = {
-        "action": "user:auth",
-        "name": "Sign in from new location",
-        "ip": req.ip,
-        "timestamp": new Date().toISOString()
-      }
 
-      notifications.push(notification)
-      await db.set('notifications-' + userinfo.id, notifications)
+      await addNotification(
+        db,
+        userinfo.id,
+        "user:sign-in",
+        "Sign in from new location",
+        req.ip
+      );
 
       discordLog("sign up", `${userinfo.login} logged in to the dashboard with GitHub!`);
 

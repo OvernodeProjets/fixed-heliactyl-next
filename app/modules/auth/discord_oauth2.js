@@ -37,7 +37,7 @@ if (settings?.pterodactyl?.domain?.endsWith("/")) {
 }
 
 const fetch = require("node-fetch");
-const { discordLog } = require("../../handlers/log.js");
+const { discordLog, addNotification } = require("../../handlers/log.js");
 
 module.exports.load = async function (router, db) {
   router.get("/discord/login", async (req, res) => {
@@ -557,17 +557,13 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
               }
             }
 
-            // Sign in notification
-            let notifications = await db.get('notifications-' + userinfo.id) || [];
-            let notification = {
-              "action": "user:sign in",
-              "name": "User Sign in",
-              "ip": req.ip,
-              "timestamp": new Date().toISOString()
-            }
-
-            notifications.push(notification)
-            await db.set('notifications-' + userinfo.id, notifications)
+            await addNotification(
+              db,
+              userinfo.id,
+              "user:sign-in",
+              "Sign in from new account created with Discord OAuth2",
+              req.ip,
+            );
             
             discordLog(
               "sign in",
@@ -584,17 +580,13 @@ if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.
         req.session.pterodactyl = PterodactylUser.attributes;
         req.session.userinfo = userinfo;
 
-        // Auth notification
-        let notifications = await db.get('notifications-' + userinfo.id) || [];
-        let notification = {
-          "action": "user:sign in",
-          "name": "Sign in from new location",
-          "ip": req.ip,
-          "timestamp": new Date().toISOString()
-        };
-
-        notifications.push(notification)
-        await db.set('notifications-' + userinfo.id, notifications);
+        await addNotification(
+          db,
+          userinfo.id,
+          "user:sign-in",
+          "Sign in from new location",
+          req.ip
+        );
 
         discordLog(
           "sign up",

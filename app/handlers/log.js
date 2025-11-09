@@ -2,6 +2,18 @@ const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 const fetch = require('node-fetch')
 const crypto = require('crypto');
+const { default: axios } = require("axios");
+
+async function addNotification(db, userId, action, name, ip) {
+  const notifications = (await db.get(`notifications-${userId}`)) || [];
+  notifications.push({
+    action,
+    name,
+    ip,
+    timestamp: new Date().toISOString()
+  });
+  await db.set(`notifications-${userId}`, notifications);
+}
 
 // Helper function to log a transaction
 const logTransaction = async (db, userId, type, amount, balanceAfter, details = {}) => {
@@ -42,33 +54,50 @@ const serverActivityLog = async (db, serverId, action, details) => {
     await db.set(`activity_log_${serverId}`, activityLog);
 }
 
-const discordLog = async (action, message) => {
-    if (!settings.logging.status) return
-    if (!settings.logging.actions.user[action] && !settings.logging.actions.admin[action]) return
+const discordLog = async (action, message, isPublic = false) => {
+  if (!settings.logging.status) return;
 
-    fetch(settings.logging.private, {
-        method: 'POST',
-        headers: {
-            'content-type': 'application/json'
+  const isUserAction = settings.logging.actions.user[action];
+  const isAdminAction = settings.logging.actions.admin[action];
+
+  if (!isUserAction && !isAdminAction) return;
+
+  const embed = {
+    embeds: [
+      {
+        color: hexToDecimal('#FFFFFF'),
+        title: `Event: \`${action}\``,
+        description: message,
+        author: { name: isPublic ? 'Heliactyl Public Logging' : 'Heliactyl Logging' },
+        thumbnail: {
+          url: settings.website.domain + "/assets/logo.png" || "https://i.imgur.com/5D0jaaX.png"  // Default Heliactyl logo
         },
-        body: JSON.stringify({
-            embeds: [
-                {
-                    color: hexToDecimal('#FFFFFF'),
-                    title: `Event: \`${action}\``,
-                    description: message,
-                    author: {
-                        name: 'Heliactyl Logging'
-                    },
-                    thumbnail: {
-                        url: 'https://atqr.pages.dev/favicon2.png' // This is the default Heliactyl logo, you can change it if you want.
-                    }
-                }
-            ]
-        })
-    })
-    .catch(() => {})
-}
+      },
+    ],
+  };
+
+  // Public logging (if enabled)
+  if (isPublic && settings.logging.public) {
+    try {
+      await axios.post(settings.logging.public, embed, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (e) {
+      console.error('Public log failed:', e.message);
+    }
+  }
+
+  // Private logging (always send if defined)
+  if (settings.logging.private) {
+    try {
+      await axios.post(settings.logging.private, embed, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (e) {
+      console.error('Private log failed:', e.message);
+    }
+  }
+};
 
 function hexToDecimal(hex) {
     return parseInt(hex.replace("#", ""), 16)
@@ -77,5 +106,6 @@ function hexToDecimal(hex) {
 module.exports = {
     discordLog,
     serverActivityLog,
-    logTransaction
+    logTransaction,
+    addNotification
 }
