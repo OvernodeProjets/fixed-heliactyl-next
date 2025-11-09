@@ -18,11 +18,13 @@ function createLogger() {
   // Replace console.log with the logger
   const originalLog = console.log;
   console.log = function () {
-    const args = Array.from(arguments); // Capture arguments passed to console.log
-    const combinedMessage = args.map(arg => arg.toString()).join(' '); // Convert each argument to string
-
-    // Log the message with Winston
-    logger.info(combinedMessage);
+      const args = Array.from(arguments);
+      const combinedMessage = args
+          .map(arg => arg === undefined ? 'undefined' : arg === null ? 'null' : arg.toString())
+          .join(' ');
+  
+      // Log the message with Winston
+      logger.info(combinedMessage);
   };
 
   return logger;

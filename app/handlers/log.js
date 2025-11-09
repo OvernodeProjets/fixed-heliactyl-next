@@ -54,7 +54,7 @@ const serverActivityLog = async (db, serverId, action, details) => {
     await db.set(`activity_log_${serverId}`, activityLog);
 }
 
-const discordLog = async (action, message, isPublic = false) => {
+const discordLog = async (action, message = '', fields = [], isPublic = false) => {
   if (!settings.logging.status) return;
 
   const isUserAction = settings.logging.actions.user[action];
@@ -68,6 +68,7 @@ const discordLog = async (action, message, isPublic = false) => {
         color: hexToDecimal('#FFFFFF'),
         title: `Event: \`${action}\``,
         description: message,
+        fields : fields,
         author: { name: isPublic ? 'Heliactyl Public Logging' : 'Heliactyl Logging' },
         thumbnail: {
           url: settings.website.domain + "/assets/logo.png" || "https://i.imgur.com/5D0jaaX.png"  // Default Heliactyl logo

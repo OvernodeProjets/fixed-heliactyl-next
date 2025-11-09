@@ -123,10 +123,10 @@ if (cluster.isMaster) {
     next();
   });
 
-  app.use((err, req, res, next) => {
+  app.use(async (err, req, res, next) => {
     if (err.status === 500 && err.message === 'Gateway Timeout') {
-      const theme = getPages();
-      res.status(500).render(theme.settings.internalError, { error: 'Gateway Timeout' });
+      const theme = await getPages();
+      res.status(500).render(theme.settings.errors.internalError, { error: 'Gateway Timeout' });
       return;
     } else {
       next(err);
