@@ -15,6 +15,7 @@ class UpdateManager extends EventEmitter {
         this.updateConfig = settings.update || {
             enabled: true,
             checkReleases: true,
+            checkPreReleases: true,
             checkCommits: false,
             autoInstall: false,
             checkInterval: 1800000 // 30 minutes
@@ -175,14 +176,16 @@ class UpdateManager extends EventEmitter {
 
     async checkReleases() {
         const response = await axios.get(`https://api.github.com/repos/${this.repoOwner}/${this.repoName}/releases`);
-        return response.data.map(release => ({
-            type: 'release',
-            version: release.tag_name,
-            name: release.name,
-            description: release.body,
-            date: release.published_at,
-            url: release.html_url
-        }));
+        return response.data
+            .filter(release => this.updateConfig.checkPreReleases || !release.prerelease)
+            .map(release => ({
+                type: 'release',
+                version: release.tag_name,
+                name: release.name,
+                description: release.body,
+                date: release.published_at,
+                url: release.html_url
+            }));
     }
 
     async checkCommits() {

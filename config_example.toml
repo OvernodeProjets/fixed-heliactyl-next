@@ -13,7 +13,6 @@ timezone = "Europe/Paris"
 # Versioning / Platform Information
 # ------------------------------------------------------
 platform_codename = "Avalanche 2" 
-platform_level = 74 
 version = "3.2.1-beta.1"
 
 # ------------------------------------------------------
@@ -39,7 +38,6 @@ debug = false
 cookie_admin = "remember_web_59ba36addc2b2f9401580f014c7f58ea4e30989d=...; XSRF-TOKEN=...; pterodactyl_session=..."
 # It could be found by inspecting the network requests when transferring a server in the Pterodactyl admin panel
 transfer_token = "6hUjLqcapcMj........."
-
 
 [website]
 port = 3000
@@ -392,6 +390,7 @@ recaptchaServerKey = "0aa0aaaaaaaaaaaaaaa0aaaaaaaaaaaaaa0aaa0aa"
 [update]
 enabled = true              # Enable or disable the update checker
 checkReleases = true       # Check for new releases
+checkPreReleases = true    # Check for pre-releases
 checkCommits = false       # Check for new commits (development updates)
 autoInstall = false        # Automatically install updates
 checkInterval = 3600000    # Check interval in milliseconds (default: 1 hour)

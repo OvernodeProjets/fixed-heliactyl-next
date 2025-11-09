@@ -111,6 +111,7 @@
 
 <script>
 const locale = navigator.language || 'en-US';
+let currentVersion;
 function switchTab(tabName) {
   const tabs = {
     'coins': '/admin',
@@ -140,6 +141,7 @@ async function updateSystemInfo() {
   try {
     const response = await fetch('/api/admin/updates/info');
     const info = await response.json();
+    currentVersion = info.currentVersion;
     
     document.getElementById('current-version').textContent = info.currentVersion;
     document.getElementById('last-update').textContent = info.lastUpdate 
@@ -200,6 +202,20 @@ async function checkUpdates() {
       const typeIcon = update.type === 'release' 
         ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>'
         : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+
+      const buttonHTML = currentVersion === update.version
+        ? `<button class="flex items-center gap-2 bg-green-500/20 text-white px-6 py-2.5 rounded-lg font-medium cursor-not-allowed" disabled>
+             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+             </svg>
+             Up to Date
+           </button>`
+        : `<button onclick="installUpdate('${update.version}')" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-lg transition-all font-medium shadow-md shadow-white/10">
+             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+             </svg>
+             Install Update
+           </button>`;
       
       updateCard.innerHTML = `
         <div class="flex items-start justify-between mb-4">
@@ -232,15 +248,7 @@ async function checkUpdates() {
               day: 'numeric' 
             })}
           </div>
-          <button 
-            onclick="installUpdate('${update.version}')" 
-            class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-lg transition-all font-medium shadow-md shadow-white/10"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-            </svg>
-            Install Update
-          </button>
+          ${buttonHTML}
         </div>
       `;
       

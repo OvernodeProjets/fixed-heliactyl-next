@@ -1556,6 +1556,9 @@
       background-color: color-mix(in oklab, var(--color-green-500) 20%, transparent);
     }
   }
+  .bg-green-600 {
+    background-color: var(--color-green-600);
+  }
   .bg-green-800\/30 {
     background-color: color-mix(in srgb, oklch(44.8% 0.119 151.328) 30%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -2522,6 +2525,12 @@
     --tw-shadow-color: color-mix(in srgb, #000 40%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-black) 40%, transparent) var(--tw-shadow-alpha), transparent);
+    }
+  }
+  .shadow-green-500\/10 {
+    --tw-shadow-color: color-mix(in srgb, oklch(72.3% 0.219 149.579) 10%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-green-500) 10%, transparent) var(--tw-shadow-alpha), transparent);
     }
   }
   .shadow-indigo-900\/20 {
