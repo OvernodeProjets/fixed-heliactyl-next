@@ -82,7 +82,8 @@ router.get("/logout", (req, res) => {
 });
 
   router.get(settings.api.client.oauth2.callbackpath.replace(/^\/api/, ''), async (req, res) => {
-    if (!req.query.code) return res.redirect(`/login`);
+    const { code } = req.query;
+    if (!code) return res.redirect(`/auth?error=missing_code`);
 
     // Check if the loginAttempt cookie exists
     const loginAttemptId = req.cookies.loginAttempt;
@@ -112,9 +113,9 @@ router.get("/logout", (req, res) => {
       <path opacity=".75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
       </svg>
     <script>
-    history.pushState(null,'Logging in...','/login');
+    history.pushState(null,'Logging in...','/auth');
     location.replace('/api/submitlogin?code=${encodeURIComponent(
-      req.query.code.replace(/'/g, "")
+      code.replace(/'/g, "")
     )}');
     </script>
     </body>
@@ -208,9 +209,11 @@ router.get("/logout", (req, res) => {
 //});
 
   router.get(`/submitlogin`, async (req, res) => {
+    const { code } = req.query;
+    if (!code) return res.send("Missing code.");
+
     let customredirect = req.session.redirect;
     delete req.session.redirect;
-    if (!req.query.code) return res.send("Missing code.");
 
     let json = await fetch("https://discord.com/api/oauth2/token", {
       method: "post",
@@ -220,7 +223,7 @@ router.get("/logout", (req, res) => {
         "&client_secret=" +
         settings.api.client.oauth2.secret +
         "&grant_type=authorization_code&code=" +
-        encodeURIComponent(req.query.code) +
+        encodeURIComponent(code) +
         "&redirect_uri=" +
         encodeURIComponent(
           settings.api.client.oauth2.link +
@@ -229,7 +232,7 @@ router.get("/logout", (req, res) => {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
     });
     if (!json.ok) {
-      res.redirect(`/login`);
+      res.redirect(`/auth?error=token_error`);
       return;
     }
       let codeinfo = JSON.parse(await json.text());
@@ -255,9 +258,8 @@ router.get("/logout", (req, res) => {
       });
       let userinfo = JSON.parse(await userjson.text());
 
-      if (settings.whitelist.status) {
-        if (!settings.whitelist.users.includes(userinfo.id))
-          return res.send("Service is under maintenance.");
+      if (settings.whitelist.status && !settings.whitelist.users.includes(userinfo.id)) {
+        return res.send("Service is under maintenance.");
       }
 
       let guildsjson = await fetch("https://discord.com/api/users/@me/guilds", {
@@ -274,69 +276,42 @@ router.get("/logout", (req, res) => {
             "You could not sign in, because your IP has been blocked from signing in."
           );
 
-// Function to send webhook notifications
-async function sendWebhookNotifications(userId, altId, ip, additionalInfo) {
-  const publicWebhookUrl = settings.webhook.public;
-  const privateWebhookUrl = settings.webhook.private;
-
-  const publicMessage = {
-    content: `<@${userId}> tried to login, but an alt was found associated with them: <@${altId}>`
-  };
-
-  const privateMessage = {
-    embeds: [{
-      title: `${settings.name} Anti-Alt`,
-      fields: [
-        { name: "User ID", value: userId, inline: true },
-        { name: "Alt ID", value: altId, inline: true },
-        { name: "IP Address", value: ip, inline: true },
-        { name: "Additional Info", value: additionalInfo }
-      ],
-      color: 0xFFFFFF, // Red color
-      timestamp: new Date().toISOString()
-    }]
-  };
-
-  try {
-    await fetch(publicWebhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(publicMessage),
-    });
-
-    await fetch(privateWebhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(privateMessage),
-    });
-  } catch (error) {
-    console.error('Failed to send webhooks:', error);
-  }
-}
-
       // Set a cookie with the user's ID
       res.cookie('userId', userinfo.id, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 }); // 30 days expiry
 
-if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.1") {
-  const ipuser = await db.get(`ipuser-${ip}`);
-  const bypassFlag = await db.get(`antialt-bypass-${userinfo.id}`);
-  
-  if (ipuser && ipuser !== userinfo.id && !bypassFlag) {
-      // Send webhook notifications
-      const additionalInfo = `Anti-alt flag triggered. User with ID ${userinfo.id} attempted to login from an IP associated with user ID ${ipuser}.`;
-      await sendWebhookNotifications(userinfo.id, ipuser, ip, additionalInfo);
-
-      // Redirect to antialt page
-      return res.redirect('../antialt');
-    } else if (!ipuser) {
-      await db.set(`ipuser-${ip}`, userinfo.id);
-    }
-  }
+      if (settings.api.client.oauth2.ip["duplicate check"] == true) {
+        const userIP = await db.get(`ipuser-${ip}`);
+        const bypassFlag = await db.get(`antialt-bypass-${userinfo.id}`) || false;
+        if (userIP && userIP !== userinfo.id && !bypassFlag) {
+          // Send webhook notifications
+          await discordLog(
+            "anti-alt",
+            `User ID: \`${userinfo.id}\` attempted to login from an IP associated with another user ID: \`${userIP}\`.`,
+            [
+              { name: "IP Address", value: ip, inline: true },
+              { name: "Alt User ID", value: userIP, inline: true }
+            ],
+            false
+          );
+          
+          await discordLog(
+            "anti-alt",
+            `<@${userinfo.id}> attempted to login from an IP associated with another user ID: <@${userIP}>.`,
+            [],
+            true
+          );
+          
+          const theme = await getPages();
+          return res.status(500).render(theme.settings.errors.antialt);
+        } else if (!userIP) {
+          await db.set(`ipuser-${ip}`, userinfo.id);
+        }
+      }
 
         if (settings.api.client.j4r.enabled) {
           if (guildsinfo.message == "401: Unauthorized")
             return res.send(
-              "Please allow us to know what servers you are in to let the J4R system work properly. <a href='/login'>Login again</a>"
+              "Please allow us to know what servers you are in to let the J4R system work properly. <a href='/auth'>Login again</a>"
             );
           let userj4r = (await db.get(`j4rs-${userinfo.id}`)) ?? [];
           await guildsinfo;

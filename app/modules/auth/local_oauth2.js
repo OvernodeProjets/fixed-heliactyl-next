@@ -27,6 +27,7 @@ const { v4: uuidv4 } = require('uuid');
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const fetch = require("node-fetch");
+const { discordLog, addNotification } = require("../../handlers/log");
 
 // Add Resend API key to your settings
 // todo : move to config file
@@ -133,7 +134,7 @@ module.exports.load = async function (router, db) {
     // Create Pterodactyl account
     try {
       const createAccount = await AppAPI.createUser({
-        username: id,
+        username: userId,
         email,
         first_name: username,
         last_name: "On Heliactyl",
@@ -193,7 +194,7 @@ module.exports.load = async function (router, db) {
 
     discordLog(
       "sign up",
-      `${userinfo.username} signed up to the dashboard in local OAuth2!`
+      `${username} signed up to the dashboard in local OAuth2!`
     );
 
     res.status(201).json({ message: "User registered successfully" });
@@ -235,6 +236,46 @@ module.exports.load = async function (router, db) {
     }
 
     req.session.pterodactyl = PterodactylUser.attributes;
+
+    if (settings.whitelist.status && !settings.whitelist.users.includes(userinfo.id)) {
+      return res.send("Service is under maintenance.");
+    }
+
+    const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.ip;
+    if (settings.api.client.oauth2.ip.block.includes(ip)) {
+      return res.send(
+        "You could not sign in, because your IP has been blocked from signing in."
+      );
+    }
+
+    if (settings.api.client.oauth2.ip["duplicate check"] == true) {
+      const userIP = await db.get(`ipuser-${ip}`);
+      const bypassFlag = await db.get(`antialt-bypass-${userinfo.id}`) || false;
+      if (userIP && userIP !== userinfo.id && !bypassFlag) {
+        // Send webhook notifications
+        await discordLog(
+          "anti-alt",
+          `User ID: \`${userinfo.id}\` attempted to login from an IP associated with another user ID: \`${userIP}\`.`,
+          [
+            { name: "IP Address", value: ip, inline: true },
+            { name: "Alt User ID", value: userIP, inline: true }
+          ],
+          false
+        );
+        
+        await discordLog(
+          "anti-alt",
+          `<@${userinfo.id}> attempted to login from an IP associated with another user ID: <@${userIP}>.`,
+          [],
+          true
+        );
+        
+        const theme = await getPages();
+        return res.status(500).render(theme.settings.errors.antialt);
+      } else if (!userIP) {
+        await db.set(`ipuser-${ip}`, userinfo.id);
+      }
+    }
 
     await addNotification(
       db,

@@ -23,7 +23,8 @@ const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { discordLog, addNotification } = require("../../handlers/log");
 const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
-const { getPteroUser } = require('../../handlers/getPteroUser.js');
+const getPteroUser = require('../../handlers/getPteroUser.js');
+const { getPages } = require('../../handlers/theme.js');
 
 let google;
 let oauth2Client;
@@ -88,15 +89,44 @@ module.exports.load = async function (router, db) {
         return res.send("Service is under maintenance.");
       }
 
-      let ip = req.headers["cf-connecting-ip"] || req.connection.remoteAddress || "::1";
-      ip = ip.replace(/::1/g, "::ffff:127.0.0.1").replace(/^.*:/, "");
-
+      const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.ip;
       if (settings.api.client.oauth2.ip.block.includes(ip)) {
-        return res.send("Your IP has been blocked from signing in.");
+        return res.send(
+          "You could not sign in, because your IP has been blocked from signing in."
+        );
       }
 
       // Set cookie with Google ID
       res.cookie('userId', user.id, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
+
+      if (settings.api.client.oauth2.ip["duplicate check"] == true) {
+        const userIP = await db.get(`ipuser-${ip}`);
+        const bypassFlag = await db.get(`antialt-bypass-${user.id}`) || false;
+        if (userIP && userIP !== user.id && !bypassFlag) {
+          // Send webhook notifications
+          await discordLog(
+            "anti-alt",
+            `User ID: \`${user.id}\` attempted to login from an IP associated with another user ID: \`${userIP}\`.`,
+            [
+              { name: "IP Address", value: ip, inline: true },
+              { name: "Alt User ID", value: userIP, inline: true }
+            ],
+            false
+          );
+          
+          await discordLog(
+            "anti-alt",
+            `<@${user.id}> attempted to login from an IP associated with another user ID: <@${userIP}>.`,
+            [],
+            true
+          );
+          
+          const theme = await getPages();
+          return res.status(500).render(theme.settings.errors.antialt);
+        } else if (!userIP) {
+          await db.set(`ipuser-${ip}`, user.id);
+        }
+      }
 
       if (!(await db.get("users-" + user.id))) {
         if (!settings.api.client.allow.new_users) {
@@ -106,7 +136,6 @@ module.exports.load = async function (router, db) {
         const genpassword = settings.api.client.passwordgenerator.signup
           ? makeid(settings.api.client.passwordgenerator["length"])
           : makeid(16);
-
 
         try {
           // Try creating a new Pterodactyl account
@@ -170,7 +199,7 @@ module.exports.load = async function (router, db) {
       }
 
       // Fetch and cache user info from Pterodactyl
-      const PterodactylUser = await getPteroUser(userinfo.id, db);
+      const PterodactylUser = await getPteroUser(user.id, db);
       if (!PterodactylUser) {
           res.send("An error has occurred while attempting to update your account information and server list.");
           return;

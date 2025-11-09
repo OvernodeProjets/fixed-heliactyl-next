@@ -23,7 +23,7 @@ const settings = loadConfig("./config.toml");
 const getPteroUser = require('../../handlers/getPteroUser.js');
 
 const fetch = require("node-fetch");
-const { discordLog } = require("../../handlers/log");
+const { discordLog, addNotification } = require("../../handlers/log");
 
 // todo : implement that in frontend and review code 
 module.exports.load = async function (app, db) {
@@ -94,15 +94,44 @@ module.exports.load = async function (app, db) {
         return res.send("Service is under maintenance.");
       }
 
-      let ip = req.headers["cf-connecting-ip"] || req.connection.remoteAddress;
-      ip = (ip ? ip : "::1").replace(/::1/g, "::ffff:127.0.0.1").replace(/^.*:/, "");
-
+      const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.ip;
       if (settings.api.client.oauth2.ip.block.includes(ip)) {
-        return res.send("You could not sign in, because your IP has been blocked from signing in.");
+        return res.send(
+          "You could not sign in, because your IP has been blocked from signing in."
+        );
       }
 
       // Set a cookie with the user's ID
       res.cookie('userId', userinfo.id.toString(), { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
+
+      if (settings.api.client.oauth2.ip["duplicate check"] == true) {
+        const userIP = await db.get(`ipuser-${ip}`);
+        const bypassFlag = await db.get(`antialt-bypass-${userinfo.id}`) || false;
+        if (userIP && userIP !== userinfo.id && !bypassFlag) {
+          // Send webhook notifications
+          await discordLog(
+            "anti-alt",
+            `User ID: \`${userinfo.id}\` attempted to login from an IP associated with another user ID: \`${userIP}\`.`,
+            [
+              { name: "IP Address", value: ip, inline: true },
+              { name: "Alt User ID", value: userIP, inline: true }
+            ],
+            false
+          );
+          
+          await discordLog(
+            "anti-alt",
+            `<@${userinfo.id}> attempted to login from an IP associated with another user ID: <@${userIP}>.`,
+            [],
+            true
+          );
+          
+          const theme = await getPages();
+          return res.status(500).render(theme.settings.errors.antialt);
+        } else if (!userIP) {
+          await db.set(`ipuser-${ip}`, userinfo.id);
+        }
+      }
 
       if (!(await db.get("users-" + userinfo.id))) {
         if (settings.api.client.allow.new_users) {
