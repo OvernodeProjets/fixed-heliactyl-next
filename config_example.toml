@@ -371,9 +371,6 @@ every = 60
 coins = 2.5
 _note = "This is the 2nd-generation version of Heliactyl's AFK system. Please report any bugs on the GitHub (github.com/heliactyloss/heliactyl). Thank you."
 
-[api.rdv]
-enabled = false
-
 [whitelist]
 status = false
 users = [ "User ID" ]
@@ -383,6 +380,9 @@ note = "This allows only specific people to be able to login to the Heliactyl da
 enableCaptcha = false
 recaptchaSiteKey = "0aa0aaaaaaaaaaaaaaa0aaaaaaaaaaaaaa0aaa0aa"
 recaptchaServerKey = "0aa0aaaaaaaaaaaaaaa0aaaaaaaaaaaaaa0aaa0aa"
+
+[sftp] # Mode: "node" uses SFTP details from the API (data.attributes.sftp_details.ip), "allocation" uses the allocation IP (useful if your node is behind a proxy)
+mode = "node"
 
 # ------------------------------------------------------
 # Update Configuration
@@ -394,7 +394,7 @@ checkPreReleases = true    # Check for pre-releases
 checkCommits = false       # Check for new commits (development updates)
 autoInstall = false        # Automatically install updates
 checkInterval = 3600000    # Check interval in milliseconds (default: 1 hour)
-
+ 
 # ======================================================
 # Logging System
 # ======================================================

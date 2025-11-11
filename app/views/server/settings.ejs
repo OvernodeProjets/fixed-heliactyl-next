@@ -196,7 +196,13 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(`/api/server/${serverId}`)
         .then(response => response.json())
         .then(data => {
-            document.getElementById('sftp-host').textContent = `sftp://${data.attributes.sftp_details.ip}:${data.attributes.sftp_details.port}`;
+            let sftpHost;
+            if (<%= settings.sftp.mode === "node" %>) {
+                sftpHost = data.attributes.sftp_details.ip
+            } else if (<%= settings.sftp.mode === "allocation" %>) {
+                sftpHost = data.attributes.relationships.allocations.data[0].attributes.ip_alias
+            }
+            document.getElementById('sftp-host').textContent = `sftp://${sftpHost}:${data.attributes.sftp_details.port}`;
             document.getElementById('sftp-username').textContent = `<%= req.session.pterodactyl.username %>.${data.attributes.identifier}`;
             document.getElementById('server-name').textContent = data.attributes.name;
             document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
