@@ -312,6 +312,21 @@ module.exports.load = async function (app, db) {
 
     let pterodactylID = await db.get("users-" + id);
 
+    if (!pterodactylID) {
+      return res.status(404).json({ error: "User not found in database" });
+    }
+
+    // Get user info before deleting
+    const userKeys = await db.list("user-*");
+    let userEmail = null;
+    for (const key of userKeys) {
+      const userData = await db.get(key);
+      if (userData && userData.id === id) {
+        userEmail = key.substring("user-".length);
+        break;
+      }
+    }
+
     // Remove user.
 
     let userids = (await db.get("users")) || [];
@@ -324,9 +339,12 @@ module.exports.load = async function (app, db) {
     }
 
     await db.delete("users-" + id);
+    if (userEmail) {
+      await db.delete("user-" + userEmail);
+    }
 
-    // Remove coins/resources.
-
+    await db.delete("dailycoins-" + id);
+    await db.delete("notifications-" + id);
     await db.delete("coins-" + id);
     await db.delete("extra-" + id);
     await db.delete("package-" + id);
@@ -405,7 +423,8 @@ module.exports.load = async function (app, db) {
         userinfo: PterodactylUserReq,
         coins: settings.api.client.coins.enabled
           ? (await db.get("coins-" + userId)) ?? 0
-          : null
+          : null,
+        notifications: (await db.get("notifications-" + userId)) || [],
       });
     } catch (error) {
       console.error("Error in /admin/userinfo:", error);

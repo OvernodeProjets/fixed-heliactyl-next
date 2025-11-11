@@ -214,7 +214,7 @@
                             <label for="userinfo-id" class="block text-sm font-medium text-gray-300 mb-2">User ID or Email</label>
                             <input type="text" id="userinfo-id" name="id_or_email" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all" placeholder="Enter user ID or email" required>
                         </div>
-                        <button onclick="getUserInfo()" class="w-full bg-indigo-500 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg hover:bg-white/20 transition-all font-medium shadow-md shadow-white/10">Get Info</button>
+                        <button onclick="handleUserInfoSubmit()" class="w-full bg-indigo-500 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg hover:bg-white/20 transition-all font-medium shadow-md shadow-white/10">Get Info</button>
                     </div>
                     <div id="userinfo-result" class="mt-4 hidden">
                         <div class="border-t border-white/10 pt-4">
@@ -367,9 +367,7 @@ document.querySelectorAll('form:not(.userinfo-form)').forEach(form => {
     form.addEventListener('submit', handleFormSubmit);
 });
 
-function handleUserInfoSubmit(event) {
-  event.preventDefault();
-  const form = event.target;
+function handleUserInfoSubmit() {
   const input = document.getElementById("userinfo-id").value.trim();
 
   if (!input) {
@@ -380,7 +378,7 @@ function handleUserInfoSubmit(event) {
   const isEmail = input.includes("@");
   const paramName = isEmail ? "email" : "id";
 
-  const url = form.action + `?${paramName}=` + encodeURIComponent(input);
+  const url = "/api/admin/userinfo" + `?${paramName}=` + encodeURIComponent(input);
 
   const resultContainer = document.getElementById("userinfo-result");
   const dataContainer = document.getElementById("userinfo-data");
@@ -389,6 +387,9 @@ function handleUserInfoSubmit(event) {
     .then(response => response.json())
     .then(data => {
       if (data.error) throw new Error(data.error);
+
+      // Count notifications
+      const notificationsCount = data.notifications ? Object.keys(data.notifications).length : 0;
 
       // Format the data for display
       const formattedData = {
@@ -400,7 +401,8 @@ function handleUserInfoSubmit(event) {
           "Admin": data.userinfo.attributes?.root_admin ? "Yes" : "No",
           "Id": data.id || 'N/A'
         } : 'User not found',
-        "Coins": data.coins
+        "Coins": data.coins,
+        "Notifications": `${notificationsCount} notification(s) - Click to expand`
       };
 
       // Show the result container
@@ -410,12 +412,58 @@ function handleUserInfoSubmit(event) {
       dataContainer.textContent = JSON.stringify(formattedData, null, 2);
       dataContainer.classList.remove("text-red-500");
       dataContainer.classList.add("text-gray-300");
+      
+      // Store full notifications data for toggle
+      dataContainer.dataset.notifications = JSON.stringify(data.notifications);
+      dataContainer.dataset.expanded = 'false';
+      dataContainer.style.cursor = 'pointer';
+      
+      // Add click handler to toggle notifications
+      dataContainer.onclick = function() {
+        const isExpanded = this.dataset.expanded === 'true';
+        const notifications = JSON.parse(this.dataset.notifications);
+        
+        if (isExpanded) {
+          // Collapse back to summary
+          const summaryData = {
+            "Package Info": data.package,
+            "Extra Resources": data.extra,
+            "User Details": data.userinfo ? {
+              "Username": data.userinfo.attributes?.username || 'N/A',
+              "Email": data.userinfo.attributes?.email || 'N/A',
+              "Admin": data.userinfo.attributes?.root_admin ? "Yes" : "No",
+              "Id": data.id || 'N/A'
+            } : 'User not found',
+            "Coins": data.coins,
+            "Notifications": `${notificationsCount} notification(s) - Click to expand`
+          };
+          this.textContent = JSON.stringify(summaryData, null, 2);
+          this.dataset.expanded = 'false';
+        } else {
+          // Expand to show all notifications
+          const fullData = {
+            "Package Info": data.package,
+            "Extra Resources": data.extra,
+            "User Details": data.userinfo ? {
+              "Username": data.userinfo.attributes?.username || 'N/A',
+              "Email": data.userinfo.attributes?.email || 'N/A',
+              "Admin": data.userinfo.attributes?.root_admin ? "Yes" : "No",
+              "Id": data.id || 'N/A'
+            } : 'User not found',
+            "Coins": data.coins,
+            "Notifications": notifications
+          };
+          this.textContent = JSON.stringify(fullData, null, 2);
+          this.dataset.expanded = 'true';
+        }
+      };
     })
     .catch(error => {
       resultContainer.classList.remove("hidden");
       dataContainer.textContent = "Error: " + error.message;
       dataContainer.classList.remove("text-gray-300");
       dataContainer.classList.add("text-red-500");
+      dataContainer.onclick = null;
     });
 }
 </script>
