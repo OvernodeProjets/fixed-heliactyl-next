@@ -283,10 +283,10 @@ router.get("/server/create", authMiddleware, async (req, res) => {
                 let newpterodactylinfo = req.session.pterodactyl;
                 newpterodactylinfo.relationships.servers.data.push(serverinfotext);
                 req.session.pterodactyl = newpterodactylinfo;
-
+                
                 discordLog(
                     "created server",
-                    `${req.session.userinfo.username} created a new server named \`${name}\` with the following specs:\n\`\`\`Memory: ${ram} MB\nCPU: ${cpu}%\nDisk: ${disk}\`\`\``
+                    `${req.session.userinfo.username} and with the userid \`${req.session.userinfo.id}\` created a new server named \`${name}\` with the following specs:\n\`\`\`Memory: ${ram} MB\nCPU: ${cpu}%\nDisk: ${disk}\`\`\``
                 );
                 console.log(`user ${req.session.userinfo.username} created a server called ${name}`)
                 return res.redirect("/dashboard?err=CREATED");
