@@ -18,7 +18,6 @@ const heliactylModule = {
 module.exports.heliactylModule = heliactylModule;
 
 const express = require('express');
-const router = express.Router();
 const Client = require('ssh2-sftp-client');
 const fs = require('fs');
 const path = require('path');
@@ -26,9 +25,9 @@ const axios = require('axios');
 const FormData = require('form-data');
 const { pipeline } = require('stream/promises');
 const { PassThrough } = require('stream');
-const loadConfig = require("../handlers/config");
+const loadConfig = require("../../handlers/config");
 const settings = loadConfig("./config.toml");
-module.exports.load = async function (app, db) {
+module.exports.load = async function (router, db) {
 // Constants
 const MAX_SIZE_BYTES = 5 * 1024 * 1024 * 1024; // 5GB in bytes
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB chunks for memory efficiency
@@ -196,7 +195,7 @@ async function uploadToServer(localPath, serverId, pterodactylDomain, apiKey, tr
   }
 }
 
-router.post('/import/:id', async (req, res) => {
+router.post('/server/:id/import', async (req, res) => {
   const { id: serverId } = req.params;
   const { host, port, username, password } = req.body;
   
@@ -272,7 +271,7 @@ router.post('/import/:id', async (req, res) => {
 });
 
 // Route to check import status
-router.get('/import/:transferId/status', (req, res) => {
+router.get('/server/import/:transferId/status', (req, res) => {
   const { transferId } = req.params;
   const transfer = transfers.get(transferId);
   
@@ -298,6 +297,4 @@ router.get('/import/:transferId/status', (req, res) => {
 
   res.json(status);
 });
-
-app.use(router)
 };

@@ -31,11 +31,11 @@ const getPteroUser = require("../handlers/getPteroUser");
 const PterodactylApplicationModule = require('../handlers/ApplicationAPI.js');
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 
-module.exports.load = async function (app, db) {
+module.exports.load = async function (router, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
   const requireAdmin = (req, res, next) => requireAuth(req, res, next, true, db);
 
-  app.get("/admin/setcoins", requireAdmin, async (req, res) => { 
+  router.get("/admin/setcoins", requireAdmin, async (req, res) => { 
     let failredirect = "/admin/coins?err=FAILEDSETCOINS";
 
     let { id, coins } = req.query;
@@ -67,7 +67,7 @@ module.exports.load = async function (app, db) {
     res.status(200).json({ message: "Coins set successfully." });
   });
 
-  app.get("/admin/addcoins", requireAdmin, async (req, res) => {
+  router.get("/admin/addcoins", requireAdmin, async (req, res) => {
     let failredirect = "/admin?err=FAILEDADDCOINS";
 
     let { id, coins } = req.query;
@@ -101,7 +101,7 @@ module.exports.load = async function (app, db) {
     res.status(200).json({ message: "Coins added successfully." });
   });
 
-  app.get("/admin/setresources", requireAdmin, async (req, res) => {
+  router.get("/admin/setresources", requireAdmin, async (req, res) => {
     let { id, ram, disk, cpu, servers } = req.query;
 
     let failredirect = "/admin/resources?err=FAILEDSETRESOURCES";
@@ -183,7 +183,7 @@ module.exports.load = async function (app, db) {
       res.status(200).json({ message: "Resources set successfully." });
   });
 
-  app.get("/admin/addresources", requireAdmin, async (req, res) => {
+  router.get("/admin/addresources", requireAdmin, async (req, res) => {
 
     let { ram, disk, cpu, servers, id } = req.query;
 
@@ -265,7 +265,7 @@ module.exports.load = async function (app, db) {
       return res.status(200).json({ message: "Resources added successfully." });
   });
 
-  app.get("/admin/setplan", requireAdmin, async (req, res) => {
+  router.get("/admin/setplan", requireAdmin, async (req, res) => {
     let { id, package } = req.query;
 
     let failredirect = "/admin?err=FAILEDSETPLAN";
@@ -300,7 +300,7 @@ module.exports.load = async function (app, db) {
     return res.status(200).json({ message: "Plan set successfully." });
   });
 
-  app.get("/admin/remove_account", requireAdmin, async (req, res) => {
+  router.get("/admin/remove_account", requireAdmin, async (req, res) => {
     let { id } = req.query;
 
     // This doesn't delete the account and doesn't touch the renewal system.
@@ -356,7 +356,7 @@ module.exports.load = async function (app, db) {
     res.status(200).json({ message: "Account removed successfully." });
   });
 
-  app.get("/admin/userinfo", requireAdmin, async (req, res) => {
+  router.get("/admin/userinfo", requireAdmin, async (req, res) => {
     try {
       const { id, email } = req.query;
 
@@ -432,7 +432,7 @@ module.exports.load = async function (app, db) {
     }
   });
 
-  app.get("/admin/ban", requireAdmin, async (req, res) => {
+  router.get("/admin/ban", requireAdmin, async (req, res) => {
       const { id, reason, expiration } = req.query;
       if (!id) return res.status(400).json({ error: "Missing user ID" });
 
@@ -455,7 +455,7 @@ module.exports.load = async function (app, db) {
       res.status(200).json({ message: "User banned successfully." });
   });
 
-  app.get("/admin/unban", requireAdmin, async (req, res) => {
+  router.get("/admin/unban", requireAdmin, async (req, res) => {
       const { id } = req.query;
       if (!id) return res.status(400).json({ error: "Missing user ID" });
       const dbUser = await db.get("users-" + id);
@@ -470,7 +470,7 @@ module.exports.load = async function (app, db) {
       res.status(200).json({ message: "User unbanned successfully." });
   });
 
-  app.get("/admin/updates/check", requireAdmin, async (req, res) => {
+  router.get("/admin/updates/check", requireAdmin, async (req, res) => {
     try {
       const ignoreCache = req.query.force === 'true';
       const updates = await updateManager.checkForUpdates(ignoreCache);
@@ -482,7 +482,7 @@ module.exports.load = async function (app, db) {
     }
   });
 
-  app.get("/admin/updates/info", requireAdmin, async (req, res) => {
+  router.get("/admin/updates/info", requireAdmin, async (req, res) => {
     try {
       const lastUpdate = await db.get("system-lastUpdate");
       const lastCheck = updateManager.cache.lastCheck;
@@ -498,7 +498,7 @@ module.exports.load = async function (app, db) {
     }
   });
 
-  app.post("/admin/updates/install", requireAdmin, async (req, res) => {
+  router.post("/admin/updates/install", requireAdmin, async (req, res) => {
     try {
       const { version } = req.body;
       const updates = await updateManager.checkForUpdates(true);
