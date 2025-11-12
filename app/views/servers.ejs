@@ -295,7 +295,7 @@ document.querySelectorAll('.server-row').forEach(row => {
 });
 
 // Fetch and display shared servers
-fetch('/api/subuser-servers')
+fetch('/api/server/subuser-servers')
     .then(response => response.json())
     .then(servers => {
         if (servers.length > 0) {
