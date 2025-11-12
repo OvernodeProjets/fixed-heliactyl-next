@@ -103,14 +103,14 @@ module.exports.load = async function (app, db) {
     });
 
     // REMOVE a server from a group
-    app.delete("/groups/:groupId/servers/:serverId", authMiddleware, async (req, res) => {
+    app.delete("/groups/:groupId/servers/:id", authMiddleware, async (req, res) => {
         const userId = req.session.userinfo.id;
         const groups = await db.get(getUserGroupsKey(userId)) || {};
         const group = groups[req.params.groupId];
 
         if (!group) return res.status(404).json({ error: "Group not found" });
 
-        group.servers = group.servers.filter(id => id !== req.params.serverId);
+        group.servers = group.servers.filter(id => id !== req.params.id);
         await db.set(getUserGroupsKey(userId), groups);
         res.json(group);
     });

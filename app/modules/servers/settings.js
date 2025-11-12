@@ -29,7 +29,7 @@ module.exports.load = async function(router, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
     
     // PUT /api/server/:id/startup
-    router.put('/server/:serverId/startup', authMiddleware, async (req, res) => {
+    router.put('/server/:id/startup', authMiddleware, async (req, res) => {
       try {
         const serverId = req.params.serverId;
         const { startup, environment, egg, image, skip_scripts } = req.body;

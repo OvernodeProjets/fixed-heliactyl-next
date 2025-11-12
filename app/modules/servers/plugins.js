@@ -70,11 +70,11 @@ module.exports.load = async function(router, db) {
   });
 
   router.post(
-    "/plugins/install/:serverId",
+    "/plugins/install/:id",
     authMiddleware,
     ownsServer,
     async (req, res) => {
-      const { serverId } = req.params;
+      const { id: serverId } = req.params;
       const { pluginId } = req.body;
 
       if (!pluginId) {

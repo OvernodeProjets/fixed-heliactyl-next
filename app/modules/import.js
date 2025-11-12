@@ -196,8 +196,8 @@ async function uploadToServer(localPath, serverId, pterodactylDomain, apiKey, tr
   }
 }
 
-router.post('/import/:serverId', async (req, res) => {
-  const { serverId } = req.params;
+router.post('/import/:id', async (req, res) => {
+  const { id: serverId } = req.params;
   const { host, port, username, password } = req.body;
   
   if (!host || !port || !username || !password) {
