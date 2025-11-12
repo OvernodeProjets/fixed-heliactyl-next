@@ -264,14 +264,15 @@ router.get("/server/create", authMiddleware, async (req, res) => {
         }
     );
     if (!serverinfo.ok) {
-        const errorData = await serverinfo.json();
         const text = await serverinfo.text();
         console.error("Pterodactyl API Raw Response:", text);
+        let errorData = {};
         try {
-          const parsed = JSON.parse(text);
-          console.error("Parsed Error:", parsed);
+          errorData = JSON.parse(text);
+          console.error("Parsed Error:", errorData);
         } catch {
           console.error("Could not parse JSON response");
+          errorData = { error: text };
         }
 
         // Encode the error response for the URL
