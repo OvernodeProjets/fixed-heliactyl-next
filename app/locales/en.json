@@ -101,6 +101,35 @@
       "no_password": "No password available: passwords are only shown once."
     }
   },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your personal information",
+    "personal_info": "Personal Information",
+    "username": "Username",
+    "email": "Email",
+    "user_id": "User ID",
+    "connected_accounts": "Connected Accounts",
+    "connected": "Connected",
+    "no_connections": "No connected accounts",
+    "danger_zone": "Danger Zone",
+    "delete_warning": "Deleting your account is irreversible. All your data will be permanently deleted.",
+    "delete_account": "Delete Account",
+    "cannot_delete": "This account cannot be deleted.",
+    "delete_confirm": "Are you sure you want to delete your account? This action is irreversible.",
+    "delete_double_confirm": "Type 'DELETE' to confirm account deletion:",
+    "delete_confirm_text": "DELETE",
+    "success": {
+      "updated": "Profile updated successfully",
+      "deleted": "Account deleted successfully"
+    },
+    "errors": {
+      "username_required": "Username is required",
+      "invalid_email": "Invalid email format",
+      "update_failed": "Failed to update profile",
+      "delete_failed": "Failed to delete account",
+      "confirmation_mismatch": "Confirmation does not match"
+    }
+  },
   "afk": {
     "title": "AFK Page",
     "subtitle": "Earn free rewards for keeping this page open.",

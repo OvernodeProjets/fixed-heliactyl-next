@@ -225,27 +225,43 @@
 
                 <!-- Header -->
                 <div class="flex items-center mt-2 mb-4 py-2 mx-2 border-b border-white/5">
-                    <button
-                        onclick="window.location.href='/api/logout'"
-                        class="flex items-center gap-1.5 w-full px-3 py-1.5 text-zinc-400 cursor-pointer hover:bg-white/5 transition rounded-md">
-                        <div class="flex items-center gap-1.5">
-                            <% if (req.session.userinfo.picture) { %>
-                                <img src="<%= req.session.userinfo.picture %>" alt="User Avatar" class="w-6 h-6 rounded-md">
-                            <% } else if (req.session.userinfo.avatar) { %>
-                                <img src="https://cdn.discordapp.com/avatars/<%= req.session.userinfo.id %>/<%= req.session.userinfo.avatar %>.png?size=256" alt="User Avatar" class="w-6 h-6 rounded-md">
-                            <% } else { %>
-                                <div class="w-6 h-6 bg-indigo-950 rounded-md flex items-center justify-center text-indigo-300 pt-0.5 text-xs">
-                                    <%= req.session.userinfo.username.charAt(0).toUpperCase() %>
-                                </div>
-                            <% } %>
-                            <span class="ml-1 text-sm">
-                                <%= req.session.userinfo.username %>
-                            </span>
+                    <div class="relative w-full" x-data="{ open: false }">
+                        <button
+                            @click="open = !open"
+                            class="flex items-center gap-1.5 w-full px-3 py-1.5 text-zinc-400 cursor-pointer hover:bg-white/5 transition rounded-md">
+                            <div class="flex items-center gap-1.5">
+                                <% if (req.session.userinfo.picture) { %>
+                                    <img src="<%= req.session.userinfo.picture %>" alt="User Avatar" class="w-6 h-6 rounded-md">
+                                <% } else if (req.session.userinfo.avatar) { %>
+                                    <img src="https://cdn.discordapp.com/avatars/<%= req.session.userinfo.id %>/<%= req.session.userinfo.avatar %>.png?size=256" alt="User Avatar" class="w-6 h-6 rounded-md">
+                                <% } else { %>
+                                    <div class="w-6 h-6 bg-indigo-950 rounded-md flex items-center justify-center text-indigo-300 pt-0.5 text-xs">
+                                        <%= req.session.userinfo.username.charAt(0).toUpperCase() %>
+                                    </div>
+                                <% } %>
+                                <span class="ml-1 text-sm">
+                                    <%= req.session.userinfo.username %>
+                                </span>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 ml-auto" :class="open ? 'rotate-180' : ''" style="transition: transform 0.2s;">
+                                <path d="M6 9l6 6 6-6"></path>
+                            </svg>                          
+                        </button>
+                        <div x-show="open" @click.outside="open = false" x-transition class="absolute left-0 right-0 mt-2 bg-[#101017] backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl py-2 z-50" style="display: none;">
+                            <a href="/profile" class="flex items-center gap-2 px-4 py-2.5 text-sm text-white/70 hover:bg-white/5 hover:text-white transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                <%= __('profile.title') %>
+                            </a>
+                            <a href="/api/logout" class="flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                <%= __('common.logout') %>
+                            </a>
                         </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 ml-auto">
-                            <path fill-rule="evenodd" d="M16.5 3.75a1.5 1.5 0 0 1 1.5 1.5v13.5a1.5 1.5 0 0 1-1.5 1.5h-6a1.5 1.5 0 0 1-1.5-1.5V15a.75.75 0 0 0-1.5 0v3.75a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V5.25a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3V9A.75.75 0 1 0 9 9V5.25a1.5 1.5 0 0 1 1.5-1.5h6ZM5.78 8.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 0 0 0 1.06l3 3a.75.75 0 0 0 1.06-1.06l-1.72-1.72H15a.75.75 0 0 0 0-1.5H4.06l1.72-1.72a.75.75 0 0 0 0-1.06Z" clip-rule="evenodd" />
-                          </svg>                          
-                    </button>
+                    </div>
                 </div>
 
 <!-- Server Info Section (Only shown on server pages) -->

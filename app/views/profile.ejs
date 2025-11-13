@@ -1,0 +1,395 @@
+<%- include('./components/top') %>
+<main class="flex-grow container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center w-full mx-auto pb-4">
+        <div class="flex flex-col">
+            <h1 class="text-xl font-semibold mb-0.5 heavy"><%= __('profile.title') %></h1>
+            <p class="text-gray-400 text-md"><%= __('profile.subtitle') %></p>
+        </div>
+
+        <nav aria-label="Breadcrumb" class="inline-flex py-2 px-4 rounded-xl bg-white/5 transition-colors duration-200">
+            <ol role="list" class="flex items-center space-x-2">
+                <li>
+                    <a href="/dashboard" class="text-sm flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-colors duration-200">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler size-4 icons-tabler-outline icon-tabler-home">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+                            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
+                            <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
+                        </svg>
+                        <span><%= __('breadcrumbs.home') %></span>
+                    </a>
+                </li>
+                <li class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right size-4 text-zinc-400">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M9 6l6 6l-6 6"></path>
+                    </svg>
+                </li>
+                <li>
+                    <a href="#_" class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200" aria-current="page">
+                        <%= __('profile.title') %>
+                    </a>
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="mt-8 max-w-4xl mx-auto space-y-6">
+        <div class="rounded-xl bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-white/10 backdrop-blur-xl p-8 shadow-2xl">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                    <% if (req.session.userinfo.picture) { %>
+                        <img src="<%= req.session.userinfo.picture %>" alt="Avatar" class="w-full h-full rounded-full object-cover">
+                    <% } else if (req.session.userinfo.avatar) { %>
+                        <img src="https://cdn.discordapp.com/avatars/<%= req.session.userinfo.id %>/<%= req.session.userinfo.avatar %>.png?size=256" alt="Avatar" class="w-full h-full rounded-full object-cover">
+                    <% } else { %>
+                        <%= req.session.userinfo.username.charAt(0).toUpperCase() %>
+                    <% } %>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white"><%= req.session.userinfo.username %></h2>
+                    <p class="text-white/60 text-sm"><%= __('profile.personal_info') %></p>
+                </div>
+            </div>
+
+            <form id="profile-form" class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-white/80 mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <%= __('profile.username') %>
+                        </label>
+                        <input type="text" id="username" value="<%= req.session.userinfo.username %>" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-white/80 mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <%= __('profile.email') %>
+                        </label>
+                        <input type="email" id="email" value="<%= req.session.userinfo.email || '' %>" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-white/80 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                        </svg>
+                        <%= __('profile.user_id') %>
+                    </label>
+                    <input type="text" id="userid" value="<%= req.session.userinfo.id %>" disabled class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/50 cursor-not-allowed font-mono text-sm">
+                </div>
+
+                <div id="oauth-connections" class="mt-6 pt-6 border-t border-white/10">
+                    <label class="block text-sm font-semibold text-white/80 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                        <%= __('profile.connected_accounts') %>
+                    </label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="oauth-list">
+                        <div class="flex items-center justify-center p-4 bg-white/5 rounded-lg border border-white/10">
+                            <p class="text-sm text-white/50"><%= __('common.loading') %></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-6 border-t border-white/10">
+                    <button type="button" onclick="window.location.href='/dashboard'" class="px-6 py-3 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-all font-medium">
+                        <%= __('common.cancel') %>
+                    </button>
+                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all font-medium shadow-lg shadow-indigo-500/25 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <%= __('common.save') %>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="rounded-xl bg-gradient-to-br from-red-500/10 via-rose-500/10 to-pink-500/10 border border-red-500/20 backdrop-blur-xl p-8 shadow-2xl">
+            <div class="flex items-start gap-4 mb-6">
+                <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h2 class="text-xl font-bold mb-2 text-red-400"><%= __('profile.danger_zone') %></h2>
+                    <p class="text-sm text-white/60 mb-6"><%= __('profile.delete_warning') %></p>
+                    <button id="delete-account-btn" <% if (req.session.userinfo.username === 'banny') { %>disabled<% } %> class="px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl hover:from-red-600 hover:to-rose-700 transition-all font-medium shadow-lg shadow-red-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-red-500 disabled:hover:to-rose-600 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <%= __('profile.delete_account') %>
+                    </button>
+                    <% if (req.session.userinfo.username === 'banny') { %>
+                    <p class="text-sm text-red-400 mt-3 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <%= __('profile.cannot_delete') %>
+                    </p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="status-message" class="fixed bottom-6 right-6 z-50 hidden">
+        <div class="px-6 py-4 rounded-xl shadow-2xl backdrop-blur-xl border min-w-[300px]">
+            <div class="flex items-center gap-3">
+                <div id="status-icon" class="w-6 h-6"></div>
+                <p id="status-text" class="text-sm font-medium"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4" style="background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px);">
+        <div class="bg-gradient-to-br from-red-500/20 via-rose-500/20 to-pink-500/20 border border-red-500/30 rounded-2xl shadow-2xl backdrop-blur-xl max-w-md w-full p-8">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-14 h-14 rounded-full bg-red-500/30 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-white"><%= __('profile.delete_account') %></h3>
+                    <p class="text-white/60 text-sm"><%= __('profile.delete_warning') %></p>
+                </div>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <p class="text-white/80 text-sm"><%= __('profile.delete_confirm') %></p>
+                <div>
+                    <label class="block text-sm font-semibold text-white/80 mb-2">
+                        <%= __('profile.delete_double_confirm') %>
+                    </label>
+                    <input type="text" id="delete-confirm-input" placeholder="<%= __('profile.delete_confirm_text') %>" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all font-mono">
+                    <p class="text-xs text-white/50 mt-2"><%= __('profile.delete_confirm_text') %></p>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button id="delete-modal-cancel" class="flex-1 px-6 py-3 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-all font-medium">
+                    <%= __('common.cancel') %>
+                </button>
+                <button id="delete-modal-confirm" class="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl hover:from-red-600 hover:to-rose-700 transition-all font-medium shadow-lg shadow-red-500/25">
+                    <%= __('profile.delete_account') %>
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+let oauthConnections = [];
+
+async function loadOAuthConnections() {
+    try {
+        const response = await fetch('/api/profile/oauth');
+        const data = await response.json();
+        oauthConnections = data.connections || [];
+        displayOAuthConnections();
+    } catch (error) {
+        console.error('Error loading OAuth connections:', error);
+    }
+}
+
+function displayOAuthConnections() {
+    const container = document.getElementById('oauth-list');
+    if (!container) return;
+
+    if (oauthConnections.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-2 flex items-center justify-center p-6 bg-white/5 rounded-lg border border-white/10">
+                <p class="text-sm text-white/50"><%= __('profile.no_connections') %></p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = oauthConnections.map(conn => `
+        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all group">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-xl">
+                    ${conn.icon}
+                </div>
+                <div>
+                    <p class="text-white font-medium">${conn.provider}</p>
+                    <p class="text-xs text-white/50"><%= __('profile.connected') %></p>
+                </div>
+            </div>
+            <div class="w-2 h-2 rounded-full bg-green-400 shadow-lg shadow-green-400/50"></div>
+        </div>
+    `).join('');
+}
+
+function showStatus(message, type) {
+    const statusDiv = document.getElementById('status-message');
+    const statusText = document.getElementById('status-text');
+    const statusIcon = document.getElementById('status-icon');
+    const statusContainer = statusDiv.querySelector('div');
+    
+    statusDiv.classList.remove('hidden');
+    statusText.textContent = message;
+    
+    if (type === 'success') {
+        statusContainer.classList.add('bg-green-500/20', 'border-green-500/30', 'text-green-400');
+        statusContainer.classList.remove('bg-red-500/20', 'border-red-500/30', 'text-red-400');
+        statusIcon.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        `;
+    } else {
+        statusContainer.classList.add('bg-red-500/20', 'border-red-500/30', 'text-red-400');
+        statusContainer.classList.remove('bg-green-500/20', 'border-green-500/30', 'text-green-400');
+        statusIcon.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        `;
+    }
+
+    setTimeout(() => {
+        statusDiv.classList.add('hidden');
+    }, 4000);
+}
+
+document.getElementById('profile-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+
+    if (!username) {
+        showStatus('<%= __('profile.errors.username_required') %>', 'error');
+        return;
+    }
+
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showStatus('<%= __('profile.errors.invalid_email') %>', 'error');
+        return;
+    }
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<%= __('common.processing') %>...';
+
+    try {
+        const response = await fetch('/api/profile/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, email })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showStatus('<%= __('profile.success.updated') %>', 'success');
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            showStatus(data.error || '<%= __('profile.errors.update_failed') %>', 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    } catch (error) {
+        showStatus('<%= __('profile.errors.update_failed') %>', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+});
+
+document.getElementById('delete-account-btn').addEventListener('click', () => {
+    const modal = document.getElementById('delete-modal');
+    const input = document.getElementById('delete-confirm-input');
+    input.value = '';
+    modal.classList.remove('hidden');
+    input.focus();
+});
+
+document.getElementById('delete-modal-cancel').addEventListener('click', () => {
+    const modal = document.getElementById('delete-modal');
+    const input = document.getElementById('delete-confirm-input');
+    modal.classList.add('hidden');
+    input.value = '';
+});
+
+document.getElementById('delete-modal-confirm').addEventListener('click', () => {
+    const input = document.getElementById('delete-confirm-input');
+    const confirmText = '<%= __('profile.delete_confirm_text') %>';
+    
+    if (input.value.trim() === confirmText) {
+        const modal = document.getElementById('delete-modal');
+        modal.classList.add('hidden');
+        deleteAccount();
+    } else {
+        showStatus('<%= __('profile.errors.confirmation_mismatch') %>', 'error');
+        input.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+        setTimeout(() => {
+            input.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+        }, 2000);
+    }
+});
+
+document.getElementById('delete-confirm-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        document.getElementById('delete-modal-confirm').click();
+    } else if (e.key === 'Escape') {
+        document.getElementById('delete-modal-cancel').click();
+    }
+});
+
+document.getElementById('delete-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'delete-modal') {
+        document.getElementById('delete-modal-cancel').click();
+    }
+});
+
+async function deleteAccount() {
+    const deleteBtn = document.getElementById('delete-account-btn');
+    const originalText = deleteBtn.innerHTML;
+    deleteBtn.disabled = true;
+    deleteBtn.innerHTML = '<%= __('common.processing') %>...';
+
+    try {
+        const response = await fetch('/api/profile/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showStatus('<%= __('profile.success.deleted') %>', 'success');
+            setTimeout(() => {
+                window.location.href = '/api/logout';
+            }, 2000);
+        } else {
+            showStatus(data.error || '<%= __('profile.errors.delete_failed') %>', 'error');
+            deleteBtn.disabled = false;
+            deleteBtn.innerHTML = originalText;
+        }
+    } catch (error) {
+        showStatus('<%= __('profile.errors.delete_failed') %>', 'error');
+        deleteBtn.disabled = false;
+        deleteBtn.innerHTML = originalText;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadOAuthConnections();
+});
+</script>
+
+<%- include('./components/bottom') %>

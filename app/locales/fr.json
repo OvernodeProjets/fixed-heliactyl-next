@@ -101,6 +101,35 @@
       "no_password": "Aucun mot de passe disponible : les mots de passe ne sont affichés qu'une seule fois."
     }
   },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Gérez vos informations personnelles",
+    "personal_info": "Informations personnelles",
+    "username": "Nom d'utilisateur",
+    "email": "Email",
+    "user_id": "ID utilisateur",
+    "connected_accounts": "Comptes connectés",
+    "connected": "Connecté",
+    "no_connections": "Aucun compte connecté",
+    "danger_zone": "Zone de danger",
+    "delete_warning": "La suppression de votre compte est irréversible. Toutes vos données seront définitivement supprimées.",
+    "delete_account": "Supprimer le compte",
+    "cannot_delete": "Ce compte ne peut pas être supprimé.",
+    "delete_confirm": "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.",
+    "delete_double_confirm": "Tapez 'SUPPRIMER' pour confirmer la suppression de votre compte :",
+    "delete_confirm_text": "SUPPRIMER",
+    "success": {
+      "updated": "Profil mis à jour avec succès",
+      "deleted": "Compte supprimé avec succès"
+    },
+    "errors": {
+      "username_required": "Le nom d'utilisateur est requis",
+      "invalid_email": "Format d'email invalide",
+      "update_failed": "Échec de la mise à jour du profil",
+      "delete_failed": "Échec de la suppression du compte",
+      "confirmation_mismatch": "La confirmation ne correspond pas"
+    }
+  },
   "afk": {
     "title": "Page AFK",
     "subtitle": "Gagnez des récompenses gratuites en gardant cette page ouverte.",

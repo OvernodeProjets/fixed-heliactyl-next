@@ -101,6 +101,35 @@
       "no_password": "Kein Passwort verfügbar: Passwörter werden nur einmal angezeigt."
     }
   },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Verwalten Sie Ihre persönlichen Informationen",
+    "personal_info": "Persönliche Informationen",
+    "username": "Benutzername",
+    "email": "E‑Mail",
+    "user_id": "Benutzer‑ID",
+    "connected_accounts": "Verbundene Konten",
+    "connected": "Verbunden",
+    "no_connections": "Keine verbundenen Konten",
+    "danger_zone": "Gefahrenbereich",
+    "delete_warning": "Das Löschen Ihres Kontos ist irreversibel. Alle Ihre Daten werden dauerhaft gelöscht.",
+    "delete_account": "Konto löschen",
+    "cannot_delete": "Dieses Konto kann nicht gelöscht werden.",
+    "delete_confirm": "Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion ist irreversibel.",
+    "delete_double_confirm": "Geben Sie 'LÖSCHEN' ein, um die Kontolöschung zu bestätigen:",
+    "delete_confirm_text": "LÖSCHEN",
+    "success": {
+      "updated": "Profil erfolgreich aktualisiert",
+      "deleted": "Konto erfolgreich gelöscht"
+    },
+    "errors": {
+      "username_required": "Benutzername ist erforderlich",
+      "invalid_email": "Ungültiges E‑Mail‑Format",
+      "update_failed": "Profil konnte nicht aktualisiert werden",
+      "delete_failed": "Konto konnte nicht gelöscht werden",
+      "confirmation_mismatch": "Bestätigung stimmt nicht überein"
+    }
+  },
   "afk": {
     "title": "AFK‑Seite",
     "subtitle": "Erhalten Sie kostenlose Belohnungen, wenn diese Seite geöffnet bleibt.",
