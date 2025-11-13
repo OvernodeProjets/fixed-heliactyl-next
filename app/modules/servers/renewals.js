@@ -21,6 +21,7 @@ const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js");
 const PterodactylClientModule = require("../../handlers/ClientAPI.js");
+const { serverActivityLog } = require("../../handlers/log.js");
 
 module.exports.load = async function(router, db) {
   const ClientAPI = new PterodactylClientModule(settings.pterodactyl.domain, settings.pterodactyl.client_key);

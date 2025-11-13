@@ -28,10 +28,15 @@ const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const fetch = require("node-fetch");
 const { discordLog, addNotification } = require("../../handlers/log");
+const { authLimiter, passwordResetLimiter } = require("../../handlers/rateLimitConfig");
 
-// Add Resend API key to your settings
-// todo : move to config file
-const RESEND_API_KEY = 're_GqVR7va3_8z8QuYyECBEDYKYdvrf9iqbb';
+// Get Resend API key from environment variables
+const RESEND_API_KEY = settings.api.client.resend.RESEND_API_KEY || "";
+const RESEND_FROM_EMAIL = settings.api.client.resend.RESEND_FROM_EMAIL || 'noreply@example.com';
+
+if (!RESEND_API_KEY && settings.api?.client?.email?.enabled) {
+  console.warn('⚠️ RESEND_API_KEY not configured. Email functionality will be unavailable.');
+}
 
 module.exports.load = async function (router, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
@@ -55,6 +60,10 @@ module.exports.load = async function (router, db) {
   };
 
   const sendEmail = async (to, subject, html) => {
+    if (!RESEND_API_KEY) {
+      throw new Error('Email service not configured');
+    }
+    
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -62,7 +71,7 @@ module.exports.load = async function (router, db) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'fractal@mail.turing.su',
+        from: RESEND_FROM_EMAIL,
         to,
         subject,
         html
@@ -424,21 +433,43 @@ module.exports.load = async function (router, db) {
   router.get("/auth/magic-login", async (req, res) => {
     const { token } = req.query;
 
-    if (!token) {
+    if (!token || typeof token !== 'string') {
       return res.status(400).json({ error: "Token is required" });
     }
 
-    const magicInfo = await db.get(`magic-${token}`);
-    if (!magicInfo || magicInfo.expiry < Date.now()) {
-      return res.status(400).json({ error: "Invalid or expired token" });
+    // Validate token format (should be hex string)
+    if (!/^[a-f0-9]{64}$/.test(token)) {
+      return res.status(400).json({ error: "Invalid token format" });
     }
 
-    const userEmail = await db.get(`userid-${magicInfo.userId}`);
-    const user = await db.get(`user-${userEmail}`);
+    const magicInfo = await db.get(`magic-${token}`);
+    if (!magicInfo) {
+      return res.status(400).json({ error: "Invalid token" });
+    }
 
-    if (!user) {
+    if (magicInfo.expiry < Date.now()) {
+      await db.delete(`magic-${token}`);
+      return res.status(400).json({ error: "Token expired" });
+    }
+
+    // Validate userId
+    const userId = magicInfo.userId;
+    if (!userId || typeof userId !== 'string') {
+      return res.status(400).json({ error: "Invalid user mapping" });
+    }
+
+    const userEmail = await db.get(`userid-${userId}`);
+    if (!userEmail || typeof userEmail !== 'string') {
+      return res.status(400).json({ error: "User mapping not found" });
+    }
+
+    const user = await db.get(`user-${userEmail}`);
+    if (!user || !user.id) {
       return res.status(404).json({ error: "User not found" });
     }
+
+    // Delete the used magic token immediately
+    await db.delete(`magic-${token}`);
 
     // Create session
     req.session.userinfo = {
@@ -448,26 +479,27 @@ module.exports.load = async function (router, db) {
       global_name: user.username
     };
 
-    const PterodactylUser = await getPteroUser(userinfo.id, db);
-    if (!PterodactylUser) {
-        res.send("An error has occurred while attempting to update your account information and server list.");
-        return;
+    try {
+      const PterodactylUser = await getPteroUser(user.id, db);
+      if (!PterodactylUser) {
+        req.session.destroy();
+        return res.status(401).json({ error: "Failed to authenticate with Pterodactyl" });
+      }
+      req.session.pterodactyl = PterodactylUser.attributes;
+
+      await addNotification(
+        db,
+        user.id,
+        "user:sign-in",
+        "Sign in using magic link",
+        req.ip
+      );
+
+      res.json({ message: "Logged in successfully" });
+    } catch (error) {
+      console.error('Magic link login error:', error);
+      req.session.destroy();
+      return res.status(500).json({ error: "Authentication failed" });
     }
-    req.session.pterodactyl = PterodactylUser.attributes;
-
-    // Delete the used magic token
-    await db.delete(`magic-${token}`);
-
-    await addNotification(
-      db,
-      user.id,
-      "user:sign-in",
-      "Sign in using magic link",
-      req.ip
-    );
-
-    discordLog("sign in", `${user.username} signed in to the dashboard using a magic link!`);
-
-    res.redirect('/dashboard');
   });
 };

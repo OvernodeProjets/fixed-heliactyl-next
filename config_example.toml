@@ -90,6 +90,12 @@ is_default = false
   enabled = true
   code = "Example Code"
 
+# --- Resend integration ---
+  [api.client.resend]
+  #enabled = false
+  RESEND_API_KEY= ""
+  RESEND_FROM_EMAIL= ""
+
 # ---  Plesk integration ---
   [api.client.plesk]
   enabled = false
