@@ -262,6 +262,61 @@ module.exports.load = async function (router, db) {
   });
 
   /**
+   * POST api/v3/ban
+   * Bans a user.
+   */
+  router.post("api/v3/ban", authenticate, async (req, res) => {
+    if (typeof req.body !== "object")
+      return res.send({ status: "body must be an object" });
+    if (Array.isArray(req.body))
+      return res.send({ status: "body cannot be an array" });
+    
+    let id = req.body.id;
+    let reason = req.body.reason || "No reason provided";
+    let expiration = req.body.expiration || null;
+    
+    if (typeof id !== "string")
+      return res.send({ status: "id must be a string" });
+    
+    if (!(await db.get("users-" + id)))
+      return res.send({ status: "invalid id" });
+    
+    const banData = {
+      reason: reason,
+      expiration: expiration,
+    };
+    
+    await db.set(`ban-${id}`, banData);
+    adminjs.suspend(id);
+    
+    res.send({ status: "success", message: "User banned successfully" });
+  });
+
+  /**
+   * POST api/v3/unban
+   * Unbans a user.
+   */
+  router.post("api/v3/unban", authenticate, async (req, res) => {
+    if (typeof req.body !== "object")
+      return res.send({ status: "body must be an object" });
+    if (Array.isArray(req.body))
+      return res.send({ status: "body cannot be an array" });
+    
+    let id = req.body.id;
+    
+    if (typeof id !== "string")
+      return res.send({ status: "id must be a string" });
+    
+    if (!(await db.get("users-" + id)))
+      return res.send({ status: "invalid id" });
+    
+    await db.delete(`ban-${id}`);
+    adminjs.suspend(id);
+    
+    res.send({ status: "success", message: "User unbanned successfully" });
+  });
+
+  /**
    * Checks the authorization and returns the settings if authorized.
    * Renders the file based on the theme and sends the response.
    * @param {Object} req - The request object.
