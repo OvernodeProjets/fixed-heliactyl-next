@@ -258,7 +258,7 @@ module.exports.load = async function (router, db) {
       );
     }
 
-    if (settings.api.client.oauth2.ip["duplicate check"] == true) {
+    if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.1" && ip !== "::1" && ip !== "::ffff:127.0.0.1" && !ip.startsWith("192.168.")) {
       const userIP = await db.get(`ipuser-${ip}`);
       const bypassFlag = await db.get(`antialt-bypass-${userinfo.id}`) || false;
       if (userIP && userIP !== userinfo.id && !bypassFlag) {

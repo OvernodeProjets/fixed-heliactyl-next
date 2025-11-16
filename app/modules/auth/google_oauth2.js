@@ -99,7 +99,7 @@ module.exports.load = async function (router, db) {
       // Set cookie with Google ID
       res.cookie('userId', user.id, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
 
-      if (settings.api.client.oauth2.ip["duplicate check"] == true) {
+      if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.1" && ip !== "::1" && ip !== "::ffff:127.0.0.1" && !ip.startsWith("192.168.")) {
         const userIP = await db.get(`ipuser-${ip}`);
         const bypassFlag = await db.get(`antialt-bypass-${user.id}`) || false;
         if (userIP && userIP !== user.id && !bypassFlag) {
