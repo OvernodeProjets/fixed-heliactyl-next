@@ -98,10 +98,7 @@
                 </div>
 
                 <div class="flex justify-end gap-3 pt-6 border-t border-white/10">
-                    <button type="button" onclick="window.location.href='/dashboard'" class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-all font-medium">
-                        <%= __('common.cancel') %>
-                    </button>
-                    <button type="submit" class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-all font-medium flex items-center gap-2">
+                    <button id="save-btn" type="submit" class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 font-medium flex items-center gap-2 opacity-0 scale-95 pointer-events-none transition-all duration-300 ease-in-out-cubic">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
@@ -188,6 +185,8 @@
 
 <script>
 let oauthConnections = [];
+let initialUsername = '';
+let initialEmail = '';
 
 async function loadOAuthConnections() {
     try {
@@ -199,6 +198,39 @@ async function loadOAuthConnections() {
         console.error('Error loading OAuth connections:', error);
     }
 }
+
+function initializeFormTracking() {
+    initialUsername = document.getElementById('username').value.trim();
+    initialEmail = document.getElementById('email').value.trim();
+    checkFormChanges();
+}
+
+function checkFormChanges() {
+    const currentUsername = document.getElementById('username').value.trim();
+    const currentEmail = document.getElementById('email').value.trim();
+    const saveBtn = document.getElementById('save-btn');
+    
+    const hasChanges = currentUsername !== initialUsername || currentEmail !== initialEmail;
+    
+    if (hasChanges) {
+        saveBtn.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+        saveBtn.classList.add('opacity-100', 'scale-100');
+    } else {
+        saveBtn.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+        saveBtn.classList.remove('opacity-100', 'scale-100');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadOAuthConnections();
+    initializeFormTracking();
+    
+    const usernameInput = document.getElementById('username');
+    const emailInput = document.getElementById('email');
+    
+    usernameInput.addEventListener('input', checkFormChanges);
+    emailInput.addEventListener('input', checkFormChanges);
+});
 
 function displayOAuthConnections() {
     const container = document.getElementById('oauth-list');
@@ -309,6 +341,9 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
 
         if (response.ok) {
             showStatus('<%= __('profile.success.updated') %>', 'success');
+            initialUsername = username;
+            initialEmail = email;
+            checkFormChanges();
             setTimeout(() => window.location.reload(), 1500);
         } else {
             showStatus(data.error || '<%= __('profile.errors.update_failed') %>', 'error');
