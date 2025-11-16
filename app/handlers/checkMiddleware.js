@@ -9,6 +9,11 @@ const requireAuth = async (req, res, next, admin = false, db) => {
   if (!user) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
+
+  const isBanned = await db.get(`ban-${req.session.userinfo.id}`);
+  if (isBanned) {
+    return res.status(403).json({ error: 'Forbidden: banned user' });
+  }
   
   if (admin && user.attributes.root_admin !== true) {
     return res.status(403).json({ error: 'Forbidden: admin only' });
