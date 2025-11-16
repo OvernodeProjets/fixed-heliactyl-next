@@ -170,7 +170,7 @@ module.exports.load = async function(router, db) {
       await db.set(`renewal_${serverId}`, renewalData);
     
       // Stop the server
-      await executePowerAction(serverId, 'stop');
+      await ClientAPI.executePowerAction(serverId, 'stop');
     
       console.log(`Server ${serverId} has expired and been stopped.`);
     
@@ -243,7 +243,7 @@ module.exports.load = async function(router, db) {
       
       // If server was stopped due to expiration, restart it
       if (!currentStatus.isActive) {
-        await executePowerAction(serverId, 'start');
+        await ClientAPI.executePowerAction(serverId, 'start');
       }
       
       res.json({

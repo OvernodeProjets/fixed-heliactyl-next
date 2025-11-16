@@ -375,25 +375,7 @@ async function executePowerAction(instanceId, powerAction) {
       throw new Error(`Invalid power action: ${powerAction}`);
     }
 
-    const response = await axios.post(
-      `${settings.pterodactyl.domain}/api/client/servers/${instanceId}/power`,
-      { signal: powerAction },
-      {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-        },
-      }
-    );
-
-    if (response.status === 204) {
-      console.log(`Successfully executed power action: ${powerAction} for server ${instanceId}`);
-      return true;
-    } else {
-      console.error(`Unexpected response status: ${response.status}`);
-      return false;
-    }
+    return await pterodactylClient.executePowerAction(instanceId, powerAction);
   } catch (error) {
     console.error(`Error executing power action for server ${instanceId}:`, error.message);
     return false;

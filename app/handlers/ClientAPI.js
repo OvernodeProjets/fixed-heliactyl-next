@@ -159,6 +159,27 @@ class PterodactylClientModule {
     this.sendToWebSocket('set state', [state]);
   }
 
+  async executePowerAction(serverId, action) {
+    try {
+      const response = await axios.post(
+        `${this.apiUrl}/api/client/servers/${serverId}/power`,
+        { signal: action },
+        {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.apiKey}`
+          }
+        }
+      );
+      console.log(`Power action '${action}' executed for server ${serverId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error executing power action '${action}' for server ${serverId}:`, error.message);
+      throw error;
+    }
+  }
+
   disconnect() {
     if (this.socket) {
       this.socket.close();
