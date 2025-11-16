@@ -161,7 +161,8 @@ module.exports.load = async function (router, db) {
             user.id,
             "user:sign up",
             "Account created via Google OAuth2",
-             req.ip
+             req.ip,
+            req.headers['user-agent']
           );
 
           discordLog("sign in", `${user.name} signed in with Google!`);
@@ -216,7 +217,8 @@ module.exports.load = async function (router, db) {
         user.id,
         "user:auth",
         "Signed in with Google OAuth2",
-        req.ip
+        req.ip,
+        req.headers['user-agent']
       );
 
       discordLog("sign in", `${user.name} logged in to the dashboard with Google!`);

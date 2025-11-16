@@ -411,6 +411,10 @@ module.exports.load = async function (router, db) {
         return res.status(404).json({ error: "User not found in Pterodactyl" });
       }
 
+      const banStatus = await db.get(`ban-${userId}`);
+      const isBanned = banStatus ? true : false;
+      const banHistory = await db.get(`banHistory-${userId}`) || [];
+
       res.status(200).json({
         id: userId,
         package: package,
@@ -425,6 +429,9 @@ module.exports.load = async function (router, db) {
           ? (await db.get("coins-" + userId)) ?? 0
           : null,
         notifications: (await db.get("notifications-" + userId)) || [],
+        banned: isBanned,
+        banStatus: banStatus || null,
+        banHistory: banHistory
       });
     } catch (error) {
       console.error("Error in /admin/userinfo:", error);
@@ -444,9 +451,16 @@ module.exports.load = async function (router, db) {
       const banData = {
           reason: reason || "No reason provided",
           expiration: expiration || null,
+          bannedAt: new Date().toISOString(),
+          bannedBy: req.session.userinfo.id
       };
 
       await db.set(`ban-${id}`, banData);
+
+      // Add to ban history
+      const banHistory = (await db.get(`banHistory-${id}`)) || [];
+      banHistory.push(banData);
+      await db.set(`banHistory-${id}`, banHistory);
 
       discordLog(
           `ban user`,

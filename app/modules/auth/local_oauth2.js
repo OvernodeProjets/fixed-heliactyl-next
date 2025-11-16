@@ -198,7 +198,8 @@ module.exports.load = async function (router, db) {
       userId,
       "user:sign-in",
       "Account created via Local OAuth2",
-      req.ip
+      req.ip,
+      req.headers['user-agent']
     );
 
     discordLog(
@@ -291,7 +292,8 @@ module.exports.load = async function (router, db) {
       user.id,
       "user:sign-in",
       "Sign in from new location",
-      req.ip
+      req.ip,
+      req.headers['user-agent']
     );
 
     discordLog(
@@ -492,7 +494,8 @@ module.exports.load = async function (router, db) {
         user.id,
         "user:sign-in",
         "Sign in using magic link",
-        req.ip
+        req.ip,
+        req.headers['user-agent']
       );
 
       res.json({ message: "Logged in successfully" });

@@ -9,19 +9,12 @@ const settings = require("../handlers/config")("./config.toml");
 const AppAPI = new ApplicationAPI(settings.pterodactyl.domain, settings.pterodactyl.key);
 const getPteroUser = require("../handlers/getPteroUser");
 const { discordLog, addNotification } = require("../handlers/log");
-const { default: axios } = require("axios");
+const { requireAuth } = require("../handlers/checkMiddleware");
 
-const WHITE_COLOR = parseInt('#FFFFFF'.replace("#", ""), 16);
-const DEFAULT_LOGO = "https://i.imgur.com/5D0jaaX.png";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 module.exports.load = async function (router, db) {
-  const authMiddleware = (req, res, next) => {
-    if (!req.session.userinfo || !req.session.pterodactyl) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-    next();
-  };
+  const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
   router.get("/profile/oauth", authMiddleware, async (req, res) => {
     try {
@@ -137,7 +130,7 @@ module.exports.load = async function (router, db) {
 
       const [pterodactylUser] = await Promise.all([
         getPteroUser(userId, db),
-        addNotification(db, userId, "user:profile:update", "Profile information updated", req.ip)
+        addNotification(db, userId, "user:profile:update", "Profile information updated", req.ip, req.headers['user-agent'])
       ]);
 
       if (pterodactylUser) {
@@ -161,24 +154,15 @@ module.exports.load = async function (router, db) {
         changes.push(`Email: \`${oldEmail || 'N/A'}\` → \`${email}\``);
       }
 
-      if (changes.length > 0 && settings.logging.status && settings.logging.private) {
-        try {
-          await axios.post(settings.logging.private, {
-            embeds: [{
-              color: WHITE_COLOR,
-              title: `Event: \`profile update\``,
-              description: `${trimmedUsername} (${userId}) updated their profile information`,
-              fields: [
-                { name: "Changes", value: changes.join("\n"), inline: false },
-                { name: "IP Address", value: `\`${req.ip}\``, inline: true }
-              ],
-              author: { name: 'Heliactyl Logging' },
-              thumbnail: { url: settings.website.domain + "/assets/logo.png" || DEFAULT_LOGO }
-            }]
-          }, { headers: { 'Content-Type': 'application/json' } });
-        } catch (error) {
-          console.error("Error sending Discord log for profile update:", error);
-        }
+      if (changes.length > 0 && settings.logging.status) {
+        await discordLog(
+          "profile update",
+          `${trimmedUsername} (${userId}) updated their profile information`,
+          [
+            { name: "Changes", value: changes.join("\n"), inline: false },
+            { name: "IP Address", value: `\`${req.ip}\``, inline: true }
+          ]
+        );
       }
 
       res.json({ success: true, message: "Profile updated successfully" });
@@ -193,9 +177,10 @@ module.exports.load = async function (router, db) {
       const userId = req.session.userinfo.id;
       const username = req.session.userinfo.username;
 
-      if (username === 'banny') {
-        return res.status(403).json({ error: "This account cannot be deleted" });
-      }
+      // ??????
+      //if (username === 'banny') {
+      //  return res.status(403).json({ error: "This account cannot be deleted" });
+      //}
 
       const pterodactylId = await db.get(`users-${userId}`);
       if (!pterodactylId) {
@@ -280,46 +265,38 @@ module.exports.load = async function (router, db) {
         userId,
         "user:account:deleted",
         "Account deleted",
-        req.ip
+        req.ip,
+        req.headers['user-agent']
       );
 
-      if (settings.logging.status && settings.logging.private) {
-        try {
-          const fields = [
-            { name: "User ID", value: `\`${userId}\``, inline: true },
-            { name: "Pterodactyl ID", value: `\`${pterodactylId}\``, inline: true },
-            { name: "IP Address", value: `\`${req.ip}\``, inline: true }
-          ];
+      if (settings.logging.status) {
+        const fields = [
+          { name: "User ID", value: `\`${userId}\``, inline: true },
+          { name: "Pterodactyl ID", value: `\`${pterodactylId}\``, inline: true },
+          { name: "IP Address", value: `\`${req.ip}\``, inline: true }
+        ];
 
-          if (deletedServers.length > 0) {
-            fields.push({
-              name: "Deleted Servers",
-              value: deletedServers.map(s => `\`${s}\``).join(", "),
-              inline: false
-            });
-          }
-
-          if (serverErrors.length > 0) {
-            fields.push({
-              name: "Server Deletion Errors",
-              value: serverErrors.map(s => `\`${s}\``).join(", "),
-              inline: false
-            });
-          }
-
-          await axios.post(settings.logging.private, {
-            embeds: [{
-              color: WHITE_COLOR,
-              title: `Event: \`account deletion\``,
-              description: `${username} (${userId}) deleted their account\n\n**Actions performed:**\n• ${deletedServers.length} server(s) deleted\n• Pterodactyl account deleted`,
-              fields,
-              author: { name: 'Heliactyl Logging' },
-              thumbnail: { url: settings.website.domain + "/assets/logo.png" || DEFAULT_LOGO }
-            }]
-          }, { headers: { 'Content-Type': 'application/json' } });
-        } catch (error) {
-          console.error("Error sending Discord log for account deletion:", error);
+        if (deletedServers.length > 0) {
+          fields.push({
+            name: "Deleted Servers",
+            value: deletedServers.map(s => `\`${s}\``).join(", "),
+            inline: false
+          });
         }
+
+        if (serverErrors.length > 0) {
+          fields.push({
+            name: "Server Deletion Errors",
+            value: serverErrors.map(s => `\`${s}\``).join(", "),
+            inline: false
+          });
+        }
+
+        await discordLog(
+          "account deletion",
+          `${username} (${userId}) deleted their account\n\n**Actions performed:**\n• ${deletedServers.length} server(s) deleted\n• Pterodactyl account deleted`,
+          fields
+        );
       }
 
       req.session.destroy();

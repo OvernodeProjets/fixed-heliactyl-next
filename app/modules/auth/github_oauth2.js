@@ -201,7 +201,8 @@ module.exports.load = async function (router, db) {
             userinfo.id,
             "user:sign-in",
             "Sign in from new account created with GitHub OAuth2",
-            req.ip
+            req.ip,
+            req.headers['user-agent']
           );
 
           discordLog("sign in", `${userinfo.login} signed in to the dashboard with GitHub!`);
@@ -231,7 +232,8 @@ module.exports.load = async function (router, db) {
         userinfo.id,
         "user:sign-in",
         "Sign in from new location",
-        req.ip
+        req.ip,
+        req.headers['user-agent']
       );
 
       discordLog("sign up", `${userinfo.login} logged in to the dashboard with GitHub!`);

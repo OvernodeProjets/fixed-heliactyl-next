@@ -454,6 +454,7 @@ router.get("/logout", (req, res) => {
               "user:sign-in",
               "Sign in from new account created with Discord OAuth2",
               req.ip,
+              req.headers['user-agent']
             );
             
             discordLog(
@@ -476,7 +477,8 @@ router.get("/logout", (req, res) => {
           userinfo.id,
           "user:sign-in",
           "Sign in from new location",
-          req.ip
+          req.ip,
+          req.headers['user-agent']
         );
 
         discordLog(

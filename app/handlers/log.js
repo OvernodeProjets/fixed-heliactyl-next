@@ -4,12 +4,13 @@ const fetch = require('node-fetch')
 const crypto = require('crypto');
 const { default: axios } = require("axios");
 
-async function addNotification(db, userId, action, name, ip) {
+async function addNotification(db, userId, action, name, ip, userAgent = null) {
   const notifications = (await db.get(`notifications-${userId}`)) || [];
   notifications.push({
     action,
     name,
     ip,
+    userAgent: userAgent,
     timestamp: new Date().toISOString()
   });
   await db.set(`notifications-${userId}`, notifications);
