@@ -17,8 +17,8 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const loadConfig = require("../handlers/config");
-const updateManager = require("../handlers/updateManager");
+const loadConfig = require("../../handlers/config.js");
+const updateManager = require("../../handlers/updateManager.js");
 const settings = loadConfig("./config.toml");
 
 if (settings?.pterodactyl?.domain?.endsWith("/")) {
@@ -26,10 +26,10 @@ if (settings?.pterodactyl?.domain?.endsWith("/")) {
 }
 
 const adminjs = require("./admin.js");
-const { discordLog } = require("../handlers/log.js");
-const getPteroUser = require("../handlers/getPteroUser");
-const PterodactylApplicationModule = require('../handlers/ApplicationAPI.js');
-const { requireAuth } = require("../handlers/checkMiddleware.js");
+const { discordLog } = require("../../handlers/log.js");
+const getPteroUser = require("../../handlers/getPteroUser.js");
+const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
+const { requireAuth } = require("../../handlers/checkMiddleware.js");
 
 module.exports.load = async function (router, db) {
   const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);

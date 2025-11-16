@@ -35,7 +35,7 @@ const RESEND_API_KEY = settings.api.client.resend.RESEND_API_KEY || "";
 const RESEND_FROM_EMAIL = settings.api.client.resend.RESEND_FROM_EMAIL || 'noreply@example.com';
 
 if (!RESEND_API_KEY && settings.api?.client?.email?.enabled) {
-  console.warn('⚠️ RESEND_API_KEY not configured. Email functionality will be unavailable.');
+  console.warn('RESEND_API_KEY not configured. Email functionality will be unavailable.');
 }
 
 module.exports.load = async function (router, db) {

@@ -19,7 +19,7 @@ module.exports.heliactylModule = heliactylModule;
 
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
-const adminjs = require("./admin.js");
+const adminjs = require("./admin/admin.js");
 // todo : logging
 const { discordLog } = require("../handlers/log");
 const getPteroUser = require('../handlers/getPteroUser.js');

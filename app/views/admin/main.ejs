@@ -42,6 +42,12 @@
         </svg>
         Users
       </button>
+      <button onclick="switchTab('alts')" id="tab-alts" class="tab-button flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-gray-300 hover:bg-white/10 font-medium transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
+        Alts
+      </button>
       <button onclick="window.location.href='/admin/updates'" class="tab-button flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-gray-300 hover:bg-white/10 font-medium transition-all">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -317,6 +323,76 @@
                 </div>
             </div>
         </div>
+
+        <!-- ALTS TAB -->
+        <div id="content-alts" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Get Alts Form -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-white/10 rounded-lg">
+                            <svg class="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white">View Alts</h2>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Find all alternate accounts linked to a user's IP address.</p>
+                    <div>
+                        <div class="mb-4">
+                            <label for="alts-userid" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                            <input type="text" id="alts-userid" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all" placeholder="Enter user ID" required>
+                        </div>
+                        <button onclick="handleGetAlts()" class="w-full bg-indigo-500 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg hover:bg-white/20 transition-all font-medium shadow-md shadow-white/10">View Alts</button>
+                    </div>
+                    <div id="alts-result" class="mt-4 hidden">
+                        <div class="p-4 bg-white/5 rounded-lg border border-white/10">
+                            <p class="text-sm text-gray-300 font-mono whitespace-pre-wrap break-words" id="alts-data"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bypass Anti-Alt Form -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-white/10 rounded-lg">
+                            <svg class="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white">Bypass Anti-Alt</h2>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Allow a user to bypass the anti-alt check system.</p>
+                    <form action="/api/admin/alts/bypass" method="POST">
+                        <div class="mb-6">
+                            <label for="bypass-userid" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                            <input type="text" id="bypass-userid" name="userId" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all" placeholder="Enter user ID" required>
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg hover:bg-white/20 transition-all font-medium shadow-md shadow-white/10">Bypass Anti-Alt</button>
+                    </form>
+                </div>
+
+                <!-- Delete IP Association Form -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-white/10 rounded-lg">
+                            <svg class="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white">Delete IP Association</h2>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">⚠️ Remove the IP-user association for an account.</p>
+                    <form action="/api/admin/alts/delete" method="GET" onsubmit="return confirm('Are you sure you want to delete this IP association?')">
+                        <div class="mb-6">
+                            <label for="delete-ip" class="block text-sm font-medium text-gray-300 mb-2">IP Address</label>
+                            <input type="text" id="delete-ip" name="ip" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all" placeholder="Enter IP address to delete" required>
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg hover:bg-white/20 transition-all font-medium shadow-md shadow-white/10">Delete IP Association</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </main>
 
@@ -366,6 +442,42 @@ function handleFormSubmit(event) {
 document.querySelectorAll('form:not(.userinfo-form)').forEach(form => {
     form.addEventListener('submit', handleFormSubmit);
 });
+
+function handleGetAlts() {
+  const userId = document.getElementById("alts-userid").value.trim();
+
+  if (!userId) {
+    alert("Please enter a user ID.");
+    return;
+  }
+
+  const url = "/api/admin/alts/" + encodeURIComponent(userId);
+  const resultContainer = document.getElementById("alts-result");
+  const dataContainer = document.getElementById("alts-data");
+
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) throw new Error(data.error);
+
+      const formattedData = {
+        "User ID": data.userId,
+        "IP Address": data.ip,
+        "Alternate Accounts": data.alts.length > 0 ? data.alts : "No alts found"
+      };
+
+      resultContainer.classList.remove("hidden");
+      dataContainer.textContent = JSON.stringify(formattedData, null, 2);
+      dataContainer.classList.remove("text-red-500");
+      dataContainer.classList.add("text-gray-300");
+    })
+    .catch(error => {
+      resultContainer.classList.remove("hidden");
+      dataContainer.textContent = "Error: " + error.message;
+      dataContainer.classList.remove("text-gray-300");
+      dataContainer.classList.add("text-red-500");
+    });
+}
 
 function handleUserInfoSubmit() {
   const input = document.getElementById("userinfo-id").value.trim();
