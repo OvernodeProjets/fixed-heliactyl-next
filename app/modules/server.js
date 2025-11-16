@@ -29,10 +29,10 @@ const schedule = require("node-schedule");
 const { requireAuth, ownsServer } = require("../handlers/checkMiddleware.js")
 const { discordLog, serverActivityLog } = require("../handlers/log.js");
 
-const workflowsFilePath = path.join(__dirname, "../storage/workflows.json");
+const workflowsFilePath = path.join(__dirname, "../../storage/workflows.json");
 const scheduledWorkflowsFilePath = path.join(
   __dirname,
-  "../storage/scheduledWorkflows.json"
+  "../../storage/scheduledWorkflows.json"
 );
 module.exports.load = async function (router, db) {
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
@@ -289,6 +289,12 @@ function saveScheduledWorkflows() {
         const instanceId = job.name.split("_")[1];
         scheduledWorkflows[instanceId] = job.nextInvocation();
       }
+    }
+
+    // Ensure directory exists
+    const storageDir = path.dirname(scheduledWorkflowsFilePath);
+    if (!fs.existsSync(storageDir)) {
+      fs.mkdirSync(storageDir, { recursive: true });
     }
 
     fs.writeFileSync(
