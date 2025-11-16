@@ -35,9 +35,9 @@
     </div>
 
     <div class="mt-8 max-w-4xl mx-auto space-y-6">
-        <div class="rounded-xl bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-white/10 backdrop-blur-xl p-8 shadow-2xl">
+        <div class="rounded-xl bg-white/5 border border-white/10 p-8">
             <div class="flex items-center gap-4 mb-6">
-                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-2xl font-bold text-white">
                     <% if (req.session.userinfo.picture) { %>
                         <img src="<%= req.session.userinfo.picture %>" alt="Avatar" class="w-full h-full rounded-full object-cover">
                     <% } else if (req.session.userinfo.avatar) { %>
@@ -61,7 +61,7 @@
                             </svg>
                             <%= __('profile.username') %>
                         </label>
-                        <input type="text" id="username" value="<%= req.session.userinfo.username %>" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+                        <input type="text" id="username" value="<%= req.session.userinfo.username %>" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all">
                     </div>
                     <div class="space-y-2">
                         <label class="block text-sm font-semibold text-white/80 mb-2">
@@ -70,7 +70,7 @@
                             </svg>
                             <%= __('profile.email') %>
                         </label>
-                        <input type="email" id="email" value="<%= req.session.userinfo.email || '' %>" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+                        <input type="email" id="email" value="<%= req.session.userinfo.email || '' %>" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all">
                     </div>
                 </div>
                 <div class="space-y-2">
@@ -80,7 +80,7 @@
                         </svg>
                         <%= __('profile.user_id') %>
                     </label>
-                    <input type="text" id="userid" value="<%= req.session.userinfo.id %>" disabled class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/50 cursor-not-allowed font-mono text-sm">
+                    <input type="text" id="userid" value="<%= req.session.userinfo.id %>" disabled class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white/50 cursor-not-allowed font-mono text-sm">
                 </div>
 
                 <div id="oauth-connections" class="mt-6 pt-6 border-t border-white/10">
@@ -91,17 +91,17 @@
                         <%= __('profile.connected_accounts') %>
                     </label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="oauth-list">
-                        <div class="flex items-center justify-center p-4 bg-white/5 rounded-lg border border-white/10">
+                        <div class="flex items-center justify-center p-4 bg-white/10 rounded-lg border border-white/20">
                             <p class="text-sm text-white/50"><%= __('common.loading') %></p>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-6 border-t border-white/10">
-                    <button type="button" onclick="window.location.href='/dashboard'" class="px-6 py-3 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-all font-medium">
+                    <button type="button" onclick="window.location.href='/dashboard'" class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-all font-medium">
                         <%= __('common.cancel') %>
                     </button>
-                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all font-medium shadow-lg shadow-indigo-500/25 flex items-center gap-2">
+                    <button type="submit" class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-all font-medium flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
@@ -111,24 +111,24 @@
             </form>
         </div>
 
-        <div class="rounded-xl bg-gradient-to-br from-red-500/10 via-rose-500/10 to-pink-500/10 border border-red-500/20 backdrop-blur-xl p-8 shadow-2xl">
+        <div class="rounded-xl bg-white/5 border border-white/10 p-8">
             <div class="flex items-start gap-4 mb-6">
-                <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
                 <div class="flex-1">
-                    <h2 class="text-xl font-bold mb-2 text-red-400"><%= __('profile.danger_zone') %></h2>
+                    <h2 class="text-xl font-bold mb-2 text-white"><%= __('profile.danger_zone') %></h2>
                     <p class="text-sm text-white/60 mb-6"><%= __('profile.delete_warning') %></p>
-                    <button id="delete-account-btn" <% if (req.session.userinfo.username === 'banny') { %>disabled<% } %> class="px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl hover:from-red-600 hover:to-rose-700 transition-all font-medium shadow-lg shadow-red-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-red-500 disabled:hover:to-rose-600 flex items-center gap-2">
+                    <button id="delete-account-btn" <% if (req.session.userinfo.username === 'banny') { %>disabled<% } %> class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-indigo-700 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                         <%= __('profile.delete_account') %>
                     </button>
                     <% if (req.session.userinfo.username === 'banny') { %>
-                    <p class="text-sm text-red-400 mt-3 flex items-center gap-2">
+                    <p class="text-sm text-white/60 mt-3 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
@@ -150,35 +150,35 @@
     </div>
 
     <div id="delete-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4" style="background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px);">
-        <div class="bg-gradient-to-br from-red-500/20 via-rose-500/20 to-pink-500/20 border border-red-500/30 rounded-2xl shadow-2xl backdrop-blur-xl max-w-md w-full p-8">
+        <div class="bg-white/5 border border-white/10 rounded-2xl max-w-md w-full p-8">
             <div class="flex items-center gap-4 mb-6">
-                <div class="w-14 h-14 rounded-full bg-red-500/30 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
                 <div>
                     <h3 class="text-2xl font-bold text-white"><%= __('profile.delete_account') %></h3>
-                    <p class="text-white/60 text-sm"><%= __('profile.delete_warning') %></p>
+                    <p class="text-gray-400 text-sm"><%= __('profile.delete_warning') %></p>
                 </div>
             </div>
 
             <div class="space-y-4 mb-6">
-                <p class="text-white/80 text-sm"><%= __('profile.delete_confirm') %></p>
+                <p class="text-gray-300 text-sm"><%= __('profile.delete_confirm') %></p>
                 <div>
-                    <label class="block text-sm font-semibold text-white/80 mb-2">
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">
                         <%= __('profile.delete_double_confirm') %>
                     </label>
-                    <input type="text" id="delete-confirm-input" placeholder="<%= __('profile.delete_confirm_text') %>" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all font-mono">
+                    <input type="text" id="delete-confirm-input" placeholder="<%= __('profile.delete_confirm_text') %>" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all font-mono">
                     <p class="text-xs text-white/50 mt-2"><%= __('profile.delete_confirm_text') %></p>
                 </div>
             </div>
 
             <div class="flex gap-3">
-                <button id="delete-modal-cancel" class="flex-1 px-6 py-3 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-all font-medium">
+                <button id="delete-modal-cancel" class="flex-1 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all font-medium">
                     <%= __('common.cancel') %>
                 </button>
-                <button id="delete-modal-confirm" class="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl hover:from-red-600 hover:to-rose-700 transition-all font-medium shadow-lg shadow-red-500/25">
+                <button id="delete-modal-confirm" class="flex-1 px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-all font-medium">
                     <%= __('profile.delete_account') %>
                 </button>
             </div>
@@ -214,9 +214,9 @@ function displayOAuthConnections() {
     }
 
     container.innerHTML = oauthConnections.map(conn => `
-        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all group">
+        <div class="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20 hover:bg-white/15 transition-all group">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-xl">
+                <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-xl">
                     ${conn.icon}
                 </div>
                 <div>
@@ -224,7 +224,7 @@ function displayOAuthConnections() {
                     <p class="text-xs text-white/50"><%= __('profile.connected') %></p>
                 </div>
             </div>
-            <div class="w-2 h-2 rounded-full bg-green-400 shadow-lg shadow-green-400/50"></div>
+            <div class="w-2 h-2 rounded-full bg-white/30"></div>
         </div>
     `).join('');
 }
@@ -239,16 +239,16 @@ function showStatus(message, type) {
     statusText.textContent = message;
     
     if (type === 'success') {
-        statusContainer.classList.add('bg-green-500/20', 'border-green-500/30', 'text-green-400');
-        statusContainer.classList.remove('bg-red-500/20', 'border-red-500/30', 'text-red-400');
+        statusContainer.classList.add('bg-white/10', 'border-white/20', 'text-white');
+        statusContainer.classList.remove('bg-white/10', 'border-white/20', 'text-white');
         statusIcon.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
         `;
     } else {
-        statusContainer.classList.add('bg-red-500/20', 'border-red-500/30', 'text-red-400');
-        statusContainer.classList.remove('bg-green-500/20', 'border-green-500/30', 'text-green-400');
+        statusContainer.classList.add('bg-white/10', 'border-white/20', 'text-white');
+        statusContainer.classList.remove('bg-white/10', 'border-white/20', 'text-white');
         statusIcon.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -333,9 +333,9 @@ document.getElementById('delete-modal-confirm').addEventListener('click', () => 
         deleteAccount();
     } else {
         showStatus('<%= __('profile.errors.confirmation_mismatch') %>', 'error');
-        input.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+        input.classList.add('border-white/50', 'ring-2', 'ring-white/50');
         setTimeout(() => {
-            input.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+            input.classList.remove('border-white/50', 'ring-2', 'ring-white/50');
         }, 2000);
     }
 });
