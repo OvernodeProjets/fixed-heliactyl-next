@@ -30,7 +30,7 @@ module.exports.load = async function (router, db) {
       if (userEmail) {
         localUser = await db.get(`user-${userEmail}`);
         if (localUser?.password) {
-          connections.push({ provider: "Local", icon: "🔐" });
+          connections.push({ provider: "Local" });
         }
       }
 
@@ -39,11 +39,11 @@ module.exports.load = async function (router, db) {
         if (pterodactylUser) {
           const { userinfo } = req.session;
           if (userinfo.avatar || userinfo.discriminator) {
-            connections.push({ provider: "Discord", icon: "🎮" });
+            connections.push({ provider: "Discord" });
           } else if (userinfo.picture?.includes('googleusercontent.com')) {
-            connections.push({ provider: "Google", icon: "🔍" });
+            connections.push({ provider: "Google" });
           } else if (userinfo.login || userinfo.html_url) {
-            connections.push({ provider: "GitHub", icon: "💻" });
+            connections.push({ provider: "GitHub" });
           }
         }
       }
