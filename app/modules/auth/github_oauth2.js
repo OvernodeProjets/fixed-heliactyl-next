@@ -24,6 +24,7 @@ const getPteroUser = require('../../handlers/getPteroUser.js');
 
 const fetch = require("node-fetch");
 const { discordLog, addNotification } = require("../../handlers/log");
+const { getPages } = require("../../handlers/theme.js");
 
 // todo : implement that in frontend and review code 
 module.exports.load = async function (router, db) {

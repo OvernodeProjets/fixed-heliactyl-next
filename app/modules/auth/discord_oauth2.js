@@ -38,6 +38,7 @@ if (settings?.pterodactyl?.domain?.endsWith("/")) {
 
 const fetch = require("node-fetch");
 const { discordLog, addNotification } = require("../../handlers/log.js");
+const { getPages } = require("../../handlers/theme.js");
 
 module.exports.load = async function (router, db) {
   router.get("/discord/login", async (req, res) => {

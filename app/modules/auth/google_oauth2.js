@@ -24,7 +24,7 @@ const settings = loadConfig("./config.toml");
 const { discordLog, addNotification } = require("../../handlers/log");
 const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
 const getPteroUser = require('../../handlers/getPteroUser.js');
-const { getPages } = require('../../handlers/theme.js');
+const { getPages } = require("../../handlers/theme.js");
 
 let google;
 let oauth2Client;

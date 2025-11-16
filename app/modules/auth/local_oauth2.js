@@ -29,6 +29,7 @@ const settings = loadConfig("./config.toml");
 const fetch = require("node-fetch");
 const { discordLog, addNotification } = require("../../handlers/log");
 const { authLimiter, passwordResetLimiter } = require("../../handlers/rateLimitConfig");
+const { getPages } = require("../../handlers/theme.js");
 
 // Get Resend API key from environment variables
 const RESEND_API_KEY = settings.api.client.resend.RESEND_API_KEY || "";
