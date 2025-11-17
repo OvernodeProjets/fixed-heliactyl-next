@@ -187,6 +187,34 @@ module.exports.load = async function (router, db) {
         return res.status(404).json({ error: "User not found" });
       }
 
+      // Check if any server is suspended BEFORE doing anything
+      try {
+        const pterodactylUser = await getPteroUser(userId, db);
+        const servers = pterodactylUser?.attributes?.relationships?.servers?.data;
+        
+        if (servers?.length) {
+          const suspendedServers = servers.filter(server => server.attributes.suspended === true);
+          
+          if (suspendedServers.length > 0) {
+            if (settings.logging.status) {
+              await discordLog(
+                "account deletion",
+                `${username} (${userId}) attempted to delete their account but has suspended server(s)`,
+                [
+                  { name: "User ID", value: `\`${userId}\``, inline: true },
+                  { name: "Pterodactyl ID", value: `\`${pterodactylId}\``, inline: true },
+                  { name: "IP Address", value: `\`${req.ip}\``, inline: true },
+                  { name: "Suspended Servers", value: suspendedServers.map(s => `\`${s.attributes.name || s.attributes.identifier}\``).join(", "), inline: false }
+                ]
+              );
+            }
+            return res.status(403).json({ error: "Cannot delete account with suspended servers. Please contact support." });
+          }
+        }
+      } catch (error) {
+        console.error("Error checking suspended servers:", error);
+      }
+
       const userEmail = await db.get(`userid-${userId}`);
       const localUser = userEmail ? await db.get(`user-${userEmail}`) : null;
 
@@ -231,25 +259,6 @@ module.exports.load = async function (router, db) {
         const servers = pterodactylUser?.attributes?.relationships?.servers?.data;
         
         if (servers?.length) {
-          // Check if any server is suspended
-          const suspendedServers = servers.filter(server => server.attributes.suspended === true);
-          
-          if (suspendedServers.length > 0) {
-            if (settings.logging.status) {
-              await discordLog(
-                "account deletion",
-                `${username} (${userId}) attempted to delete their account but has suspended server(s)`,
-                [
-                  { name: "User ID", value: `\`${userId}\``, inline: true },
-                  { name: "Pterodactyl ID", value: `\`${pterodactylId}\``, inline: true },
-                  { name: "IP Address", value: `\`${req.ip}\``, inline: true },
-                  { name: "Suspended Servers", value: suspendedServers.map(s => `\`${s.attributes.name || s.attributes.identifier}\``).join(", "), inline: false }
-                ]
-              );
-            }
-            return res.status(403).json({ error: "Cannot delete account with suspended servers. Please contact support." });
-          }
-
           const deletePromises = servers.map(async (server) => {
             try {
               await AppAPI.deleteServer(server.attributes.id, true);
