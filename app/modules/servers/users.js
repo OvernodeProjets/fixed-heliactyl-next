@@ -118,7 +118,7 @@ module.exports.load = async function(router, db) {
   }
 
   // Update the existing /server/:id/users endpoint to call updateSubuserInfo
-  router.get('/server/:id/users', authMiddleware, ownsServer, async (req, res) => {
+  router.get('/server/:id/users', authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const serverId = req.params.id;
       const response = await axios.get(
@@ -142,7 +142,7 @@ module.exports.load = async function(router, db) {
     }
   });
 
-  router.post('/server/:id/users', authMiddleware, ownsServer, async (req, res) => {
+  router.post('/server/:id/users', authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const serverId = req.params.id;
       const { email } = req.body;
@@ -213,7 +213,7 @@ module.exports.load = async function(router, db) {
   });
 
   // DELETE /api/server/:id/users/:subuser - Delete User
-  router.delete('/server/:id/users/:subuser', authMiddleware, ownsServer, async (req, res) => {
+  router.delete('/server/:id/users/:subuser', authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const { id: serverId, subuser: subuserId } = req.params;
       await axios.delete(

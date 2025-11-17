@@ -74,7 +74,7 @@ module.exports.load = async function(router, db) {
   
   
   // Worlds endpoints
-  router.get('/server/:id/worlds', authMiddleware, ownsServer, async (req, res) => {
+  router.get('/server/:id/worlds', authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const serverId = req.params.id;
       
@@ -160,7 +160,7 @@ module.exports.load = async function(router, db) {
     }
   });
   
-  router.post('/server/:id/worlds/import', authMiddleware, ownsServer, async (req, res) => {
+  router.post('/server/:id/worlds/import', authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const serverId = req.params.id;
       const { worldName } = req.body;
@@ -212,7 +212,7 @@ module.exports.load = async function(router, db) {
     }
   });
   
-  router.post('/server/:id/worlds/import/complete', authMiddleware, ownsServer, async (req, res) => {
+  router.post('/server/:id/worlds/import/complete', authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const serverId = req.params.id;
       const { worldName, fileName } = req.body;
@@ -404,7 +404,7 @@ module.exports.load = async function(router, db) {
     }
   });
   
-  router.delete('/server/:id/worlds/:worldName', authMiddleware, ownsServer, async (req, res) => {
+  router.delete('/server/:id/worlds/:worldName', authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const { id: serverId, worldName } = req.params;
   

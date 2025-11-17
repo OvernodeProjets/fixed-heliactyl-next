@@ -59,7 +59,7 @@ module.exports.load = async function(router, db) {
     });
     
     // POST Reinstall server
-    router.post('/server/:id/reinstall', authMiddleware, ownsServer, async (req, res) => {
+    router.post('/server/:id/reinstall', authMiddleware, ownsServer(db), async (req, res) => {
         try {
             const serverId = req.params.id;
             await axios.post(`${settings.pterodactyl.domain}/api/client/servers/${serverId}/settings/reinstall`, {}, {
@@ -77,7 +77,7 @@ module.exports.load = async function(router, db) {
     });
 
     // POST Rename server
-    router.post('/server/:id/rename', authMiddleware, ownsServer, async (req, res) => {
+    router.post('/server/:id/rename', authMiddleware, ownsServer(db), async (req, res) => {
         try {
             const serverId = req.params.id;
             const { name } = req.body; // Expecting the new name for the server in the request body

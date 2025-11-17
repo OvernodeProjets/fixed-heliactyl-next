@@ -30,7 +30,7 @@ module.exports.load = async function(router, db) {
   router.get(
     "/server/:id/backups",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       try {
         const serverId = req.params.id;
@@ -56,7 +56,7 @@ module.exports.load = async function(router, db) {
   router.post(
     "/server/:id/backups",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       try {
         const serverId = req.params.id;
@@ -83,7 +83,7 @@ module.exports.load = async function(router, db) {
   router.get(
     "/server/:id/backups/:backupId/download",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       try {
         const serverId = req.params.id;
@@ -110,7 +110,7 @@ module.exports.load = async function(router, db) {
   router.delete(
     "/server/:id/backups/:backupId",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       try {
         const serverId = req.params.id;

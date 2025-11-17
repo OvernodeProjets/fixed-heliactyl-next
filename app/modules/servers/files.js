@@ -26,7 +26,7 @@ const { discordLog, serverActivityLog } = require("../../handlers/log");
 module.exports.load = async function (router, db) {
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 // GET /api/server/:id/files/download
-router.get('/server/:id/files/download', authMiddleware, ownsServer, async (req, res) => {
+router.get('/server/:id/files/download', authMiddleware, ownsServer(db), async (req, res) => {
   try {
     const serverId = req.params.id;
     const file = req.query.file;
@@ -56,7 +56,7 @@ router.get('/server/:id/files/download', authMiddleware, ownsServer, async (req,
 
 // POST /api/server/:id/files/copy
 // unused
-router.post('/server/:id/files/copy', authMiddleware, ownsServer, async (req, res) => {
+router.post('/server/:id/files/copy', authMiddleware, ownsServer(db), async (req, res) => {
   try {
     const serverId = req.params.id;
     const { location } = req.body;
@@ -87,7 +87,7 @@ router.post('/server/:id/files/copy', authMiddleware, ownsServer, async (req, re
 router.get(
   "/server/:id/files/list",
   authMiddleware,
-  ownsServer,
+  ownsServer(db),
   async (req, res) => {
     try {
       const serverId = req.params.id;
@@ -140,7 +140,7 @@ router.get(
   router.get(
     "/server/:id/files/contents",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       try {
         const serverId = req.params.id;
@@ -178,7 +178,7 @@ router.get(
   router.post(
     "/server/:id/files/write",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       try {
         const serverId = req.params.id;
@@ -211,7 +211,7 @@ router.get(
   router.post(
     "/server/:id/files/compress",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       try {
         const serverId = req.params.id;
@@ -239,7 +239,7 @@ router.get(
   router.post(
     "/server/:id/files/decompress",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       try {
         const serverId = req.params.id;
@@ -267,7 +267,7 @@ router.get(
   router.post(
     "/server/:id/files/delete",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       try {
         const serverId = req.params.id;
@@ -296,7 +296,7 @@ router.get(
   router.get(
     "/server/:id/files/upload",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       try {
         const serverId = req.params.id;
@@ -324,7 +324,7 @@ router.get(
   router.post(
     "/server/:id/files/create-folder",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       try {
         const serverId = req.params.id;
@@ -352,7 +352,7 @@ router.get(
   router.put(
     "/server/:id/files/rename",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       try {
         const serverId = req.params.id;

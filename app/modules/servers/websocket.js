@@ -30,7 +30,7 @@ module.exports.load = async function(router, db) {
   router.get(
     "/server/:id/websocket",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       try {
         const serverId = req.params.id;
@@ -62,7 +62,7 @@ module.exports.load = async function(router, db) {
   );
 
   // GET server details
-  router.get("/server/:id", authMiddleware, ownsServer, async (req, res) => {
+  router.get("/server/:id", authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const serverId = req.params.id;
       const serverDetails = await ClientAPI.getServerDetails(serverId);

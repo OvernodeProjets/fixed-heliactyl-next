@@ -185,7 +185,7 @@ module.exports.load = async function(router, db) {
   }
   
   // Add these routes to the router
-  router.get('/server/:id/renewal/status', authMiddleware, ownsServer, async (req, res) => {
+  router.get('/server/:id/renewal/status', authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const serverId = req.params.id;
       const renewalStatus = await getRenewalStatus(db, serverId, req.session.userinfo.id);
@@ -216,7 +216,7 @@ module.exports.load = async function(router, db) {
   });
   
   // And update the renewal endpoint validation in the POST route:
-  router.post('/server/:id/renewal/renew', authMiddleware, ownsServer, async (req, res) => {
+  router.post('/server/:id/renewal/renew', authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const serverId = req.params.id;
       const currentStatus = await getRenewalStatus(db, serverId);

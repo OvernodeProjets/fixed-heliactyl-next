@@ -27,7 +27,7 @@ module.exports.load = async function(router, db) {
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
   // POST /api/server/:id/allocations - Assign new allocation
-  router.post('/server/:id/allocations', authMiddleware, ownsServer, async (req, res) => {
+  router.post('/server/:id/allocations', authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const serverId = req.params.id;
     

@@ -108,7 +108,7 @@ module.exports.load = async function (router, db) {
   loadScheduledWorkflows();
 
 // GET /api/server/:id/logs - Get server activity logs
-router.get('/server/:id/logs', authMiddleware, ownsServer, async (req, res) => {
+router.get('/server/:id/logs', authMiddleware, ownsServer(db), async (req, res) => {
   try {
     const serverId = req.params.id;
     const page = parseInt(req.query.page) || 1;
@@ -149,7 +149,7 @@ router.get('/server/:id/logs', authMiddleware, ownsServer, async (req, res) => {
   router.get(
     "/server/:id/workflow",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       try {
         const serverId = req.params.id;
@@ -171,7 +171,7 @@ router.get('/server/:id/logs', authMiddleware, ownsServer, async (req, res) => {
   );
 
 // GET /api/server/:id/variables
-router.get('/server/:id/variables', authMiddleware, ownsServer, async (req, res) => {
+router.get('/server/:id/variables', authMiddleware, ownsServer(db), async (req, res) => {
   try {
     const serverId = req.params.id;
     const response = await axios.get(
@@ -191,7 +191,7 @@ router.get('/server/:id/variables', authMiddleware, ownsServer, async (req, res)
 });
 
 // PUT /api/server/:id/variables
-router.put('/server/:id/variables', authMiddleware, ownsServer, async (req, res) => {
+router.put('/server/:id/variables', authMiddleware, ownsServer(db), async (req, res) => {
   try {
     const serverId = req.params.id;
     const { key, value } = req.body;
@@ -222,7 +222,7 @@ router.put('/server/:id/variables', authMiddleware, ownsServer, async (req, res)
   router.post(
     "/server/:instanceId/workflow/save-workflow",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       const { instanceId } = req.params;
       const workflow = req.body;

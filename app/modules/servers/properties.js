@@ -43,7 +43,7 @@ module.exports.load = async function(router, db) {
     };
 
     // GET server properties
-    router.get('/server/:id/properties', authMiddleware, ownsServer, async (req, res) => {
+    router.get('/server/:id/properties', authMiddleware, ownsServer(db), async (req, res) => {
         try {
             const serverId = req.params.id;
             const response = await axios.get(`${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/contents`, {
@@ -64,7 +64,7 @@ module.exports.load = async function(router, db) {
     });
 
     // PUT update server properties
-    router.put('/server/:id/properties', authMiddleware, ownsServer, async (req, res) => {
+    router.put('/server/:id/properties', authMiddleware, ownsServer(db), async (req, res) => {
         try {
             const serverId = req.params.id;
             const updatedProperties = req.body;

@@ -72,7 +72,7 @@ module.exports.load = async function(router, db) {
   router.post(
     "/plugins/install/:id",
     authMiddleware,
-    ownsServer,
+    ownsServer(db),
     async (req, res) => {
       const { id: serverId } = req.params;
       const { pluginId } = req.body;

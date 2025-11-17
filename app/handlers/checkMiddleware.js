@@ -24,7 +24,7 @@ const requireAuth = async (req, res, next, admin = false, db) => {
 };
 
 
-const ownsServer = async (req, res, next) => {
+const ownsServer = (db) => async (req, res, next) => {
   const serverId = req.params.id || req.params.serverId || req.params.instanceId;
   const userServers = req.session.pterodactyl.relationships.servers.data;
   const serverOwned = userServers.some(server => server.attributes.identifier === serverId);
