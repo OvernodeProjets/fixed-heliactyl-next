@@ -60,8 +60,9 @@ const discordLog = async (action, message = '', fields = [], isPublic = false) =
 
   const isUserAction = settings.logging.actions.user[action];
   const isAdminAction = settings.logging.actions.admin[action];
+  const isApiAction = settings.logging.actions.api[action];
 
-  if (!isUserAction && !isAdminAction) return;
+  if (!isUserAction && !isAdminAction && !isApiAction) return;
 
   const embed = {
     embeds: [

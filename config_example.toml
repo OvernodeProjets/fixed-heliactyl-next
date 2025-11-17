@@ -410,36 +410,56 @@ public = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAaa
 private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAaaA-aaaaaaaaa0aaa0aAa0aa0aa0aa0a0"
 
   [logging.actions.user]
+  # Account
   "sign up" = true
   "sign in" = true
   "profile update" = true
+  # Server
   "created server" = true
   "modified server" = true
   "deleted server" = true
   "resource adjustment" = true
-  "gifted coins" = true
-  "daily coins" = true
-  "anti-alt" = true
-  # event
-  "halloween rewards claimed" = true
-  # store
+  # Store
   "buy servers" = true  
   "buy ram" = true
   "buy cpu" = true
   "buy disk" = true
   "transaction" = true
   "renewal bypass" = true
+  # Rewards
+  "gifted coins" = true
+  "daily coins" = true
+  # Security
+  "anti-alt" = true
+  # Events
+  "halloween rewards claimed" = true
 
   [logging.actions.admin]
+  # Coins management
   "set coins" = true
   "add coins" = true
+  # Resources management
   "set resources" = true
   "add resources" = true
+  # Plan management
   "set plan" = true
+  # Account management
   "remove account" = true
+  # Ban system
   "unban user" = true
   "ban user" = true
-  # don't used
-  "create coupon" = true
-  "revoke coupon" = true
-  "view ip" = true
+
+  [logging.actions.api]
+  # Access & Errors
+  "api access" = true
+  "api error" = true
+  # Coins management
+  "api set coins" = true
+  "api add coins" = true
+  # Plan management
+  "api set plan" = true
+  # Resources management
+  "api set resources" = true
+  # Ban system
+  "api ban user" = true
+  "api unban user" = true

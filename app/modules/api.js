@@ -40,6 +40,7 @@ module.exports.load = async function (router, db) {
    * Returns the status of the API.
    */
   router.get("/api", authenticate, async (req, res) => {
+    discordLog('api access', `API Status check requested`);
     res.send({
       status: true,
       version: settings.version,
@@ -54,10 +55,15 @@ module.exports.load = async function (router, db) {
   router.get("api/v3/userinfo", authenticate, async (req, res) => {
     const { id } = req.query;
 
-    if (!id) return res.send({ status: "missing id" });
+    if (!id) {
+      discordLog('api error', `API userinfo request: Missing user ID`);
+      return res.send({ status: "missing id" });
+    }
 
-    if (!(await db.get("users-" + id)))
+    if (!(await db.get("users-" + id))) {
+      discordLog('api error', `API userinfo request: Invalid user ID \`${id}\``);
       return res.send({ status: "invalid id" });
+    }
 
     let packagename = await db.get("package-" + id);
     let package =
@@ -75,10 +81,12 @@ module.exports.load = async function (router, db) {
 
     const PterodactylUser = await getPteroUser(id, db);
     if (!PterodactylUser) {
+        discordLog('api error', `API userinfo request: Failed to fetch Pterodactyl user data for ID \`${id}\``);
         res.send("An error has occurred while attempting to update your account information and server list.");
         return;
     }
 
+    discordLog('api access', `API userinfo retrieved for user ID \`${id}\``);
     res.send({
       status: "success",
       package: package,
@@ -113,8 +121,10 @@ module.exports.load = async function (router, db) {
     let coins = req.body.coins;
     if (typeof id !== "string")
       return res.send({ status: "id must be a string" });
-    if (!(await db.get("users-" + id)))
+    if (!(await db.get("users-" + id))) {
+      discordLog('api error', `API setcoins request: Invalid user ID \`${id}\``);
       return res.send({ status: "invalid id" });
+    }
     if (typeof coins !== "number")
       return res.send({ status: "coins must be number" });
     if (coins < 0 || coins > 999999999999999)
@@ -124,6 +134,7 @@ module.exports.load = async function (router, db) {
     } else {
       await db.set("coins-" + id, coins);
     }
+    discordLog('api set coins', `User ID: \`${id}\` | Coins set to: \`${coins}\``);
     res.send({ status: "success" });
   });
 
@@ -136,8 +147,10 @@ module.exports.load = async function (router, db) {
     let coins = req.body.coins;
     if (typeof id !== "string")
       return res.send({ status: "id must be a string" });
-    if (!(await db.get("users-" + id)))
+    if (!(await db.get("users-" + id))) {
+      discordLog('api error', `API addcoins request: Invalid user ID \`${id}\``);
       return res.send({ status: "invalid id" });
+    }
     if (typeof coins !== "number")
       return res.send({ status: "coins must be number" });
     if (coins < 1 || coins > 999999999999999)
@@ -148,6 +161,7 @@ module.exports.load = async function (router, db) {
       let current = await db.get("coins-" + id);
       await db.set("coins-" + id, current + coins);
     }
+    discordLog('api add coins', `User ID: \`${id}\` | Coins added: \`${coins}\``);
     res.send({ status: "success" });
   });
 
@@ -161,18 +175,24 @@ module.exports.load = async function (router, db) {
     if (typeof req.body.id !== "string")
       return res.send({ status: "missing id" });
 
-    if (!(await db.get("users-" + req.body.id)))
+    if (!(await db.get("users-" + req.body.id))) {
+      discordLog('api error', `API setplan request: Invalid user ID \`${req.body.id}\``);
       return res.send({ status: "invalid id" });
+    }
 
     if (typeof req.body.package !== "string") {
       await db.delete("package-" + req.body.id);
       adminjs.suspend(req.body.id);
+      discordLog('api set plan', `User ID: \`${req.body.id}\` | Package deleted`);
       return res.send({ status: "success" });
     } else {
-      if (!settings.api.client.packages.list[req.body.package])
+      if (!settings.api.client.packages.list[req.body.package]) {
+        discordLog('api error', `API setplan request: Invalid package \`${req.body.package}\` for user ID \`${req.body.id}\``);
         return res.send({ status: "invalid package" });
+      }
       await db.set("package-" + req.body.id, req.body.package);
       adminjs.suspend(req.body.id);
+      discordLog('api set plan', `User ID: \`${req.body.id}\` | Package set to: \`${req.body.package}\``);
       return res.send({ status: "success" });
     }
   });
@@ -187,8 +207,10 @@ module.exports.load = async function (router, db) {
     if (typeof req.body.id !== "string")
       return res.send({ status: "missing id" });
 
-    if (!(await db.get("users-" + req.body.id)))
-      res.send({ status: "invalid id" });
+    if (!(await db.get("users-" + req.body.id))) {
+      discordLog('api error', `API setresources request: Invalid user ID \`${req.body.id}\``);
+      return res.send({ status: "invalid id" });
+    }
 
     if (
       typeof req.body.ram == "number" ||
@@ -254,9 +276,11 @@ module.exports.load = async function (router, db) {
         await db.set("extra-" + req.body.id, extra);
       }
 
+      discordLog('api set resources', `User ID: \`${req.body.id}\` | RAM: \`${extra.ram}\` | Disk: \`${extra.disk}\` | CPU: \`${extra.cpu}\` | Servers: \`${extra.servers}\``);
       adminjs.suspend(req.body.id);
       return res.send({ status: "success" });
     } else {
+      discordLog('api error', `API setresources request: Missing variables for user ID \`${req.body.id}\``);
       res.send({ status: "missing variables" });
     }
   });
@@ -288,6 +312,7 @@ module.exports.load = async function (router, db) {
     
     await db.set(`ban-${id}`, banData);
     adminjs.suspend(id);
+    discordLog('api ban user', `User ID: \`${id}\` | Reason: \`${reason}\` | Expiration: \`${expiration || 'Never'}\``);
     
     res.send({ status: "success", message: "User banned successfully" });
   });
@@ -312,6 +337,7 @@ module.exports.load = async function (router, db) {
     
     await db.delete(`ban-${id}`);
     adminjs.suspend(id);
+    discordLog('api unban user', `User ID: \`${id}\` has been unbanned`);
     
     res.send({ status: "success", message: "User unbanned successfully" });
   });
