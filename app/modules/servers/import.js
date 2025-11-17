@@ -31,7 +31,7 @@ module.exports.load = async function (router, db) {
 // Constants
 const MAX_SIZE_BYTES = 5 * 1024 * 1024 * 1024; // 5GB in bytes
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB chunks for memory efficiency
-const TEMP_DIR = path.join(__dirname, '../temp');
+const TEMP_DIR = path.join(__dirname, '../../../temp');
 
 // Create temp directory if it doesn't exist
 if (!fs.existsSync(TEMP_DIR)) {

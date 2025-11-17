@@ -514,6 +514,14 @@ function handleUserInfoSubmit() {
           "Id": data.id || 'N/A'
         } : 'User not found',
         "Coins": data.coins,
+        "Ban Status": data.banned ? "BANNED" : "ACTIVE",
+        "Ban Details": data.banStatus ? {
+          "Reason": data.banStatus.reason,
+          "Banned At": data.banStatus.bannedAt,
+          "Expiration": data.banStatus.expiration || "Permanent",
+          "Banned By": data.banStatus.bannedBy
+        } : "No ban active",
+        "Ban History": data.banHistory && data.banHistory.length > 0 ? `${data.banHistory.length} ban(s) - Click to expand` : "No ban history",
         "Notifications": `${notificationsCount} notification(s) - Click to expand`
       };
 
@@ -527,6 +535,7 @@ function handleUserInfoSubmit() {
       
       // Store full notifications data for toggle
       dataContainer.dataset.notifications = JSON.stringify(data.notifications);
+      dataContainer.dataset.banHistory = JSON.stringify(data.banHistory);
       dataContainer.dataset.expanded = 'false';
       dataContainer.style.cursor = 'pointer';
       
@@ -534,6 +543,7 @@ function handleUserInfoSubmit() {
       dataContainer.onclick = function() {
         const isExpanded = this.dataset.expanded === 'true';
         const notifications = JSON.parse(this.dataset.notifications);
+        const banHistory = JSON.parse(this.dataset.banHistory);
         
         if (isExpanded) {
           // Collapse back to summary
@@ -547,12 +557,20 @@ function handleUserInfoSubmit() {
               "Id": data.id || 'N/A'
             } : 'User not found',
             "Coins": data.coins,
+            "Ban Status": data.banned ? "BANNED" : "ACTIVE",
+            "Ban Details": data.banStatus ? {
+              "Reason": data.banStatus.reason,
+              "Banned At": data.banStatus.bannedAt,
+              "Expiration": data.banStatus.expiration || "Permanent",
+              "Banned By": data.banStatus.bannedBy
+            } : "No ban active",
+            "Ban History": banHistory && banHistory.length > 0 ? `${banHistory.length} ban(s) - Click to expand` : "No ban history",
             "Notifications": `${notificationsCount} notification(s) - Click to expand`
           };
           this.textContent = JSON.stringify(summaryData, null, 2);
           this.dataset.expanded = 'false';
         } else {
-          // Expand to show all notifications
+          // Expand to show all notifications and ban history
           const fullData = {
             "Package Info": data.package,
             "Extra Resources": data.extra,
@@ -563,6 +581,14 @@ function handleUserInfoSubmit() {
               "Id": data.id || 'N/A'
             } : 'User not found',
             "Coins": data.coins,
+            "Ban Status": data.banned ? "BANNED" : "ACTIVE",
+            "Ban Details": data.banStatus ? {
+              "Reason": data.banStatus.reason,
+              "Banned At": data.banStatus.bannedAt,
+              "Expiration": data.banStatus.expiration || "Permanent",
+              "Banned By": data.banStatus.bannedBy
+            } : "No ban active",
+            "Ban History": banHistory,
             "Notifications": notifications
           };
           this.textContent = JSON.stringify(fullData, null, 2);
