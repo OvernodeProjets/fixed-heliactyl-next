@@ -488,6 +488,8 @@ private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAa
   "sign up" = true
   "sign in" = true
   "profile update" = true
+  # Account deletion
+  "account deletion" = true
   # Server
   "created server" = true
   "modified server" = true
