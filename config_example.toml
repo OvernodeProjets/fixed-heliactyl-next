@@ -185,7 +185,7 @@ is_default = false
     [api.client.oauth2.ip]
     "trust x-forwarded-for" = true
     block = [ ]
-    "duplicate check" = false
+    "duplicate check" = true
     _note = "Anti-alt checks will not work if you are proxying through Cloudflare. This is due to the fact that Cloudflare does not pass the real IP address through the headers. If you are using Cloudflare, please disable this feature."
 
 # --- Rate Limits ---
@@ -201,7 +201,7 @@ is_default = false
     ram = 2_048
     disk = 3_072
     cpu = 100
-    servers = 3
+    servers = 2
 
     [api.client.packages.list.2]
     ram = 6_144
@@ -242,8 +242,8 @@ logo = "https://avatars.githubusercontent.com/u/41710604?s=200&v=4"
 free = true
 
   [api.client.eggs.velocity.minimum]
-  ram = 512
-  disk = 512
+  ram = 256
+  disk = 256
   cpu = 50
 
   [api.client.eggs.velocity.maximum]
@@ -279,8 +279,8 @@ free = true
 
   [api.client.eggs.paper.maximum]
   ram = 8192
-  disk = 20480
-  cpu = 300
+  disk = 10240
+  cpu = 200
 
   [api.client.eggs.paper.info]
   egg = 3
@@ -298,7 +298,7 @@ free = true
 [api.client.eggs.forge]
 display = "Minecraft - Forge"
 category = "Game Servers" 
-logo = "https://avatars.githubusercontent.com/u/1034606?s=200&v=4"
+logo = "https://avatars.githubusercontent.com/u/1390178?s=200&v=4"
 free = true
 
   [api.client.eggs.forge.minimum]
@@ -308,12 +308,12 @@ free = true
 
   [api.client.eggs.forge.maximum]
   ram = 8192
-  disk = 20480
-  cpu = 300
+  disk = 10240
+  cpu = 200
 
   [api.client.eggs.forge.info]
   egg = 1
-  docker_image = "ghcr.io/zenllc/java:21"
+  docker_image = "ghcr.io/pterodactyl/yolks:java_21"
   startup = 'java -Xms128M -Xmx{{SERVER_MEMORY}}M -Dterminal.jline=false -Dterminal.ansi=true $( [[  ! -f unix_args.txt ]] && printf %s "-jar {{SERVER_JARFILE}}" || printf %s "@unix_args.txt" )'
 
     [api.client.eggs.forge.info.environment]
@@ -322,6 +322,80 @@ free = true
     BUILD_TYPE = "recommended"
 
     [api.client.eggs.forge.info.feature_limits]
+    databases = 0
+    backups = 0
+
+[api.client.eggs.nodejs]
+display = "NodeJS"
+category = "Generics" 
+logo = "https://avatars.githubusercontent.com/u/9950313?s=200&v=4"
+free = true
+
+  [api.client.eggs.nodejs.minimum]
+  ram = 512
+  disk = 128
+  cpu = 50
+
+  [api.client.eggs.nodejs.maximum]
+  ram = 8192
+  disk = 10240
+  cpu = 200
+
+  [api.client.eggs.nodejs.info]
+  egg = 47
+  docker_image = "ghcr.io/parkervcp/yolks:nodejs_20"
+  startup = 'if [[ -d .git ]] && [[ {{AUTO_UPDATE}} == "1" ]]; then git pull; fi; if [[ ! -z ${NODE_PACKAGES} ]]; then /usr/local/bin/npm install ${NODE_PACKAGES}; fi; if [[ ! -z ${UNNODE_PACKAGES} ]]; then /usr/local/bin/npm uninstall ${UNNODE_PACKAGES}; fi; if [ -f /home/container/package.json ]; then /usr/local/bin/npm install; fi; if [[ "${MAIN_FILE}" == "*.js" ]]; then /usr/local/bin/node "/home/container/${MAIN_FILE}" ${NODE_ARGS}; else /usr/local/bin/ts-node --esm "/home/container/${MAIN_FILE}" ${NODE_ARGS}; fi'
+
+    [api.client.eggs.nodejs.info.environment]
+    USER_UPLOAD = "0"
+    GIT_ADDRESS = ""
+    AUTO_UPDATE = "0"
+    MAIN_FILE = "index.js"
+    BRANCH = ""
+    NODE_PACKAGES = ""
+    USERNAME = ""
+    ACCESS_TOKEN = ""
+    UNNODE_PACKAGES = ""
+    NODE_ARGS = ""
+
+    [api.client.eggs.nodejs.info.feature_limits]
+    databases = 0
+    backups = 0
+    
+[api.client.eggs.python]
+display = "Python Generic"
+category = "Generics" 
+logo = "https://avatars.githubusercontent.com/u/1525981?s=200&v=4"
+free = true
+
+
+  [api.client.eggs.python.minimum]
+  ram = 512
+  disk = 512
+  cpu = 50
+
+  [api.client.eggs.python.maximum]
+    ram = 8192
+  disk = 10240
+  cpu = 200
+
+  [api.client.eggs.python.info]
+  egg = 53
+  docker_image = "ghcr.io/parkervcp/yolks:python_3.12"
+  startup = 'if [[ -d .git ]] && [[ "{{AUTO_UPDATE}}" == "1" ]]; then git pull; fi; if [[ ! -z "{{PY_PACKAGES}}" ]]; then pip install -U --prefix .local {{PY_PACKAGES}}; fi; if [[ -f /home/container/${REQUIREMENTS_FILE} ]]; then pip install -U --prefix .local -r ${REQUIREMENTS_FILE}; fi; /usr/local/bin/python /home/container/{{PY_FILE}}'
+
+    [api.client.eggs.python.info.environment]
+    GIT_ADDRESS = ""
+    BRANCH = ""
+    USER_UPLOAD = "0"
+    AUTO_UPDATE = "0"
+    PY_FILE = "app.py"
+    PY_PACKAGES = ""
+    USERNAME = ""
+    ACCESS_TOKEN = ""
+    REQUIREMENTS_FILE = "requirements.txt"
+
+    [api.client.eggs.python.info.feature_limits]
     databases = 0
     backups = 0
 
@@ -374,7 +448,7 @@ free = true
 enabled = true
 path = "ws"
 every = 60
-coins = 2.5
+coins = 1
 _note = "This is the 2nd-generation version of Heliactyl's AFK system. Please report any bugs on the GitHub (github.com/heliactyloss/heliactyl). Thank you."
 
 [whitelist]
