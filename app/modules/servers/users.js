@@ -17,6 +17,7 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
+const axios = require("axios");
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js");
