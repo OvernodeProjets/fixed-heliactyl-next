@@ -12,6 +12,9 @@ class AFKRewardsManager {
     this.sessionStartTimes = new Map();
   }
 
+  isSocketOpen(ws) {
+    return ws && ws.readyState === ws.OPEN;
+  }
   async hasActiveSession(userId) {
     try {
       const session = await this.db.get(`afk_session-${userId}`);
@@ -76,6 +79,10 @@ class AFKRewardsManager {
 
   async processReward(userId, ws, username) {
     try {
+      if (!this.isSocketOpen(ws)) {
+        await this.cleanup(userId);
+        return;
+      }
       const currentCoins = await this.db.get(`coins-${userId}`) || 0;
       const newBalance = currentCoins + this.COINS_PER_MINUTE;
       await this.db.set(`coins-${userId}`, newBalance);
@@ -87,12 +94,16 @@ class AFKRewardsManager {
       this.scheduleNextReward(userId, ws, username);
     } catch (error) {
       console.error(`[ERROR] Failed to process reward for ${userId}:`, error);
-      ws.close(4000, 'Failed to process reward');
+      if (this.isSocketOpen(ws)) {
+        ws.close(4000, 'Failed to process reward');
+      }
     }
   }
 
   scheduleNextReward(userId, ws, username) {
+    if (!this.isSocketOpen(ws)) return;
     const timeout = setTimeout(() => {
+      if (!this.isSocketOpen(ws)) return;
       this.processReward(userId, ws, username);
     }, this.INTERVAL_MS);
 
@@ -100,9 +111,11 @@ class AFKRewardsManager {
   }
 
   sendState(userId, ws) {
+    if (!this.isSocketOpen(ws)) return;
     this.getLastReward(userId).then(lastRewardTime => {
       const nextRewardIn = Math.max(0, this.INTERVAL_MS - (Date.now() - lastRewardTime));
       
+      if (!this.isSocketOpen(ws)) return;
       ws.send(JSON.stringify({
         type: 'afk_state',
         coinsPerMinute: this.COINS_PER_MINUTE,
@@ -114,6 +127,7 @@ class AFKRewardsManager {
 
   startStateUpdates(userId, ws) {
     const updateState = () => {
+      if (!this.isSocketOpen(ws)) return;
       this.sendState(userId, ws);
       
       const timeout = setTimeout(updateState, 30000);
