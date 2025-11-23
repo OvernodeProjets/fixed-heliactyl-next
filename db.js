@@ -165,10 +165,22 @@ class CustomDBHandler {
 
   async list(pattern) {
     return this.executeQuery(() => new Promise((resolve, reject) => {
-      const sqlPattern = pattern.replace('*', '%').replace('?', '_');
+      // Sanitize pattern to prevent SQL injection
+      // First escape SQL LIKE special characters
+      let sanitized = pattern
+        .replace(/\\/g, '\\\\')   // Escape backslash first
+        .replace(/%/g, '\\%')     // Escape %
+        .replace(/_/g, '\\_');    // Escape _
+      
+      // Now convert glob wildcards to SQL LIKE wildcards
+      const sqlPattern = sanitized
+        .replace(/\*/g, '%')      // * becomes %
+        .replace(/\?/g, '_');     // ? becomes _
+      
       const namespacePattern = `${this.namespace}:${sqlPattern}`;
       
-      this.db.all('SELECT [key] FROM keyv WHERE [key] LIKE ?', [namespacePattern], (err, rows) => {
+      // Use ESCAPE clause to specify backslash as escape character
+      this.db.all('SELECT [key] FROM keyv WHERE [key] LIKE ? ESCAPE \'\\\'', [namespacePattern], (err, rows) => {
         if (err) {
           reject(err);
         } else {

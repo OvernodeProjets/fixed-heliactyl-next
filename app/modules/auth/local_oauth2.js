@@ -229,6 +229,14 @@ module.exports.load = async function (router, db) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
+    // Regenerate session to prevent session fixation attacks
+    await new Promise((resolve, reject) => {
+      req.session.regenerate((err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+
     // Create session
     const userinfo = {
       id: user.id,
