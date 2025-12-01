@@ -38,6 +38,7 @@
     },
     "advent_calendar": {
       "title": "Calendrier de l'Avent",
+      "claim": "Réclamer les récompenses",
       "description": "Notre calendrier de l'Avent a commencé le 11 novembre et se terminera le 25 décembre !"
     },
     "support": {

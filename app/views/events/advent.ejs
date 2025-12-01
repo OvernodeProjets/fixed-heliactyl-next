@@ -431,9 +431,12 @@ function adventCalendar() {
         formatReward(reward) {
             if (!reward) return '';
 
+            // Check if it's currency (could be HCoins, Credits, etc.)
+            if (reward.type === '<%= settings.website.currency %>') {
+                return `${reward.value} <%= settings.website.currency %>`;
+            }
+
             switch (reward.type) {
-                case 'currency':
-                    return `${reward.value} <%= settings.website.currency %>`;
                 case 'ram':
                     return `${reward.value}MiB RAM`;
                 case 'disk':
@@ -441,25 +444,18 @@ function adventCalendar() {
                 case 'cpu':
                     return `${reward.value}% CPU`;
                 case 'servers':
-return `${reward.value} Server Slots`;
+                    return `${reward.value} Server Slots`;
                 default:
                     return 'Unknown Reward';
             }
         },
 
         formatSpecialReward(special) {
-            const rewards = {
-                'discord_nitro_basic': 'Discord Nitro Basic',
-                'discord_nitro': 'Discord Nitro',
-                'visa_5': '$5 Visa Card',
-                'vps_1gb': '1GB VPS',
-                'vps_2gb': '2GB VPS',
-                'vps_4gb': '4GB VPS',
-                'vps_8gb': '8GB VPS',
-                'domain_com': '.com Domain',
-                'domain_couk': '.co.uk Domain'
-            };
-            return rewards[special] || 'Special Reward';
+            // Convert snake_case to Title Case dynamically
+            return special
+                .split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
         },
 
         showSuccess(message) {

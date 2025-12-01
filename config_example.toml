@@ -464,6 +464,15 @@ recaptchaServerKey = "0aa0aaaaaaaaaaaaaaa0aaaaaaaaaaaaaa0aaa0aa"
 [sftp] # Mode: "node" uses SFTP details from the API (data.attributes.sftp_details.ip), "allocation" uses the allocation IP (useful if your node is behind a proxy)
 mode = "node"
 
+[advent]
+# Custom rewards for the special rewards (1% chance)
+# You need to do the verification of the rewards manually (like screenshots of the rewards)
+customRewards = [
+    "discord_role",
+    "premium_plan_1month",
+    "steam_gift_card_10"
+]
+
 # ------------------------------------------------------
 # Update Configuration
 # ------------------------------------------------------
@@ -505,6 +514,7 @@ private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAa
   # Rewards
   "gifted coins" = true
   "daily coins" = true
+  "advent calendar" = true
   # Security
   "anti-alt" = true
   # Events

@@ -118,6 +118,31 @@ const alerts = {
     </div>
   </div>
 </div>
+
+    <% if (new Date().getMonth() === 11 && new Date().getDate() >= 1 && new Date().getDate() <= 31) { %>
+      <div class="bg-gradient-to-r from-indigo-500/10 to-indigo-600/15 border border-indigo-500/10 rounded-3xl p-6 pl-12 mb-8 container mx-auto mt-8">
+        <div class="flex items-center justify-between">
+            <div class="space-y-4">
+                <div class="flex items-center gap-2">
+                    <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300">
+                        <span class="size-2 rounded-full bg-indigo-400 mr-2"></span>
+                        <%= __('dashboard.advent_calendar.title') %> <%= new Date().getFullYear() %>
+                    </div>
+                </div>
+                <p class="text-white/60"><%= __('dashboard.advent_calendar.description') %></p>
+                <a href="/events/advent" class="inline-flex items-center justify-center h-11 gap-2 px-6 text-sm font-medium text-white transition-all duration-200 rounded-full shadow bg-indigo-500 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-800 focus:ring-offset-2 ring-offset-gray-200 hover:shadow-none">
+                    <%= __('dashboard.advent_calendar.claim') %>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                </a>
+            </div>
+            <div class="hidden md:block">
+                <img src="https://i.imgur.com/e8hcEY1.png" alt="d" class="rounded-lg w-[400px] shadow-sm h-[250px] object-cover" />
+            </div>
+        </div>
+      </div>
+    <% } %>
     <!-- New Flex Container for Side-by-Side Layout -->
     <div class="flex gap-8 mt-4">
         <!-- Welcome Message on the Left -->
@@ -184,31 +209,6 @@ const alerts = {
             </div>
         </div>
     </div>
-
-    <% if (new Date().getMonth() == 11 && new Date().getDate() >= 11) { %>
-      <div class="bg-gradient-to-r from-indigo-500/10 to-indigo-600/15 border border-indigo-500/10 rounded-3xl p-6 pl-12 mb-8 container mx-auto mt-8">
-        <div class="flex items-center justify-between">
-            <div class="space-y-4">
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300">
-                        <span class="size-2 rounded-full bg-indigo-400 mr-2"></span>
-                        <%= __('dashboard.advent_calendar.title') %> <%= new Date().getFullYear() %>
-                    </div>
-                </div>
-                <p class="text-white/60"><%= __('dashboard.advent_calendar.description') %></p>
-                <a href="/advent" class="inline-flex items-center justify-center h-11 gap-2 px-6 text-sm font-medium text-white transition-all duration-200 rounded-full shadow bg-indigo-500 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-800 focus:ring-offset-2 ring-offset-gray-200 hover:shadow-none">
-                    <%= __('dashboard.advent_calendar.claim') %>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                    </svg>
-                </a>
-            </div>
-            <div class="hidden md:block">
-                <img src="https://i.imgur.com/e8hcEY1.png" alt="d" class="rounded-lg w-[400px] shadow-sm h-[250px] object-cover" />
-            </div>
-        </div>
-      </div>
-    <% } %>
 
   <!-- Support & Changelog Section -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">

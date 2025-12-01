@@ -21,47 +21,38 @@ const crypto = require('crypto');
 const { requireAuth } = require('../../handlers/checkMiddleware.js');
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
+const { discordLog, addNotification } = require("../../handlers/log.js");
 
-// Define reward types and their possible values
+// Define reward types and their possible values - balanced for daily rewards
 const REWARD_TYPES = {
   CURRENCY: {
     type: settings.website.currency,
-    values: [25, 50, 100, 250, 500, 750, 1000, 1500, 2000],
+    values: [5, 10, 15, 25, 50, 75, 100],
     special: false
   },
   RAM: {
     type: 'ram',
-    values: [256, 512, 768, 1024],
+    values: [128, 256, 512, 768],
     special: false
   },
   DISK: {
     type: 'disk',
-    values: [2048, 5120, 10240],
+    values: [512, 1024, 2048, 3072],
     special: false
   },
   CPU: {
     type: 'cpu',
-    values: [10, 25, 50, 100],
+    values: [5, 10, 25, 50],
     special: false
   },
   SERVERS: {
     type: 'servers',
-    values: [2, 4, 6],
+    values: [1, 2],
     special: false
   },
   SPECIAL: {
     type: 'special',
-    values: [
-      'discord_nitro_basic',
-      'discord_nitro',
-      'visa_5',
-      'vps_1gb',
-      'vps_2gb',
-      'vps_4gb',
-      'vps_8gb',
-      'domain_com',
-      'domain_couk'
-    ],
+    values: settings.advent?.customRewards || [],
     special: true
   }
 };
@@ -70,7 +61,7 @@ class AdventCalendarManager {
   constructor(db) {
     this.db = db;
     this.year = new Date().getFullYear();
-    this.totalDays = 45; // Nov 11 to Dec 25
+    this.totalDays = 31; // Dec 1 to Dec 31
   }
 
   isValidDate() {
@@ -78,8 +69,8 @@ class AdventCalendarManager {
     const currentYear = currentDate.getFullYear();
     
     // Create date objects for the start and end of the event
-    const startDate = new Date(currentYear, 10, 11, 0, 0, 0); // November 11, 00:00:00
-    const endDate = new Date(currentYear, 11, 25, 23, 59, 59); // December 25, 23:59:59
+    const startDate = new Date(currentYear, 11, 1, 0, 0, 0); // December 1, 00:00:00
+    const endDate = new Date(currentYear, 11, 31, 23, 59, 59); // December 31, 23:59:59
     
     // Pour le debug
     console.log('Current Date:', currentDate);
@@ -92,7 +83,7 @@ class AdventCalendarManager {
 
   getDayNumber(date = new Date()) {
     const year = date.getFullYear();
-    const startDate = new Date(year, 10, 11); // November 11
+    const startDate = new Date(year, 11, 1); // December 1
     const diffTime = date - startDate;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
     return diffDays;
@@ -100,15 +91,15 @@ class AdventCalendarManager {
 
   getDateFromDayNumber(day) {
     const year = new Date().getFullYear();
-    const startDate = new Date(year, 10, 11); // November 11
+    const startDate = new Date(year, 11, 1); // December 1
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + day - 1);
     return date;
   }
 
   generateReward() {
-    // 90% chance for regular rewards, 10% chance for special rewards
-    const isSpecial = Math.random() < 0.0000000005;
+    // 1% chance for special rewards, 99% for regular rewards - balanced
+    const isSpecial = Math.random() < 0.01;
     
     if (isSpecial) {
       return {
@@ -120,16 +111,27 @@ class AdventCalendarManager {
       };
     }
 
-    // Select random reward type (excluding SPECIAL)
+    // Select random reward type (excluding SPECIAL) with weighted probabilities
     const regularTypes = [
-      REWARD_TYPES.CURRENCY,
-      REWARD_TYPES.RAM,
-      REWARD_TYPES.DISK,
-      REWARD_TYPES.CPU,
-      REWARD_TYPES.SERVERS
+      { type: REWARD_TYPES.CURRENCY, weight: 40 }, // 40% chance
+      { type: REWARD_TYPES.RAM, weight: 20 },      // 20% chance
+      { type: REWARD_TYPES.DISK, weight: 20 },     // 20% chance
+      { type: REWARD_TYPES.CPU, weight: 15 },      // 15% chance
+      { type: REWARD_TYPES.SERVERS, weight: 5 }    // 5% chance
     ];
     
-    const selectedType = regularTypes[Math.floor(Math.random() * regularTypes.length)];
+    const totalWeight = regularTypes.reduce((sum, t) => sum + t.weight, 0);
+    let random = Math.random() * totalWeight;
+    
+    let selectedType;
+    for (const typeObj of regularTypes) {
+      random -= typeObj.weight;
+      if (random <= 0) {
+        selectedType = typeObj.type;
+        break;
+      }
+    }
+    
     const value = selectedType.values[Math.floor(Math.random() * selectedType.values.length)];
 
     return {
@@ -292,11 +294,26 @@ module.exports.load = function(router, db) {
       const day = parseInt(req.params.day);
 
       const reward = await adventCalendar.claimReward(userId, day);
+
+      // Send notification
+      await addNotification(
+        db,
+        userId,
+        "advent-calendar",
+        "You claimed a reward from the advent calendar!",
+        req.ip,
+        req.headers['user-agent']
+      );
+
+      discordLog(
+        "advent calendar",
+        `${req.session.userinfo.username} and with the userid \`${req.session.userinfo.id}\` claimed a reward from the advent calendar! (${reward.type} ${reward.value})`
+      );
+
       res.json({
         success: true,
         reward
       });
-
     } catch (error) {
       console.error('[ERROR] Failed to claim reward:', error);
       res.status(400).json({ error: error.message });

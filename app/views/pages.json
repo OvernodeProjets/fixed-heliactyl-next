@@ -43,7 +43,7 @@
         "transfer": "transfer.ejs",
         "account": "account.ejs",
         "profile": "profile.ejs",
-        "events/christmas": "events/advent.ejs",
+        "events/advent": "events/advent.ejs",
         "events/halloween": "events/halloween.ejs"
     },
     "mustbeloggedin": [
