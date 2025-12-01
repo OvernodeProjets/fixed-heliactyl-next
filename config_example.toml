@@ -465,13 +465,16 @@ recaptchaServerKey = "0aa0aaaaaaaaaaaaaaa0aaaaaaaaaaaaaa0aaa0aa"
 mode = "node"
 
 [advent]
+enabled = true
 # Custom rewards for the special rewards (1% chance)
 # You need to do the verification of the rewards manually (like screenshots of the rewards)
-customRewards = [
-    "discord_role",
-    "premium_plan_1month",
-    "steam_gift_card_10"
-]
+ [advent.customRewards]
+  enabled = true
+  rewards = [
+      "discord_role",
+      "premium_plan_1month",
+      "steam_gift_card_10"
+  ]
 
 # ------------------------------------------------------
 # Update Configuration

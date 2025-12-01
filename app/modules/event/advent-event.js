@@ -50,11 +50,14 @@ const REWARD_TYPES = {
     values: [1, 2],
     special: false
   },
-  SPECIAL: {
-    type: 'special',
-    values: settings.advent?.customRewards || [],
-    special: true
-  }
+  // Custom rewards - only included if enabled
+  ...(settings.advent?.customRewards?.enabled === true ? {
+    SPECIAL: {
+      type: 'special',
+      values: settings.advent?.customRewards?.rewards || [],
+      special: true
+    }
+  } : {})
 };
 
 class AdventCalendarManager {
@@ -99,7 +102,11 @@ class AdventCalendarManager {
 
   generateReward() {
     // 1% chance for special rewards, 99% for regular rewards - balanced
-    const isSpecial = Math.random() < 0.01;
+    // Only if SPECIAL rewards are enabled and configured
+    const hasSpecialRewards = REWARD_TYPES.SPECIAL && 
+                              REWARD_TYPES.SPECIAL.values && 
+                              REWARD_TYPES.SPECIAL.values.length > 0;
+    const isSpecial = hasSpecialRewards && Math.random() < 0.01;
     
     if (isSpecial) {
       return {
