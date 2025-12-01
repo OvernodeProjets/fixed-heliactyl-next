@@ -1,4 +1,3 @@
-const fetch = require("node-fetch");
 const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 const PterodactylApplicationModule = require('../handlers/ApplicationAPI.js');

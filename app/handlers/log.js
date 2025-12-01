@@ -1,6 +1,5 @@
 const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
-const fetch = require('node-fetch')
 const crypto = require('crypto');
 const { default: axios } = require("axios");
 

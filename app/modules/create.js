@@ -19,7 +19,6 @@ module.exports.heliactylModule = heliactylModule;
 
 const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
-const fetch = require("node-fetch");
 const adminjs = require("./admin/admin.js");
 const fs = require("fs");
 const getPteroUser = require("../handlers/getPteroUser.js");
@@ -79,26 +78,15 @@ router.get("/updateinfo", authMiddleware, async (req, res) => {
                     cpu: 50
                 });
 
-                await fetch(
-                    `${settings.pterodactyl.domain}/api/application/servers/${serverId}/build`,
-                    {
-                        method: "PATCH",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${settings.pterodactyl.key}`,
-                            "Accept": "application/json"
-                        },
-                        body: JSON.stringify({
-                            allocation: server.attributes.allocation,
-                            memory: 1024,
-                            swap: server.attributes.limits.swap,
-                            disk: 5120,
-                            io: server.attributes.limits.io,
-                            cpu: 50,
-                            feature_limits: server.attributes.feature_limits
-                        })
-                    }
-                );
+                await AppAPI.updateServerBuild(serverId, {
+                    allocation: server.attributes.allocation,
+                    memory: 1024,
+                    swap: server.attributes.limits.swap,
+                    disk: 5120,
+                    io: server.attributes.limits.io,
+                    cpu: 50,
+                    feature_limits: server.attributes.feature_limits
+                });
 
                 discordLog(
                     "resource adjustment",
@@ -252,35 +240,13 @@ router.get("/server/create", authMiddleware, async (req, res) => {
                   }
         };
 
-    let serverinfo = await fetch(
-        settings.pterodactyl.domain + "/api/application/servers", {
-            method: "post",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${settings.pterodactyl.key}`,
-                Accept: "application/json",
-            },
-            body: JSON.stringify(serverSpecs),
-        }
-    );
-    if (!serverinfo.ok) {
-        const text = await serverinfo.text();
-        console.error("Pterodactyl API Raw Response:", text);
-        let errorData = {};
-        try {
-          errorData = JSON.parse(text);
-          console.error("Parsed Error:", errorData);
-        } catch {
-          console.error("Could not parse JSON response");
-          errorData = { error: text };
-        }
-
-        // Encode the error response for the URL
-        const encodedError = encodeURIComponent(JSON.stringify(errorData));
-        
+    let serverinfo = await AppAPI.createServer(serverSpecs);
+    if (!serverinfo || !serverinfo.attributes) {
+        console.error("Pterodactyl API Error:", serverinfo);
+        const encodedError = encodeURIComponent(JSON.stringify(serverinfo || { error: "Unknown error" }));
         return res.redirect(`/dashboard?err=PTERODACTYL&data=${encodedError}`);
     }
-                let serverinfotext = await serverinfo.json();
+                let serverinfotext = serverinfo;
                 let newpterodactylinfo = req.session.pterodactyl;
                 newpterodactylinfo.relationships.servers.data.push(serverinfotext);
                 req.session.pterodactyl = newpterodactylinfo;
@@ -331,21 +297,10 @@ async function processQueue() {
 
   console.log('Attempting to create server...');
   try {
-    let serverinfo = await fetch(
-      `${settings.pterodactyl.domain}/api/application/servers`,
-      {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${settings.pterodactyl.key}`,
-          Accept: "application/json",
-        },
-        body: JSON.stringify(specs),
-      }
-    );
+    let serverinfo = await AppAPI.createServer(specs);
     console.log(`Pterodactyl API response status: ${serverinfo.status} ${serverinfo.statusText}`);
 
-    if (serverinfo.ok) {
+    if (serverinfo && serverinfo.attributes) {
       console.log('Server created successfully');
       await removeFromQueue(serverToCreate);
 
@@ -587,30 +542,16 @@ router.get("/clear-queue", authMiddleware, async (req, res) => {
               io: egginfo ? checkexist[0].attributes.limits.io : 500,
             };
     
-            let serverinfo = await fetch(
-              settings.pterodactyl.domain +
-                "/api/application/servers/" +
-                id +
-                "/build",
-              {
-                method: "patch",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${settings.pterodactyl.key}`,
-                  Accept: "application/json",
-                },
-                body: JSON.stringify({
-                  limits: limits,
-                  feature_limits: checkexist[0].attributes.feature_limits,
-                  allocation: checkexist[0].attributes.allocation,
-                }),
-              }
-            );
-            if ((await serverinfo.statusText) !== "OK")
+            let serverinfo = await AppAPI.updateServerBuild(id, {
+              limits: limits,
+              feature_limits: checkexist[0].attributes.feature_limits,
+              allocation: checkexist[0].attributes.allocation,
+            });
+            if (!serverinfo || !serverinfo.attributes)
               return res.redirect(
                 `${redirectlink}?id=${id}&err=ERRORONMODIFY`
               );
-            let text = JSON.parse(await serverinfo.text());
+            let text = serverinfo;
             discordLog(
               `modified server`,
               `${req.session.userinfo.username} modified the server called \`${text.attributes.name}\` to have the following specs:\n\`\`\`Memory: ${ram} MB\nCPU: ${cpu}%\nDisk: ${disk}\`\`\``
