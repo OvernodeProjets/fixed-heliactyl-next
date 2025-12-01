@@ -39,20 +39,24 @@ module.exports.load = async function(router, db) {
           return cachedValue;
         }
 
-        const response = await fetch(`${settings.pterodactyl.domain}/api/application/${endpoint}?per_page=100000`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.key}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        let data;
+        switch(endpoint) {
+          case 'users':
+            data = await AppAPI.listUsers({ perPage: 100000 });
+            break;
+          case 'servers':
+            data = await AppAPI.listServers(1, 100000);
+            break;
+          case 'nodes':
+            data = await AppAPI.listNodes(1, 100000);
+            break;
+          case 'locations':
+            data = await AppAPI.listLocations(1, 100000);
+            break;
+          default:
+            throw new Error(`Unknown endpoint: ${endpoint}`);
         }
 
-        const data = await response.json();
         const total = data.meta.pagination.total;
 
         // Store in cache
