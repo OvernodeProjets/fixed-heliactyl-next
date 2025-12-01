@@ -119,7 +119,7 @@ const alerts = {
   </div>
 </div>
 
-    <% if (new Date().getMonth() === 11 && new Date().getDate() >= 1 && new Date().getDate() <= 31) { %>
+    <% if (settings.advent?.enabled === true && new Date().getMonth() === 11 && new Date().getDate() >= 1 && new Date().getDate() <= 31) { %>
       <div class="bg-gradient-to-r from-indigo-500/10 to-indigo-600/15 border border-indigo-500/10 rounded-3xl p-6 pl-12 mb-8 container mx-auto mt-8">
         <div class="flex items-center justify-between">
             <div class="space-y-4">

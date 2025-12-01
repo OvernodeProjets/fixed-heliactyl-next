@@ -75,12 +75,6 @@ class AdventCalendarManager {
     const startDate = new Date(currentYear, 11, 1, 0, 0, 0); // December 1, 00:00:00
     const endDate = new Date(currentYear, 11, 31, 23, 59, 59); // December 31, 23:59:59
     
-    // Pour le debug
-    console.log('Current Date:', currentDate);
-    console.log('Start Date:', startDate);
-    console.log('End Date:', endDate);
-    console.log('Is Valid:', currentDate >= startDate && currentDate <= endDate);
-    
     return currentDate >= startDate && currentDate <= endDate;
   }
 
@@ -297,6 +291,11 @@ module.exports.load = function(router, db) {
   // Claim daily reward
   router.post('/advent/claim/:day', authMiddleware, async (req, res) => {
     try {
+      // Check if advent calendar is enabled
+      if (settings.advent?.enabled !== true) {
+        return res.status(400).json({ error: 'Advent Calendar is currently disabled' });
+      }
+
       const userId = req.session.userinfo.id;
       const day = parseInt(req.params.day);
 
@@ -330,6 +329,11 @@ module.exports.load = function(router, db) {
   // Get user's calendar
   router.get('/advent/calendar', authMiddleware, async (req, res) => {
     try {
+      // Check if advent calendar is enabled
+      if (settings.advent?.enabled !== true) {
+        return res.status(400).json({ error: 'Advent Calendar is currently disabled' });
+      }
+
       if (!adventCalendar.isValidDate()) {
         return res.status(400).json({ error: 'Advent Calendar event is not active' });
       }
