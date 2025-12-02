@@ -1,348 +1,403 @@
 <%- include('./components/top') %>
-<!-- Main Content -->
-<main class="flex-grow container mx-auto px-4 py-8">
+  <!-- Main Content -->
+  <main class="flex-grow container mx-auto px-4 py-8">
     <div class="flex justify-between items-center w-full mx-auto pb-4">
-        <!-- Welcome text and subtext on the left -->
-        <div class="flex flex-col">
-            <h1 class="text-xl font-semibold mb-0.5 heavy"><%= __('dashboard.title') %></h1>
-            <p class="text-gray-400 text-md"><%= __('dashboard.subtitle') %></p>
-        </div>
+      <!-- Welcome text and subtext on the left -->
+      <div class="flex flex-col">
+        <h1 class="text-xl font-semibold mb-0.5 heavy">
+          <%= __('dashboard.title') %>
+        </h1>
+        <p class="text-gray-400 text-md">
+          <%= __('dashboard.subtitle') %>
+        </p>
+      </div>
 
-        <!-- Breadcrumbs on the right -->
-        <nav aria-label="Breadcrumb" class="inline-flex py-2 px-4 rounded-xl bg-white/5 transition-colors duration-200">
-            <ol role="list" class="flex items-center space-x-2">
-                <li>
-                    <a href="#_" class="text-sm flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-colors duration-200" aria-current="false">
-                        <svg
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            class="icon icon-tabler size-4 icons-tabler-outline icon-tabler-home"
-                        >
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
-                            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
-                            <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
-                        </svg>
-                        <span><%= __('breadcrumbs.home') %></span>
-                    </a>
-                </li>
-                <li class="flex items-center">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right size-4 text-zinc-400"
-                    >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <path d="M9 6l6 6l-6 6"></path>
-                    </svg>
-                </li>
-                <li>
-                    <a href="#_" class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200" aria-current="page">
-                        <%= __('breadcrumbs.dashboard') %>
-                    </a>
-                </li>
-            </ol>
-        </nav>
+      <!-- Breadcrumbs on the right -->
+      <nav aria-label="Breadcrumb" class="inline-flex py-2 px-4 rounded-xl bg-white/5 transition-colors duration-200">
+        <ol role="list" class="flex items-center space-x-2">
+          <li>
+            <a href="#_"
+              class="text-sm flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-colors duration-200"
+              aria-current="false">
+              <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler size-4 icons-tabler-outline icon-tabler-home">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
+                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
+              </svg>
+              <span>
+                <%= __('breadcrumbs.home') %>
+              </span>
+            </a>
+          </li>
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right size-4 text-zinc-400">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M9 6l6 6l-6 6"></path>
+            </svg>
+          </li>
+          <li>
+            <a href="#_"
+              class="text-sm flex items-center gap-2 font-medium text-white/80 hover:text-white transition-colors duration-200"
+              aria-current="page">
+              <%= __('breadcrumbs.dashboard') %>
+            </a>
+          </li>
+        </ol>
+      </nav>
     </div>
 
     <!-- Content -->
-    <%
-    let ram = 0;
-    let disk = 0;
-    let cpu = 0;
-    let servers = pterodactyl.relationships.servers.data.length;
-    for (let i = 0, len = pterodactyl.relationships.servers.data.length; i < len; i++) {
-       ram = ram + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.memory == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.memory : 0);
-       disk = disk + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.disk == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.disk : 0);
-       cpu = cpu + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.cpu == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.cpu : 0);
-    }
-    %>
-<%
-const alerts = {
-  "none": __('dashboard.alerts.daily_claimed', { amount: settings.api.client.coins.daily.amount, currency: settings.website.currency }),
-  "CREATED": __('dashboard.alerts.server_created'),
-  "MODIFIED": __('dashboard.alerts.server_modified'),
-  "DELETED": __('dashboard.alerts.server_deleted')
-};
-%>
+    <% let ram=0; let disk=0; let cpu=0; let servers=pterodactyl.relationships.servers.data.length; for (let i=0,
+      len=pterodactyl.relationships.servers.data.length; i < len; i++) { ram=ram + (typeof
+      pterodactyl.relationships.servers.data[i].attributes.limits.memory=="number" ?
+      pterodactyl.relationships.servers.data[i].attributes.limits.memory : 0); disk=disk + (typeof
+      pterodactyl.relationships.servers.data[i].attributes.limits.disk=="number" ?
+      pterodactyl.relationships.servers.data[i].attributes.limits.disk : 0); cpu=cpu + (typeof
+      pterodactyl.relationships.servers.data[i].attributes.limits.cpu=="number" ?
+      pterodactyl.relationships.servers.data[i].attributes.limits.cpu : 0); } %>
+      <% const alerts={ "none" : __('dashboard.alerts.daily_claimed', { amount: settings.api.client.coins.daily.amount,
+        currency: settings.website.currency }), "CREATED" : __('dashboard.alerts.server_created'), "MODIFIED" :
+        __('dashboard.alerts.server_modified'), "DELETED" : __('dashboard.alerts.server_deleted') }; %>
 
-<% if (req.query.err && alerts[req.query.err]) { %>
-<div class="my-4 rounded-full shadow-sm border border-white/10 px-3 py-2 pt-2.5">
-    <span class="text-white text-xs mt-0.5">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mb-0.5 text-indigo-300 rounded-full shadow-sm bg-indigo-500/15 p-1.5 mr-2.5 inline-flex">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-        </svg>
-        <%= alerts[req.query.err] %> 
-        <code style="font-family: 'JetBrains Mono'" class="text-white/60">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
-    </span>
-</div>
-<% } else if (req.query.err && req.query.err === "PTERODACTYL" && req.query.data) { %>
-<div class="mb-4 rounded-lg bg-amber-500/10 p-4">
-    <div class="flex items-center gap-3">
-        <div class="text-amber-400">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-            </svg>
-        </div>
-        <p class="text-sm font-medium text-amber-400">This location has no available capacity.</p>
-        <p class="text-sm text-amber-300"><%= JSON.parse(decodeURIComponent(req.query.data)).errors[0].detail %></p>
-    </div>
-</div>
-<% } %>
-
-<div id="dailyCoinsBanner" class="hidden w-full border-l-4 mt-2 mb-8 bg-white/5 border-white/10 rounded-r-2xl">
-  <div class="p-6">
-    <h2 class="text-white/90 text-lg font-semibold"><%= __('dashboard.daily_reward.title') %></h2>
-    <div class="space-y-5">
-      <p class="text-white/60 text-sm leading-5">
-        <%- __('dashboard.daily_reward.description', { 
-          name: settings.name, 
-          amount: settings.api.client.coins.daily.amount,
-          currency: settings.website.currency 
-        }) %>
-      </p>
-      <a class="transition hover:scale-95 cursor-pointer font-semibold gap-2 grow-0 items-center justify-center rounded-xl shrink-0 disabled:cursor-not-allowed inline-flex border focus:outline-none px-4 py-[9px] bg-emerald-700 border-emerald-700 text-white hover:bg-emerald-600 hover:border-emerald-600 focus:ring-4 focus:ring-emerald-900 disabled:bg-emerald-900 disabled:border-emerald-900 disabled:text-emerald-400 text-sm" href="/api/daily-coins">
-        <span class="pointer-events-none shrink-0"><%= __('dashboard.daily_reward.claim') %></span>
-      </a>
-    </div>
-  </div>
-</div>
-
-    <% if (settings.advent?.enabled === true && new Date().getMonth() === 11 && new Date().getDate() >= 1 && new Date().getDate() <= 31) { %>
-      <div class="bg-gradient-to-r from-indigo-500/10 to-indigo-600/15 border border-indigo-500/10 rounded-3xl p-6 pl-12 mb-8 container mx-auto mt-8">
-        <div class="flex items-center justify-between">
-            <div class="space-y-4">
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300">
-                        <span class="size-2 rounded-full bg-indigo-400 mr-2"></span>
-                        <%= __('dashboard.advent_calendar.title') %> <%= new Date().getFullYear() %>
-                    </div>
+        <% if (req.query.err && alerts[req.query.err]) { %>
+          <div class="my-4 rounded-full shadow-sm border border-white/10 px-3 py-2 pt-2.5">
+            <span class="text-white text-xs mt-0.5">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor"
+                class="size-8 mb-0.5 text-indigo-300 rounded-full shadow-sm bg-indigo-500/15 p-1.5 mr-2.5 inline-flex">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+              <%= alerts[req.query.err] %>
+                <code style="font-family: 'JetBrains Mono'"
+                  class="text-white/60">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
+            </span>
+          </div>
+          <% } else if (req.query.err && req.query.err==="PTERODACTYL" && req.query.data) { %>
+            <div class="mb-4 rounded-lg bg-amber-500/10 p-4">
+              <div class="flex items-center gap-3">
+                <div class="text-amber-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                  </svg>
                 </div>
-                <p class="text-white/60"><%= __('dashboard.advent_calendar.description') %></p>
-                <a href="/events/advent" class="inline-flex items-center justify-center h-11 gap-2 px-6 text-sm font-medium text-white transition-all duration-200 rounded-full shadow bg-indigo-500 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-800 focus:ring-offset-2 ring-offset-gray-200 hover:shadow-none">
-                    <%= __('dashboard.advent_calendar.claim') %>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                    </svg>
-                </a>
+                <p class="text-sm font-medium text-amber-400">This location has no available capacity.</p>
+                <p class="text-sm text-amber-300">
+                  <%= JSON.parse(decodeURIComponent(req.query.data)).errors[0].detail %>
+                </p>
+              </div>
             </div>
-            <div class="hidden md:block">
-                <img src="https://i.imgur.com/e8hcEY1.png" alt="d" class="rounded-lg w-[400px] shadow-sm h-[250px] object-cover" />
-            </div>
-        </div>
-      </div>
-    <% } %>
-    <!-- New Flex Container for Side-by-Side Layout -->
-    <div class="flex gap-8 mt-4">
-        <!-- Welcome Message on the Left -->
-        <div class="w-1/3">
-            <div class="w-full border-l-4 bg-indigo-500/15 border-indigo-500 rounded-r-3xl h-full">
-                <div class="p-6 flex flex-col h-full justify-between">
-                    <div>
-                        <h2 class="text-white/90 text-lg heavy font-semibold mb-1"><%= __('dashboard.welcome_title', { name: settings.name, username: req.session.userinfo.username }) %></h2>
-                        <p class="text-white/60 text-sm leading-5">
-                            <%- __('dashboard.welcome_description', { currency: settings.website.currency, discord: settings.website.discord }) %>
+            <% } %>
+
+              <div id="dailyCoinsBanner"
+                class="hidden w-full border-l-4 mt-2 mb-8 bg-white/5 border-white/10 rounded-r-2xl">
+                <div class="p-6">
+                  <h2 class="text-white/90 text-lg font-semibold">
+                    <%= __('dashboard.daily_reward.title') %>
+                  </h2>
+                  <div class="space-y-5">
+                    <p class="text-white/60 text-sm leading-5">
+                      <%- __('dashboard.daily_reward.description', { name: settings.name, amount:
+                        settings.api.client.coins.daily.amount, currency: settings.website.currency }) %>
+                    </p>
+                    <a class="transition hover:scale-95 cursor-pointer font-semibold gap-2 grow-0 items-center justify-center rounded-xl shrink-0 disabled:cursor-not-allowed inline-flex border focus:outline-none px-4 py-[9px] bg-emerald-700 border-emerald-700 text-white hover:bg-emerald-600 hover:border-emerald-600 focus:ring-4 focus:ring-emerald-900 disabled:bg-emerald-900 disabled:border-emerald-900 disabled:text-emerald-400 text-sm"
+                      href="/api/daily-coins">
+                      <span class="pointer-events-none shrink-0">
+                        <%= __('dashboard.daily_reward.claim') %>
+                      </span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <% if (settings.advent?.enabled===true && new Date().getMonth()===11 && new Date().getDate()>= 1 && new
+                Date().getDate() <= 31) { %>
+                  <div
+                    class="bg-gradient-to-r from-indigo-500/10 to-indigo-600/15 border border-indigo-500/10 rounded-3xl p-6 pl-12 mb-8 container mx-auto mt-8">
+                    <div class="flex items-center justify-between">
+                      <div class="space-y-4">
+                        <div class="flex items-center gap-2">
+                          <div
+                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300">
+                            <span class="size-2 rounded-full bg-indigo-400 mr-2"></span>
+                            <%= __('dashboard.advent_calendar.title') %>
+                              <%= new Date().getFullYear() %>
+                          </div>
+                        </div>
+                        <p class="text-white/60">
+                          <%= __('dashboard.advent_calendar.description') %>
                         </p>
-                    </div>
-                    <div class="mt-6">
-                        <a class="transition hover:scale-95 cursor-pointer font-semibold gap-2 grow-0 items-center justify-center rounded-xl shrink-0 disabled:cursor-not-allowed inline-flex border focus:outline-none px-4 py-[9px] bg-indigo-700 border-indigo-700 text-white hover:bg-indigo-500 hover:border-indigo-500 focus:ring-4 focus:ring-indigo-900 disabled:bg-indigo-900 disabled:border-indigo-900 disabled:text-indigo-400 text-sm" href="/server/new">
-                            <span class="pointer-events-none shrink-0"><%= __('dashboard.get_started') %></span>
+                        <a href="/events/advent"
+                          class="inline-flex items-center justify-center h-11 gap-2 px-6 text-sm font-medium text-white transition-all duration-200 rounded-full shadow bg-indigo-500 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-800 focus:ring-offset-2 ring-offset-gray-200 hover:shadow-none">
+                          <%= __('dashboard.advent_calendar.claim') %>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" class="size-4">
+                              <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
                         </a>
+                      </div>
+                      <div class="hidden md:block">
+                        <img src="https://i.imgur.com/AzBUTCJ.png" alt="advent calendar"
+                          class="rounded-lg w-[400px] shadow-sm h-[250px] object-cover" />
+                      </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Resource Cards on the Right in 2x2 Grid -->
-        <div class="w-2/3">
-            <div class="grid grid-cols-2 gap-4">
-                <!-- RAM Card -->
-                <div class="px-4 py-5 sm:p-6 bg-white/5 rounded-tl-3xl rounded-lg">
-                    <dt class="text-base font-medium text-white/70"><%= __('dashboard.resources.memory') %></dt>
-                    <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
-                        <div class="flex items-baseline text-2xl font-semibold text-white">
-                            <%= (packages.ram/1024 + extraresources.ram/1024 - ram/1024).toFixed(2) %> GiB
+                  </div>
+                  <% } %>
+                    <!-- New Flex Container for Side-by-Side Layout -->
+                    <div class="flex gap-8 mt-4">
+                      <!-- Welcome Message on the Left -->
+                      <div class="w-1/3">
+                        <div class="w-full border-l-4 bg-indigo-500/15 border-indigo-500 rounded-r-3xl h-full">
+                          <div class="p-6 flex flex-col h-full justify-between">
+                            <div>
+                              <h2 class="text-white/90 text-lg heavy font-semibold mb-1">
+                                <%= __('dashboard.welcome_title', { name: settings.name, username:
+                                  req.session.userinfo.username }) %>
+                              </h2>
+                              <p class="text-white/60 text-sm leading-5">
+                                <%- __('dashboard.welcome_description', { currency: settings.website.currency, discord:
+                                  settings.website.discord }) %>
+                              </p>
+                            </div>
+                            <div class="mt-6">
+                              <a class="transition hover:scale-95 cursor-pointer font-semibold gap-2 grow-0 items-center justify-center rounded-xl shrink-0 disabled:cursor-not-allowed inline-flex border focus:outline-none px-4 py-[9px] bg-indigo-700 border-indigo-700 text-white hover:bg-indigo-500 hover:border-indigo-500 focus:ring-4 focus:ring-indigo-900 disabled:bg-indigo-900 disabled:border-indigo-900 disabled:text-indigo-400 text-sm"
+                                href="/server/new">
+                                <span class="pointer-events-none shrink-0">
+                                  <%= __('dashboard.get_started') %>
+                                </span>
+                              </a>
+                            </div>
+                          </div>
                         </div>
-                    </dd>
-                </div>
+                      </div>
 
-                <!-- CPU Card -->
-                <div class="px-4 py-5 sm:p-6 bg-white/5 rounded-tr-3xl rounded-lg">
-                    <dt class="text-base font-medium text-white/70"><%= __('dashboard.resources.cpu') %></dt>
-                    <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
-                        <div class="flex items-baseline text-2xl font-semibold text-white">
-                            <%= (packages.cpu/100 + extraresources.cpu/100 - cpu/100).toFixed(2) %> core(s)
+                      <!-- Resource Cards on the Right in 2x2 Grid -->
+                      <div class="w-2/3">
+                        <div class="grid grid-cols-2 gap-4">
+                          <!-- RAM Card -->
+                          <div class="px-4 py-5 sm:p-6 bg-white/5 rounded-tl-3xl rounded-lg">
+                            <dt class="text-base font-medium text-white/70">
+                              <%= __('dashboard.resources.memory') %>
+                            </dt>
+                            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+                              <div class="flex items-baseline text-2xl font-semibold text-white">
+                                <%= (packages.ram/1024 + extraresources.ram/1024 - ram/1024).toFixed(2) %> GiB
+                              </div>
+                            </dd>
+                          </div>
+
+                          <!-- CPU Card -->
+                          <div class="px-4 py-5 sm:p-6 bg-white/5 rounded-tr-3xl rounded-lg">
+                            <dt class="text-base font-medium text-white/70">
+                              <%= __('dashboard.resources.cpu') %>
+                            </dt>
+                            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+                              <div class="flex items-baseline text-2xl font-semibold text-white">
+                                <%= (packages.cpu/100 + extraresources.cpu/100 - cpu/100).toFixed(2) %> core(s)
+                              </div>
+                            </dd>
+                          </div>
+
+                          <!-- Disk Card -->
+                          <div class="px-4 py-5 sm:p-6 bg-white/5 rounded-bl-3xl rounded-lg">
+                            <dt class="text-base font-medium text-white/70">
+                              <%= __('dashboard.resources.disk') %>
+                            </dt>
+                            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+                              <div class="flex items-baseline text-2xl font-semibold text-white">
+                                <%= (packages.disk/1024 + extraresources.disk/1024 - disk/1024).toFixed(2) %> GiB
+                              </div>
+                            </dd>
+                          </div>
+
+                          <!-- Server Slots Card -->
+                          <div class="px-4 py-5 sm:p-6 bg-white/5 rounded-br-3xl rounded-lg">
+                            <dt class="text-base font-medium text-white/70">
+                              <%= __('dashboard.resources.servers') %>
+                            </dt>
+                            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+                              <div class="flex items-baseline text-2xl font-semibold text-white">
+                                <%= (packages.servers + extraresources.servers - servers) %>
+                              </div>
+                            </dd>
+                          </div>
                         </div>
-                    </dd>
-                </div>
+                      </div>
+                    </div>
 
-                <!-- Disk Card -->
-                <div class="px-4 py-5 sm:p-6 bg-white/5 rounded-bl-3xl rounded-lg">
-                    <dt class="text-base font-medium text-white/70"><%= __('dashboard.resources.disk') %></dt>
-                    <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
-                        <div class="flex items-baseline text-2xl font-semibold text-white">
-                            <%= (packages.disk/1024 + extraresources.disk/1024 - disk/1024).toFixed(2) %> GiB
+                    <!-- Support & Changelog Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                      <!-- Support Section -->
+                      <section>
+                        <div class="flex items-center justify-between mb-6">
+                          <h2 class="text-2xl font-semibold text-white heavy">
+                            <%= __('dashboard.support.title') %>
+                          </h2>
+                          <a href="<%= settings.website.discord %>"
+                            class="text-indigo-300 hover:text-indigo-200 font-medium">Discord →</a>
                         </div>
-                    </dd>
-                </div>
-
-                <!-- Server Slots Card -->
-                <div class="px-4 py-5 sm:p-6 bg-white/5 rounded-br-3xl rounded-lg">
-                    <dt class="text-base font-medium text-white/70"><%= __('dashboard.resources.servers') %></dt>
-                    <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
-                        <div class="flex items-baseline text-2xl font-semibold text-white">
-                            <%= (packages.servers + extraresources.servers - servers) %>
+                        <div class="p-6 bg-white/5 rounded-xl">
+                          <p class="text-gray-400">
+                            <%= __('dashboard.support.description') %>
+                          </p>
                         </div>
-                    </dd>
-                </div>
-            </div>
-        </div>
-    </div>
+                      </section>
 
-  <!-- Support & Changelog Section -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-    <!-- Support Section -->
-    <section>
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-semibold text-white heavy"><%= __('dashboard.support.title') %></h2>
-        <a href="<%= settings.website.discord %>" class="text-indigo-300 hover:text-indigo-200 font-medium">Discord →</a>
-      </div>
-      <div class="p-6 bg-white/5 rounded-xl">
-        <p class="text-gray-400"><%= __('dashboard.support.description') %></p>
-      </div>
-    </section>
+                      <!-- Changelog Section -->
+                      <section>
+                        <div class="flex items-center justify-between mb-6">
+                          <h2 class="text-2xl font-semibold text-white heavy">Changelog</h2>
+                          <a href="#comingsoon" class="text-indigo-300 hover:text-indigo-200 font-medium">Go to
+                            changelog →</a>
+                        </div>
+                        <div class="space-y-4">
+                          <div class="flex items-center justify-between">
+                            <p class="text-gray-300 text-sm">---</p>
+                            <span class="text-sm text-gray-400">---</span>
+                          </div>
+                          <div class="flex items-center justify-between">
+                            <p class="text-gray-300 text-sm">---</p>
+                            <span class="text-sm text-gray-400">---</span>
+                          </div>
+                          <div class="flex items-center justify-between">
+                            <p class="text-gray-300 text-sm">Introducing <%= settings.name %> - deploy your apps in the
+                                cloud, for free. </p>
+                            <span class="text-sm text-gray-400">---</span>
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+                    <!-- Platform Statistics Section -->
+                    <section class="mt-12 mb-12">
+                      <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-semibold text-white heavy">
+                          <%= __('dashboard.stats.title') %>
+                        </h2>
+                        <span class="text-indigo-300 text-sm">
+                          <%= __('dashboard.stats.updated') %>
+                        </span>
+                      </div>
 
-    <!-- Changelog Section -->
-    <section>
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-semibold text-white heavy">Changelog</h2>
-        <a href="#comingsoon" class="text-indigo-300 hover:text-indigo-200 font-medium">Go to changelog →</a>
-      </div>
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
-          <p class="text-gray-300 text-sm">---</p>
-          <span class="text-sm text-gray-400">---</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <p class="text-gray-300 text-sm">---</p>
-          <span class="text-sm text-gray-400">---</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <p class="text-gray-300 text-sm">Introducing <%= settings.name %> - deploy your apps in the cloud, for free. </p>
-          <span class="text-sm text-gray-400">---</span>
-        </div>  
-      </div>
-    </section>
-  </div>
-<!-- Platform Statistics Section -->
-<section class="mt-12 mb-12">
-  <div class="flex items-center justify-between mb-6">
-    <h2 class="text-2xl font-semibold text-white heavy"><%= __('dashboard.stats.title') %></h2>
-    <span class="text-indigo-300 text-sm"><%= __('dashboard.stats.updated') %></span>
-  </div>
-  
-  <!-- Main Stats Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-    <!-- Total Users -->
-    <div class="bg-white/5 p-6 rounded-2xl border border-white/5 hover:bg-white/[0.07] transition-colors">
-      <div class="flex items-center gap-4">
-        <div>
-          <p class="text-sm font-medium text-white/60"><%= __('dashboard.stats.total_users') %></p>
-          <p class="text-2xl font-semibold text-white mt-1" id="totalUsers"><%= __('common.loading') %></p>
-        </div>
-      </div>
-    </div>
+                      <!-- Main Stats Grid -->
+                      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                        <!-- Total Users -->
+                        <div
+                          class="bg-white/5 p-6 rounded-2xl border border-white/5 hover:bg-white/[0.07] transition-colors">
+                          <div class="flex items-center gap-4">
+                            <div>
+                              <p class="text-sm font-medium text-white/60">
+                                <%= __('dashboard.stats.total_users') %>
+                              </p>
+                              <p class="text-2xl font-semibold text-white mt-1" id="totalUsers">
+                                <%= __('common.loading') %>
+                              </p>
+                            </div>
+                          </div>
+                        </div>
 
-    <!-- Active Servers -->
-    <div class="bg-white/5 p-6 rounded-2xl border border-white/5 hover:bg-white/[0.07] transition-colors">
-      <div class="flex items-center gap-4">
-        <div>
-          <p class="text-sm font-medium text-white/60"><%= __('dashboard.stats.active_servers') %></p>
-          <p class="text-2xl font-semibold text-white mt-1" id="totalServers"><%= __('common.loading') %></p>
-        </div>
-      </div>
-    </div>
+                        <!-- Active Servers -->
+                        <div
+                          class="bg-white/5 p-6 rounded-2xl border border-white/5 hover:bg-white/[0.07] transition-colors">
+                          <div class="flex items-center gap-4">
+                            <div>
+                              <p class="text-sm font-medium text-white/60">
+                                <%= __('dashboard.stats.active_servers') %>
+                              </p>
+                              <p class="text-2xl font-semibold text-white mt-1" id="totalServers">
+                                <%= __('common.loading') %>
+                              </p>
+                            </div>
+                          </div>
+                        </div>
 
-    <!-- Total Nodes -->
-    <div class="bg-white/5 p-6 rounded-2xl border border-white/5 hover:bg-white/[0.07] transition-colors">
-      <div class="flex items-center gap-4">
-        <div>
-          <p class="text-sm font-medium text-white/60"><%= __('dashboard.stats.nodes') %></p>
-          <p class="text-2xl font-semibold text-white mt-1" id="totalNodes"><%= __('common.loading') %></p>
-        </div>
-      </div>
-    </div>
+                        <!-- Total Nodes -->
+                        <div
+                          class="bg-white/5 p-6 rounded-2xl border border-white/5 hover:bg-white/[0.07] transition-colors">
+                          <div class="flex items-center gap-4">
+                            <div>
+                              <p class="text-sm font-medium text-white/60">
+                                <%= __('dashboard.stats.nodes') %>
+                              </p>
+                              <p class="text-2xl font-semibold text-white mt-1" id="totalNodes">
+                                <%= __('common.loading') %>
+                              </p>
+                            </div>
+                          </div>
+                        </div>
 
-    <!-- Locations -->
-    <div class="bg-white/5 p-6 rounded-2xl border border-white/5 hover:bg-white/[0.07] transition-colors">
-      <div class="flex items-center gap-4">
-        <div>
-          <p class="text-sm font-medium text-white/60"><%= __('dashboard.stats.locations') %></p>
-          <p class="text-2xl font-semibold text-white mt-1" id="totalLocations"><%= __('common.loading') %></p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+                        <!-- Locations -->
+                        <div
+                          class="bg-white/5 p-6 rounded-2xl border border-white/5 hover:bg-white/[0.07] transition-colors">
+                          <div class="flex items-center gap-4">
+                            <div>
+                              <p class="text-sm font-medium text-white/60">
+                                <%= __('dashboard.stats.locations') %>
+                              </p>
+                              <p class="text-2xl font-semibold text-white mt-1" id="totalLocations">
+                                <%= __('common.loading') %>
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </section>
 
-<script>
-  // Function to fetch and update statistics
-  async function updateStats() {
-    try {
-      const response = await fetch('/api/stats');
-      const data = await response.json();
-      
-      // Update the statistics
-      document.getElementById('totalUsers').textContent = data.users;
-      document.getElementById('totalServers').textContent = data.servers;
-      document.getElementById('totalNodes').textContent = data.nodes;
-      document.getElementById('totalLocations').textContent = data.locations;
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-    }
-  }
-  // Function to fetch daily coins status
-  async function checkDailyCoins() {
-    try {
-      const response = await fetch('/api/dailystatus');
-      const data = await response.json();
-      if (data.text === '1') {
-                document.getElementById('dailyCoinsBanner').classList.remove('hidden');
-                document.getElementById('dailyCoinsBanner').classList.add('animate-fadeIn');
-            }
-        } catch (error) {
-            console.error('Error checking daily coins:', error);
-        }
-    }
+                    <script>
+                      // Function to fetch and update statistics
+                      async function updateStats() {
+                        try {
+                          const response = await fetch('/api/stats');
+                          const data = await response.json();
 
-  // Update stats when page loads
-  document.addEventListener('DOMContentLoaded', () => {
-    updateStats();
-    checkDailyCoins();
-    // Update stats every minute
-    setInterval(updateStats, 60000);
-  });
-</script>
-<% if (packages.ram/1024 + extraresources.ram/1024 - ram/1024 < 0) { %>
-    <div class="mb-8 p-4 border-l-4 bg-amber-600/15 border-amber-600 rounded-r-2xl transform transition-all duration-500 ease-in-out">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center">
-                <span class="text-amber-400 font-semibold"><%- __('dashboard.resources_below_zero') %></span>
-            </div>
-        </div>
-    </div>
-<% } %>
-    
-</main>
-<%- include('./components/bottom') %>
+                          // Update the statistics
+                          document.getElementById('totalUsers').textContent = data.users;
+                          document.getElementById('totalServers').textContent = data.servers;
+                          document.getElementById('totalNodes').textContent = data.nodes;
+                          document.getElementById('totalLocations').textContent = data.locations;
+                        } catch (error) {
+                          console.error('Error fetching stats:', error);
+                        }
+                      }
+                      // Function to fetch daily coins status
+                      async function checkDailyCoins() {
+                        try {
+                          const response = await fetch('/api/dailystatus');
+                          const data = await response.json();
+                          if (data.text === '1') {
+                            document.getElementById('dailyCoinsBanner').classList.remove('hidden');
+                            document.getElementById('dailyCoinsBanner').classList.add('animate-fadeIn');
+                          }
+                        } catch (error) {
+                          console.error('Error checking daily coins:', error);
+                        }
+                      }
+
+                      // Update stats when page loads
+                      document.addEventListener('DOMContentLoaded', () => {
+                        updateStats();
+                        checkDailyCoins();
+                        // Update stats every minute
+                        setInterval(updateStats, 60000);
+                      });
+                    </script>
+                    <% if (packages.ram/1024 + extraresources.ram/1024 - ram/1024 < 0) { %>
+                      <div
+                        class="mb-8 p-4 border-l-4 bg-amber-600/15 border-amber-600 rounded-r-2xl transform transition-all duration-500 ease-in-out">
+                        <div class="flex items-center justify-between">
+                          <div class="flex items-center">
+                            <span class="text-amber-400 font-semibold"><%- __('dashboard.resources_below_zero')
+                                %></span>
+                          </div>
+                        </div>
+                      </div>
+                      <% } %>
+
+  </main>
+  <%- include('./components/bottom') %>
