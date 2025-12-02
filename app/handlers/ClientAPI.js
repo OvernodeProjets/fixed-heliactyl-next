@@ -28,6 +28,11 @@ class PterodactylClientModule {
       });
       return response.data;
     } catch (error) {
+      // If server doesn't exist (404), return null
+      if (error.response?.status === 404) {
+        console.log(`Server ${serverId} not found (404)`);
+        return null;
+      }
       console.error('Error fetching server details:', error);
       throw error;
     }
@@ -161,6 +166,13 @@ class PterodactylClientModule {
 
   async executePowerAction(serverId, action) {
     try {
+      // First check if the server exists
+      const serverDetails = await this.getServerDetails(serverId);
+      if (!serverDetails) {
+        console.log(`Server ${serverId} not found, cannot execute power action '${action}'`);
+        return null;
+      }
+
       const response = await axios.post(
         `${this.apiUrl}/api/client/servers/${serverId}/power`,
         { signal: action },
@@ -175,6 +187,11 @@ class PterodactylClientModule {
       console.log(`Power action '${action}' executed for server ${serverId}`);
       return response.data;
     } catch (error) {
+      // If server doesn't exist (404), return null instead of throwing
+      if (error.response?.status === 404) {
+        console.log(`Server ${serverId} not found (404), cannot execute power action '${action}'`);
+        return null;
+      }
       console.error(`Error executing power action '${action}' for server ${serverId}:`, error.message);
       throw error;
     }

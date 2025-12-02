@@ -22,8 +22,9 @@ const settings = loadConfig("./config.toml");
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js");
 const PterodactylClientModule = require("../../handlers/ClientAPI.js");
 const { serverActivityLog } = require("../../handlers/log.js");
+const getPteroUser = require("../../handlers/getPteroUser.js");
 
-module.exports.load = async function(router, db) {
+module.exports.load = async function (router, db) {
   const ClientAPI = new PterodactylClientModule(settings.pterodactyl.domain, settings.pterodactyl.client_key);
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
@@ -31,75 +32,84 @@ module.exports.load = async function(router, db) {
   const RENEWAL_PERIOD_HOURS = 48;
   const WARNING_THRESHOLD_HOURS = 24; // When to start showing warnings
   const CHECK_INTERVAL_MINUTES = 5; // How often to check for expired servers
-  
+
   async function initializeRenewalSystem(db) {
     // Start the background task to check for expired servers
     setInterval(async () => {
       await checkExpiredServers(db);
     }, CHECK_INTERVAL_MINUTES * 60 * 1000);
   }
-  
+
   async function getRenewalStatus(db, serverId, user) {
     try {
       const renewalData = await db.get(`renewal_${serverId}`);
       const hasRenewalBypass = await db.get(`renewbypass-${user}`);
-      
+
       if (!renewalData) {
         // Initialize renewal data if it doesn't exist
         const now = new Date();
-        const nextRenewal = hasRenewalBypass ? 
-          new Date('2099-12-31T23:59:59.999Z').toISOString() : 
+        const nextRenewal = hasRenewalBypass ?
+          new Date('2099-12-31T23:59:59.999Z').toISOString() :
           new Date(now.getTime() + RENEWAL_PERIOD_HOURS * 60 * 60 * 1000).toISOString();
-        
+
         const initialRenewalData = {
           lastRenewal: now.toISOString(),
           nextRenewal: nextRenewal,
           isActive: true,
           renewalCount: 0,
-          hasRenewalBypass: hasRenewalBypass
+          hasRenewalBypass: hasRenewalBypass,
+          userId: user // Store userId for future reference
         };
         await db.set(`renewal_${serverId}`, initialRenewalData);
         return initialRenewalData;
       }
-    
+
       // If renewal bypass has been purchased, update the nextRenewal date
       if (hasRenewalBypass && !renewalData.hasRenewalBypass) {
         const updatedRenewalData = {
           ...renewalData,
           nextRenewal: new Date('2099-12-31T23:59:59.999Z').toISOString(),
           hasRenewalBypass: true,
-          isActive: true // Ensure server is active if it was previously expired
+          isActive: true, // Ensure server is active if it was previously expired
+          userId: user || renewalData.userId // Update userId if provided
         };
         await db.set(`renewal_${serverId}`, updatedRenewalData);
         return updatedRenewalData;
       }
-    
+
+      // Ensure userId is stored if missing and provided
+      if (user && !renewalData.userId) {
+        renewalData.userId = user;
+        await db.set(`renewal_${serverId}`, renewalData);
+      }
+
       return renewalData;
     } catch (error) {
       console.error(`Error getting renewal status for server ${serverId}:`, error);
       throw new Error('Failed to get renewal status');
     }
   }
-  
+
   async function renewServer(db, serverId) {
     try {
       const now = new Date();
       const renewalData = await getRenewalStatus(db, serverId);
-      
+
       // Update renewal data
       const updatedRenewalData = {
         lastRenewal: now.toISOString(),
         nextRenewal: new Date(now.getTime() + RENEWAL_PERIOD_HOURS * 60 * 60 * 1000).toISOString(),
         isActive: true,
-        renewalCount: (renewalData.renewalCount || 0) + 1
+        renewalCount: (renewalData.renewalCount || 0) + 1,
+        userId: renewalData.userId // Preserve userId
       };
-      
+
       await db.set(`renewal_${serverId}`, updatedRenewalData);
       await serverActivityLog(db, serverId, 'Server Renewal', {
         renewalCount: updatedRenewalData.renewalCount,
         nextRenewal: updatedRenewalData.nextRenewal
       });
-      
+
       return updatedRenewalData;
     } catch (error) {
       console.error(`Error renewing server ${serverId}:`, error);
@@ -130,22 +140,22 @@ module.exports.load = async function(router, db) {
       );
     });
   }
-  
+
   async function checkExpiredServers(db) {
     try {
       // Get all renewal keys from the database
       const renewalKeys = await listKeys('renewal_');
       const now = new Date();
-    
+
       for (const key of renewalKeys) {
         const serverId = key.replace('renewal_', '');
         const renewalData = await db.get(key);
-      
+
         if (!renewalData || !renewalData.isActive) continue;
-      
+
         const nextRenewal = new Date(renewalData.nextRenewal);
         const hoursUntilExpiration = (nextRenewal - now) / (1000 * 60 * 60);
-      
+
         // If server is expired, shut it down
         if (hoursUntilExpiration <= 0) {
           await handleExpiredServer(db, serverId);
@@ -161,19 +171,32 @@ module.exports.load = async function(router, db) {
       console.error('Error checking expired servers:', error);
     }
   }
-  
+
   async function handleExpiredServer(db, serverId) {
     try {
       // Update renewal status
       const renewalData = await db.get(`renewal_${serverId}`);
       renewalData.isActive = false;
       await db.set(`renewal_${serverId}`, renewalData);
-    
+
       // Stop the server
-      await ClientAPI.executePowerAction(serverId, 'stop');
-    
+      const powerResult = await ClientAPI.executePowerAction(serverId, 'stop');
+
+      // If server not found (null result), clean up renewal data
+      if (powerResult === null) {
+        console.log(`Server ${serverId} not found during expiration check. Removing renewal data.`);
+        await db.delete(`renewal_${serverId}`);
+
+        // Update user data if we have the userId
+        if (renewalData.userId) {
+          console.log(`Refreshing user data for user ${renewalData.userId}`);
+          await getPteroUser(renewalData.userId, db);
+        }
+        return;
+      }
+
       console.log(`Server ${serverId} has expired and been stopped.`);
-    
+
       // Log the expiration
       await serverActivityLog(db, serverId, 'Server Expired', {
         lastRenewal: renewalData.lastRenewal,
@@ -183,18 +206,18 @@ module.exports.load = async function(router, db) {
       console.error(`Error handling expired server ${serverId}:`, error);
     }
   }
-  
+
   // Add these routes to the router
   router.get('/server/:id/renewal/status', authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const serverId = req.params.id;
       const renewalStatus = await getRenewalStatus(db, serverId, req.session.userinfo.id);
-      
+
       // Calculate time remaining
       const now = new Date();
       const nextRenewal = new Date(renewalStatus.nextRenewal);
       const timeRemaining = nextRenewal - now;
-      
+
       // Format the response
       const response = {
         ...renewalStatus,
@@ -207,25 +230,26 @@ module.exports.load = async function(router, db) {
         requiresRenewal: timeRemaining <= WARNING_THRESHOLD_HOURS * 60 * 60 * 1000,
         isExpired: timeRemaining <= 0
       };
-      
+
       res.json(response);
     } catch (error) {
       console.error('Error getting renewal status:', error);
       res.status(500).json({ error: 'Failed to get renewal status' });
     }
   });
-  
+
   // And update the renewal endpoint validation in the POST route:
   router.post('/server/:id/renewal/renew', authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const serverId = req.params.id;
-      const currentStatus = await getRenewalStatus(db, serverId);
-      
+      // Pass user ID to ensure it's stored/updated
+      const currentStatus = await getRenewalStatus(db, serverId, req.session.userinfo.id);
+
       // Check if renewal is actually needed
       const now = new Date();
       const nextRenewal = new Date(currentStatus.nextRenewal);
       const timeRemaining = nextRenewal - now;
-      
+
       // Allow renewal if less than 24 hours remaining or expired
       if (timeRemaining > WARNING_THRESHOLD_HOURS * 60 * 60 * 1000) {
         return res.status(400).json({
@@ -237,15 +261,15 @@ module.exports.load = async function(router, db) {
           }
         });
       }
-      
+
       // Process the renewal
       const renewalData = await renewServer(db, serverId);
-      
+
       // If server was stopped due to expiration, restart it
       if (!currentStatus.isActive) {
         await ClientAPI.executePowerAction(serverId, 'start');
       }
-      
+
       res.json({
         message: 'Server renewed successfully',
         renewalData
@@ -255,8 +279,8 @@ module.exports.load = async function(router, db) {
       res.status(500).json({ error: 'Failed to renew server' });
     }
   });
-  
-  
+
+
   // Initialize the renewal system when the module loads
   initializeRenewalSystem(db);
 };
