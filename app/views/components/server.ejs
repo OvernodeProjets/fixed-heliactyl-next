@@ -5,40 +5,40 @@
 <nav class="relative z-50 mb-6">
 
     <!-- Navigation Items -->
-<div class="block md:overflow-x-visible overflow-x-auto scrollbar-hide relative overflow-visible">
+<div class="block overflow-visible relative">
 
-    <div class="space-x-2 md:space-x-4 rounded-full bg-white/5 backdrop-blur-xl p-2 md:p-1.5 inline-flex items-center">
+    <div class="inline-flex flex-wrap md:flex-nowrap gap-2 md:gap-0 md:space-x-1 rounded-xl md:rounded-full bg-white/5 backdrop-blur-xl p-2 md:p-1.5">
             <!-- Core Server Management -->
-            <a href="/server/manage?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+            <a href="/server/manage?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-3 md:px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95 whitespace-nowrap">
                 Console
             </a>
-            <a href="/server/files?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+            <a href="/server/files?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-3 md:px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95 whitespace-nowrap">
                 Files
             </a>
-            <a href="/server/backups?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+            <a href="/server/backups?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-3 md:px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95 whitespace-nowrap">
                 Backups
             </a>
             
             <!-- Server Content -->
-            <a href="/server/worlds?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+            <a href="/server/worlds?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-3 md:px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95 whitespace-nowrap">
                 Worlds
             </a>
-            <a href="/server/plugins?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+            <a href="/server/plugins?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-3 md:px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95 whitespace-nowrap">
                 Plugins
             </a>
             
             <!-- Configuration -->
-            <a href="/server/allocations?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+            <a href="/server/allocations?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-3 md:px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95 whitespace-nowrap">
                 Allocations
             </a>
 
-            <a href="/server/settings?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95">
+            <a href="/server/settings?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-3 md:px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95 whitespace-nowrap">
                 Settings
             </a>
 
         <!-- More Dropdown -->
         <div class="relative inline-block">
-            <button id="more-menu-button" class="srv-link group rounded-full px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 flex items-center space-x-1">
+            <button id="more-menu-button" class="srv-link group rounded-full px-3 md:px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 flex items-center space-x-1 whitespace-nowrap">
                 <span>More</span>
                 <svg class="w-4 h-4 transition-transform duration-200 group-data-[state=open]:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
