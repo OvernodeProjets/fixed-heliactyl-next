@@ -136,10 +136,11 @@
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }
-    .file-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1rem;
+        .file-grid {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+        gap: 1rem !important;
+        flex-direction: unset !important;
     }
     .file-card {
         background-color: rgba(255, 255, 255, 0.1);
@@ -212,6 +213,67 @@
 .context-menu-item:hover {
     background-color: #2c2e33;
 }
+
+    /* List View Styles */
+    .file-list-view {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    .file-list-header {
+        display: grid;
+        grid-template-columns: 40px 2fr 1fr 1fr 1fr 40px;
+        padding: 0.5rem 1rem;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 0.5rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 0.5rem;
+        align-items: center;
+    }
+    .file-row {
+        display: grid;
+        grid-template-columns: 40px 2fr 1fr 1fr 1fr 40px;
+        padding: 0.5rem 1rem;
+        background-color: rgba(255, 255, 255, 0.02);
+        border-radius: 0.5rem;
+        align-items: center;
+        transition: background-color 0.2s ease;
+        cursor: pointer;
+    }
+    .file-row:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+    .file-row .file-icon-small {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .file-row .file-icon-small svg {
+        width: 20px;
+        height: 20px;
+    }
+    .file-row .file-name-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .file-row .context-menu-button {
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+    }
+    .file-row:hover .context-menu-button {
+        opacity: 1;
+    }
+    
+    .hidden {
+        display: none !important;
+    }
 </style>
 
 <main class="flex-grow container mx-auto px-4 py-8">
@@ -275,7 +337,19 @@
     <div class="bg-white/5 rounded-xl p-6 mb-6">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold heavy"><%= __('server.files.title') %></h2>
-            <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-2">
+                    <div class="flex bg-black/20 rounded-lg p-1">
+                        <button id="view-grid" class="p-1.5 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors" title="Grid View">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
+                        </button>
+                        <button id="view-list" class="p-1.5 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors" title="List View">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
                 <div class="p-2.5 bg-black/20 rounded-lg">
                     <input 
                         type="checkbox" 
@@ -321,6 +395,15 @@
                 <button id="create-folder" class="action-button bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-1.5 px-4 rounded-full transition"><%= __('server.files.new_folder') %></button>
                 <button id="new-file" class="action-button bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-1.5 px-4 rounded-full transition"><%= __('server.files.new_file') %></button>
             </div>
+        </div>
+
+        <div id="file-list-header" class="file-list-header hidden">
+            <div></div>
+            <div>Name</div>
+            <div>Size</div>
+            <div>Type</div>
+            <div>Date Modified</div>
+            <div></div>
         </div>
         
         <div id="file-list" class="file-grid">
@@ -443,7 +526,49 @@ const itemsPerPage = 50;
 let searchTerm = '';
 let sortBy = 'name';
 let sortDirection = 'asc';
+let viewMode = localStorage.getItem('fileViewMode') || 'grid';
 let fileCache = [];
+
+document.getElementById('view-grid').addEventListener('click', () => {
+    viewMode = 'grid';
+    localStorage.setItem('fileViewMode', 'grid');
+    updateViewModeUI();
+    loadFileList(currentPath);
+});
+
+document.getElementById('view-list').addEventListener('click', () => {
+    viewMode = 'list';
+    localStorage.setItem('fileViewMode', 'list');
+    updateViewModeUI();
+    loadFileList(currentPath);
+});
+
+function updateViewModeUI() {
+    const gridBtn = document.getElementById('view-grid');
+    const listBtn = document.getElementById('view-list');
+    const fileList = document.getElementById('file-list');
+    const fileListHeader = document.getElementById('file-list-header');
+    
+    if (viewMode === 'grid') {
+        gridBtn.classList.add('text-white', 'bg-white/10');
+        gridBtn.classList.remove('text-gray-400');
+        listBtn.classList.remove('text-white', 'bg-white/10');
+        listBtn.classList.add('text-gray-400');
+        
+        fileList.classList.remove('file-list-view');
+        fileList.classList.add('file-grid');
+        fileListHeader.classList.add('hidden');
+    } else {
+        listBtn.classList.add('text-white', 'bg-white/10');
+        listBtn.classList.remove('text-gray-400');
+        gridBtn.classList.remove('text-white', 'bg-white/10');
+        gridBtn.classList.add('text-gray-400');
+        
+        fileList.classList.remove('file-grid');
+        fileList.classList.add('file-list-view');
+        fileListHeader.classList.remove('hidden');
+    }
+}
 
 function sortFiles(files) {
     return [...files].sort((a, b) => {
@@ -522,13 +647,13 @@ fetch(`/api/server/${serverId}`)
     });
 
 function getSelectedFiles() {
-    return Array.from(document.querySelectorAll('.file-card input[type="checkbox"]:checked'))
+    return Array.from(document.querySelectorAll(viewMode === 'grid' ? '.file-card input[type="checkbox"]:checked' : '.file-row input[type="checkbox"]:checked'))
         .map(checkbox => checkbox.getAttribute('data-name'));
 }
 
 
 function updateMassActionsBar() {
-    const checkboxes = document.querySelectorAll('.file-card input[type="checkbox"]');
+    const checkboxes = document.querySelectorAll(viewMode === 'grid' ? '.file-card input[type="checkbox"]' : '.file-row input[type="checkbox"]');
     const selectedFiles = getSelectedFiles();
     const massActionsBar = document.getElementById('mass-actions-bar');
     const selectedCount = document.getElementById('selected-count');
@@ -631,8 +756,8 @@ async function loadFileList(path, page = 1) {
         }
         
         sortedFiles.forEach(item => {
-            const { name, is_file: isFile, mimetype, size } = item.attributes;
-            fileList.appendChild(createFileCard(name, isFile ? 'file' : 'directory', mimetype, size));
+            const { name, is_file: isFile, mimetype, size, modified } = item.attributes;
+            fileList.appendChild(createFileElement(name, isFile ? 'file' : 'directory', mimetype, size, modified));
         });
         
         // Update pagination
@@ -668,6 +793,83 @@ async function loadFileList(path, page = 1) {
     }
 }
 
+function createFileElement(name, type, mimetype, size, modified) {
+    if (viewMode === 'grid') {
+        return createFileCard(name, type, mimetype, size);
+    } else {
+        return createFileRow(name, type, mimetype, size, modified);
+    }
+}
+
+function createFileRow(name, type, mimetype, size, modified) {
+    const row = document.createElement('div');
+    row.className = 'file-row';
+    const isArchive = type === 'file' && archiveExtensions.some(ext => name.toLowerCase().endsWith(ext));
+    const iconClass = type === 'file' ? (isArchive ? 'archive' : 'file') : 'folder';
+    const formattedSize = type === 'file' ? formatFileSize(size) : '-';
+    const formattedDate = modified ? new Date(modified).toLocaleString() : '-';
+    const fileType = type === 'directory' ? 'Folder' : (name.split('.').pop().toUpperCase() + ' File');
+
+    row.innerHTML = `
+        <div class="flex items-center justify-center">
+            <input type="checkbox" class="form-checkbox h-4 w-4 text-indigo-500 rounded focus:ring-indigo-500" data-name="${name}">
+        </div>
+        <div class="file-name-cell">
+            <div class="file-icon-small">${getFileIcon(iconClass)}</div>
+            <span>${name}</span>
+        </div>
+        <div class="text-sm text-gray-400">${formattedSize}</div>
+        <div class="text-sm text-gray-400">${fileType}</div>
+        <div class="text-sm text-gray-400">${formattedDate}</div>
+        <div class="flex items-center justify-center">
+            <button class="context-menu-button text-gray-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                </svg>
+            </button>
+        </div>
+    `;
+
+    setupFileElementEvents(row, name, type);
+    return row;
+}
+
+function setupFileElementEvents(element, name, type) {
+    const checkbox = element.querySelector('input[type="checkbox"]');
+    if (checkbox) {
+        checkbox.addEventListener('change', () => {
+            updateMassActionsBar();
+        });
+        checkbox.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+
+    const contextMenuButton = element.querySelector('.context-menu-button');
+    if (contextMenuButton) {
+        contextMenuButton.addEventListener('click', (e) => {
+            console.log('Context menu button clicked');
+            e.stopPropagation();
+            e.preventDefault();
+            showContextMenu(e, name, type === 'file');
+        });
+    }
+
+    element.addEventListener('click', (e) => {
+        console.log('Element clicked');
+        if (e.target.type === 'checkbox') {
+            // Handled by checkbox click listener
+        } else if (name === '..') {
+            const parentPath = currentPath.split('/').slice(0, -1).join('/') || '/';
+            loadFileList(parentPath);
+        } else if (type === 'directory') {
+            loadFileList(`${currentPath}${currentPath.endsWith('/') ? '' : '/'}${name}`);
+        } else {
+            openFileEditor(name);
+        }
+    });
+}
+
 function createFileCard(name, type, mimetype, size) {
     const card = document.createElement('div');
     card.className = 'file-card relative bg-white/5 p-4 rounded-lg transition-all duration-200 hover:bg-white/10 cursor-pointer hover:scale-95';
@@ -691,36 +893,7 @@ function createFileCard(name, type, mimetype, size) {
         ${formattedSize ? `<div class="file-size text-sm text-gray-400 text-center">${formattedSize}</div>` : ''}
     `;
 
-    const checkbox = card.querySelector('input[type="checkbox"]');
-    if (checkbox) {
-        checkbox.addEventListener('change', () => {
-            updateMassActionsBar();
-        });
-    }
-
-    const contextMenuButton = card.querySelector('.context-menu-button');
-    contextMenuButton.addEventListener('click', (e) => {
-        console.log('Context menu button clicked');
-        e.stopPropagation();
-        e.preventDefault();
-        showContextMenu(e, name, type === 'file');
-    });
-
-    card.addEventListener('click', (e) => {
-        console.log('Card clicked');
-        if (e.target.type === 'checkbox') {
-            e.stopPropagation();
-            updateMassActionsBar();
-        } else if (name === '..') {
-            const parentPath = currentPath.split('/').slice(0, -1).join('/') || '/';
-            loadFileList(parentPath);
-        } else if (type === 'directory') {
-            loadFileList(`${currentPath}${currentPath.endsWith('/') ? '' : '/'}${name}`);
-        } else {
-            openFileEditor(name);
-        }
-    });
-
+    setupFileElementEvents(card, name, type);
     return card;
 }
 
@@ -1635,6 +1808,11 @@ dropZone.addEventListener('drop', (e) => {
 
 // Initial load
 loadFileList('/');
+
+// Initialize view mode UI after DOM is ready
+setTimeout(() => {
+    updateViewModeUI();
+}, 100);
 
 // Add smooth scrolling for better UX
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
