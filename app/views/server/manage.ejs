@@ -908,6 +908,17 @@ document.getElementById('stop-server').addEventListener('click', () => {
 });
 document.getElementById('restart-server').addEventListener('click', () => sendPowerAction('restart'));
 
+// Mobile server control buttons  
+document.getElementById('mobile-start-server').addEventListener('click', () => sendPowerAction('start'));
+document.getElementById('mobile-stop-server').addEventListener('click', () => {
+    if (serverStatus === 'starting' || serverStatus === 'stopping') {
+        sendPowerAction('kill');
+    } else {
+        sendPowerAction('stop');
+    }
+});
+document.getElementById('mobile-restart-server').addEventListener('click', () => sendPowerAction('restart'));
+
 function sendPowerAction(action) {
     if (socket && socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify({ event: 'set state', args: [action] }));
