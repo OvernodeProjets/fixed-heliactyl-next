@@ -508,10 +508,14 @@ function fetchServerDetails() {
 
             if (serverName) serverName.textContent = data.attributes.name;
             if (serverNameCard) serverNameCard.textContent = data.attributes.name;
+            const mobileServerNameCard = document.getElementById('mobile-server-name-card');
+            if (mobileServerNameCard) mobileServerNameCard.textContent = data.attributes.name;
             if (serverNameBreadcrumb) serverNameBreadcrumb.textContent = data.attributes.name;
             if (serverDescription) serverDescription.textContent = data.attributes.description || "<%= __('server.manage.no_description') %>";
             nodeName = data.attributes.node;
             if (nodeElement) nodeElement.textContent = nodeName;
+            const mobileNodeElement = document.getElementById('mobile-node');
+            if (mobileNodeElement) mobileNodeElement.textContent = nodeName;
             const limitConfigs = {
                 cpu: {
                     element: 'cpu-limit-card',
@@ -534,6 +538,13 @@ function fetchServerDetails() {
                     const text = value === 0 ? 'Unlimited' : config.format(value);
                     element.textContent = text;
                 }
+                // Update mobile elements too
+                const mobileElement = document.getElementById('mobile-' + config.element);
+                if (mobileElement) {
+                    const value = data.attributes.limits[key];
+                    const text = value === 0 ? 'Unlimited' : config.format(value);
+                    mobileElement.textContent = text;
+                }
             });
             const defaultAllocation = data.attributes.relationships.allocations.data.find(allocation => allocation.attributes.is_default);
             if (defaultAllocation) {
@@ -541,6 +552,10 @@ function fetchServerDetails() {
                 if (ipElement) {
                     ipElement.textContent = `${defaultAllocation.attributes.ip_alias}:${defaultAllocation.attributes.port}`;
                 }
+            }
+            const mobileIpElement = document.getElementById('mobile-ip');
+            if (mobileIpElement) {
+                mobileIpElement.textContent = `${defaultAllocation.attributes.ip_alias}:${defaultAllocation.attributes.port}`;
             }
 
             if (data.attributes.is_installing) {
@@ -782,9 +797,19 @@ function updateStats(stats) {
     const diskUsage = (stats.disk_bytes / 1024 / 1024).toFixed(2);
     const networkUsage = (stats.network.tx_bytes / 1024).toFixed(2);
 
+    // Update desktop stats
     document.getElementById('cpu-usage-card').textContent = `${cpuUsage}%`;
     document.getElementById('ram-usage-card2').textContent = `${ramUsage} MB`;
     document.getElementById('disk-usage-card2').textContent = `${diskUsage} MB`;
+    
+    // Update mobile stats
+    const mobileCpuElement = document.getElementById('mobile-cpu-usage-card');
+    const mobileRamElement = document.getElementById('mobile-ram-usage-card2');
+    const mobileDiskElement = document.getElementById('mobile-disk-usage-card2');
+    
+    if (mobileCpuElement) mobileCpuElement.textContent = `${cpuUsage}%`;
+    if (mobileRamElement) mobileRamElement.textContent = `${ramUsage} MB`;
+    if (mobileDiskElement) mobileDiskElement.textContent = `${diskUsage} MB`;
 
     updateUsageBar('cpu', cpuUsage, '%');
     updateUsageBar('ram', ramUsage, 'MB', stats.memory_limit_bytes / 1024 / 1024);
@@ -828,18 +853,35 @@ function updateUsageBar(type, value, unit, max = 100) {
 function updateServerStatus(status) {
     serverStatus = status.replace('offline', 'powered off');
     const statusElement = document.getElementById('server-status');
-    statusElement.textContent = ((status.charAt(0).toUpperCase() + status.slice(1)).replace('Offline', 'Powered off')).replace('Running', 'Powered on');
+    const mobileStatusElement = document.getElementById('mobile-server-status');
+    const statusText = ((status.charAt(0).toUpperCase() + status.slice(1)).replace('Offline', 'Powered off')).replace('Running', 'Powered on');
+    
+    statusElement.textContent = statusText;
+    if (mobileStatusElement) {
+        mobileStatusElement.textContent = statusText;
+    }
 
     const startButton = document.getElementById('start-server');
     const stopButton = document.getElementById('stop-server');
     const restartButton = document.getElementById('restart-server');
+    
+    const mobileStartButton = document.getElementById('mobile-start-server');
+    const mobileStopButton = document.getElementById('mobile-stop-server');
+    const mobileRestartButton = document.getElementById('mobile-restart-server');
     
 switch (status) {
     case 'running':
         startButton.disabled = true;
         stopButton.disabled = false;
         restartButton.disabled = false;
+        if (mobileStartButton) mobileStartButton.disabled = true;
+        if (mobileStopButton) mobileStopButton.disabled = false;
+        if (mobileRestartButton) mobileRestartButton.disabled = false;
         statusElement.classList.add('text-emerald-500', 'bg-emerald-500/15');
+        if (mobileStatusElement) {
+            mobileStatusElement.classList.add('text-emerald-500', 'bg-emerald-500/15');
+            mobileStatusElement.classList.remove('text-red-500', 'text-yellow-500', 'bg-red-500/15', 'bg-yellow-500/15');
+        }
         statusElement.classList.remove(
             'text-red-500', 'text-yellow-500',
             'bg-red-500/15', 'bg-yellow-500/15'
@@ -849,7 +891,14 @@ switch (status) {
         startButton.disabled = false;
         stopButton.disabled = true;
         restartButton.disabled = true;
+        if (mobileStartButton) mobileStartButton.disabled = false;
+        if (mobileStopButton) mobileStopButton.disabled = true;
+        if (mobileRestartButton) mobileRestartButton.disabled = true;
         statusElement.classList.add('text-red-500', 'bg-red-500/15');
+        if (mobileStatusElement) {
+            mobileStatusElement.classList.add('text-red-500', 'bg-red-500/15');
+            mobileStatusElement.classList.remove('text-emerald-500', 'text-yellow-500', 'bg-emerald-500/15', 'bg-yellow-500/15');
+        }
         statusElement.classList.remove(
             'text-emerald-500', 'text-yellow-500',
             'bg-emerald-500/15', 'bg-yellow-500/15'
@@ -860,6 +909,9 @@ switch (status) {
         startButton.disabled = true;
         stopButton.disabled = false;
         restartButton.disabled = true;
+        if (mobileStartButton) mobileStartButton.disabled = true;
+        if (mobileStopButton) mobileStopButton.disabled = false;
+        if (mobileRestartButton) mobileRestartButton.disabled = true;
         statusElement.classList.add('text-yellow-500', 'bg-yellow-500/15');
         statusElement.classList.remove(
             'text-emerald-500', 'text-red-500',
@@ -871,6 +923,10 @@ switch (status) {
         stopButton.disabled = true;
         restartButton.disabled = true;
         statusElement.classList.add('text-yellow-500', 'bg-yellow-500/15');
+        if (mobileStatusElement) {
+            mobileStatusElement.classList.add('text-yellow-500', 'bg-yellow-500/15');
+            mobileStatusElement.classList.remove('text-emerald-500', 'text-red-500', 'bg-emerald-500/15', 'bg-red-500/15');
+        }
         statusElement.classList.remove(
             'text-emerald-500', 'text-red-500',
             'bg-emerald-500/15', 'bg-red-500/15'
