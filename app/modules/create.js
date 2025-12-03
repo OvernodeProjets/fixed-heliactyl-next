@@ -158,7 +158,7 @@ router.get("/server/create", authMiddleware, async (req, res) => {
             }
 
             let name = decodeURIComponent(req.query.name);
-            if (name.length < 1) {
+            if (name.length < 3) {
                 return res.redirect(`/server/new?err=LITTLESERVERNAME`);
             }
             if (name.length > 191) {

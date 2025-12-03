@@ -398,6 +398,11 @@ async function submitForm() {
         alertify.error('Please fill out all fields and select a location.');
         return;
     }
+    
+    if (nameValue.length < 3) {
+        alertify.error('Server name must be at least 3 characters long.');
+        return;
+    }
 
     if (selectedLocation == 28 || selectedLocation == 29) {
         if (ram > 6144) {
