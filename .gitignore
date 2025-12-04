@@ -10,3 +10,4 @@ storage/sessions.db
 backup/
 backup-*
 tests/
+logs/
