@@ -29,6 +29,33 @@ You can get started straight away by following these steps:
 3. Check everything out and make sure you've configured Heliactyl correctly
 4. Create SSL certificates for your target domain and set up the NGINX reverse proxy
 
+## ⚠️ Critical: Configure Pterodactyl Wings
+
+> [!CAUTION]
+> **You must configure Wings on every node before deploying Fixed Heliactyl Next!**  
+> Without this step, your dashboard will be unable to communicate with Pterodactyl nodes.
+
+For **each node** in your infrastructure, follow these steps:
+
+1. **Locate the Wings configuration file** (typically at `/etc/pterodactyl/config.yml`)
+2. **Find the `allowed-origins` setting** in the configuration
+3. **Update the value** to one of the following options:
+
+   **Option 1: Allow all origins** (simplest, recommended for testing):
+   ```yaml
+   allowed-origins: ['*']
+   ```
+
+   **Option 2: Restrict to your dashboard domain** (more secure, recommended for production):
+   ```yaml
+   allowed-origins: ['https://dashboard.yourdomain.com']
+   ```
+
+4. **Restart Wings** to apply the changes:
+   ```bash
+   systemctl restart wings
+   ```
+
 ## NGINX Reverse Proxy
 
 You can either use a single domain setup or a split domain setup (recommended for production).
