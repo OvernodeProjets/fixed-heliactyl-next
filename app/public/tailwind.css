@@ -812,6 +812,9 @@
   .min-w-\[300px\] {
     min-width: 300px;
   }
+  .min-w-fit {
+    min-width: fit-content;
+  }
   .flex-1 {
     flex: 1;
   }
@@ -1112,6 +1115,9 @@
   }
   .overflow-visible {
     overflow: visible;
+  }
+  .overflow-x-hidden {
+    overflow-x: hidden;
   }
   .overflow-y-auto {
     overflow-y: auto;
@@ -1957,6 +1963,9 @@
   }
   .bg-clip-text {
     background-clip: text;
+  }
+  .object-contain {
+    object-fit: contain;
   }
   .object-cover {
     object-fit: cover;

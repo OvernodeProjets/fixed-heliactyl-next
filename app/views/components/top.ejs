@@ -42,6 +42,17 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        <% if (!settings.website.domain.includes('localhost') && !settings.website.domain.includes('127.0.0.1')) { %>
+        /* Prevent horizontal overflow on mobile (production only) */
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+        <% } %>
         .text-3xl {
             color: white;
         }
@@ -130,8 +141,7 @@
     </style>
 </head>
 
-<body class="bg-[#010103] text-gray-300" style="font-family: 'Inter'" x-data="{ sidebarOpen: false }" @keydown.escape="sidebarOpen = false">
-    <!-- Loading bar -->
+<body class="bg-[#010103] text-gray-300 overflow-x-hidden" style="font-family: 'Inter'" x-data="{ sidebarOpen: false }" @keydown.escape="sidebarOpen = false">
     <div class="loading-bar"></div>
     <!-- Spinner -->
     <div class="spinner">
@@ -150,9 +160,9 @@
             </svg>
         </button>
         <!-- Left side -->
-        <div class="flex items-center space-x-2 hover:bg-white/5 rounded-md px-2 py-1 transition duration-200 hover:scale-95 cursor-pointer"
+        <div class="flex items-center space-x-2 hover:bg-white/5 rounded-md px-3 py-1.5 transition duration-200 hover:scale-95 cursor-pointer min-w-fit"
             onclick="window.location.href='/dashboard'">
-            <img src="/assets/console.png" alt="<%= settings.name %> Logo" class="w-auto h-8">
+            <img src="/assets/console.png" alt="<%= settings.name %> Logo" class="w-auto h-8 object-contain">
         </div>
 
         <!-- Right side -->
