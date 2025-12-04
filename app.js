@@ -188,12 +188,14 @@ if (cluster.isMaster) {
       console.log(
         chalk.white(chalk.gray('[cluster]') + " Cleared all AFK sessions on startup.")
       );
-      try {
-        await updateManager.initialize(db);
-      } catch (error) {
-        console.error(`[Worker ${process.pid}] Failed to initialize UpdateManager:`, error);
-      }
     }
+    
+    try {
+      await updateManager.initialize(db);
+    } catch (error) {
+      console.error(`[Worker ${process.pid}] Failed to initialize UpdateManager:`, error);
+    }
+    
     console.log(
       chalk.white(chalk.gray("[cluster]") + " Cluster state updated: ") + chalk.green('running')
     );
