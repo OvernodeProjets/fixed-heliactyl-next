@@ -121,13 +121,17 @@ if (cluster.isMaster) {
   });
 
   app.use(async (err, req, res, next) => {
-    if (err.status === 500 && err.message === 'Gateway Timeout') {
+    try {
       const theme = await getPages();
-      res.status(500).render(theme.settings.errors.internalError, { error: 'Gateway Timeout' });
-      return;
-    } else {
-      next(err);
-      return;
+      if (err.status === 500 && err.message === 'Gateway Timeout') {
+        res.status(500).render(theme.settings.errors.internalError, { error: 'Gateway Timeout' });
+      } else {
+        res.status(err.status || 500).render(theme.settings.errors.internalError, { 
+          error: process.env.NODE_ENV === 'production' ? 'Internal Error' : err.message 
+        });
+      }
+    } catch (renderError) {
+      res.status(500).send('Critical error');
     }
   });
 
@@ -158,24 +162,20 @@ if (cluster.isMaster) {
 
   app.use(i18nMiddleware);
 
+  const userCache = new Map();
   app.use(async (req, res, next) => {
-    if (req.ws) {
-      // Skip session handling for WebSocket connections
-      return next();
-    }
+    if (req.ws || !req.session.userinfo?.id) return next();
 
-    // Check if user is logged in and not accessing the /banned route
-    if (req.session.userinfo?.id) {
-      const userId = req.session.userinfo.id;
-      const coinsKey = await db.get(`coins-${userId}`);
-
-      if (coinsKey == null) {
+    const userId = req.session.userinfo.id;
+    if (!userCache.has(userId)) {
+      const coins = await db.get(`coins-${userId}`);
+      if (coins == null) {
         await db.set('coins-' + userId, 0);
       }
+      userCache.set(userId, true);
     }
-
     next();
-  });
+});
 
   const listener = app.listen(settings.website.port, async function () {
     /* clear all afk sessions */
@@ -223,21 +223,21 @@ if (cluster.isMaster) {
       const absolutePath = path.resolve(file);
       const APIFile = require(absolutePath);
 
-      if (APIFile.load && typeof APIFile.load === 'function') {
-        const router = express.Router();
-
-        APIFile.load(router, db);
-        if (path.basename(file) !== "pages.js") {
-          app.use('/api', router);
-        } else {
-          app.use(router);
-        }
-        console.log(chalk.green(`✓ Loaded: ${path.basename(file)} in ${Date.now() - startTime} ms`));
-      } else {
-        console.warn(`⚠ Module ${file} does not export a load function`);
+      if (!APIFile.load || typeof APIFile.load !== 'function') {
+        throw new Error(`⚠ Module ${file} missing load() function`); 
       }
+
+      const router = express.Router();
+      APIFile.load(router, db);
+
+      if (path.basename(file) !== "pages.js") {
+        app.use('/api', router);
+      } else {
+        app.use(router);
+      }
+      console.log(chalk.green(`✓ Loaded: ${path.basename(file)} in ${Date.now() - startTime} ms`));
     } catch (error) {
-      console.error(`✗ Failed to load ${file}:`, error.message);
+      console.error(chalk.red(`✗ CRITICAL: Failed to load ${file}:`), error);
     }
   }
 
