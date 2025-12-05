@@ -57,8 +57,8 @@
         </div>
     </div>
 <div id="alert-container" class="mb-4 space-y-2"></div>
-    <!-- Servers List Header -->
-    <div class="px-6 py-3 mt-6 grid grid-cols-12 gap-4 items-center text-sm font-medium text-white/50">
+    <!-- Servers List Header (hidden on mobile) -->
+    <div class="hidden md:grid px-6 py-3 mt-6 grid-cols-12 gap-4 items-center text-sm font-medium text-white/50">
         <div class="col-span-2"><%= __('servers.columns.server') %></div>
         <div class="col-span-2"><%= __('servers.columns.status') %></div>
         <div class="col-span-2"><%= __('servers.columns.memory') %></div>
@@ -68,7 +68,7 @@
 
     <% pterodactyl.data = pterodactyl.relationships.servers.data %>
     <!-- Servers List -->
-    <div class="divide-y divide-white/5" id="servers-list">
+    <div class="divide-y divide-white/5 mt-4 md:mt-0" id="servers-list">
         <% if (pterodactyl.data.length === 0) { %>
             <div class="px-6 py-8 text-center text-white/60">
                 <p class="text-lg mb-2"><%= __('servers.no_servers') %></p>
@@ -76,49 +76,53 @@
             </div>
         <% } else { %>
             <% pterodactyl.data.forEach(server => { %>
-<div class="server-row mb-4 bg-white/5 rounded-2xl hover:bg-white/10 border-2 border-dashed border-transparent hover:border-white/5 transition px-6 py-4 grid grid-cols-12 gap-4 items-center cursor-pointer"
+<div class="server-row mb-4 bg-white/5 rounded-2xl hover:bg-white/10 border-2 border-dashed border-transparent hover:border-white/5 transition px-4 md:px-6 py-4 flex flex-col gap-3 md:grid md:grid-cols-12 md:gap-4 md:items-center cursor-pointer"
      data-server-id="<%= server.attributes.identifier %>"
      data-server-numeric="<%= server.attributes.id %>"
      data-egg="<%= server.attributes.egg %>"
      onclick="window.location.href='/server/manage?id=<%= server.attributes.identifier%>&numeric=<%= server.attributes.id%>&mode=server'">
                     
-                    <!-- Server Name & Node -->
-                    <div class="col-span-2">
-                        <div class="font-medium text-white"><%= server.attributes.name %></div>
-                    </div>
-
-                    <!-- Status -->
-                    <div class="col-span-2">
-                        <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-zinc-500/20 text-zinc-300">
-                            <div class="size-2 rounded-full bg-zinc-400 mr-2 status-indicator"></div>
-                            <span class="status-text"><%= __('servers.status.connecting') %></span>
+                    <!-- Server Name & Status (mobile: inline row) -->
+                    <div class="flex items-center justify-between md:contents">
+                        <div class="md:col-span-2">
+                            <div class="font-medium text-white text-sm md:text-base"><%= server.attributes.name %></div>
                         </div>
-                    </div>
 
-                    <!-- Memory Usage -->
-                    <div class="col-span-2">
-                        <div class="flex items-center gap-2">
-                            <div class="w-full bg-white/10 rounded-full h-1.5">
-                                <div class="memory-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                        <div class="md:col-span-2">
+                            <div class="inline-flex items-center px-2 md:px-3 py-1 rounded-full text-xs font-medium bg-zinc-500/20 text-zinc-300">
+                                <div class="size-2 rounded-full bg-zinc-400 mr-1.5 md:mr-2 status-indicator"></div>
+                                <span class="status-text"><%= __('servers.status.connecting') %></span>
                             </div>
-                            <span class="text-xs memory-text">0/<%= server.attributes.limits.memory %>MiB</span>
                         </div>
                     </div>
 
-                    <!-- CPU Usage -->
-                    <div class="col-span-2">
-                        <div class="flex items-center gap-2">
-                            <div class="w-full bg-white/10 rounded-full h-1.5">
-                                <div class="cpu-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                    <!-- Memory & CPU (mobile: side by side) -->
+                    <div class="flex gap-4 md:contents">
+                        <div class="flex-1 md:col-span-2">
+                            <div class="text-xs text-white/50 mb-1 md:hidden">Memory</div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-full bg-white/10 rounded-full h-1.5">
+                                    <div class="memory-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                                </div>
+                                <span class="text-xs memory-text whitespace-nowrap">0/<%= server.attributes.limits.memory %>MiB</span>
                             </div>
-                            <span class="text-xs cpu-text">0%</span>
+                        </div>
+
+                        <div class="flex-1 md:col-span-2">
+                            <div class="text-xs text-white/50 mb-1 md:hidden">CPU</div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-full bg-white/10 rounded-full h-1.5">
+                                    <div class="cpu-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                                </div>
+                                <span class="text-xs cpu-text">0%</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Server Details -->
-                    <div class="col-span-3 ml-4">
-                        <div class="text-xs font-mono text-white/70 bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg shadow-sm">
-                            <span class="server-address"><%= __('servers.fetching') %></span>
+                    <!-- IP Address -->
+                    <div class="md:col-span-3 md:ml-4">
+                        <div class="text-xs font-mono text-white/70 bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg shadow-sm overflow-x-auto">
+                            <span class="server-address whitespace-nowrap"><%= __('servers.fetching') %></span>
                         </div>
                     </div>
                 </div>
@@ -129,7 +133,7 @@
     <!-- Shared Servers Section -->
     <div class="mt-8 hidden" id="shared-servers-section">
         <h2 class="text-xl font-semibold mb-4 heavy"><%= __('servers.shared_servers') %></h2>
-        <div class="rounded-t-xl px-6 py-3 grid grid-cols-12 gap-4 items-center text-sm font-medium text-gray-400">
+        <div class="hidden md:grid rounded-t-xl px-6 py-3 grid-cols-12 gap-4 items-center text-sm font-medium text-gray-400">
         <div class="col-span-2"><%= __('servers.columns.server') %></div>
         <div class="col-span-2"><%= __('servers.columns.status') %></div>
         <div class="col-span-2"><%= __('servers.columns.memory') %></div>
@@ -304,48 +308,52 @@ fetch('/api/server/subuser-servers')
             
             servers.forEach(server => {
                 const serverRow = document.createElement('div');
-                serverRow.className = 'server-row mb-4 bg-white/5 rounded-2xl hover:bg-white/10 border-2 border-dashed border-transparent hover:border-white/5 transition px-6 py-4 grid grid-cols-12 gap-4 items-center cursor-pointer';
+                serverRow.className = 'server-row mb-4 bg-white/5 rounded-2xl hover:bg-white/10 border-2 border-dashed border-transparent hover:border-white/5 transition px-4 md:px-6 py-4 flex flex-col gap-3 md:grid md:grid-cols-12 md:gap-4 md:items-center cursor-pointer';
                 serverRow.setAttribute('data-server-id', server.id);
                 serverRow.onclick = () => window.location.href = `/server/manage?id=${server.id}&numeric=0`;
                 
                 serverRow.innerHTML = `
-                    <!-- Server Name & Node -->
-                    <div class="col-span-2">
-                        <div class="font-medium text-white">${server.name}</div>
-                    </div>
-
-                    <!-- Status -->
-                    <div class="col-span-2">
-                        <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-zinc-500/20 text-zinc-300">
-                            <div class="size-2 rounded-full bg-zinc-400 mr-2 status-indicator"></div>
-                            <span class="status-text"><%= __("servers.status.connecting") %></span>
+                    <!-- Server Name & Status (mobile: inline row) -->
+                    <div class="flex items-center justify-between md:contents">
+                        <div class="md:col-span-2">
+                            <div class="font-medium text-white text-sm md:text-base">${server.name}</div>
                         </div>
-                    </div>
 
-                    <!-- Memory Usage -->
-                    <div class="col-span-2">
-                        <div class="flex items-center gap-2">
-                            <div class="w-full bg-white/10 rounded-full h-1.5">
-                                <div class="memory-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                        <div class="md:col-span-2">
+                            <div class="inline-flex items-center px-2 md:px-3 py-1 rounded-full text-xs font-medium bg-zinc-500/20 text-zinc-300">
+                                <div class="size-2 rounded-full bg-zinc-400 mr-1.5 md:mr-2 status-indicator"></div>
+                                <span class="status-text"><%= __("servers.status.connecting") %></span>
                             </div>
-                            <span class="text-xs memory-text">0MiB</span>
                         </div>
                     </div>
 
-                    <!-- CPU Usage -->
-                    <div class="col-span-2">
-                        <div class="flex items-center gap-2">
-                            <div class="w-full bg-white/10 rounded-full h-1.5">
-                                <div class="cpu-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                    <!-- Memory & CPU (mobile: side by side) -->
+                    <div class="flex gap-4 md:contents">
+                        <div class="flex-1 md:col-span-2">
+                            <div class="text-xs text-white/50 mb-1 md:hidden">Memory</div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-full bg-white/10 rounded-full h-1.5">
+                                    <div class="memory-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                                </div>
+                                <span class="text-xs memory-text whitespace-nowrap">0MiB</span>
                             </div>
-                            <span class="text-xs cpu-text">0%</span>
+                        </div>
+
+                        <div class="flex-1 md:col-span-2">
+                            <div class="text-xs text-white/50 mb-1 md:hidden">CPU</div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-full bg-white/10 rounded-full h-1.5">
+                                    <div class="cpu-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                                </div>
+                                <span class="text-xs cpu-text">0%</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Server Details -->
-                    <div class="col-span-3 ml-4">
-                        <div class="text-xs font-mono text-white/70 bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg shadow-sm">
-                            <span class="server-address"><%= __("servers.fetching") %></span>
+                    <!-- IP Address -->
+                    <div class="md:col-span-3 md:ml-4">
+                        <div class="text-xs font-mono text-white/70 bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg shadow-sm overflow-x-auto">
+                            <span class="server-address whitespace-nowrap"><%= __("servers.fetching") %></span>
                         </div>
                     </div>
                 `;

@@ -142,6 +142,38 @@
 </head>
 
 <body class="bg-[#010103] text-gray-300 overflow-x-hidden" style="font-family: 'Inter'" x-data="{ sidebarOpen: false }" @keydown.escape="sidebarOpen = false">
+    <!-- Swipe gesture handler for mobile sidebar -->
+    <script>
+    (function() {
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const swipeThreshold = 50; // minimum distance for swipe
+        const edgeWidth = 30; // width of edge detection zone for opening
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const swipeDistance = touchEndX - touchStartX;
+            const alpineData = Alpine.$data(document.body);
+            
+            // Swipe right to open (only from left edge)
+            if (swipeDistance > swipeThreshold && touchStartX < edgeWidth && !alpineData.sidebarOpen) {
+                alpineData.sidebarOpen = true;
+            }
+            // Swipe left to close
+            else if (swipeDistance < -swipeThreshold && alpineData.sidebarOpen) {
+                alpineData.sidebarOpen = false;
+            }
+        }
+    })();
+    </script>
     <div class="loading-bar"></div>
     <!-- Spinner -->
     <div class="spinner">
@@ -223,19 +255,18 @@
         <aside class="backdrop-blur-lg fixed inset-0 z-40 transform transition-transform duration-100 ease-in-out md:translate-x-0 md:static md:inset-auto md:h-screen md:w-64 border-r border-b rounded-br-3xl border-white/5 bg-indigo-900/10"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
             <div class="flex flex-col h-full relative flex flex-col min-h-full">
-                <!-- Close button for mobile -->
-                <button @click="sidebarOpen = false"
-                    class="md:hidden absolute top-4 right-4 text-gray-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-
                 <!-- Header -->
                 <div class="flex items-center mt-2 mb-4 py-2 mx-2 border-b border-white/5">
-                    <div class="relative w-full" x-data="{ open: false }">
+                    <!-- Close button for mobile - now inside header -->
+                    <button @click="sidebarOpen = false"
+                        class="md:hidden mr-2 p-1.5 text-gray-500 hover:text-white hover:bg-white/10 rounded-lg focus:outline-none transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <div class="relative flex-1" x-data="{ open: false }">
                         <button
                             @click="open = !open"
                             class="flex items-center gap-1.5 w-full px-3 py-1.5 text-zinc-400 cursor-pointer hover:bg-white/5 transition rounded-md">
