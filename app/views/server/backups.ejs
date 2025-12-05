@@ -187,7 +187,41 @@
             .then(response => response.json())
             .then(data => {
                 const backupList = document.getElementById('backup-list');
+                const createBackupBtn = document.getElementById('create-backup');
                 backupList.innerHTML = '';
+                
+                // Check if user has backup slots - if backup_count is 0 and no backups, they have no slots
+                // We need to check the server limits to know the actual limit
+                const backupCount = data.meta?.backup_count || 0;
+                
+                // Hide create button if no backup slots allocated (backup_count is 0 and no existing backups)
+                // This assumes if they have 0 backup_count and 0 backups, they don't have backup feature
+                fetch(`/api/server/${serverId}`)
+                    .then(res => res.json())
+                    .then(serverData => {
+                        const backupLimit = serverData.attributes?.feature_limits?.backups || 0;
+                        if (backupLimit === 0) {
+                            createBackupBtn.style.display = 'none';
+                            // Show no backup slots message
+                            backupList.innerHTML = `
+                                <div class="text-center py-8">
+                                    <div class="w-16 h-16 mx-auto mb-4 bg-red-900/50 rounded-full flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-red-300">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-lg font-medium text-white mb-2">No Backup Slots</h3>
+                                    <p class="text-red-200/60">This server does not have any backup slots allocated.</p>
+                                </div>
+                            `;
+                        } else {
+                            createBackupBtn.style.display = '';
+                        }
+                    })
+                    .catch(() => {
+                        // On error, still show the button
+                        createBackupBtn.style.display = '';
+                    });
                 
                 if (!data.data || data.data.length === 0) {
                     backupList.innerHTML = `

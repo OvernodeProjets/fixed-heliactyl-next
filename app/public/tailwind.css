@@ -2376,6 +2376,12 @@
       color: color-mix(in oklab, var(--color-red-200) 30%, transparent);
     }
   }
+  .text-red-200\/60 {
+    color: color-mix(in srgb, oklch(88.5% 0.062 18.334) 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      color: color-mix(in oklab, var(--color-red-200) 60%, transparent);
+    }
+  }
   .text-red-300 {
     color: var(--color-red-300);
   }
