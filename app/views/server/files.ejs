@@ -52,6 +52,82 @@
         .drop-zone {
             padding: 1rem;
         }
+        
+        /* Mobile file grid - 2 columns on small screens */
+        .file-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 0.5rem !important;
+        }
+        
+        /* Mobile file cards - compact */
+        .file-card {
+            padding: 0.75rem !important;
+        }
+        .file-card .file-icon {
+            margin-top: 1.5rem !important;
+        }
+        .file-card .file-icon svg {
+            width: 2rem !important;
+            height: 2rem !important;
+        }
+        .file-card .file-name {
+            font-size: 0.75rem !important;
+            margin-top: 0.5rem !important;
+            word-break: break-all;
+            line-height: 1.2;
+        }
+        .file-card .file-size {
+            font-size: 0.65rem !important;
+        }
+        
+        /* Hide list header on mobile */
+        .file-list-header {
+            display: none !important;
+        }
+        
+        /* Mobile file row - simplified */
+        .file-row {
+            grid-template-columns: 32px 1fr 40px !important;
+            padding: 0.75rem !important;
+        }
+        .file-row > div:nth-child(3),
+        .file-row > div:nth-child(4),
+        .file-row > div:nth-child(5) {
+            display: none !important;
+        }
+        
+        /* Mass actions bar - full width on mobile */
+        #mass-actions-bar {
+            left: 1rem !important;
+            right: 1rem !important;
+            transform: none !important;
+            border-radius: 1rem !important;
+        }
+        #mass-actions-bar .flex.items-center.space-x-4 {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        #mass-actions-bar #selected-count {
+            margin-right: 0 !important;
+        }
+        
+        /* Modal improvements */
+        .modal-content {
+            width: 95% !important;
+            max-height: 85vh !important;
+            padding: 1rem !important;
+        }
+        #file-edit-modal .modal-content {
+            width: 98% !important;
+            height: 90% !important;
+        }
+    }
+    
+    /* Extra small screens */
+    @media (max-width: 380px) {
+        .file-grid {
+            grid-template-columns: 1fr !important;
+        }
     }
     .modal-overlay {
         position: fixed;
@@ -335,66 +411,97 @@
       <div id="alert-container" class="mb-4 space-y-2"></div> 
     <%- include('../components/server') %>
 
-    <div class="bg-white/5 rounded-xl p-6 mb-6">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold heavy"><%= __('server.files.title') %></h2>
-                <div class="flex items-center space-x-2">
-                    <div class="flex bg-black/20 rounded-lg p-1">
-                        <button id="view-grid" class="p-1.5 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors" title="Grid View">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                            </svg>
-                        </button>
-                        <button id="view-list" class="p-1.5 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors" title="List View">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        </button>
-                    </div>
-                <div class="p-2.5 bg-black/20 rounded-lg">
+    <div class="bg-white/5 rounded-xl p-4 md:p-6 mb-6">
+        <!-- Header row with title and view toggles -->
+        <div class="flex flex-wrap gap-3 justify-between items-center mb-4">
+            <h2 class="text-lg md:text-xl font-semibold heavy"><%= __('server.files.title') %></h2>
+            
+            <div class="flex items-center gap-2 flex-wrap">
+                <!-- View toggle buttons -->
+                <div class="flex bg-black/20 rounded-lg p-1">
+                    <button id="view-grid" class="p-1.5 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors" title="Grid View">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                    </button>
+                    <button id="view-list" class="p-1.5 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors" title="List View">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Select all -->
+                <div class="hidden md:flex p-2.5 bg-black/20 rounded-lg items-center">
                     <input 
                         type="checkbox" 
                         id="select-all" 
                         class="form-checkbox h-4 w-4 text-indigo-500 border border-white/5 bg-white/5 rounded focus:ring-indigo-500"
                     >
-                    <label for="select-all" class="select-all-label px-4"><%= __('server.files.select_all') %></label>
+                    <label for="select-all" class="select-all-label px-2 text-sm"><%= __('server.files.select_all') %></label>
                 </div>
-    <div class="relative flex-grow">
-        <input 
-            type="text" 
-            id="file-search" 
-            class="w-full bg-black/20 border border-transparent rounded-lg py-2 px-4 pl-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-            placeholder="<%= __('server.files.search_files') %>"
-        >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-2.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-    </div>
-    <div class="flex items-center space-x-2">
-        <select 
-            id="sort-by" 
-            class=" bg-black/20 rounded-lg border border-transparent py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-        >
-            <option value="name"><%= __('server.files.sort_name') %></option>
-            <option value="size"><%= __('server.files.sort_size') %></option>
-            <option value="type"><%= __('server.files.sort_type') %></option>
-            <option value="date"><%= __('server.files.sort_date') %></option>
-        </select>
-        <button 
-            id="sort-direction" 
-            class=" rounded-full border border-transparent rounded-lg p-2.5 text-white hover:bg-black/15 transition-all duration-200"
-            title="Toggle sort direction"
-        >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-            </svg>
-        </button>
-    </div>
-</div>
-            <div class="flex space-x-2">
-                <button id="upload-file" class="action-button bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-1.5 px-4 rounded-full transition"><%= __('server.files.upload') %></button>
-                <button id="create-folder" class="action-button bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-1.5 px-4 rounded-full transition"><%= __('server.files.new_folder') %></button>
-                <button id="new-file" class="action-button bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-1.5 px-4 rounded-full transition"><%= __('server.files.new_file') %></button>
+            </div>
+        </div>
+        
+        <!-- Search, sort row and action buttons - same row on desktop -->
+        <div class="flex flex-col md:flex-row gap-3 mb-4">
+            <!-- Search input -->
+            <div class="relative flex-grow">
+                <input 
+                    type="text" 
+                    id="file-search" 
+                    class="w-full bg-black/20 border border-transparent rounded-lg py-2.5 px-4 pl-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                    placeholder="<%= __('server.files.search_files') %>"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+            
+            <!-- Sort controls -->
+            <div class="flex items-center gap-2">
+                <select 
+                    id="sort-by" 
+                    class="flex-1 md:flex-none bg-black/20 rounded-lg border border-transparent py-2.5 px-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                >
+                    <option value="name"><%= __('server.files.sort_name') %></option>
+                    <option value="size"><%= __('server.files.sort_size') %></option>
+                    <option value="type"><%= __('server.files.sort_type') %></option>
+                    <option value="date"><%= __('server.files.sort_date') %></option>
+                </select>
+                <button 
+                    id="sort-direction" 
+                    class="rounded-lg p-2.5 text-white hover:bg-black/15 transition-all duration-200 bg-black/20"
+                    title="Toggle sort direction"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Action buttons - inline on desktop, stacked on mobile -->
+            <div class="flex flex-wrap md:flex-nowrap gap-2">
+                <button id="upload-file" class="action-button flex-1 md:flex-none bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    <span><%= __('server.files.upload') %></span>
+                </button>
+                <button id="create-folder" class="action-button flex-1 md:flex-none bg-white/5 hover:bg-white/10 text-white font-medium py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                    </svg>
+                    <span class="hidden sm:inline"><%= __('server.files.new_folder') %></span>
+                    <span class="sm:hidden">Folder</span>
+                </button>
+                <button id="new-file" class="action-button flex-1 md:flex-none bg-white/5 hover:bg-white/10 text-white font-medium py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span class="hidden sm:inline"><%= __('server.files.new_file') %></span>
+                    <span class="sm:hidden">File</span>
+                </button>
             </div>
         </div>
 
@@ -425,7 +532,7 @@
 </main>
 
 <!-- File Edit Modal -->
-<div id="file-edit-modal" class="modal-overlay z-50">
+<div id="file-edit-modal" class="modal-overlay z-[70]">
     <div class="modal-content w-3/4 h-3/4 flex flex-col">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-xl font-semibold" id="modal-title"><%= __('server.files.modal_edit_file') %></h3>
