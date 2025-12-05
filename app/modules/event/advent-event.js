@@ -168,6 +168,10 @@ class AdventCalendarManager {
       }
 
       // Generate reward
+      // Only allow claiming on the same day (past days are expired)
+      if (day < currentDay) {
+        throw new Error('You can only claim rewards on the current day. This reward has expired.');
+      }
       const reward = this.generateReward();
       const rewardId = crypto.randomUUID();
 
@@ -262,11 +266,16 @@ class AdventCalendarManager {
           };
         }
         
+        const currentDay = this.getDayNumber();
+        const isToday = dayNumber === currentDay;
+        const isPast = dayNumber < currentDay;
+        
         return {
           day: dayNumber,
           date: date.toISOString(),
           claimed: false,
-          available: this.getDayNumber() >= dayNumber
+          available: isToday,
+          expired: isPast
         };
       });
 
