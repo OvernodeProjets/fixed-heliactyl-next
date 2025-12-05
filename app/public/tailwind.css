@@ -326,6 +326,9 @@
   .static {
     position: static;
   }
+  .sticky {
+    position: sticky;
+  }
   .inset-0 {
     inset: calc(var(--spacing) * 0);
   }
@@ -445,6 +448,9 @@
     @media (width >= 96rem) {
       max-width: 96rem;
     }
+  }
+  .-mx-4 {
+    margin-inline: calc(var(--spacing) * -4);
   }
   .mx-2 {
     margin-inline: calc(var(--spacing) * 2);
@@ -706,6 +712,9 @@
   }
   .max-h-60 {
     max-height: calc(var(--spacing) * 60);
+  }
+  .max-h-\[70vh\] {
+    max-height: 70vh;
   }
   .min-h-\[490px\] {
     min-height: 490px;
@@ -1423,6 +1432,9 @@
   }
   .bg-\[\#010103\] {
     background-color: #010103;
+  }
+  .bg-\[\#010103\]\/80 {
+    background-color: color-mix(in oklab, #010103 80%, transparent);
   }
   .bg-\[\#101017\] {
     background-color: #101017;
@@ -3840,6 +3852,16 @@
   .md\:inset-auto {
     @media (width >= 48rem) {
       inset: auto;
+    }
+  }
+  .md\:right-0 {
+    @media (width >= 48rem) {
+      right: calc(var(--spacing) * 0);
+    }
+  }
+  .md\:left-auto {
+    @media (width >= 48rem) {
+      left: auto;
     }
   }
   .md\:col-span-2 {

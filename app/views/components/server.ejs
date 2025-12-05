@@ -2,7 +2,7 @@
 <meta http-equiv="refresh" content="0; url=/servers?err=INVALID">
 <% } %>
 
-<nav class="relative z-50 mb-6">
+<nav class="sticky top-0 z-50 mb-6 bg-[#010103]/80 backdrop-blur-lg py-2 -mx-4 px-4">
 
     <!-- Navigation Items -->
 <div class="block overflow-visible relative">
@@ -45,7 +45,7 @@
                 </svg>
             </button>
 
-            <div id="more-menu-content" class="backdrop-blur-xl hidden opacity-0 transform scale-95 absolute right-0 mt-2 w-56 transition-all duration-200">
+            <div id="more-menu-content" class="backdrop-blur-xl hidden opacity-0 transform scale-95 absolute left-0 md:left-auto md:right-0 mt-2 w-56 max-h-[70vh] overflow-y-auto transition-all duration-200">
                 <div class="rounded-xl bg-[#0e0e10] backdrop-blur-xl border border-white/10 shadow-xl">
             <!-- Monitoring -->
             <div class="p-1.5">
@@ -147,14 +147,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // utility: position menu under button (for fixed positioning)
     function positionMenuFixed() {
         const btnRect = moreMenuButton.getBoundingClientRect();
-        const menuRect = moreMenuContent.getBoundingClientRect();
-        // place menu just below button, align right edges
-        const top = Math.min(window.innerHeight - menuRect.height - 8, btnRect.bottom + 6);
-        const right = Math.max(8, window.innerWidth - (btnRect.right));
+        const menuWidth = Math.min(280, window.innerWidth - 16); // max 280px or screen width - 16px padding
+        const menuMaxHeight = window.innerHeight * 0.7; // 70% of viewport height
+        
+        // Calculate left position - center on small screens, align to button on larger
+        let left;
+        if (window.innerWidth < 400) {
+            // Center the menu on very small screens
+            left = (window.innerWidth - menuWidth) / 2;
+        } else {
+            // Align to button, but ensure it doesn't go off screen
+            left = Math.max(8, Math.min(btnRect.left, window.innerWidth - menuWidth - 8));
+        }
+        
+        // Calculate top position - below button, but ensure it fits
+        const spaceBelow = window.innerHeight - btnRect.bottom - 8;
+        const top = spaceBelow > 200 ? btnRect.bottom + 6 : Math.max(8, window.innerHeight - menuMaxHeight - 8);
+        
         moreMenuContent.style.position = 'fixed';
         moreMenuContent.style.top = top + 'px';
-        moreMenuContent.style.right = right + 'px';
-        moreMenuContent.style.left = 'auto';
+        moreMenuContent.style.left = left + 'px';
+        moreMenuContent.style.right = 'auto';
+        moreMenuContent.style.width = menuWidth + 'px';
+        moreMenuContent.style.maxHeight = menuMaxHeight + 'px';
+        moreMenuContent.style.overflowY = 'auto';
         moreMenuContent.style.zIndex = 99999;
     }
 
