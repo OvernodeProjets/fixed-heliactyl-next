@@ -506,7 +506,8 @@ module.exports.load = async function (router, db) {
         req.headers['user-agent']
       );
 
-      res.json({ message: "Logged in successfully" });
+      res.redirect("/dashboard");
+      //res.json({ message: "Logged in successfully" });
     } catch (error) {
       console.error('Magic link login error:', error);
       req.session.destroy();
