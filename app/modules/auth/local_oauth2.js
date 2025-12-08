@@ -340,7 +340,7 @@ module.exports.load = async function (router, db) {
       expiry: resetTokenExpiry
     });
 
-    const resetLink = `${settings.website.domain}/auth/reset-password?token=${resetToken}`;
+    const resetLink = `${settings.website.domain}/api/auth/reset-password?token=${resetToken}`;
 
     try {
       await sendEmail(
