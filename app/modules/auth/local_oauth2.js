@@ -423,7 +423,7 @@ module.exports.load = async function (router, db) {
       expiry: magicTokenExpiry
     });
 
-    const magicLink = `${settings.website.domain}/auth/magic-login?token=${magicToken}`;
+    const magicLink = `${settings.website.domain}/api/auth/magic-login?token=${magicToken}`;
 
     try {
       await sendEmail(
