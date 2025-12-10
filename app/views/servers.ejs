@@ -193,6 +193,10 @@ function connectToServer(serverId, numericId) {
             case 'stats':
                 const stats = JSON.parse(message.args[0]);
                 updateServerStats(serverRow, stats);
+                // Stats message also contains the server state
+                if (stats.state) {
+                    updateServerStatus(serverRow, stats.state);
+                }
                 break;
             
             case 'status':
