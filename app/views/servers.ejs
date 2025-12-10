@@ -171,44 +171,53 @@ async function fetchServerDetails(serverId) {
 }
 
 function connectToServer(serverId, numericId) {
-    fetch(`/api/server/${serverId}/websocket`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'suspended') {
-                console.log(`Server ${serverId} is suspended. Denying WebSocket access.`);
-                showAlert('error', '<%= __("servers.alerts.suspended_title") %>', '<%= __("servers.alerts.suspended_body", { discord: "discord.gg/" + settings.discord }) %>', 100000);
-                return;
-            }
-            const socket = new WebSocket(data.data.socket);
-            const serverRow = document.querySelector(`[data-server-id="${serverId}"]`);
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const socket = new WebSocket(`${protocol}//${window.location.host}/api/server/${serverId}/ws`);
+    const serverRow = document.querySelector(`[data-server-id="${serverId}"]`);
+    
+    socket.onopen = () => {
+        console.log(`Server ${serverId} connected via proxy`);
+        socket.send(JSON.stringify({ event: 'send stats', args: [null] }));
+        fetchServerDetails(serverId);
+    };
+
+    socket.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        
+        switch (message.event) {
+            case 'auth success':
+                socket.send(JSON.stringify({ event: 'send stats', args: [null] }));
+                fetchServerDetails(serverId);
+                break;
             
-            socket.onopen = () => {
-                socket.send(JSON.stringify({ event: 'auth', args: [data.data.token] }));
-            };
+            case 'stats':
+                const stats = JSON.parse(message.args[0]);
+                updateServerStats(serverRow, stats);
+                break;
+            
+            case 'status':
+                updateServerStatus(serverRow, message.args[0]);
+                break;
+        }
+    };
 
-            socket.onmessage = (event) => {
-                const message = JSON.parse(event.data);
-                
-                switch (message.event) {
-                    case 'auth success':
-                        socket.send(JSON.stringify({ event: 'send stats', args: [null] }));
-                        fetchServerDetails(serverId);
-                        break;
-                    
-                    case 'stats':
-                        const stats = JSON.parse(message.args[0]);
-                        updateServerStats(serverRow, stats);
-                        break;
-                    
-                    case 'status':
-                        updateServerStatus(serverRow, message.args[0]);
-                        break;
-                }
-            };
+    socket.onclose = (event) => {
+        if (event.code === 4003) {
+            // Server is suspended
+            console.log(`Server ${serverId} is suspended`);
+            showAlert('error', '<%= __("servers.alerts.suspended_title") %>', '<%= __("servers.alerts.suspended_body", { discord: "discord.gg/" + settings.discord }) %>', 100000);
+            updateServerStatus(serverRow, 'suspended');
+            return;
+        }
+        console.log(`Server ${serverId} disconnected, reconnecting...`);
+        setTimeout(() => connectToServer(serverId, numericId), 5000);
+    };
 
-            serverConnections.set(serverId, socket);
-        })
-        .catch(error => console.error('Error connecting to server:', error));
+    socket.onerror = (error) => {
+        console.error(`Server ${serverId} WebSocket error:`, error);
+    };
+
+    serverConnections.set(serverId, socket);
 }
 
 
