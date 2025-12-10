@@ -26,8 +26,11 @@ const fetch = require("node-fetch");
 const { discordLog, addNotification } = require("../../handlers/log");
 const { getPages } = require("../../handlers/theme.js");
 
+const { getAppAPI } = require('../../handlers/pterodactylSingleton.js');
+
 // todo : implement that in frontend and review code 
 module.exports.load = async function (router, db) {
+  const AppAPI = getAppAPI();
   router.get("/github/login", (req, res) => {
     if (req.query.redirect) req.session.redirect = "/" + req.query.redirect;
     
@@ -140,45 +143,29 @@ module.exports.load = async function (router, db) {
           ? makeid(settings.api.client.passwordgenerator["length"])
           : makeid(16);
           
-          let accountjson = await fetch(
-            settings.pterodactyl.domain + "/api/application/users",
-            {
-              method: "post",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${settings.pterodactyl.key}`,
-              },
-              body: JSON.stringify({
+          
+          try {
+            let accountinfo = await AppAPI.createUser({
                 username: userinfo.login,
                 email: primaryEmail.email,
                 first_name: userinfo.name ? userinfo.name.split(' ')[0] : userinfo.login,
-                last_name: userinfo.name ? userinfo.name.split(' ').slice(1).join(' ') : '',
+                last_name: userinfo.name ? userinfo.name.split(' ').slice(1).join(' ') : 'User',
                 password: genpassword,
-              }),
-            }
-          );
+            });
 
-          if ((await accountjson.status) == 201) {
-            let accountinfo = JSON.parse(await accountjson.text());
             let userids = (await db.get("users")) ? await db.get("users") : [];
             userids.push(accountinfo.attributes.id);
             await db.set("users", userids);
             await db.set("users-" + userinfo.id, accountinfo.attributes.id);
             req.session.newaccount = true;
             req.session.password = genpassword;
-          } else {
+          } catch (error) {
             // Handle error or existing account
-            let accountlistjson = await fetch(
-              settings.pterodactyl.domain + "/api/application/users?include=servers&filter[email]=" + encodeURIComponent(primaryEmail.email),
-              {
-                method: "get",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${settings.pterodactyl.key}`,
-                },
-              }
-            );
-            let accountlist = await accountlistjson.json();
+            let accountlist = await AppAPI.listUsers({ 
+                include: 'servers', 
+                'filter[email]': primaryEmail.email 
+            });
+            
             let user = accountlist.data.filter((acc) => acc.attributes.email == primaryEmail.email);
             if (user.length == 1) {
               let userid = user[0].attributes.id;

@@ -25,14 +25,14 @@ const getPteroUser = require("../handlers/getPteroUser.js");
 const Queue = require("../handlers/Queue.js");
 const {discordLog} = require("../handlers/log.js");
 const { requireAuth } = require("../handlers/checkMiddleware.js");
-const PterodactylApplicationModule = require('../handlers/ApplicationAPI.js');
+const { getAppAPI } = require('../handlers/pterodactylSingleton.js');
 
 if (settings?.pterodactyl?.domain?.endsWith("/")) {
   settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
 }
 
 module.exports.load = async function(router, db) {
-  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
+  const AppAPI = getAppAPI();
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
   
 router.get("/updateinfo", authMiddleware, async (req, res) => {

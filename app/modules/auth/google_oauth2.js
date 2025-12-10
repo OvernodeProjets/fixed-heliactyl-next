@@ -22,7 +22,7 @@ const axios = require('axios');
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { discordLog, addNotification } = require("../../handlers/log");
-const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
+const {  getAppAPI } = require('../../handlers/pterodactylSingleton.js');
 const getPteroUser = require('../../handlers/getPteroUser.js');
 const { getPages } = require("../../handlers/theme.js");
 
@@ -42,7 +42,7 @@ module.exports.load = async function (router, db) {
     );
   }
 
-  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
+  const AppAPI = getAppAPI();
 
   router.get("/google/login", (req, res) => {
     const { redirect } = req.query;

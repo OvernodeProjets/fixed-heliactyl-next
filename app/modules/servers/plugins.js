@@ -20,11 +20,11 @@ module.exports.heliactylModule = heliactylModule;
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js");
-const PterodactylClientModule = require("../../handlers/ClientAPI.js");
+const { getClientAPI } = require("../../handlers/pterodactylSingleton.js");
 const axios = require("axios");
 
 module.exports.load = async function(router, db) {
-  const ClientAPI = new PterodactylClientModule(settings.pterodactyl.domain, settings.pterodactyl.client_key);
+  const ClientAPI = getClientAPI();
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
   
   // Spigot API base URL

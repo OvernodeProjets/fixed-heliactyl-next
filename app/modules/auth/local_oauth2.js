@@ -20,7 +20,7 @@ module.exports.heliactylModule = heliactylModule;
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const axios = require('axios');
-const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
+const { getAppAPI } = require('../../handlers/pterodactylSingleton.js');
 const getPteroUser = require('../../handlers/getPteroUser.js');
 // todo : replace with an local
 const { v4: uuidv4 } = require('uuid');
@@ -39,7 +39,7 @@ if (!RESEND_API_KEY && settings.api?.client?.email?.enabled) {
 }
 
 module.exports.load = async function (router, db) {
-  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
+  const AppAPI = getAppAPI();
 
   const verifyCaptcha = async (recaptchaResponse) => {
     if (!settings.security.enableCaptcha) return true;

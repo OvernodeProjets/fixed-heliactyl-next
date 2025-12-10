@@ -17,7 +17,7 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const PterodactylClientModule = require("../handlers/ClientAPI.js");
+const { getClientAPI } = require("../handlers/pterodactylSingleton.js");
 const loadConfig = require("../handlers/config");
 const settings = loadConfig("./config.toml");
 const WebSocket = require("ws");
@@ -37,10 +37,7 @@ const scheduledWorkflowsFilePath = path.join(
 module.exports.load = async function (router, db) {
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
-  const pterodactylClient = new PterodactylClientModule(
-    settings.pterodactyl.domain,
-    settings.pterodactyl.client_key
-  );
+  const pterodactylClient = getClientAPI();
 
   function saveWorkflowToFile(instanceId, workflow) {
     try {

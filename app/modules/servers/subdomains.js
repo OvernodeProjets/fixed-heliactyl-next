@@ -21,15 +21,12 @@ const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const axios = require('axios');
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js");
-const PterodactylClientModule = require("../../handlers/ClientAPI.js");
+const { getClientAPI } = require("../../handlers/pterodactylSingleton.js");
 const { serverActivityLog } = require('../../handlers/log.js');
 
 module.exports.load = async function(router, db) {
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
-  const pterodactylClient = new PterodactylClientModule(
-    settings.pterodactyl.domain,
-    settings.pterodactyl.client_key
-  );
+  const pterodactylClient = getClientAPI();
 
   // Filter and map enabled domains from config
   const DOMAINS = (settings.cloudflare?.domains || [])

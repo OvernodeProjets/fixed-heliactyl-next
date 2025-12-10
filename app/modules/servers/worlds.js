@@ -20,11 +20,11 @@ module.exports.heliactylModule = heliactylModule;
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js");
-const PterodactylClientModule = require("../../handlers/ClientAPI.js");
-const axios = require("axios");
+const { getClientAPI } = require("../../handlers/pterodactylSingleton.js");
+
 
 module.exports.load = async function(router, db) {
-  const ClientAPI = new PterodactylClientModule(settings.pterodactyl.domain, settings.pterodactyl.client_key);
+  const ClientAPI = getClientAPI();
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
   // Helper function to get world type (default, nether, end, or custom)
@@ -51,15 +51,11 @@ module.exports.load = async function(router, db) {
       }
   
       // For other directories, check for level.dat
-      const worldContents = await axios.get(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/list`,
-        {
-          params: { directory: `/${fileData.attributes.name}` },
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-            'Accept': 'application/json',
-          },
-        }
+      const worldContents = await ClientAPI.request(
+        'GET',
+        `/api/client/servers/${serverId}/files/list`,
+        null,
+        { directory: `/${fileData.attributes.name}` }
       );
   
       // Check if level.dat exists in the directory
@@ -80,15 +76,12 @@ module.exports.load = async function(router, db) {
       const serverId = req.params.id;
       
       // Get server.properties to find level-name
-      const serverPropsResponse = await axios.get(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/contents`,
-        {
-          params: { file: '/server.properties' },
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-            'Accept': 'application/json',
-          },
-        }
+      const serverPropsResponse = await ClientAPI.request(
+        'GET',
+        `/api/client/servers/${serverId}/files/contents`,
+        null,
+        { file: '/server.properties' },
+        'text'
       );
   
       // Parse server.properties to get default world name
@@ -103,15 +96,8 @@ module.exports.load = async function(router, db) {
       const defaultWorld = serverProps['level-name'] || 'world';
   
       // List contents of root directory to find world folders
-      const response = await axios.get(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/list`,
-        {
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-            'Accept': 'application/json',
-          },
-        }
-      );
+      // List contents of root directory to find world folders
+      const response = await ClientAPI.request('GET', `/api/client/servers/${serverId}/files/list`);
   
       // Filter for world folders (using Promise.all since we're using async filter)
       const fl = await Promise.all(
@@ -190,20 +176,11 @@ module.exports.load = async function(router, db) {
       }
   
       // 1. Get upload URL
-      const uploadUrlResponse = await axios.get(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/upload`,
-        {
-          params: { directory: '/temp' },
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-            'Accept': 'application/json',
-          },
-        }
-      );
+      const uploadUrlResponse = await ClientAPI.request('GET', `/api/client/servers/${serverId}/files/upload`, null, { directory: '/temp' });
   
       // 2. Return the upload URL and needed headers for the client
       res.json({
-        url: uploadUrlResponse.data.attributes.url,
+        url: uploadUrlResponse.attributes.url,
         worldName: worldName
       });
   
@@ -238,157 +215,52 @@ module.exports.load = async function(router, db) {
       }
   
       // 2. Move zip to temp directory
-      await axios.put(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/rename`,
-        {
-          root: '/',
-          files: [
-            {
-              from: fileName,
-              to: `temp/${fileName}`
-            }
-          ]
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-            'Accept': 'application/json',
-          },
-        }
-      );
+      // 2. Move zip to temp directory
+      await ClientAPI.request('PUT', `/api/client/servers/${serverId}/files/rename`, { root: '/', files: [{ from: fileName, to: `temp/${fileName}` }] });
   
       // 3. Decompress the zip in temp directory
-      await axios.post(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/decompress`,
-        {
-          root: '/temp',
-          file: fileName
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-            'Accept': 'application/json',
-          },
-        }
-      );
+      // 3. Decompress the zip in temp directory
+      await ClientAPI.request('POST', `/api/client/servers/${serverId}/files/decompress`, { root: '/temp', file: fileName });
   
       // 4. Delete the zip file
-      await axios.post(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/delete`,
-        {
-          root: '/temp',
-          files: [fileName]
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-            'Accept': 'application/json',
-          },
-        }
-      );
+      // 4. Delete the zip file
+      await ClientAPI.request('POST', `/api/client/servers/${serverId}/files/delete`, { root: '/temp', files: [fileName] });
   
       // 5. List contents of temp directory
-      const tempContents = await axios.get(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/list`,
-        {
-          params: { directory: '/temp' },
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-            'Accept': 'application/json',
-          },
-        }
-      );
+      // 5. List contents of temp directory
+      const tempContents = await ClientAPI.request('GET', `/api/client/servers/${serverId}/files/list`, null, { directory: '/temp' });
   
       // Create the final world directory
-      await axios.post(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/create-folder`,
-        {
-          root: '/',
-          name: worldName
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-            'Accept': 'application/json',
-          },
-        }
-      );
+      // Create the final world directory
+      await ClientAPI.request('POST', `/api/client/servers/${serverId}/files/create-folder`, { root: '/', name: worldName });
   
       // 6. Move files to final location
-      const items = tempContents.data.data;
+      const items = tempContents.data;
       if (items.length === 1 && items[0].attributes.mimetype === "inode/directory") {
         // If there's a single directory, move its contents
         const srcDirName = items[0].attributes.name;
-        const srcContents = await axios.get(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/list`,
-          {
-            params: { directory: `/temp/${srcDirName}` },
-            headers: {
-              'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-              'Accept': 'application/json',
-            },
-          }
-        );
+        const srcContents = await ClientAPI.request('GET', `/api/client/servers/${serverId}/files/list`, null, { directory: `/temp/${srcDirName}` });
   
         // Move each file/folder from the source directory
-        for (const item of srcContents.data.data) {
-          await axios.put(
-            `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/rename`,
-            {
-              root: `/temp/${srcDirName}`,
-              files: [
-                {
-                  from: item.attributes.name,
-                  to: `../../${worldName}/${item.attributes.name}`
-                }
-              ]
-            },
-            {
-              headers: {
-                'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-                'Accept': 'application/json',
-              },
-            }
-          );
+        for (const item of srcContents.data) {
+          await ClientAPI.request('PUT', `/api/client/servers/${serverId}/files/rename`, { 
+            root: `/temp/${srcDirName}`, 
+            files: [{ from: item.attributes.name, to: `../../${worldName}/${item.attributes.name}` }]
+          });
         }
       } else {
         // Move all files directly
         for (const item of items) {
-          await axios.put(
-            `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/rename`,
-            {
-              root: '/temp',
-              files: [
-                {
-                  from: item.attributes.name,
-                  to: `../${worldName}/${item.attributes.name}`
-                }
-              ]
-            },
-            {
-              headers: {
-                'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-                'Accept': 'application/json',
-              },
-            }
-          );
+          await ClientAPI.request('PUT', `/api/client/servers/${serverId}/files/rename`, { 
+            root: '/temp', 
+            files: [{ from: item.attributes.name, to: `../${worldName}/${item.attributes.name}` }]
+          });
         }
       }
   
       // 7. Clean up temp directory
-      await axios.post(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/delete`,
-        {
-          root: '/',
-          files: ['temp']
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-            'Accept': 'application/json',
-          },
-        }
-      );
+      // 7. Clean up temp directory
+      await ClientAPI.request('POST', `/api/client/servers/${serverId}/files/delete`, { root: '/', files: ['temp'] });
   
       // 8. Track the imported world in database
       const trackedWorlds = await db.get(`worlds-${serverId}`) || [];
@@ -410,18 +282,15 @@ module.exports.load = async function(router, db) {
       const { id: serverId, worldName } = req.params;
   
       // Get server.properties to check if trying to delete default world
-      const serverPropsResponse = await axios.get(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/contents`,
-        {
-          params: { file: '/server.properties' },
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-            'Accept': 'application/json',
-          },
-        }
+      const serverPropsContent = await ClientAPI.request(
+        'GET',
+        `/api/client/servers/${serverId}/files/contents`,
+        null,
+        { file: '/server.properties' },
+        'text'
       );
   
-      const serverProps = serverPropsResponse.data
+      const serverProps = serverPropsContent
         .split('\n')
         .reduce((acc, line) => {
           const [key, value] = line.split('=');
@@ -439,19 +308,8 @@ module.exports.load = async function(router, db) {
       }
   
       // Delete the world folder
-      await axios.post(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/delete`,
-        {
-          root: '/',
-          files: [worldName]
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-            'Accept': 'application/json',
-          },
-        }
-      );
+      // Delete the world folder
+      await ClientAPI.request('POST', `/api/client/servers/${serverId}/files/delete`, { root: '/', files: [worldName] });
   
       // Remove from tracked worlds
       const trackedWorlds = await db.get(`worlds-${serverId}`) || [];

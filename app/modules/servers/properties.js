@@ -18,15 +18,15 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const axios = require('axios');
-const PterodactylClientModule = require('../../handlers/ClientAPI.js');
+
+const { getClientAPI } = require('../../handlers/pterodactylSingleton.js');
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js")
 
 module.exports.load = async function(router, db) {
     const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
-    const pterodactylClient = new PterodactylClientModule(settings.pterodactyl.domain, settings.pterodactyl.client_key);
+    const pterodactylClient = getClientAPI();
 
     // Helper function to parse server.properties content
     const parseServerProperties = (content) => {
@@ -46,16 +46,15 @@ module.exports.load = async function(router, db) {
     router.get('/server/:id/properties', authMiddleware, ownsServer(db), async (req, res) => {
         try {
             const serverId = req.params.id;
-            const response = await axios.get(`${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/contents`, {
-                params: { file: '/server.properties' },
-                headers: {
-                    'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            });
+            const responseData = await pterodactylClient.request(
+              'GET',
+              `/api/client/servers/${serverId}/files/contents`,
+              null,
+              { file: '/server.properties' },
+              'text'
+            );
 
-            const properties = parseServerProperties(response.data);
+            const properties = parseServerProperties(responseData);
             res.json(properties);
         } catch (error) {
             console.error('Error fetching server properties:', error);
@@ -70,16 +69,16 @@ module.exports.load = async function(router, db) {
             const updatedProperties = req.body;
 
             // First, get the current content of server.properties
-            const response = await axios.get(`${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/contents`, {
-                params: { file: '/server.properties' },
-                headers: {
-                    'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            });
+            // First, get the current content of server.properties
+            const currentContent = await pterodactylClient.request(
+              'GET',
+              `/api/client/servers/${serverId}/files/contents`,
+              null,
+              { file: '/server.properties' },
+              'text'
+            );
 
-            let properties = parseServerProperties(response.data);
+            let properties = parseServerProperties(currentContent);
 
             // Update the properties
             for (const [key, value] of Object.entries(updatedProperties)) {
@@ -90,16 +89,12 @@ module.exports.load = async function(router, db) {
             const content = Object.entries(properties).map(([key, value]) => `${key}=${value}`).join('\n');
 
             // Write the updated content back to the file
-            await axios.post(`${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/write`,
+            // Write the updated content back to the file
+            await pterodactylClient.request(
+                'POST',
+                `/api/client/servers/${serverId}/files/write`,
                 content,
-                {
-                    params: { file: '/server.properties' },
-                    headers: {
-                        'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-                        'Accept': 'application/json',
-                        'Content-Type': 'text/plain'
-                    }
-                }
+                { file: '/server.properties' }
             );
 
             res.json({ success: true, message: "Properties updated successfully" });

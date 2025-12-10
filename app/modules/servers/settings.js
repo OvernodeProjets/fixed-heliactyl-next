@@ -19,14 +19,13 @@ module.exports.heliactylModule = heliactylModule;
 
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
-const WebSocket = require('ws');
-const axios = require('axios');
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js");
-const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
+const { getAppAPI, getClientAPI } = require('../../handlers/pterodactylSingleton.js');
 
 module.exports.load = async function(router, db) {
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
-  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
+  const AppAPI = getAppAPI();
+  const ClientAPI = getClientAPI();
     
     // PUT /api/server/:id/startup
     router.put('/server/:id/startup', authMiddleware, async (req, res) => {
@@ -62,13 +61,7 @@ module.exports.load = async function(router, db) {
     router.post('/server/:id/reinstall', authMiddleware, ownsServer(db), async (req, res) => {
         try {
             const serverId = req.params.id;
-            await axios.post(`${settings.pterodactyl.domain}/api/client/servers/${serverId}/settings/reinstall`, {}, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${settings.pterodactyl.client_key}`
-                }
-            });
+            await ClientAPI.request('POST', `/api/client/servers/${serverId}/settings/reinstall`);
             res.status(204).send(); // No content response on success
         } catch (error) {
             console.error('Error reinstalling server:', error);
@@ -82,15 +75,7 @@ module.exports.load = async function(router, db) {
             const serverId = req.params.id;
             const { name } = req.body; // Expecting the new name for the server in the request body
 
-            await axios.post(`${settings.pterodactyl.domain}/api/client/servers/${serverId}/settings/rename`, 
-            { name: name }, 
-            {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${settings.pterodactyl.client_key}`
-                }
-            });
+            await ClientAPI.request('POST', `/api/client/servers/${serverId}/settings/rename`, { name });
             res.status(204).send(); // No content response on success
         } catch (error) {
             console.error('Error renaming server:', error);

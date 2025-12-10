@@ -20,11 +20,11 @@ module.exports.heliactylModule = heliactylModule;
 const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { requireAuth } = require("../handlers/checkMiddleware.js");
-const PterodactylApplicationModule = require('../handlers/ApplicationAPI.js');
+const { getAppAPI } = require('../handlers/pterodactylSingleton.js');
 const NodeCache = require("node-cache");
 
 module.exports.load = async function(router, db) {
-  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key)
+  const AppAPI = getAppAPI();
   const myCache = new NodeCache({ stdTTL: 60, checkperiod: 10 });
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 

@@ -17,13 +17,15 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const axios = require("axios");
+
 const loadConfig = require("../../handlers/config");
 const settings = loadConfig("./config.toml");
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware")
 const { discordLog, serverActivityLog } = require("../../handlers/log");
+const { getClientAPI } = require("../../handlers/pterodactylSingleton.js");
 
 module.exports.load = async function (router, db) {
+  const ClientAPI = getClientAPI();
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 // GET /api/server/:id/files/download
 router.get('/server/:id/files/download', authMiddleware, ownsServer(db), async (req, res) => {
@@ -35,19 +37,8 @@ router.get('/server/:id/files/download', authMiddleware, ownsServer(db), async (
       return res.status(400).json({ error: 'File parameter is required' });
     }
 
-    const response = await axios.get(
-      `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/download`,
-      {
-        params: { file },
-        headers: {
-          Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    res.json(response.data);
+    const data = await ClientAPI.request('GET', `/api/client/servers/${serverId}/files/download`, null, { file });
+    res.json(data);
   } catch (error) {
     console.error('Error generating download link:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -55,7 +46,6 @@ router.get('/server/:id/files/download', authMiddleware, ownsServer(db), async (
 });
 
 // POST /api/server/:id/files/copy
-// unused
 router.post('/server/:id/files/copy', authMiddleware, ownsServer(db), async (req, res) => {
   try {
     const serverId = req.params.id;
@@ -65,17 +55,7 @@ router.post('/server/:id/files/copy', authMiddleware, ownsServer(db), async (req
       return res.status(400).json({ error: 'Missing location' });
     }
 
-    await axios.post(
-      `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/copy`,
-      { location },
-      {
-        headers: {
-          Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    await ClientAPI.request('POST', `/api/client/servers/${serverId}/files/copy`, { location });
     res.status(204).send();
   } catch (error) {
     console.error('Error copying file:', error);
@@ -95,32 +75,22 @@ router.get(
       const page = parseInt(req.query.page) || 1;
       const perPage = parseInt(req.query.per_page) || 10;
 
-      const response = await axios.get(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/list`,
-        {
-          params: { 
-            directory,
-            page: page,
-            per_page: perPage
-          },
-          headers: {
-            Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const data = await ClientAPI.request('GET', `/api/client/servers/${serverId}/files/list`, null, { 
+        directory,
+        page: page,
+        per_page: perPage
+      });
 
       // Add pagination metadata to the response
-      const totalItems = response.data.meta?.pagination?.total || 0;
+      const totalItems = data.meta?.pagination?.total || 0;
       const totalPages = Math.ceil(totalItems / perPage);
 
       const paginatedResponse = {
-        ...response.data,
+        ...data,
         meta: {
-          ...response.data.meta,
+          ...data.meta,
           pagination: {
-            ...response.data.meta?.pagination,
+            ...data.meta?.pagination,
             current_page: page,
             per_page: perPage,
             total_pages: totalPages
@@ -144,31 +114,13 @@ router.get(
     async (req, res) => {
       try {
         const serverId = req.params.id;
-        const file = encodeURIComponent(req.query.file); // URL-encode the file path
-        const response = await axios.get(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/contents?file=${file}`,
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            responseType: "text", // Treat the response as plain text
-          }
-        );
-
-        // Log the raw content for debugging
+        const file = req.query.file; 
+        const data = await ClientAPI.request('GET', `/api/client/servers/${serverId}/files/contents`, null, { file }, 'text');
 
         // Send the raw file content back to the client
-        res.send(response.data);
+        res.send(data);
       } catch (error) {
         console.error("Error getting file contents:", error);
-
-        // Optionally log the error response for more details
-        if (error.response) {
-          console.error("Error response data:", error.response.data);
-        }
-
         res.status(500).json({ error: "Internal server error" });
       }
     }
@@ -182,20 +134,10 @@ router.get(
     async (req, res) => {
       try {
         const serverId = req.params.id;
-        const file = encodeURIComponent(req.query.file); // URL-encode the file path
+        const file = req.query.file; 
         const content = req.body; // Expect the raw file content from the client
 
-        const response = await axios.post(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/write?file=${file}`,
-          content, // Send the content as the raw body
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "text/plain", // Adjust based on your file type (e.g., 'text/yaml')
-            },
-          }
-        );
+        await ClientAPI.request('POST', `/api/client/servers/${serverId}/files/write`, content, { file });
 
     await serverActivityLog(db, serverId, 'Write File', { file });
 
@@ -216,18 +158,8 @@ router.get(
       try {
         const serverId = req.params.id;
         const { root, files } = req.body;
-        const response = await axios.post(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/compress`,
-          { root, files },
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        res.status(200).json(response.data);
+        const data = await ClientAPI.request('POST', `/api/client/servers/${serverId}/files/compress`, { root, files });
+        res.status(200).json(data);
       } catch (error) {
         console.error("Error compressing files:", error);
         res.status(500).json({ error: "Internal server error" });
@@ -244,17 +176,7 @@ router.get(
       try {
         const serverId = req.params.id;
         const { root, file } = req.body;
-        await axios.post(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/decompress`,
-          { root, file },
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        await ClientAPI.request('POST', `/api/client/servers/${serverId}/files/decompress`, { root, file });
         res.status(204).send();
       } catch (error) {
         console.error("Error decompressing file:", error);
@@ -272,17 +194,8 @@ router.get(
       try {
         const serverId = req.params.id;
         const { root, files } = req.body;
-        await axios.post(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/delete`,
-          { root, files },
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        await ClientAPI.request('POST', `/api/client/servers/${serverId}/files/delete`, { root, files });
+
         await serverActivityLog(db, serverId, 'Delete File', { root, files });
         res.status(204).send();
       } catch (error) {
@@ -301,18 +214,8 @@ router.get(
       try {
         const serverId = req.params.id;
         const directory = req.query.directory || "/";
-        const response = await axios.get(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/upload`,
-          {
-            params: { directory },
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        res.json(response.data);
+        const data = await ClientAPI.request('GET', `/api/client/servers/${serverId}/files/upload`, null, { directory });
+        res.json(data);
       } catch (error) {
         console.error("Error getting upload URL:", error);
         res.status(500).json({ error: "Internal server error" });
@@ -329,17 +232,7 @@ router.get(
       try {
         const serverId = req.params.id;
         const { root, name } = req.body;
-        await axios.post(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/create-folder`,
-          { root, name },
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        await ClientAPI.request('POST', `/api/client/servers/${serverId}/files/create-folder`, { root, name });
         res.status(204).send();
       } catch (error) {
         console.error("Error creating folder:", error);
@@ -357,17 +250,7 @@ router.get(
       try {
         const serverId = req.params.id;
         const { root, files } = req.body;
-        await axios.put(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/files/rename`,
-          { root, files },
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        await ClientAPI.request('PUT', `/api/client/servers/${serverId}/files/rename`, { root, files });
         res.status(204).send();
       } catch (error) {
         console.error("Error renaming file/folder:", error);

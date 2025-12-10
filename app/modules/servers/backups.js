@@ -20,11 +20,11 @@ module.exports.heliactylModule = heliactylModule;
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js");
-const PterodactylClientModule = require("../../handlers/ClientAPI.js");
-const axios = require("axios");
+const { getClientAPI } = require("../../handlers/pterodactylSingleton.js");
+
 
 module.exports.load = async function(router, db) {
-  const ClientAPI = new PterodactylClientModule(settings.pterodactyl.domain, settings.pterodactyl.client_key);
+  const ClientAPI = getClientAPI();
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
   // GET /api/server/:id/backups
@@ -35,17 +35,8 @@ module.exports.load = async function(router, db) {
     async (req, res) => {
       try {
         const serverId = req.params.id;
-        const response = await axios.get(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/backups`,
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        res.json(response.data);
+        const data = await ClientAPI.request('GET', `/api/client/servers/${serverId}/backups`);
+        res.json(data);
       } catch (error) {
         console.error("Error fetching backups:", error);
         res.status(500).json({ error: "Internal server error" });
@@ -61,18 +52,8 @@ module.exports.load = async function(router, db) {
     async (req, res) => {
       try {
         const serverId = req.params.id;
-        const response = await axios.post(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/backups`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        res.status(201).json(response.data);
+        const data = await ClientAPI.request('POST', `/api/client/servers/${serverId}/backups`);
+        res.status(201).json(data);
       } catch (error) {
         console.error("Error creating backup:", error);
         res.status(500).json({ error: "Internal server error" });
@@ -89,17 +70,8 @@ module.exports.load = async function(router, db) {
       try {
         const serverId = req.params.id;
         const backupId = req.params.backupId;
-        const response = await axios.get(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/backups/${backupId}/download`,
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        res.json(response.data);
+        const data = await ClientAPI.request('GET', `/api/client/servers/${serverId}/backups/${backupId}/download`);
+        res.json(data);
       } catch (error) {
         console.error("Error generating backup download link:", error);
         res.status(500).json({ error: "Internal server error" });
@@ -116,16 +88,7 @@ module.exports.load = async function(router, db) {
       try {
         const serverId = req.params.id;
         const backupId = req.params.backupId;
-        await axios.delete(
-          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/backups/${backupId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${settings.pterodactyl.client_key}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        await ClientAPI.request('DELETE', `/api/client/servers/${serverId}/backups/${backupId}`);
         res.status(204).send();
       } catch (error) {
         console.error("Error deleting backup:", error);

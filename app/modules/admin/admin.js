@@ -28,11 +28,11 @@ if (settings?.pterodactyl?.domain?.endsWith("/")) {
 const adminjs = require("./admin.js");
 const { discordLog } = require("../../handlers/log.js");
 const getPteroUser = require("../../handlers/getPteroUser.js");
-const PterodactylApplicationModule = require('../../handlers/ApplicationAPI.js');
+const { getAppAPI } = require('../../handlers/pterodactylSingleton.js');
 const { requireAuth } = require("../../handlers/checkMiddleware.js");
 
 module.exports.load = async function (router, db) {
-  const AppAPI = new PterodactylApplicationModule(settings.pterodactyl.domain, settings.pterodactyl.key);
+  const AppAPI = getAppAPI();
   const requireAdmin = (req, res, next) => requireAuth(req, res, next, true, db);
 
   router.get("/admin/setcoins", requireAdmin, async (req, res) => { 

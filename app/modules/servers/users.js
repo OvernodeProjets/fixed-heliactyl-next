@@ -17,14 +17,13 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const axios = require("axios");
 const loadConfig = require("../../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js");
-const PterodactylClientModule = require("../../handlers/ClientAPI.js");
+const { getClientAPI } = require("../../handlers/pterodactylSingleton.js");
 
 module.exports.load = async function(router, db) {
-  const ClientAPI = new PterodactylClientModule(settings.pterodactyl.domain, settings.pterodactyl.client_key);
+  const ClientAPI = getClientAPI();
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
   async function addUserToAllUsersList(userId) {
@@ -37,17 +36,11 @@ module.exports.load = async function(router, db) {
 
   async function getServerName(serverId) {
     try {
-      const response = await axios.get(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      return response.data.attributes.name;
+      const serverDetails = await ClientAPI.getServerDetails(serverId, false, false);
+      if (serverDetails) {
+        return serverDetails.attributes.name;
+      }
+      return 'Unknown Server';
     } catch (error) {
       console.error('Error fetching server name:', error);
       return 'Unknown Server';
@@ -57,18 +50,9 @@ module.exports.load = async function(router, db) {
   async function updateSubuserInfo(serverId, serverOwnerId) {
     try {
       console.log(`Updating subuser info for server ${serverId}`);
-      const response = await axios.get(
-        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/users`,
-        {
-          headers: {
-            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await ClientAPI.request('GET', `/api/client/servers/${serverId}/users`);
   
-      const subusers = response.data.data.map(user => ({
+      const subusers = response.data.map(user => ({
         id: user.attributes.username,
         username: user.attributes.username,
         email: user.attributes.email,
