@@ -73,7 +73,7 @@
                 <div class="bg-black/20 rounded-lg p-4">
                     <div class="text-sm text-gray-400 mb-2"><%= __('server.settings.sftp_host') %></div>
                     <div class="flex items-center space-x-2">
-                        <code class="flex-1 text-white bg-black/30 rounded px-3 py-2" id="sftp-host"></code>
+                        <code class="flex-1 text-white bg-black/30 rounded px-3 py-2 text-sm md:text-lg" id="sftp-host"></code>
                         <button onclick="copyToClipboard('sftp-host')" class="text-gray-400 hover:text-white transition">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -84,7 +84,7 @@
                 <div class="bg-black/20 rounded-lg p-4">
                     <div class="text-sm text-gray-400 mb-2"><%= __('server.settings.sftp_username') %></div>
                     <div class="flex items-center space-x-2">
-                        <code class="flex-1 text-white bg-black/30 rounded px-3 py-2" id="sftp-username"></code>
+                        <code class="flex-1 text-white bg-black/30 rounded px-3 py-2 text-sm md:text-lg" id="sftp-username"></code>
                         <button onclick="copyToClipboard('sftp-username')" class="text-gray-400 hover:text-white transition">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -108,7 +108,7 @@
         </div>
         <div class="p-6">
             <div class="flex space-x-4">
-                <input type="text" id="server-name-input" class="flex-1 p-3 bg-black/20 text-white border border-transparent rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition" placeholder="<%= __('server.settings.rename_placeholder') %>">
+                <input type="text" id="server-name-input" class="w-[100%] p-3 bg-black/20 text-white border border-transparent rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition" placeholder="<%= __('server.settings.rename_placeholder') %>">
                 <button id="rename-server" class="bg-indigo-500 text-sm hover:bg-indigo-600 text-white font-medium px-6 rounded-xl flex items-center space-x-2 transition duration-200 hover:scale-95">
                     <span><%= __('server.settings.rename_button') %></span>
                 </button>
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="mb-6">
             <label class="block text-sm font-medium text-gray-300 mb-2"><%= __('server.settings.docker_image') %></label>
             <div class="space-y-4">
-                <div class="flex gap-4">
+                <div class="flex gap-4 flex-col md:flex-row">
                     <select id="image-category" class="flex-1 p-3 bg-white/5 text-white border border-transparent rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition">
                         <option value=""><%= __('server.settings.select_category') %></option>
                         <option value="java">Java</option>
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="mb-6">
             <label class="block text-sm font-medium text-gray-300 mb-2"><%= __('server.settings.startup_command') %></label>
             <div class="relative">
-                <input type="text" id="startup-command" class="w-full p-3 bg-white/5 text-white border border-transparent rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition" placeholder="<%= __('server.settings.startup_placeholder') %>">
+                <input type="text" id="startup-command" class="w-full p-3 pr-10 bg-white/5 text-white border border-transparent rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition" placeholder="<%= __('server.settings.startup_placeholder') %>">
                 <button id="show-startup-help" class="absolute right-3 top-3 text-gray-400 hover:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -402,10 +402,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         imagesToShow.forEach(img => {
             const imageCard = document.createElement('div');
-            imageCard.className = 'p-4 bg-black/20 rounded-lg cursor-pointer hover:bg-black/30 transition';
+            imageCard.className = 'p-4 bg-black/20 rounded-lg truncate text-gray-500 cursor-pointer hover:bg-black/30 transition';
             imageCard.innerHTML = `
                 <div class="font-medium text-white mb-1">${img.version}</div>
-                <div class="text-sm text-gray-400 mb-2">${img.description}</div>
+                <div class="text-sm truncate text-gray-400 mb-2">${img.description}</div>
                 <code class="text-xs text-gray-500">${img.image}</code>
             `;
             imageCard.onclick = () => {
