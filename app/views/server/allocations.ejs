@@ -59,7 +59,7 @@
 
     <!-- Current Allocations -->
     <div class="bg-white/5 rounded-xl p-6 mt-8">
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-between items-center mb-6 flex-col gap-y-5 md:flex-row">
             <div>
                 <h2 class="text-xl font-semibold text-white"><%= __('server.allocations.title') %></h2>
                 <p class="text-gray-400 text-sm mt-1"><%= __('server.allocations.subtitle') %></p>
@@ -162,7 +162,7 @@
             ipInfo.className = 'flex-grow space-y-1';
             ipInfo.innerHTML = `
                 <div class="flex items-center space-x-2">
-                    <span class="text-white font-medium">${allocation.attributes.ip_alias}:${allocation.attributes.port}</span>
+                    <span class="text-sm md:text-md text-white font-medium">${allocation.attributes.ip_alias}:${allocation.attributes.port}</span>
                     ${allocation.attributes.is_default ? `
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                             ${t.defaultBadge}
