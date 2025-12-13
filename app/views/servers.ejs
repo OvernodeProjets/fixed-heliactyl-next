@@ -76,14 +76,14 @@
             </div>
         <% } else { %>
             <% pterodactyl.data.forEach(server => { %>
-<div class="server-row mb-4 bg-white/5 rounded-2xl hover:bg-white/10 border-2 border-dashed border-transparent hover:border-white/5 transition px-4 md:px-6 py-4 flex flex-col gap-3 md:grid md:grid-cols-12 md:gap-4 md:items-center cursor-pointer"
+<div class="server-row mb-4 bg-white/5 rounded-2xl hover:bg-white/10 border-2 border-dashed border-transparent hover:border-white/5 transition px-4 md:px-6 py-4 flex flex-col gap-4 md:justify-between md:grid md:grid-cols-12 lg:gap-4 md:items-center cursor-pointer"
      data-server-id="<%= server.attributes.identifier %>"
      data-server-numeric="<%= server.attributes.id %>"
      data-egg="<%= server.attributes.egg %>"
      onclick="window.location.href='/server/manage?id=<%= server.attributes.identifier%>&numeric=<%= server.attributes.id%>&mode=server'">
                     
                     <!-- Server Name & Status (mobile: inline row) -->
-                    <div class="flex items-center justify-between md:contents">
+                    <div class="flex items-evenly md:contents">
                         <div class="md:col-span-2">
                             <div class="font-medium text-white text-sm md:text-base"><%= server.attributes.name %></div>
                         </div>
