@@ -47,7 +47,15 @@ const { startCluster } = require('./app/handlers/clusterManager');
 const { i18nMiddleware } = require('./app/handlers/i18n');
 
 global.Buffer = global.Buffer || require("buffer").Buffer;
-process.emitWarning = function () { };
+process.emitWarning = function (warning, ...args) {
+  if (args[0] === 'ExperimentalWarning') {
+    return;
+  }
+  if (args[0] && typeof args[0] === 'object' && args[0].type === 'ExperimentalWarning') {
+    return;
+  }
+  return console.warn(warning, ...args);
+};
 
 if (typeof btoa === "undefined") {
   global.btoa = (str) => Buffer.from(str, "binary").toString("base64");
@@ -255,39 +263,7 @@ if (cluster.isMaster) {
 
 }
 
-function shimPromiseWithStackCapture() {
-  const originalPromise = global.Promise;
-  const captureStack = () => new Error().stack;
 
-  function PromiseWithStack(executor) {
-    const stack = captureStack();
-    return new originalPromise((resolve, reject) => {
-      return executor(resolve, (reason) => {
-        if (reason instanceof Error) {
-          if (!reason.stack) {
-            reason.stack = stack;
-          }
-        } else {
-          const err = new Error(reason);
-          err.stack = stack;
-          reject(err);
-          return;
-        }
-        reject(reason);
-      });
-    });
-  }
-
-  PromiseWithStack.prototype = originalPromise.prototype;
-  PromiseWithStack.all = originalPromise.all;
-  PromiseWithStack.race = originalPromise.race;
-  PromiseWithStack.resolve = originalPromise.resolve;
-  PromiseWithStack.reject = originalPromise.reject;
-
-  global.Promise = PromiseWithStack;
-};
-
-shimPromiseWithStackCapture();
 
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
