@@ -59,7 +59,7 @@ module.exports.load = async function(router, db) {
       );
   
       // Check if level.dat exists in the directory
-      return worldContents.data.data.some(file => 
+      return worldContents.data.some(file => 
         file.attributes.name === 'level.dat' && 
         !file.attributes.mimetype.startsWith('inode/')
       );
@@ -85,7 +85,7 @@ module.exports.load = async function(router, db) {
       );
   
       // Parse server.properties to get default world name
-      const serverProps = serverPropsResponse.data
+      const serverProps = serverPropsResponse
         .split('\n')
         .reduce((acc, line) => {
           const [key, value] = line.split('=');
@@ -101,7 +101,7 @@ module.exports.load = async function(router, db) {
   
       // Filter for world folders (using Promise.all since we're using async filter)
       const fl = await Promise.all(
-        response.data.data.map(async (folder) => {
+        response.data.map(async (folder) => {
           const isWorld = await isValidWorld(folder, serverId);
           return isWorld ? folder : null;
         })
