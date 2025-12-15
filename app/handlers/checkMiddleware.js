@@ -32,8 +32,8 @@ const ownsServer = (db) => async (req, res, next) => {
   const userId = req.session.pterodactyl.username;
   const username = req.session.pterodactyl.first_name;
 
-  if (serverOwned) {
-    console.log(`User ${username} (${userId}) owns server ${serverId}`);
+  if (serverOwned || req.session.pterodactyl.root_admin) {
+    console.log(`User ${username} (${userId}) has access to server ${serverId} (Admin: ${req.session.pterodactyl.root_admin})`);
     return next();
   }
 

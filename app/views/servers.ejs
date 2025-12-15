@@ -54,80 +54,91 @@
     </div>
   </div>
 </div>
-        </div>
+    <% if (pterodactyl.root_admin) { %>
+    <!-- Admin View Switcher -->
+    <button onclick="switchServerView()" id="view-toggle-btn" class="hover:scale-95 flex items-center justify-center h-11 gap-2 px-5 text-sm font-medium text-white transition-all duration-200 rounded-full shadow bg-white/10 hover:bg-white/20 focus:ring-2 focus:ring-white/20 focus:ring-offset-2 ring-offset-gray-900 hover:shadow-none">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+        </svg>
+        <span>Others' Servers</span>
+    </button>
+    <% } %>
+</div>
     </div>
 <div id="alert-container" class="mb-4 space-y-2"></div>
-    <!-- Servers List Header (hidden on mobile) -->
-    <div class="hidden md:grid px-6 py-3 mt-6 grid-cols-12 gap-4 items-center text-sm font-medium text-white/50">
-        <div class="col-span-2"><%= __('servers.columns.server') %></div>
-        <div class="col-span-2"><%= __('servers.columns.status') %></div>
-        <div class="col-span-2"><%= __('servers.columns.memory') %></div>
-        <div class="col-span-2"><%= __('servers.columns.cpu') %></div>
-        <div class="col-span-3 ml-4"><%= __('servers.columns.ip_address') %></div>
-    </div>
-
-    <% pterodactyl.data = pterodactyl.relationships.servers.data %>
-    <!-- Servers List -->
-    <div class="divide-y divide-white/5 mt-4 md:mt-0" id="servers-list">
-        <% if (pterodactyl.data.length === 0) { %>
-            <div class="px-6 py-8 text-center text-white/60">
-                <p class="text-lg mb-2"><%= __('servers.no_servers') %></p>
-                <p class="text-sm"><%= __('servers.get_started') %></p>
-            </div>
-        <% } else { %>
-            <% pterodactyl.data.forEach(server => { %>
-<div class="server-row mb-4 bg-white/5 rounded-2xl hover:bg-white/10 border-2 border-dashed border-transparent hover:border-white/5 transition px-4 md:px-6 py-4 flex flex-col gap-3 md:grid md:grid-cols-12 md:gap-4 md:items-center cursor-pointer"
-     data-server-id="<%= server.attributes.identifier %>"
-     data-server-numeric="<%= server.attributes.id %>"
-     data-egg="<%= server.attributes.egg %>"
-     onclick="window.location.href='/server/manage?id=<%= server.attributes.identifier%>&numeric=<%= server.attributes.id%>&mode=server'">
-                    
-                    <!-- Server Name & Status (mobile: inline row) -->
-                    <div class="flex items-center justify-between md:contents">
-                        <div class="md:col-span-2">
-                            <div class="font-medium text-white text-sm md:text-base"><%= server.attributes.name %></div>
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <div class="inline-flex items-center px-2 md:px-3 py-1 rounded-full text-xs font-medium bg-zinc-500/20 text-zinc-300">
-                                <div class="size-2 rounded-full bg-zinc-400 mr-1.5 md:mr-2 status-indicator"></div>
-                                <span class="status-text"><%= __('servers.status.connecting') %></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Memory & CPU (mobile: side by side) -->
-                    <div class="flex gap-4 md:contents">
-                        <div class="flex-1 md:col-span-2">
-                            <div class="text-xs text-white/50 mb-1 md:hidden">Memory</div>
-                            <div class="flex items-center gap-2">
-                                <div class="w-full bg-white/10 rounded-full h-1.5">
-                                    <div class="memory-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
-                                </div>
-                                <span class="text-xs memory-text whitespace-nowrap">0/<%= server.attributes.limits.memory %>MiB</span>
-                            </div>
-                        </div>
-
-                        <div class="flex-1 md:col-span-2">
-                            <div class="text-xs text-white/50 mb-1 md:hidden">CPU</div>
-                            <div class="flex items-center gap-2">
-                                <div class="w-full bg-white/10 rounded-full h-1.5">
-                                    <div class="cpu-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
-                                </div>
-                                <span class="text-xs cpu-text">0%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- IP Address -->
-                    <div class="md:col-span-3 md:ml-4">
-                        <div class="text-xs font-mono text-white/70 bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg shadow-sm overflow-x-auto">
-                            <span class="server-address whitespace-nowrap"><%= __('servers.fetching') %></span>
-                        </div>
-                    </div>
+    <div id="user-servers-container">
+        <!-- Servers List Header (hidden on mobile) -->
+        <div class="hidden md:grid px-6 py-3 mt-6 grid-cols-12 gap-4 items-center text-sm font-medium text-white/50">
+            <div class="col-span-2"><%= __('servers.columns.server') %></div>
+            <div class="col-span-2"><%= __('servers.columns.status') %></div>
+            <div class="col-span-2"><%= __('servers.columns.memory') %></div>
+            <div class="col-span-2"><%= __('servers.columns.cpu') %></div>
+            <div class="col-span-3 ml-4"><%= __('servers.columns.ip_address') %></div>
+        </div>
+    
+        <% pterodactyl.data = pterodactyl.relationships.servers.data %>
+        <!-- Servers List -->
+        <div class="divide-y divide-white/5 mt-4 md:mt-0" id="servers-list">
+            <% if (pterodactyl.data.length === 0) { %>
+                <div class="px-6 py-8 text-center text-white/60">
+                    <p class="text-lg mb-2"><%= __('servers.no_servers') %></p>
+                    <p class="text-sm"><%= __('servers.get_started') %></p>
                 </div>
-            <% }); %>
-        <% } %>
+            <% } else { %>
+                <% pterodactyl.data.forEach(server => { %>
+    <div class="server-row mb-4 bg-white/5 rounded-2xl hover:bg-white/10 border-2 border-dashed border-transparent hover:border-white/5 transition px-4 md:px-6 py-4 flex flex-col gap-3 md:grid md:grid-cols-12 md:gap-4 md:items-center cursor-pointer"
+         data-server-id="<%= server.attributes.identifier %>"
+         data-server-numeric="<%= server.attributes.id %>"
+         data-egg="<%= server.attributes.egg %>"
+         onclick="window.location.href='/server/manage?id=<%= server.attributes.identifier%>&numeric=<%= server.attributes.id%>&mode=server'">
+                        
+                        <!-- Server Name & Status (mobile: inline row) -->
+                        <div class="flex items-center justify-between md:contents">
+                            <div class="md:col-span-2">
+                                <div class="font-medium text-white text-sm md:text-base"><%= server.attributes.name %></div>
+                            </div>
+    
+                            <div class="md:col-span-2">
+                                <div class="inline-flex items-center px-2 md:px-3 py-1 rounded-full text-xs font-medium bg-zinc-500/20 text-zinc-300">
+                                    <div class="size-2 rounded-full bg-zinc-400 mr-1.5 md:mr-2 status-indicator"></div>
+                                    <span class="status-text"><%= __('servers.status.connecting') %></span>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <!-- Memory & CPU (mobile: side by side) -->
+                        <div class="flex gap-4 md:contents">
+                            <div class="flex-1 md:col-span-2">
+                                <div class="text-xs text-white/50 mb-1 md:hidden">Memory</div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-full bg-white/10 rounded-full h-1.5">
+                                        <div class="memory-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                                    </div>
+                                    <span class="text-xs memory-text whitespace-nowrap">0/<%= server.attributes.limits.memory %>MiB</span>
+                                </div>
+                            </div>
+    
+                            <div class="flex-1 md:col-span-2">
+                                <div class="text-xs text-white/50 mb-1 md:hidden">CPU</div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-full bg-white/10 rounded-full h-1.5">
+                                        <div class="cpu-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                                    </div>
+                                    <span class="text-xs cpu-text">0%</span>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <!-- IP Address -->
+                        <div class="md:col-span-3 md:ml-4">
+                            <div class="text-xs font-mono text-white/70 bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg shadow-sm overflow-x-auto">
+                                <span class="server-address whitespace-nowrap"><%= __('servers.fetching') %></span>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } %>
+        </div>
     </div>
 
     <!-- Shared Servers Section -->
@@ -142,6 +153,36 @@
         </div>
         <div class="divide-y divide-white/5" id="shared-servers-list"></div>
     </div>
+
+    <% if (pterodactyl.root_admin) { %>
+    <!-- Admin All Servers Section -->
+    <div class="mt-4 hidden" id="admin-servers-container">
+        
+        <!-- Headers -->
+        <div class="hidden md:grid rounded-t-xl px-6 py-3 grid-cols-12 gap-4 items-center text-sm font-medium text-gray-400">
+            <div class="col-span-2"><%= __('servers.columns.server') %></div>
+            <div class="col-span-2">Owner</div>
+            <div class="col-span-2"><%= __('servers.columns.memory') %></div>
+            <div class="col-span-2"><%= __('servers.columns.cpu') %></div>
+            <div class="col-span-3 ml-4"><%= __('servers.columns.ip_address') %></div>
+        </div>
+        
+        <div class="divide-y divide-white/5" id="admin-servers-list">
+            <!-- Servers will be loaded here -->
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="mt-4 flex items-center justify-between px-2" id="admin-pagination">
+            <button onclick="changeAdminPage(-1)" id="prev-page-btn" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm text-gray-300 transition">
+                &larr; Previous
+            </button>
+            <span class="text-sm text-gray-400" id="page-info">Page 1</span>
+            <button onclick="changeAdminPage(1)" id="next-page-btn" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm text-gray-300 transition">
+                Next &rarr;
+            </button>
+        </div>
+    </div>
+    <% } %>
 </main>
 
 <script>
@@ -377,6 +418,147 @@ fetch('/api/server/subuser-servers')
         }
     })
     .catch(error => console.error('Error fetching shared servers:', error));
+
+    <% if (pterodactyl.root_admin) { %>
+    let currentAdminPage = 1;
+    let totalAdminPages = 1;
+
+    function switchServerView() {
+        const userContainer = document.getElementById('user-servers-container');
+        const adminContainer = document.getElementById('admin-servers-container');
+        const toggleBtn = document.getElementById('view-toggle-btn');
+        const toggleSpan = toggleBtn.querySelector('span');
+        
+        const isAdminView = userContainer.classList.contains('hidden');
+        
+        if (isAdminView) {
+            // Switch to User View
+            userContainer.classList.remove('hidden');
+            adminContainer.classList.add('hidden');
+            toggleSpan.textContent = "Others' Servers";
+        } else {
+            // Switch to Admin View
+            userContainer.classList.add('hidden');
+            adminContainer.classList.remove('hidden');
+            toggleSpan.textContent = "My Servers";
+            
+            if (document.getElementById('admin-servers-list').children.length === 0) {
+                loadAdminServers(currentAdminPage);
+            }
+        }
+    }
+
+    function changeAdminPage(delta) {
+        const newPage = currentAdminPage + delta;
+        if (newPage >= 1 && newPage <= totalAdminPages) {
+            loadAdminServers(newPage);
+        }
+    }
+
+    function loadAdminServers(page) {
+        document.getElementById('admin-servers-list').innerHTML = '<div class="text-center py-8 text-gray-500 italic">Loading...</div>';
+        
+        fetch(`/api/admin/all_servers?page=${page}`)
+            .then(async response => {
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(text);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const servers = data.data; // Pterodactyl responses usually have data: [...]
+                const meta = data.meta; // Pagination info
+                
+                const adminList = document.getElementById('admin-servers-list');
+                adminList.innerHTML = '';
+
+                if (!servers || servers.length === 0) {
+                     adminList.innerHTML = '<div class="text-center py-4 text-gray-500">No servers found.</div>';
+                     return;
+                }
+
+                // Update pagination state
+                currentAdminPage = meta.pagination.current_page;
+                totalAdminPages = meta.pagination.total_pages;
+                
+                document.getElementById('page-info').textContent = `Page ${currentAdminPage} of ${totalAdminPages}`;
+                document.getElementById('prev-page-btn').disabled = currentAdminPage <= 1;
+                document.getElementById('next-page-btn').disabled = currentAdminPage >= totalAdminPages;
+                
+                servers.forEach(server => {
+                    const serverRow = document.createElement('div');
+                    serverRow.className = 'server-row mb-4 bg-white/5 rounded-2xl hover:bg-white/10 border-2 border-dashed border-transparent hover:border-white/5 transition px-4 md:px-6 py-4 flex flex-col gap-3 md:grid md:grid-cols-12 md:gap-4 md:items-center cursor-pointer';
+                    serverRow.onclick = () => window.location.href = `/server/manage?id=${server.attributes.identifier}&numeric=${server.attributes.id}`;
+                    
+                    const limits = server.attributes.limits || { memory: 0, cpu: 0 };
+                    
+                    serverRow.innerHTML = `
+                        <!-- Server Name -->
+                        <div class="flex items-center justify-between md:contents">
+                            <div class="md:col-span-2">
+                                <div class="font-medium text-white text-sm md:text-base">${server.attributes.name}</div>
+                                <div class="text-xs text-gray-500">${server.attributes.identifier}</div>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                 <div class="text-sm text-gray-400">User ID: ${server.attributes.user}</div>
+                            </div>
+                        </div>
+
+                        <!-- Limits -->
+                        <div class="flex gap-4 md:contents">
+                            <div class="flex-1 md:col-span-2">
+                                <div class="text-xs text-white/50 mb-1 md:hidden">Memory</div>
+                                <span class="text-sm text-gray-400">${limits.memory} MB</span>
+                            </div>
+
+                            <div class="flex-1 md:col-span-2">
+                                <div class="text-xs text-white/50 mb-1 md:hidden">CPU</div>
+                                <span class="text-sm text-gray-400">${limits.cpu}%</span>
+                            </div>
+                        </div>
+
+                        <!-- IP Address -->
+                        <div class="md:col-span-3 md:ml-4">
+                            <div class="text-xs font-mono text-white/70 bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg shadow-sm overflow-x-auto w-fit">
+                                ${formatAdminServerIP(server)}
+                            </div>
+                        </div>
+                    `;
+                    
+                    adminList.appendChild(serverRow);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching admin servers:', error);
+                document.getElementById('admin-servers-list').innerHTML = `<div class="text-center py-4 text-red-400">Error loading servers: ${error.message}</div>`;
+            });
+    }
+
+    function formatAdminServerIP(server) {
+        try {
+            const defaultAllocationId = server.attributes.allocation;
+            const allocations = server.attributes.relationships?.allocations?.data;
+            
+            if (allocations && allocations.length > 0) {
+                // Try to find the default allocation
+                const defaultAlloc = allocations.find(a => a.attributes.id === defaultAllocationId);
+                const alloc = defaultAlloc || allocations[0];
+                
+                if (alloc && alloc.attributes) {
+                    const ip = alloc.attributes.alias || alloc.attributes.ip;
+                    const port = alloc.attributes.port;
+                    return `${ip}:${port}`;
+                }
+            }
+            return 'No IP';
+        } catch (e) {
+            console.error('Error formatting IP:', e);
+            return 'Error';
+        }
+    }
+    <% } %>
 
 // Cleanup WebSocket connections when leaving the page
 window.addEventListener('beforeunload', () => {
