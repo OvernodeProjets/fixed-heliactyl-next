@@ -47,7 +47,7 @@
                 <%= __('errors.banned.description') %>
             </p>
 
-            <div class="error-code bg-gray-200/50 text-sm text-gray-700">
+            <div class="error-code bg-gray-200/50 text-sm text-gray-700 overflow-auto">
 <pre><code>
 <%= __('errors.banned.reason') %>: <%= banReason %>
 <%= __('errors.banned.expiration') %>: <%= banExpiration ? new Date(banExpiration).toLocaleString() : __('errors.banned.permanent') %>
