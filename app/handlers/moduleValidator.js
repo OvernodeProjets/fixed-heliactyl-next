@@ -28,9 +28,9 @@ function validateModules(settings) {
             
             const versionCheck = compatibility.isCompatible(version, settings.version);
 
-            if (!versionCheck.compatible) {
+            if (!versionCheck.compatible && target_platform !== "latest") {
                 console.log(chalk.red(`Module "${name}" version mismatch`));
-            } else if (version !== settings.version) {
+            } else if (version !== settings.version && target_platform !== "latest") {
                 console.log(chalk.yellow(`Module "${name}" different but compatible version`));
             } else {
                 //console.log(chalk.green(`Module "${name}" validated`));
