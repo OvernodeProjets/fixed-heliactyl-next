@@ -12,7 +12,7 @@
 
 const heliactylModule = {
   "name": "Halloween Event Module",
-  "target_platform": "3.2.1-beta.1"
+  "target_platform": "latest"
 };
 
 module.exports.heliactylModule = heliactylModule;

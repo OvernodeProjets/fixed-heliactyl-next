@@ -12,7 +12,7 @@
 
 const heliactylModule = {
   "name": "Heliactyl API 3.0 Beta",
-  "target_platform": "3.2.1-beta.1"
+  "target_platform": "latest"
 };
 
 module.exports.heliactylModule = heliactylModule;

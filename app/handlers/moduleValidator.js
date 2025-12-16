@@ -24,11 +24,13 @@ function validateModules(settings) {
             }
 
             const { name, target_platform } = module.heliactylModule;
-            const versionCheck = compatibility.isCompatible(target_platform, settings.version);
+            const version = target_platform === "latest" ? settings.version : target_platform;
+            
+            const versionCheck = compatibility.isCompatible(version, settings.version);
 
             if (!versionCheck.compatible) {
                 console.log(chalk.red(`Module "${name}" version mismatch`));
-            } else if (target_platform !== settings.version) {
+            } else if (version !== settings.version) {
                 console.log(chalk.yellow(`Module "${name}" different but compatible version`));
             } else {
                 //console.log(chalk.green(`Module "${name}" validated`));
