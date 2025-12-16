@@ -871,6 +871,9 @@
   .w-auto {
     width: auto;
   }
+  .w-fit {
+    width: fit-content;
+  }
   .w-full {
     width: 100%;
   }
@@ -2781,6 +2784,9 @@
   .uppercase {
     text-transform: uppercase;
   }
+  .italic {
+    font-style: italic;
+  }
   .tabular-nums {
     --tw-numeric-spacing: tabular-nums;
     font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
@@ -2974,6 +2980,9 @@
   }
   .ring-offset-gray-200 {
     --tw-ring-offset-color: var(--color-gray-200);
+  }
+  .ring-offset-gray-900 {
+    --tw-ring-offset-color: var(--color-gray-900);
   }
   .ring-offset-neutral-200 {
     --tw-ring-offset-color: var(--color-neutral-200);
@@ -3871,6 +3880,14 @@
   .focus\:ring-white {
     &:focus {
       --tw-ring-color: var(--color-white);
+    }
+  }
+  .focus\:ring-white\/20 {
+    &:focus {
+      --tw-ring-color: color-mix(in srgb, #fff 20%, transparent);
+      @supports (color: color-mix(in lab, red, red)) {
+        --tw-ring-color: color-mix(in oklab, var(--color-white) 20%, transparent);
+      }
     }
   }
   .focus\:ring-white\/30 {

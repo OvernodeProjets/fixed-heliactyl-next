@@ -545,6 +545,18 @@ module.exports.load = async function (router, db) {
     }
   });
 
+  router.get("/admin/all_servers", requireAdmin, async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const perPage = 15; // default per page
+      const servers = await AppAPI.listServers(page, perPage, { include: 'allocations' });
+      res.json(servers);
+    } catch (error) {
+      console.error("Error fetching all servers:", error);
+      res.status(500).json({ error: "Failed to fetch servers" });
+    }
+  });
+
   module.exports.suspend = async function (discordid) {
     if (!settings.api.client.allow.over_resources_suspend) return;
     
