@@ -25,7 +25,7 @@ const { getConnectionManager } = require("../../handlers/WebSocketConnectionMana
 
 module.exports.load = async function(router, db) {
   const ClientAPI = getClientAPI();
-  const connectionManager = getConnectionManager(settings.pterodactyl.domain, settings.pterodactyl.client_key);
+  const connectionManager = getConnectionManager(settings.pterodactyl.domain, settings.pterodactyl.client_key, settings.website.domain);
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
   // WebSocket proxy endpoint - persistent connection through server

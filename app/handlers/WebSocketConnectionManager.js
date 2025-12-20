@@ -16,9 +16,10 @@ const WebSocket = require('ws');
 const axios = require('axios');
 
 class WebSocketConnectionManager {
-  constructor(apiUrl, apiKey) {
+  constructor(apiUrl, apiKey, origin) {
     this.apiUrl = apiUrl;
     this.apiKey = apiKey;
+    this.origin = origin;
     
     // Map of serverId -> { socket, token, tokenExpiry, clients: Set<ws> }
     this.connections = new Map();
@@ -84,7 +85,13 @@ class WebSocketConnectionManager {
     const tokenExpiry = Date.now() + this.TOKEN_LIFETIME_MS;
 
     return new Promise((resolve, reject) => {
-      const socket = new WebSocket(socketUrl);
+      // Pass the origin in the options if available
+      const options = {};
+      if (this.origin) {
+        options.origin = this.origin;
+      }
+      
+      const socket = new WebSocket(socketUrl, options);
       
       const connection = {
         socket,
@@ -114,6 +121,24 @@ class WebSocketConnectionManager {
 
       socket.on('error', (error) => {
         console.error(`[WSManager] WebSocket error for server ${serverId}:`, error.message);
+        
+        // Detect 403 error and provide helpful guidance
+        if (error.message && error.message.includes('403')) {
+          console.error(`\n${'='.repeat(70)}`);
+          console.error(`[WSManager] ⚠️  WINGS CONFIGURATION ISSUE DETECTED`);
+          console.error(`${'='.repeat(70)}`);
+          console.error(`The Pterodactyl Wings node rejected the WebSocket connection (403 Forbidden).`);
+          console.error(`This usually means the 'allowed-origins' setting is not configured.`);
+          console.error(``);
+          console.error(`To fix this, for EACH node in your infrastructure:`);
+          console.error(`  1. Edit /etc/pterodactyl/config.yml`);
+          console.error(`  2. Find the 'allowed-origins' setting`);
+          console.error(`  3. Set it to: allowed-origins: ['*']`);
+          console.error(`     Or for production: allowed-origins: ['${this.origin || 'https://your-dashboard.com'}']`);
+          console.error(`  4. Restart Wings: systemctl restart wings`);
+          console.error(`${'='.repeat(70)}\n`);
+        }
+        
         if (!connection.authenticated) {
           reject(error);
         }
@@ -392,9 +417,9 @@ class WebSocketConnectionManager {
 // Singleton instance
 let instance = null;
 
-function getConnectionManager(apiUrl, apiKey) {
+function getConnectionManager(apiUrl, apiKey, origin) {
   if (!instance) {
-    instance = new WebSocketConnectionManager(apiUrl, apiKey);
+    instance = new WebSocketConnectionManager(apiUrl, apiKey, origin);
   }
   return instance;
 }
