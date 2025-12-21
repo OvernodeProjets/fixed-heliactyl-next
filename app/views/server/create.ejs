@@ -152,7 +152,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="tooltip-icon h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
-                <span><%= location.storage %></span>
+                <span id="storage"><%= location.storage %></span>
             </div>
         </div>
     </div>
@@ -270,7 +270,75 @@
 let selectedZone = "";
 let selectedImage = "";
 
+// Fetch dynamic location data and update capacity displays
+async function fetchDynamicLocations() {
+    try {
+        const response = await fetch('/api/locations');
+        if (!response.ok) return;
+        
+        const locations = await response.json();
+        
+        // Update each location card with dynamic capacity
+        document.querySelectorAll('.location-card').forEach(card => {
+            const locationId = card.dataset.locationId;
+            const locationData = locations[locationId];
+            
+            if (locationData) {
+                // Find the capacity span and update it
+                const capacitySpan = card.querySelector('.space-y-2 > div:last-child span');
+                if (capacitySpan) {
+                    const available = locationData.availableCapacity;
+                    const total = locationData.totalCapacity;
+                    
+                    // Format disk size
+                    const formatDisk = (mb) => {
+                        return mb >= 1024 ? `${(mb/1024).toFixed(1)}GB` : `${Math.round(mb)}MB`;
+                    };
+                    
+                    const availableDisk = locationData.availableDisk;
+                    const totalDisk = locationData.totalDisk;
+                    
+                    capacitySpan.innerHTML = `
+                        <div class="flex flex-col">
+                            <span>${available}/${total} slots available</span>
+                        </div>
+                    `;
+
+                    const storage = card.querySelector('#storage');
+                    if (storage) {
+                        storage.textContent = `${formatDisk(availableDisk)}/${formatDisk(totalDisk)} disk free`;
+                    }
+                    
+                    // Change color based on availability (slots or disk)
+                    const lowSlots = available < total * 0.2;
+                    const lowDisk = availableDisk < totalDisk * 0.1;
+                    
+                    if (available === 0 || availableDisk <= 0) {
+                        capacitySpan.className = 'text-red-400 text-xs text-right';
+                        card.classList.add('opacity-50');
+                    } else if (lowSlots || lowDisk) {
+                        capacitySpan.className = 'text-yellow-400 text-xs text-right';
+                    } else {
+                        capacitySpan.className = 'text-green-400 text-xs text-right';
+                    }
+                }
+                
+                // Update nodes list
+                const nodesSpan = card.querySelectorAll('.space-y-2 > div')[1]?.querySelector('span');
+                if (nodesSpan && locationData.nodes) {
+                    nodesSpan.textContent = locationData.nodes.map(n => n.name).join(', ') || 'No nodes';
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Failed to fetch dynamic locations:', error);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Fetch dynamic location data on page load
+    fetchDynamicLocations();
+    
     // Populate categories dynamically
     const categorySelect = document.getElementById('category-select');
     const images = <%- JSON.stringify(images) %>;

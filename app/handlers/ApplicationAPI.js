@@ -251,11 +251,15 @@ class PterodactylApplicationModule {
 
   // ==================== NODES ====================
 
-  async listNodes(page = 1, perPage = 50) {
+  async listNodes(page = 1, perPage = 50, include = []) {
     try {
+      const params = { page, per_page: perPage };
+      if (include.length > 0) {
+        params.include = include.join(',');
+      }
       const response = await axios.get(`${this.apiUrl}/api/application/nodes`, {
         headers: this.getHeaders(),
-        params: { page, per_page: perPage }
+        params
       });
       return response.data;
     } catch (error) {
@@ -264,10 +268,15 @@ class PterodactylApplicationModule {
     }
   }
 
-  async getNodeDetails(nodeId) {
+  async getNodeDetails(nodeId, include = []) {
     try {
+      const params = {};
+      if (include.length > 0) {
+        params.include = include.join(',');
+      }
       const response = await axios.get(`${this.apiUrl}/api/application/nodes/${nodeId}`, {
-        headers: this.getHeaders()
+        headers: this.getHeaders(),
+        params
       });
       return response.data;
     } catch (error) {
@@ -308,6 +317,19 @@ class PterodactylApplicationModule {
       return response.data;
     } catch (error) {
       this.logError('Error deleting node:', error);
+      throw error;
+    }
+  }
+
+  async getNodeAllocations(nodeId, page = 1, perPage = 1000) {
+    try {
+      const response = await axios.get(`${this.apiUrl}/api/application/nodes/${nodeId}/allocations`, {
+        headers: this.getHeaders(),
+        params: { page, per_page: perPage }
+      });
+      return response.data;
+    } catch (error) {
+      this.logError('Error fetching node allocations:', error);
       throw error;
     }
   }

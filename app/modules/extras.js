@@ -21,12 +21,49 @@ const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 const { getAppAPI } = require('../handlers/pterodactylSingleton.js');
+const { getLocationService } = require('../handlers/LocationService.js');
 const NodeCache = require("node-cache");
 
 module.exports.load = async function(router, db) {
   const AppAPI = getAppAPI();
+  const locationService = getLocationService();
   const myCache = new NodeCache({ stdTTL: 60, checkperiod: 10 });
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
+
+  // Dynamic locations endpoint
+  router.get("/locations", async (req, res) => {
+    try {
+      const locations = await locationService.getLocations();
+      res.json(locations);
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+      res.status(500).json({ error: 'Failed to fetch locations' });
+    }
+  });
+
+  // Get capacity for a specific node
+  router.get("/locations/node/:nodeId/capacity", async (req, res) => {
+    try {
+      const nodeId = parseInt(req.params.nodeId);
+      const capacity = await locationService.getNodeCapacity(nodeId);
+      if (!capacity) {
+        return res.status(404).json({ error: 'Node not found' });
+      }
+      res.json(capacity);
+    } catch (error) {
+      console.error('Error fetching node capacity:', error);
+      res.status(500).json({ error: 'Failed to fetch node capacity' });
+    }
+  });
+
+  // Clear location cache (admin only)
+  router.post("/locations/cache/clear", authMiddleware, async (req, res) => {
+    if (!req.session.userinfo?.root_admin) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    locationService.clearCache();
+    res.json({ success: true, message: 'Location cache cleared' });
+  });
 
   router.get("/stats", async (req, res) => {
     try {

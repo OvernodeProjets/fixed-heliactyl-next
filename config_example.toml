@@ -217,22 +217,19 @@ is_default = false
       "0000000000000000000" = "2"
 
 # --- Locations ---
-  [api.client.locations.1]
-  name = "France, FR"
-  country = "France"
-  flag = "https://cdn-icons-png.flaticon.com/512/197/197560.png"
-  region = "eu-west"
-  capacity = 100
-  cpu = "Intel Xeon & AMD Ryzen"
-  storage = "1 TB SSD"
+# To enable dynamic discovery, ensure your locations and nodes are correctly configured in Pterodactyl.
+# The dashboard will automatically fetch nodes, slots, and disk capacity from the API.
+# You can still override specific display names or flags here if needed.
 
-  [[api.client.locations.1.nodes]]
-  name = "fr.mrs.1"
-  id = 1
-
-  [[api.client.locations.1.nodes]]
-  name = "fr.mrs.2"
-  id = 2
+# Example Location (ID: 1)
+# Note: "capacity" and "nodes" are now optional/auto-discovered
+[api.client.locations.1]
+name = "France, FR"
+short = "fr"
+country = "France"
+region = "eu-south"
+flag = "https://cdn-icons-png.flaticon.com/512/197/197560.png"
+cpu = "Ampere"
 
 # --- Egg Templates ---
 [api.client.eggs.velocity]
