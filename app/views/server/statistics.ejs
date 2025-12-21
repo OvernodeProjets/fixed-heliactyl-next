@@ -82,7 +82,7 @@
             <h3 class="text-gray-400 text-sm font-medium"><%= __('server.statistics.network_traffic') %></h3>
             <div class="mt-2 flex items-baseline">
                 <p class="text-2xl font-semibold text-white" id="network-usage">0 B/s</p>
-                <p class="ml-2 text-sm text-gray-400 hidden" id="network-trend"></p>
+                <p class="ml-2 text-sm text-gray-400" id="network-trend"></p>
             </div>
             <div class="mt-3 h-[60px]">
                 <canvas id="network-chart"></canvas>
@@ -94,7 +94,7 @@
             <h3 class="text-gray-400 text-sm font-medium"><%= __('server.statistics.disk_usage') %></h3>
             <div class="mt-2 flex items-baseline">
                 <p class="text-2xl font-semibold text-white" id="disk-usage">0 MB</p>
-                <p class="ml-2 text-sm text-gray-400 hidden" id="disk-total"></p>
+                <p class="ml-2 text-sm text-gray-400" id="disk-total"></p>
             </div>
             <div class="mt-3 h-[60px]">
                 <canvas id="disk-chart"></canvas>
@@ -216,7 +216,7 @@ const charts = {
                 },
                 y: {
                     beginAtZero: true,
-                    max: 100,
+                    suggestedMax: 100,
                     ticks: {
                         callback: value => `${value}%`
                     }
@@ -227,8 +227,7 @@ const charts = {
                 legend: {
                     position: 'top',
                     labels: {
-                        usePointStyle: true,
-                        boxWidth: 6
+                        usePointStyle: true
                     }
                 }
             }
@@ -273,8 +272,7 @@ const charts = {
                 legend: {
                     position: 'top',
                     labels: {
-                        usePointStyle: true,
-                        boxWidth: 6
+                        usePointStyle: true
                     }
                 }
             }
@@ -282,12 +280,30 @@ const charts = {
     })
 };
 
+let disk_limit_megabytes;
+let cpu_limit;
+
+try {
+  // Gets the disk_limit_megabytes as it is provided in megabytes
+  fetch(`/api/server/${serverId}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === "suspended") return;
+      disk_limit_megabytes = data.attributes.limits.disk;
+      cpu_limit = data.attributes.limits.cpu;
+  })
+} catch(error) {
+  console.log('Error fetching stats: ' + error);
+  showAlert('error', 'Error', 'Failed to fetch server stats. Please try refreshing the page.');
+}
+
 // Modify the updateMetrics function to use simple indices instead of timestamps
 let dataIndex = 0;
 
 function updateMetrics(stats) {
     // Update CPU
     document.getElementById('cpu-usage').textContent = `${stats.cpu_absolute.toFixed(1)}%`;
+    document.getElementById('cpu-trend').textContent = `/ ${cpu_limit.toFixed(1)}%`;
     metricsHistory.cpu.push(stats.cpu_absolute);
     metricsHistory.cpu.shift();
     charts.cpu.data.datasets[0].data = [...metricsHistory.cpu];
@@ -311,9 +327,10 @@ function updateMetrics(stats) {
     charts.network.update();
 
     // Update Disk
-    const diskPercentage = (stats.disk_bytes / stats.disk_limit_bytes) * 100;
+    const disk_limit_bytes = disk_limit_megabytes * 1024 * 1024;
+    const diskPercentage = (stats.disk_bytes / disk_limit_bytes) * 100;
     document.getElementById('disk-usage').textContent = formatBytes(stats.disk_bytes);
-    document.getElementById('disk-total').textContent = `/ ${formatBytes(stats.disk_limit_bytes)}`;
+    document.getElementById('disk-total').textContent = `/ ${formatBytes(disk_limit_bytes)}`;
     metricsHistory.disk.push(diskPercentage);
     metricsHistory.disk.shift();
     charts.disk.data.datasets[0].data = [...metricsHistory.disk];
