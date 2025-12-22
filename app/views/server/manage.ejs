@@ -648,22 +648,6 @@ function handleWebSocketMessage(event) {
 }
 
 function displayStatusUpdate(status) {
-    let statusColor;
-    switch (status) {
-        case 'running':
-            statusColor = '#a1a1a1';
-            break;
-        case 'stopping':
-        case 'starting':
-            statusColor = '#a1a1a1';
-            break;
-        case 'offline':
-            statusColor = '#a1a1a1';
-            break;
-        default:
-            statusColor = '#a1a1a1';
-    }
-
     const statusMessage = `<%= settings.name %> Your server's status is now: ${(status.replace('offline', 'powered off')).replace('running', 'powered on')}`;
     appendToConsole(statusMessage, true);
 }
