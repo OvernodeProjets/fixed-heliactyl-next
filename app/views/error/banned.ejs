@@ -6,36 +6,8 @@
     <title><%= settings.name %> - <%= __('errors.banned.title') %></title>
     <link rel="stylesheet" href="./assets/tailwind.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .error-code {
-            font-family: 'Fira Code', 'Courier New', monospace;
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            margin-top: 1.5rem;
-            background: linear-gradient(145deg, #f3f4f6, #e5e7eb);
-            box-shadow: inset 0 1px 2px rgba(255,255,255,0.6),
-                        0 2px 6px rgba(0,0,0,0.08);
-            position: relative;
-        }
-        .error-code::before {
-            content: "<%= __('errors.common.account_details_label') %>";
-            position: absolute;
-            top: -12px;
-            left: 1rem;
-            background-color: #111827;
-            color: white;
-            font-size: 0.7rem;
-            letter-spacing: 0.05em;
-            padding: 0.15rem 0.5rem;
-            border-radius: 0.375rem;
-            text-transform: uppercase;
-        }
-    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-100 min-h-screen flex flex-col font-['Inter']">
     <main class="flex-grow flex items-center justify-center p-8">
         <div class="py-8 px-6 md:py-12 md:px-8 max-w-xl w-full">
             <div class="flex justify-center mb-8">
@@ -47,11 +19,12 @@
                 <%= __('errors.banned.description') %>
             </p>
 
-            <div class="error-code bg-gray-200/50 text-sm text-gray-700 overflow-auto">
-<pre><code>
-<%= __('errors.banned.reason') %>: <%= banReason %>
-<%= __('errors.banned.expiration') %>: <%= banExpiration ? new Date(banExpiration).toLocaleString() : __('errors.banned.permanent') %>
-</code></pre>
+            <div class="relative mt-6">
+                <span class="absolute -top-3 left-4 bg-gray-900 text-gray-700 text-xs uppercase tracking-wide px-2 py-0.5 rounded-md font-bold"><%= __('errors.common.account_details_label') %></span>
+                <div class="bg-gray-200/50 rounded-xl p-5 pt-6 min-h-[60px] max-h-[200px] overflow-auto shadow-inner">
+                    <pre class="m-0 whitespace-pre-wrap break-words font-mono text-sm text-gray-700"><code><%= __('errors.banned.reason') %>: <%= banReason %>
+<%= __('errors.banned.expiration') %>: <%= banExpiration ? new Date(banExpiration).toLocaleString() : __('errors.banned.permanent') %></code></pre>
+                </div>
             </div>
 
             <div class="mt-8 text-center">
