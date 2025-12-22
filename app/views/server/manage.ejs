@@ -472,7 +472,7 @@ display:none;
     </div>
 </main>
 
-<script>
+<script type="module">
 const serverId = new URLSearchParams(window.location.search).get('id');
 let socket;
 let serverStatus = 'offline';
@@ -791,6 +791,24 @@ function smoothScrollConsole() {
     });
 }
 
+let disk_limit_megabytes;
+let cpu_limit;
+
+try {
+  // Gets the server stats as it is provided in megabytes
+  const response = await fetch(`/api/server/${serverId}`);
+  
+  if (!response.ok) console.log('Could not fetch stats: ' + response.status);
+  
+  const data = await response.json();
+  
+  disk_limit_megabytes = data.attributes.limits.disk;
+  cpu_limit = data.attributes.limits.cpu;
+} catch(error) {
+  console.log('Error fetching stats: ' + error);
+  showAlert('error', 'Error', 'Failed to fetch server stats. Please try refreshing the page.');
+}
+
 function updateStats(stats) {
     const cpuUsage = (stats.cpu_absolute).toFixed(2);
     const ramUsage = (stats.memory_bytes / 1024 / 1024).toFixed(2);
@@ -811,9 +829,9 @@ function updateStats(stats) {
     if (mobileRamElement) mobileRamElement.textContent = `${ramUsage} MB`;
     if (mobileDiskElement) mobileDiskElement.textContent = `${diskUsage} MB`;
 
-    updateUsageBar('cpu', cpuUsage, '%');
+    updateUsageBar('cpu', cpuUsage, '%', cpu_limit);
     updateUsageBar('ram', ramUsage, 'MB', stats.memory_limit_bytes / 1024 / 1024);
-    updateUsageBar('disk', diskUsage, 'MB', stats.disk_limit_bytes / 1024 / 1024);
+    updateUsageBar('disk', diskUsage, 'MB', disk_limit_megabytes);
     updateUsageBar('network', networkUsage, 'KB', networkUsage*100);
 }
 
@@ -1208,7 +1226,7 @@ function initPage() {
     setInterval(checkRenewalStatus, 60000);
 }
 
-document.addEventListener('DOMContentLoaded', initPage);
+if (document.readyState !== "loading") initPage();
 </script>
 
 <script>
