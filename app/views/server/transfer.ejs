@@ -102,7 +102,7 @@
 
     <!-- Update the modal content to include a spinner state -->
     <div id="confirmation-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-        <div class="bg-[#0e0e10] rounded-xl p-8 max-w-md w-full mx-4">
+        <div class="bg-[#0e0e10] rounded-xl p-8 w-[85%] md:w-[50%] mx-4">
             <div class="flex flex-col items-center text-center">
                 <!-- This is the warning icon that shows by default -->
                 <div id="modal-icon-warning">
@@ -118,7 +118,7 @@
                     </svg>
                 </div>
                 <h3 class="text-xl font-semibold mt-4 text-white" id="modal-title"></h3>
-                <p class="text-gray-300 mt-2" id="modal-message"></p>
+                <p class="break-all text-gray-300 mt-2" id="modal-message"></p>
                 <div class="w-full border-t border-white/10 my-6"></div>
                 <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4 w-full">
                     <button id="modal-cancel" class="w-full sm:w-auto bg-white/10 hover:bg-white/15 text-white font-medium py-2 px-6 rounded-lg transition">

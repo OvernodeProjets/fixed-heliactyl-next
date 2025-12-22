@@ -342,7 +342,7 @@ display:none;
                         <h2 class="text-xl font-semibold heavy"><%= __('server.manage.renewal_title') %></h2>
                         <span class="text-gray-300 text-sm mt-1"><%= __('server.manage.renewal_subtitle') %></span>
                     </div>
-                    <div id="renewal-badge" class="hidden px-3 py-1 rounded-full text-sm font-medium">
+                    <div id="renewal-badge" class="hidden ml-3 px-3 py-1 rounded-full text-[.7em] md:text-sm font-medium text-white">
                     </div>
                 </div>
             
@@ -368,7 +368,7 @@ display:none;
                     </div>
                     <div class="mt-4">
                         <div class="w-full bg-white/10 rounded-2xl h-2">
-                            <div id="renewal-progress-bar" class="bg-emerald-600 h-2 rounded-full transition-all" style="width: 100%"></div>
+                            <div id="renewal-progress-bar" class="bg-emerald-600 h-2 rounded-full transition-all" style="width: 0"></div>
                         </div>
                     </div>
                 </div>
@@ -1115,17 +1115,21 @@ async function checkRenewalStatus() {
             renewalBadge.classList.remove('hidden');
             
             if (data.isExpired) {
-                renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-red-600 text-white';
+                renewalBadge.classList.add('bg-red-600');
+                renewalBadge.classList.remove('bg-yellow-600', 'bg-indigo-500', 'bg-emerald-600');
                 renewalBadge.textContent = '<%= __('server.manage.expired') %>';
             } else if (data.timeRemaining.hours <= 6) {
-                renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-yellow-600 text-white';
+                renewalBadge.classList.add('bg-yellow-600');
+                renewalBadge.classList.remove('bg-red-600', 'bg-indigo-500', 'bg-emerald-600');
                 renewalBadge.textContent = '<%= __('server.manage.renewal_required_soon') %>';
             } else {
-                renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-indigo-500 text-white';
+                renewalBadge.classList.add('bg-indigo-500');
+                renewalBadge.classList.remove('bg-red-600', 'bg-yellow-600', 'bg-emerald-600');
                 renewalBadge.textContent = '<%= __('server.manage.renewal_available') %>';
             }
             } else if (data.timeRemaining.hours >= 50) {
-                renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-emerald-600 text-white';
+                renewalBadge.classList.add('bg-emerald-600');
+                renewalBadge.classList.remove('bg-red-600', 'bg-yellow-600', 'bg-indigo-500');
                 renewalBadge.textContent = '<%= __('server.manage.renewal_bypass') %>';
         } else {
             renewButton.classList.add('hidden');
