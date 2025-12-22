@@ -914,7 +914,7 @@ function createFileRow(name, type, mimetype, size, modified) {
     row.className = 'file-row';
     const isArchive = type === 'file' && archiveExtensions.some(ext => name.toLowerCase().endsWith(ext));
     const iconClass = type === 'file' ? (isArchive ? 'archive' : 'file') : 'folder';
-    const formattedSize = type === 'file' ? formatFileSize(size) : '-';
+    const formattedSize = type === 'file' && size ? formatFileSize(size) : '-';
     const formattedDate = modified ? new Date(modified).toLocaleString() : '-';
     const fileType = type === 'directory' ? 'Folder' : (name.split('.').pop().toUpperCase() + ' File');
 
@@ -989,7 +989,7 @@ function createFileCard(name, type, mimetype, size) {
     card.className = 'file-card relative bg-white/5 p-4 rounded-lg transition-all duration-200 hover:bg-white/10 cursor-pointer hover:scale-95';
     const isArchive = type === 'file' && archiveExtensions.some(ext => name.toLowerCase().endsWith(ext));
     const iconClass = type === 'file' ? (isArchive ? 'archive' : 'file') : 'folder';
-    const formattedSize = type === 'file' ? formatFileSize(size) : '';
+    const formattedSize = type === 'file' && size ? formatFileSize(size) : '';
 
     card.innerHTML = `
         <div class="absolute top-2 left-2">
