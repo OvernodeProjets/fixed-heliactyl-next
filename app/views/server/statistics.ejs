@@ -123,7 +123,7 @@
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1/build/global/luxon.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.0.0"></script>
 
-<script>
+<script type="module">
 let serverId = '<%- req.query.id %>'
 // Configuration and utilities
 const MAX_HISTORY = 150;
@@ -182,6 +182,26 @@ function createMiniChart(elementId, color) {
     });
 }
 
+let disk_limit_megabytes;
+let memory_limit_megabytes;
+let cpu_limit;
+
+try {
+  // Gets the server stats as it is provided in megabytes
+  const response = await fetch(`/api/server/${serverId}`);
+  
+  if (!response.ok) console.log('Could not fetch stats: ' + response.status);
+  
+  const data = await response.json();
+  
+  disk_limit_megabytes = data.attributes.limits.disk;
+  cpu_limit = data.attributes.limits.cpu;
+  memory_limit_megabytes = data.attributes.limits.memory;
+} catch(error) {
+  console.log('Error fetching stats: ' + error);
+  showAlert('error', 'Error', 'Failed to fetch server stats. Please try refreshing the page.');
+}
+
 const charts = {
     cpu: createMiniChart('cpu-chart', 'rgb(129, 140, 248)'),
     memory: createMiniChart('memory-chart', 'rgb(52, 211, 153)'),
@@ -216,7 +236,7 @@ const charts = {
                 },
                 y: {
                     beginAtZero: true,
-                    suggestedMax: 100,
+                    suggestedMax: Math.min(cpu_limit, 100),
                     ticks: {
                         callback: value => `${value}%`
                     }
@@ -280,23 +300,6 @@ const charts = {
     })
 };
 
-let disk_limit_megabytes;
-let cpu_limit;
-
-try {
-  // Gets the disk_limit_megabytes as it is provided in megabytes
-  fetch(`/api/server/${serverId}`)
-    .then(response => response.json())
-    .then(data => {
-      if (data.status === "suspended") return;
-      disk_limit_megabytes = data.attributes.limits.disk;
-      cpu_limit = data.attributes.limits.cpu;
-  })
-} catch(error) {
-  console.log('Error fetching stats: ' + error);
-  showAlert('error', 'Error', 'Failed to fetch server stats. Please try refreshing the page.');
-}
-
 // Modify the updateMetrics function to use simple indices instead of timestamps
 let dataIndex = 0;
 
@@ -310,9 +313,10 @@ function updateMetrics(stats) {
     charts.cpu.update();
 
     // Update Memory
-    const memoryPercentage = (stats.memory_bytes / stats.memory_limit_bytes) * 100;
+    const memory_limit_bytes = memory_limit_megabytes * 1024 * 1024;
+    const memoryPercentage = (stats.memory_bytes / memory_limit_bytes) * 100;
     document.getElementById('memory-usage').textContent = formatBytes(stats.memory_bytes);
-    document.getElementById('memory-total').textContent = `/ ${formatBytes(stats.memory_limit_bytes)}`;
+    document.getElementById('memory-total').textContent = `/ ${formatBytes(memory_limit_bytes)}`;
     metricsHistory.memory.push(memoryPercentage);
     metricsHistory.memory.shift();
     charts.memory.data.datasets[0].data = [...metricsHistory.memory];
@@ -421,7 +425,7 @@ function connectWebSocket() {
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState !== "loading") {
     // Load server details
     fetch(`/api/server/${serverId}`)
         .then(response => response.json())
@@ -443,6 +447,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }));
         }
     }, 1000);
-});
+}
 </script>
 <%- include('../components/bottom') %>
