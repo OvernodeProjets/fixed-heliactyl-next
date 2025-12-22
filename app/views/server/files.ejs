@@ -96,13 +96,10 @@
             display: none !important;
         }
         
-        /* Mass actions bar - full width on mobile */
         #mass-actions-bar {
-            left: 1rem !important;
-            right: 1rem !important;
-            transform: none !important;
-            border-radius: 1rem !important;
+            border-radius: 1rem;
         }
+
         #mass-actions-bar .flex.items-center.space-x-4 {
             flex-direction: column !important;
             gap: 0.5rem !important;
@@ -113,12 +110,11 @@
         
         /* Modal improvements */
         .modal-content {
-            width: 95% !important;
             max-height: 85vh !important;
             padding: 1rem !important;
         }
         #file-edit-modal .modal-content {
-            width: 98% !important;
+            width: 95% !important;
             height: 90% !important;
         }
     }
@@ -147,7 +143,6 @@
         background-color: #1a1c20;
         padding: 2rem;
         border-radius: 0.5rem;
-        max-width: 90%;
         max-height: 90%;
         overflow: auto;
         transform: scale(0.9);
@@ -534,7 +529,7 @@
 <!-- File Edit Modal -->
 <div id="file-edit-modal" class="modal-overlay z-[70]">
     <div class="modal-content w-3/4 h-3/4 flex flex-col">
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex justify-between items-center mb-4 truncate">
             <h3 class="text-xl font-semibold" id="modal-title"><%= __('server.files.modal_edit_file') %></h3>
             <button id="close-modal" class="text-gray-500 hover:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -551,7 +546,7 @@
 
 <!-- Create Folder Modal -->
 <div id="create-folder-modal" class="modal-overlay z-50">
-    <div class="modal-content">
+    <div class="modal-content w-[85%] md:w-[50%]">
         <h3 class="text-xl font-semibold mb-4"><%= __('server.files.modal_create_folder') %></h3>
         <input type="text" id="new-folder-name" class="w-full p-2 mb-4 bg-white/5 border border-white/5 focus:ring-2 focus:ring-indigo-500 focus:border-white/5 text-white rounded-lg" placeholder="<%= __('server.files.folder_name') %>">
         <div class="flex justify-end">
@@ -583,7 +578,7 @@
 
 <!-- New File Modal -->
 <div id="new-file-modal" class="modal-overlay z-50">
-    <div class="modal-content">
+    <div class="modal-content w-[85%] md:w-[50%]">
         <h3 class="text-xl font-semibold mb-4">Create New File</h3>
         <input type="text" id="new-file-name" class="w-full p-2 mb-4 bg-white/5 border border-white/5 focus:ring-2 focus:ring-indigo-500 focus:border-white/5 text-white rounded-lg" placeholder="File Name">
         <div class="flex justify-end">
@@ -596,15 +591,15 @@
 <!-- Context Menu -->
 <div id="context-menu" class="context-menu z-50 bg-white/5 backdrop-blur" style="display: none;">
     <div class="context-menu-item hover:bg-white/5" id="context-menu-edit"><%= __('server.files.context_edit') %></div>
-    <div class="context-menu-item hover:bg-white/5" id="context-menu-delete"><%= __('server.files.context_delete') %></div>
     <div class="context-menu-item hover:bg-white/5" id="context-menu-rename"><%= __('server.files.context_rename') %></div>
     <div class="context-menu-item hover:bg-white/5" id="context-menu-download"><%= __('server.files.context_download') %></div>
     <div class="context-menu-item hover:bg-white/5" id="context-menu-clone"><%= __('server.files.context_clone') %></div>
     <div class="context-menu-item hover:bg-white/5" id="context-menu-decompress"><%= __('server.files.context_unarchive') %></div>
+    <div class="context-menu-item bg-red-500 hover:bg-white/5" id="context-menu-delete"><%= __('server.files.context_delete') %></div>
 </div>
 
 <div id="upload-progress-modal" class="modal-overlay backdrop-blur z-50">
-    <div class="modal-content w-96">
+    <div class="modal-content w-[85%] md:w-[50%]">
         <h3 class="text-xl font-semibold mb-4"><%= __('server.files.uploading_files') %></h3>
         <div id="upload-progress-container" class="space-y-4">
             <!-- Progress bars will be added here dynamically -->
@@ -922,7 +917,7 @@ function createFileRow(name, type, mimetype, size, modified) {
         <div class="flex items-center justify-center">
             <input type="checkbox" class="form-checkbox h-4 w-4 text-indigo-500 rounded focus:ring-indigo-500" data-name="${name}">
         </div>
-        <div class="file-name-cell">
+        <div class="file-name-cell md:w-[90%]">
             <div class="file-icon-small">${getFileIcon(iconClass)}</div>
             <span>${name}</span>
         </div>
@@ -1297,8 +1292,8 @@ function openFileEditor(fileName) {
     const modal = document.getElementById('file-edit-modal');
     modal.querySelector('.modal-content').className = 'modal-content editor-modal';
     modal.querySelector('.modal-content').innerHTML = `
-        <div class="editor-header">
-            <div class="editor-title-section">
+        <div class="editor-header flex gap-y-5 flex-col md:flex-row">
+            <div class="editor-title-section w-full truncate">
                 <div class="file-icon-small">${getFileIcon('file')}</div>
                 <h3 class="editor-title">${fileName}</h3>
             </div>

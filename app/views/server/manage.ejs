@@ -12,7 +12,6 @@
   }
   #console-output {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
     line-height: 1.2;
   }
   .console-line {
@@ -200,8 +199,10 @@ display:none;
             </button>
             <div onclick="window.location.href='/server/settings?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>'" style="font-family: 'Inter'; width: 6.5rem;" class="h-12 hover:bg-white/10 hover:scale-95 cursor-pointer bg-white/5 transition rounded-lg flex pt-4 justify-center p-1 text-xs">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 text-white/50 inline-flex mr-0.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0 0 15 0m-15 0a7.5 7.5 0 1 1 15 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077 1.41-.513m14.095-5.13 1.41-.513M5.106 17.785l1.15-.964m11.49-9.642 1.149-.964M7.501 19.795l.75-1.3m7.5-12.99.75-1.3m-6.063 16.658.26-1.477m2.605-14.772.26-1.477m0 17.726-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205 12 12m6.894 5.785-1.149-.964M6.256 7.178l-1.15-.964m15.352 8.864-1.41-.513M4.954 9.435l-1.41-.514M12.002 12l-3.75 6.495" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                 </svg>
+
                 Settings
             </div>
         </div>
@@ -283,11 +284,11 @@ display:none;
                 <h2 class="text-xl font-semibold heavy"><%= __('server.manage.console') %></h2>
                 <span class="text-gray-300 text-sm mt-1 mb-4"><%= __('server.manage.console_hint') %></span>
                 <div class="border-t border-white/5 mt-4"></div>
-                <div style="height: 30rem;" id="console-output" class="bg-black/20 p-4 rounded-xl border border-white/5 shadow-sm scrollbar-hide mt-4 overflow-y-auto mb-4 font-mono text-sm">
+                <div style="height: 30rem;" id="console-output" class="bg-black/20 p-4 rounded-xl border border-white/5 shadow-sm scrollbar-hide mt-4 overflow-y-auto mb-4 font-mono text-[0.75rem] sm:text-[0.85rem]">
                 </div>
                 <div class="flex border-t border-white/5 pt-4">
-                    <input type="text" id="console-input" class="flex-grow border-none bg-transparent text-white py-2 focus:border-white/5 focus:outline-none focus:ring-2 focus:ring-transparent transition placeholder-white/30" placeholder="container@<%= settings.name %>~">
-                    <button id="send-command" class="bg-indigo-500/15 hover:bg-indigo-500/20 text-indigo-200 font-medium py-2 px-2 sm:px-4 rounded-xl transition duration-300 flex items-center">
+                    <input type="text" id="console-input" class="w-[90%] md:flex-grow border-none bg-transparent text-white py-2 pr-2 focus:border-white/5 focus:outline-none focus:ring-2 focus:ring-transparent transition placeholder-white/30" placeholder="container@<%= settings.name %>~">
+                    <button id="send-command" class="flex bg-indigo-500/15 hover:bg-indigo-500/20 text-indigo-200 font-medium py-2 px-2 sm:px-4 rounded-xl transition duration-300 items-center">
                         <span class="hidden sm:inline mr-1"><%= __('server.manage.send_command') %></span>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
@@ -296,7 +297,7 @@ display:none;
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-white/5 rounded-l-2xl rounded-lg p-6">
                     <h3 class="text-sm font-semibold mb-2 text-white/60"><%= __('server.manage.cpu_usage') %></h3>
                     <div class="flex items-center">
@@ -341,12 +342,12 @@ display:none;
                         <h2 class="text-xl font-semibold heavy"><%= __('server.manage.renewal_title') %></h2>
                         <span class="text-gray-300 text-sm mt-1"><%= __('server.manage.renewal_subtitle') %></span>
                     </div>
-                    <div id="renewal-badge" class="hidden px-3 py-1 rounded-full text-sm font-medium">
+                    <div id="renewal-badge" class="hidden ml-3 px-3 py-1 rounded-full text-[.7em] md:text-sm font-medium text-white">
                     </div>
                 </div>
             
                 <div class="bg-white/5 rounded-xl p-4 mb-4">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col md:flex-row gap-y-2 items-center justify-between">
                         <div class="flex items-center space-x-3">
                             <div class="bg-white/10 rounded-xl p-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-300">
@@ -367,7 +368,7 @@ display:none;
                     </div>
                     <div class="mt-4">
                         <div class="w-full bg-white/10 rounded-2xl h-2">
-                            <div id="renewal-progress-bar" class="bg-emerald-600 h-2 rounded-full transition-all" style="width: 100%"></div>
+                            <div id="renewal-progress-bar" class="bg-emerald-600 h-2 rounded-full transition-all" style="width: 0"></div>
                         </div>
                     </div>
                 </div>
@@ -418,8 +419,10 @@ display:none;
                 </button>
                 <div onclick="window.location.href='/server/settings?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>'" style="font-family: 'Inter'; width: 6.5rem;" class=" h-12 hover:bg-white/10 hover:scale-95 cursor-pointer bg-white/5 transition rounded-lg flex pt-4 justify-center p-1 text-xs">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 text-white/50 inline-flex mr-0.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0 0 15 0m-15 0a7.5 7.5 0 1 1 15 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077 1.41-.513m14.095-5.13 1.41-.513M5.106 17.785l1.15-.964m11.49-9.642 1.149-.964M7.501 19.795l.75-1.3m7.5-12.99.75-1.3m-6.063 16.658.26-1.477m2.605-14.772.26-1.477m0 17.726-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205 12 12m6.894 5.785-1.149-.964M6.256 7.178l-1.15-.964m15.352 8.864-1.41-.513M4.954 9.435l-1.41-.514M12.002 12l-3.75 6.495" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                     </svg>
+
                     Settings
                 </div>
             </div>
@@ -1119,17 +1122,21 @@ async function checkRenewalStatus() {
             renewalBadge.classList.remove('hidden');
             
             if (data.isExpired) {
-                renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-red-600 text-white';
+                renewalBadge.classList.add('bg-red-600');
+                renewalBadge.classList.remove('bg-yellow-600', 'bg-indigo-500', 'bg-emerald-600');
                 renewalBadge.textContent = '<%= __('server.manage.expired') %>';
             } else if (data.timeRemaining.hours <= 6) {
-                renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-yellow-600 text-white';
+                renewalBadge.classList.add('bg-yellow-600');
+                renewalBadge.classList.remove('bg-red-600', 'bg-indigo-500', 'bg-emerald-600');
                 renewalBadge.textContent = '<%= __('server.manage.renewal_required_soon') %>';
             } else {
-                renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-indigo-500 text-white';
+                renewalBadge.classList.add('bg-indigo-500');
+                renewalBadge.classList.remove('bg-red-600', 'bg-yellow-600', 'bg-emerald-600');
                 renewalBadge.textContent = '<%= __('server.manage.renewal_available') %>';
             }
             } else if (data.timeRemaining.hours >= 50) {
-                renewalBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-emerald-600 text-white';
+                renewalBadge.classList.add('bg-emerald-600');
+                renewalBadge.classList.remove('bg-red-600', 'bg-yellow-600', 'bg-indigo-500');
                 renewalBadge.textContent = '<%= __('server.manage.renewal_bypass') %>';
         } else {
             renewButton.classList.add('hidden');

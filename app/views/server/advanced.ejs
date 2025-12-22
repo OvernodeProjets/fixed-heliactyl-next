@@ -18,8 +18,6 @@
         background-color: #1a1c20;
         padding: 2rem;
         border-radius: 0.5rem;
-        max-width: 50%;
-        max-height: 90%;
         overflow: auto;
         transform: scale(0.9);
         opacity: 0;
@@ -114,7 +112,7 @@
 
 <!-- Edit Variable Modal -->
 <div id="edit-variable-modal" class="modal-overlay z-50">
-    <div class="modal-content w-full max-w-md">
+    <div class="modal-content max-w-[85%] md:max-w-[50%] max-h-[70%]">
         <h3 class="text-xl font-semibold mb-4" id="modal-title"><%= __('server.advanced.edit_variable') %></h3>
         <input type="text" id="variable-name" class="w-full p-2 mb-2 bg-white/5 border-none outline-none ring-none transition focus:ring-2 focus:ring-indigo-500 text-white rounded" readonly>
         <input type="text" id="variable-value" class="w-full p-2 mb-4 bg-white/5 border-none outline-none ring-none transition focus:ring-2 focus:ring-indigo-500 text-white rounded" placeholder="<%= __('server.advanced.variable_value') %>">
@@ -169,13 +167,13 @@
             <div class="flex justify-between items-center">
                 <div>
                     <h3 class="text-lg font-semibold">${variable.name}</h3>
-                    <p class="text-sm text-gray-400">${variable.description}</p>
+                    <p class="text-sm text-gray-400 mt-3">${variable.description}</p>
                 </div>
-                <button class="edit-variable bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-1.5 px-4 rounded-full transition" data-key="${variable.env_variable}">
+                <button class="edit-variable ml-5 bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-1.5 px-4 rounded-full transition" data-key="${variable.env_variable}">
                     ${t.edit}
                 </button>
             </div>
-            <div class="mt-2">
+            <div class="mt-2 truncate w-[85%]">
                 <span class="text-sm font-medium text-gray-400">${t.currentValue}</span>
                 <span class="text-sm ml-2">${variable.server_value}</span>
             </div>
