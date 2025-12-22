@@ -963,6 +963,12 @@ function setupFileElementEvents(element, name, type) {
         });
     }
 
+    element.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        showContextMenu(e, name, type === 'file');
+    });
+
     element.addEventListener('click', (e) => {
         console.log('Element clicked');
         if (e.target.type === 'checkbox') {
