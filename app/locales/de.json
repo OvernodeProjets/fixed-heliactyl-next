@@ -302,7 +302,8 @@
     "subtitle": "Verwalten Sie Ressourcen und Abos mit {{currency}}",
     "tabs": {
       "store": "Shop",
-      "history": "Historie"
+      "history": "Historie",
+      "usage": "Usage"
     },
     "resources": {
       "ram": "RAM",

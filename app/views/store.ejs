@@ -45,6 +45,9 @@
             <button @click="activeTab = 'store'" :class="{'border-indigo-500 text-white': activeTab === 'store', 'border-transparent text-gray-400 hover:text-white': activeTab !== 'store'}" class="border-b-2 py-4 px-1 text-sm font-medium transition-colors duration-200">
                 <%= __("store.tabs.store") %>
             </button>
+            <button @click="activeTab = 'usage'" :class="{'border-indigo-500 text-white': activeTab === 'usage', 'border-transparent text-gray-400 hover:text-white': activeTab !== 'usage'}" class="border-b-2 py-4 px-1 text-sm font-medium transition-colors duration-200">
+                <%= __("store.tabs.usage") %>
+            </button>
             <button @click="activeTab = 'history'" :class="{'border-indigo-500 text-white': activeTab === 'history', 'border-transparent text-gray-400 hover:text-white': activeTab !== 'history'}" class="border-b-2 py-4 px-1 text-sm font-medium transition-colors duration-200">
                 <%= __("store.tabs.history") %>
             </button>
@@ -219,8 +222,15 @@
     <div x-show="activeTab === 'usage'" x-cloak>
         <div class="mt-4 space-y-4">
             <div class="bg-white/5 rounded-2xl p-6">
-                <h3 class="text-lg font-medium mb-4"><%= __('store.ui.resources') %></h3>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-lg font-medium"><%= __('store.ui.resources') %></h3>
+                  <select x-model="usageDays" @change="fetchUsageHistory()" class="bg-white/5 text-sm rounded-lg px-3 py-2 border border-white/10">
+                    <option value="7">Last 7 days</option>
+                    <option value="14">Last 14 days</option>
+                    <option value="30">Last 30 days</option>
+                  </select>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <template x-for="(data, type) in currentUsage" :key="type">
                         <div class="bg-white/5 rounded-xl p-4">
                             <div class="flex items-center justify-between mb-2">
@@ -231,44 +241,6 @@
                                 <div class="h-2 bg-indigo-500 rounded-full" :style="`width: ${calculateUsagePercentage(type, data)}%`"></div>
                             </div>
                             <div class="text-xs text-gray-400 mt-2" x-text="formatUsageLimit(type)"></div>
-                        </div>
-                    </template>
-                </div>
-            </div>
-
-            <div class="bg-white/5 rounded-2xl p-6 hidden">
-                <div class="flex items-center justify-between mb-4 hidden">
-                    <h3 class="text-lg font-medium">Usage History</h3>
-                    <select x-model="usageDays" @change="fetchUsageHistory()" class="bg-white/5 text-sm hidden rounded-lg px-3 py-2 border border-white/10">
-                        <option value="7">Last 7 days</option>
-                        <option value="14">Last 14 days</option>
-                        <option value="30">Last 30 days</option>
-                    </select>
-                </div>
-                <div class="space-y-4">
-                    <template x-for="usage in usageHistory" :key="usage.timestamp">
-                        <div class="p-4 bg-white/5 rounded-xl">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm font-medium" x-text="formatDate(usage.timestamp)"></span>
-                            </div>
-                            <div class="grid grid-cols-4 gap-4">
-                                <div class="text-sm">
-                                    <span class="text-gray-400"><%= __('store.resources.ram') %>:</span>
-                                    <span x-text="formatBytes(usage.resources.ram)"></span>
-                                </div>
-                                <div class="text-sm">
-                                    <span class="text-gray-400"><%= __('store.resources.disk') %>:</span>
-                                    <span x-text="formatBytes(usage.resources.disk)"></span>
-                                </div>
-                                <div class="text-sm">
-                                    <span class="text-gray-400"><%= __('store.resources.cpu') %>:</span>
-                                    <span x-text="usage.resources.cpu + '%'"></span>
-                                </div>
-                                <div class="text-sm">
-                                    <span class="text-gray-400"><%= __('store.resources.servers') %>:</span>
-                                    <span x-text="usage.resources.servers"></span>
-                                </div>
-                            </div>
                         </div>
                     </template>
                 </div>
