@@ -7,7 +7,7 @@
         <%- include('../components/server') %>
 
             <div class="flex gap-8 flex-col md:flex-row">
-                <div id="action-blocks" class="w-64 bg-white/5 p-6 rounded-2xl">
+                <div id="action-blocks" class="w-full md:w-64 bg-white/5 p-6 rounded-2xl">
                     <h3 class="text-xl font-semibold text-white mb-6"><%= __('server.automations.available_actions') %></h3>
                     <div class="action-block p-4 bg-indigo-500 shadow-lg rounded-lg mb-4 text-white cursor-pointer transition-transform transform hover:scale-105"
                         draggable="true" data-type="interval">
@@ -53,7 +53,7 @@
                 </div>
 
                 <div id="workspace"
-                    class="sm:flex-1 border border-white/5 p-8 rounded-2xl relative overflow-hidden" style="height: 600px; 
+                    class="sm:flex-1 border border-white/5 p-8 rounded-2xl relative overflow-hidden" style="height: 700px; 
       background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1.5px, transparent 1.5px),
                         radial-gradient(circle, rgba(255, 255, 255, 0.05) 1.5px, transparent 1px);
       background-size: 40px 40px; /* Erhöhte Größe für weniger Punkte */
