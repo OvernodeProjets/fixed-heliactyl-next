@@ -297,9 +297,18 @@ class StoreController {
   router.get('/store/history', authMiddleware, async (req, res) => {
     try {
       const userId = req.session.userinfo.id;
+      const days = req.params.days;
       const history = await db.get(`purchases-${userId}`) || [];
+      let purchaseHistory = history;
       
-      res.json(history);
+      const date = new Date();
+      const sorterValue = date.setDate(date.getDate + days);
+      
+      if (history.length > 0 && days) {
+        purchaseHistory = history.filter(history => sorterValue.getDate() >= history.timestamp);
+      }
+      
+      res.json(purchaseHistory);
     } catch (error) {
       console.error('[ERROR] Failed to fetch purchase history:', error);
       res.status(500).json({ error: 'Internal server error' });

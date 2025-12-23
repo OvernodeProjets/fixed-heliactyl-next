@@ -1,9 +1,5 @@
 <%- include('./components/top') %>
-<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>
-  eruda.init();
-</script>
+
 <main class="flex-grow container mx-auto px-4 py-8" x-data="storeBilling()">
     <!-- Header Section -->
     <div class="flex justify-between items-center w-full mx-auto pb-4">
@@ -484,7 +480,7 @@ function storeBilling() {
 
         async fetchBillingHistory() {
             try {
-                const response = await fetch(`/api/store/history`);
+                const response = await fetch(`/api/store/history?days=${this.historyDays}`);
                 if (!response.ok) throw new Error('Failed to fetch billing history');
                 const data = await response.json();
 
