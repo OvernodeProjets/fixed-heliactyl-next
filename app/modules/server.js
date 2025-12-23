@@ -28,6 +28,41 @@ const fs = require("fs");
 const schedule = require("node-schedule");
 const { requireAuth, ownsServer } = require("../handlers/checkMiddleware.js")
 const { discordLog, serverActivityLog } = require("../handlers/log.js");
+const pterodactylClient = getClientAPI();
+
+/**
+ * Execute a function with a file lock
+ * @param {string} lockPath - Path to the lock directory
+ * @param {Function} fn - Function to execute
+ */
+async function withFileLock(lockName, fn) {
+  const lockDir = path.join(path.dirname(workflowsFilePath), `${lockName}.lock`);
+  const maxRetries = 20; // 2 seconds total wait
+  const retryDelay = 100;
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      fs.mkdirSync(lockDir);
+      // Lock acquired
+      try {
+        return await fn();
+      } finally {
+        try {
+          fs.rmdirSync(lockDir);
+        } catch (e) {
+          console.error(`Failed to remove lock ${lockDir}:`, e);
+        }
+      }
+    } catch (error) {
+      if (error.code === 'EEXIST') {
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+        continue;
+      }
+      throw error;
+    }
+  }
+  throw new Error(`Failed to acquire lock for ${lockName} after ${maxRetries} attempts`);
+}
 
 const workflowsFilePath = path.join(__dirname, "../../storage/workflows.json");
 const scheduledWorkflowsFilePath = path.join(
@@ -37,15 +72,20 @@ const scheduledWorkflowsFilePath = path.join(
 module.exports.load = async function (router, db) {
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
-  const pterodactylClient = getClientAPI();
 
   function saveWorkflowToFile(instanceId, workflow) {
-    try {
+    withFileLock('workflows', () => {
       let workflows = {};
 
       if (fs.existsSync(workflowsFilePath)) {
-        const data = fs.readFileSync(workflowsFilePath, "utf8");
-        workflows = JSON.parse(data);
+        try {
+          const data = fs.readFileSync(workflowsFilePath, "utf8");
+          workflows = JSON.parse(data);
+        } catch (e) {
+            // Handle corrupted file
+            console.error("Error parsing workflows file, starting fresh:", e);
+            workflows = {};
+        }
       }
 
       workflows[instanceId] = workflow;
@@ -55,9 +95,7 @@ module.exports.load = async function (router, db) {
         JSON.stringify(workflows, null, 2),
         "utf8"
       );
-    } catch (error) {
-      console.error("Error saving workflow to file:", error);
-    }
+    }).catch(err => console.error("Error saving workflow:", err));
   }
 
   function saveScheduledWorkflows() {
@@ -365,6 +403,44 @@ function executeWorkflow(instanceId) {
   }
 }
 
+
+function deleteWorkflow(instanceId) {
+  withFileLock('workflows', () => {
+    try {
+      console.log(`Deleting workflow for instance ${instanceId} as server was not found.`);
+      const jobId = `job_${instanceId}`;
+      const scheduledJob = schedule.scheduledJobs[jobId];
+      if (scheduledJob) {
+        scheduledJob.cancel();
+      }
+
+      saveScheduledWorkflows();
+
+      if (fs.existsSync(workflowsFilePath)) {
+        let workflows = {};
+        try {
+            const data = fs.readFileSync(workflowsFilePath, "utf8");
+            workflows = JSON.parse(data);
+        } catch (e) {
+             console.error("Error parsing workflows file during delete:", e);
+             return;
+        }
+
+        if (workflows[instanceId]) {
+          delete workflows[instanceId];
+          fs.writeFileSync(
+            workflowsFilePath,
+            JSON.stringify(workflows, null, 2),
+            "utf8"
+          );
+        }
+      }
+    } catch (error) {
+      console.error(`Error deleting workflow for ${instanceId}:`, error);
+    }
+  }).catch(err => console.error(`Failed to delete workflow for ${instanceId}:`, err));
+}
+
 async function executePowerAction(instanceId, powerAction) {
   try {
     const validActions = ['start', 'stop', 'restart', 'kill'];
@@ -372,7 +448,12 @@ async function executePowerAction(instanceId, powerAction) {
       throw new Error(`Invalid power action: ${powerAction}`);
     }
 
-    return await pterodactylClient.executePowerAction(instanceId, powerAction);
+    const result = await pterodactylClient.executePowerAction(instanceId, powerAction);
+    if (result === null) {
+      deleteWorkflow(instanceId);
+      return false;
+    }
+    return result;
   } catch (error) {
     console.error(`Error executing power action for server ${instanceId}:`, error.message);
     return false;
