@@ -1044,6 +1044,7 @@ document.getElementById('accept-eula').addEventListener('click', acceptEula);
 document.getElementById('decline-eula').addEventListener('click', hideEulaPopup);
 
 // Add this to your existing functions
+async function checkRenewalStatus() {
     try {
         const response = await fetch(`/api/server/${serverId}/renewal/status`);
         const data = await response.json();
@@ -1053,17 +1054,17 @@ document.getElementById('decline-eula').addEventListener('click', hideEulaPopup)
 
             const subtitle = document.getElementById('renewal-subtitle');
             if (subtitle) {
-                subtitle.textContent = '<%= __('server.manage.renewal_subtitle') %>'.replace('{{renewal}}', renewalConfig.renewalPeriod);
+                subtitle.textContent = <%- JSON.stringify(__('server.manage.renewal_subtitle')) %>.replace('{{renewal}}', renewalConfig.renewalPeriod);
             }
             
             const whyRenew = document.getElementById('why-renew-text');
             if (whyRenew) {
-                whyRenew.textContent = '<%= __('server.manage.why_renew_text') %>'.replace('{{renewal}}', renewalConfig.renewalPeriod);
+                whyRenew.textContent = <%- JSON.stringify(__('server.manage.why_renew_text')) %>.replace('{{renewal}}', renewalConfig.renewalPeriod);
             }
             
             const whenRenew = document.getElementById('when-renew-text');
             if (whenRenew) {
-                whenRenew.textContent = '<%= __('server.manage.when_renew_text') %>'.replace('{{threshold}}', renewalConfig.warningThreshold);
+                whenRenew.textContent = <%- JSON.stringify(__('server.manage.when_renew_text')) %>.replace('{{threshold}}', renewalConfig.warningThreshold);
             }
         }
         
@@ -1149,7 +1150,7 @@ document.getElementById('renew-server').addEventListener('click', async () => {
         });
         
         if (response.ok) {
-            showAlert('success', '<%= __('server.manage.renewed_success') %>'.replace('{{renewal}}', renewalConfig.renewalPeriod), '');
+            showAlert('success', <%- JSON.stringify(__('server.manage.renewed_success')) %>.replace('{{renewal}}', renewalConfig.renewalPeriod), '');
             await checkRenewalStatus();
         } else {
             const data = await response.json();
