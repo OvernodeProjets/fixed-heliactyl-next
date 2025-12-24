@@ -415,7 +415,7 @@ free = true
     enabled = true
 
       [api.client.coins.store.renewalbypass]
-      enabled = true # implementation soon
+      enabled = true
       cost = 3500
 
       [api.client.coins.store.ram]

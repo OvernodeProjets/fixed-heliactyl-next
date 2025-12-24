@@ -153,10 +153,50 @@ module.exports.load = function(router, db) {
   const store = new Store(db); 
 
 class StoreController {
+// Status check
+  static async checkRenewalBypassStatus(req, res) {
+    try {
+      if (!req.session.userinfo) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // Check if feature is enabled
+      if (settings.api.client.coins.store.renewalbypass.enabled === false) {
+        return res.json({
+          enabled: false,
+          hasRenewalBypass: false,
+          price: 0,
+          canAfford: false,
+          currentBalance: 0
+        });
+      }
+
+      const userId = req.session.userinfo.id;
+      const hasRenewalBypass = (await db.get(`renewbypass-${userId}`)) || false;
+      const currentBalance = await db.get(`coins-${userId}`) || 0;
+
+      res.json({
+        enabled: true,
+        hasRenewalBypass,
+        price: RENEWAL_BYPASS_PRICE,
+        canAfford: currentBalance >= RENEWAL_BYPASS_PRICE,
+        currentBalance
+      });
+    } catch (error) {
+      console.error('[ERROR] Failed to fetch renewal bypass status:', error);
+      return this.handleUnexpectedError(res, error);
+    }
+  }
+
   static async handleRenewalBypassPurchase(req, res) {
     try {
       if (!req.session.userinfo) {
         return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // Check if feature is enabled
+      if (settings.api.client.coins.store.renewalbypass.enabled === false) {
+        return res.status(400).json({ error: 'Renewal bypass is currently disabled.' });
       }
 
       const userId = req.session.userinfo.id;
@@ -199,28 +239,6 @@ class StoreController {
     } catch (error) {
       console.error('[ERROR] Renewal bypass purchase failed:', error);
       return res.status(500).json({ error: 'Internal server error' });
-    }
-  }
-
-  static async checkRenewalBypassStatus(req, res) {
-    try {
-      if (!req.session.userinfo) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
-
-      const userId = req.session.userinfo.id;
-      const hasRenewalBypass = (await db.get(`renewbypass-${userId}`)) || false;
-      const currentBalance = await db.get(`coins-${userId}`) || 0;
-
-      res.json({
-        hasRenewalBypass,
-        price: RENEWAL_BYPASS_PRICE,
-        canAfford: currentBalance >= RENEWAL_BYPASS_PRICE,
-        currentBalance
-      });
-    } catch (error) {
-      console.error('[ERROR] Failed to fetch renewal bypass status:', error);
-      return this.handleUnexpectedError(res, error);
     }
   }
 

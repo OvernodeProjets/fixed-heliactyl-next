@@ -147,7 +147,7 @@
             </div>
         </div>
     <!-- Renewal Bypass Promo Section -->
-    <div class="bg-white/5 rounded-2xl p-6 mb-8 mt-5">
+    <div class="bg-white/5 rounded-2xl p-6 mb-8 mt-5" x-show="renewalBypassStatus.enabled !== false">
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-semibold text-white/90"><%= __('store.renewal_bypass.title') %></h2>
             <button 
@@ -272,6 +272,7 @@
 function storeBilling() {
     return {
         renewalBypassStatus: {
+            enabled: true,
             hasRenewalBypass: false,
             price: <%= settings.api.client.coins.store.renewalbypass.cost %>,
             canAfford: false,
