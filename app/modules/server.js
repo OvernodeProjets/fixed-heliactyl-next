@@ -249,6 +249,9 @@ router.put('/server/:id/variables', authMiddleware, ownsServer(db), async (req, 
     res.json(response.data);
   } catch (error) {
     console.error('Error updating server variable:', error);
+    if (error.response) {
+      console.error('Pterodactyl Response:', JSON.stringify(error.response.data, null, 2));
+    }
     res.status(500).json({ error: 'Internal server error' });
   }
 });
