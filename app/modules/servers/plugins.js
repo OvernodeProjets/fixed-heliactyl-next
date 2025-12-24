@@ -22,6 +22,7 @@ const settings = loadConfig("./config.toml");
 const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js");
 const { getClientAPI } = require("../../handlers/pterodactylSingleton.js");
 const axios = require("axios");
+const FormData = require("form-data");
 
 module.exports.load = async function(router, db) {
   const ClientAPI = getClientAPI();
