@@ -204,7 +204,7 @@ module.exports.load = async function (router, db) {
 
     discordLog(
       "sign up",
-      `${username} signed up to the dashboard in local OAuth2!`
+      `${username} (${userId}) signed up to the dashboard in local OAuth2! `
     );
 
     res.status(201).json({ message: "User registered successfully" });
@@ -306,7 +306,7 @@ module.exports.load = async function (router, db) {
 
     discordLog(
       "sign in",
-      `${userinfo.username} signed in to the dashboard in local OAuth2!`
+      `${userinfo.username} (${userinfo.id}) signed in to the dashboard in local OAuth2!`
     );
 
     res.json({ message: "Login successful" });
