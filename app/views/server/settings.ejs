@@ -441,7 +441,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (newName) {
             showConfirmationModal(
                 '<%= __('server.settings.rename_confirm_title') %>',
-                '<%= __('server.settings.rename_confirm_text', { name: "__NAME__" }) %>'.replace('__NAME__', newName),
+                '<%- __('server.settings.rename_confirm_text', { name: "__NAME__" }) %>'.replace('__NAME__', newName),
                 () => {
                     fetch(`/api/server/${serverId}/rename`, {
                         method: 'POST',
@@ -475,17 +475,13 @@ document.getElementById('reinstall-server').addEventListener('click', () => {
         '<%= __('server.settings.reinstall_confirm_text') %>',
         () => {
             fetch(`/api/server/${serverId}/reinstall`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include' // Include credentials if using sessions
+                method: 'POST'
             })
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                return response.json();
+                return;
             })
             .then(data => {
                 alert('<%= __('server.settings.reinstall_started') %>');

@@ -39,7 +39,7 @@
           </h3>
           <div class="mt-2 text-sm text-red-200">
             <p>
-              <%= (() => {
+              <%- (() => {
                 switch(req.query.err) {
                   case "MISSINGVARIABLE":
                     return "You have not filled out all of the server information.";
@@ -54,7 +54,7 @@
                   case "TOOMUCHRAM":
                   case "TOOMUCHDISK":
                   case "TOOMUCHCPU":
-                    return `With the selected server type, you can have a maximum of <b>${req.query.num}</b> ${req.query.err.slice(-3) === "RAM" ? "MB RAM" : req.query.err.slice(-4) === "DISK" ? "MB disk" : "% CPU"} on the server.`;
+                    return `With the selected server type, you can have a maximum of <b>${req.query.num}</b>${req.query.err.slice(-3) === "RAM" ? "MB RAM" : req.query.err.slice(-4) === "DISK" ? "MB disk" : "% CPU"} on the server.`;
                   case "EXCEEDRAM":
                   case "EXCEEDDISK":
                   case "EXCEEDCPU":
