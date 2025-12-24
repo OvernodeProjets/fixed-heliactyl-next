@@ -29,9 +29,9 @@ module.exports.load = async function (router, db) {
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
   // Add these constants at the top of the file
-  const RENEWAL_PERIOD_HOURS = 48;
-  const WARNING_THRESHOLD_HOURS = 24; // When to start showing warnings
-  const CHECK_INTERVAL_MINUTES = 5; // How often to check for expired servers
+  const RENEWAL_PERIOD_HOURS = settings.renewal?.renewal_period || 48;
+  const WARNING_THRESHOLD_HOURS = settings.renewal?.warning_threshold || 24; // When to start showing warnings
+  const CHECK_INTERVAL_MINUTES = settings.renewal?.check_interval || 5; // How often to check for expired servers
 
   async function initializeRenewalSystem(db) {
     // Start the background task to check for expired servers
@@ -228,7 +228,11 @@ module.exports.load = async function (router, db) {
           seconds: Math.floor((timeRemaining % (1000 * 60)) / 1000)
         },
         requiresRenewal: timeRemaining <= WARNING_THRESHOLD_HOURS * 60 * 60 * 1000,
-        isExpired: timeRemaining <= 0
+        isExpired: timeRemaining <= 0,
+        config: {
+          renewalPeriod: RENEWAL_PERIOD_HOURS,
+          warningThreshold: WARNING_THRESHOLD_HOURS
+        }
       };
 
       res.json(response);

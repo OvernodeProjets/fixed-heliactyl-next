@@ -285,7 +285,7 @@ display:none;
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h2 class="text-xl font-semibold heavy"><%= __('server.manage.renewal_title') %></h2>
-                        <span class="text-gray-300 text-sm mt-1"><%= __('server.manage.renewal_subtitle') %></span>
+                        <span id="renewal-subtitle" class="text-gray-300 text-sm mt-1 mb-4"><%= __('server.manage.renewal_subtitle') %></span>
                     </div>
                     <div id="renewal-badge" class="hidden ml-3 px-3 py-1 rounded-full text-[.7em] md:text-sm font-medium text-white">
                     </div>
@@ -325,7 +325,7 @@ display:none;
                         </svg>
                         <%= __('server.manage.why_renew') %>
                     </div>
-                    <p class="ml-6">
+                    <p id="why-renew-text" class="ml-6">
                         <%= __('server.manage.why_renew_text') %>
                     </p>
                 </div>
@@ -338,7 +338,7 @@ display:none;
                         </svg>
                         <%= __('server.manage.when_renew') %>
                     </div>
-                    <p class="ml-6">
+                    <p id="when-renew-text" class="ml-6">
                         <%= __('server.manage.when_renew_text') %>
                     </p>
                 </div>
@@ -430,6 +430,7 @@ const maxRetries = 5;
 const retryDelay = 5000; 
 let isMinecraft = false;
 let randomId = () => Math.random().toString(36).substring(2, 8);
+let renewalConfig = { renewalPeriod: 48, warningThreshold: 24 };
 
 function showLoading(elementId) {
     const element = document.getElementById(elementId);
@@ -1043,10 +1044,28 @@ document.getElementById('accept-eula').addEventListener('click', acceptEula);
 document.getElementById('decline-eula').addEventListener('click', hideEulaPopup);
 
 // Add this to your existing functions
-async function checkRenewalStatus() {
     try {
         const response = await fetch(`/api/server/${serverId}/renewal/status`);
         const data = await response.json();
+        
+        if (data.config) {
+            renewalConfig = data.config;
+
+            const subtitle = document.getElementById('renewal-subtitle');
+            if (subtitle) {
+                subtitle.textContent = '<%= __('server.manage.renewal_subtitle') %>'.replace('{{renewal}}', renewalConfig.renewalPeriod);
+            }
+            
+            const whyRenew = document.getElementById('why-renew-text');
+            if (whyRenew) {
+                whyRenew.textContent = '<%= __('server.manage.why_renew_text') %>'.replace('{{renewal}}', renewalConfig.renewalPeriod);
+            }
+            
+            const whenRenew = document.getElementById('when-renew-text');
+            if (whenRenew) {
+                whenRenew.textContent = '<%= __('server.manage.when_renew_text') %>'.replace('{{threshold}}', renewalConfig.warningThreshold);
+            }
+        }
         
         const renewalBadge = document.getElementById('renewal-badge');
         const renewalTime = document.getElementById('renewal-time');
@@ -1060,8 +1079,8 @@ async function checkRenewalStatus() {
         }
         
         // Show/hide renew button and update status
-        // Show renewal button if 24 hours or less remaining
-        if (data.timeRemaining.hours <= 23) {
+        // Show renewal button if within threshold
+        if (data.timeRemaining.hours < renewalConfig.warningThreshold) {
             renewButton.classList.remove('hidden');
             renewButton.disabled = false;
             renewalBadge.classList.remove('hidden');
@@ -1079,7 +1098,7 @@ async function checkRenewalStatus() {
                 renewalBadge.classList.remove('bg-red-600', 'bg-yellow-600', 'bg-emerald-600');
                 renewalBadge.textContent = '<%= __('server.manage.renewal_available') %>';
             }
-            } else if (data.timeRemaining.hours >= 50) {
+        } else if (data.timeRemaining.hours > renewalConfig.renewalPeriod + 1) { // Grace period/bypass check
                 renewalBadge.classList.add('bg-emerald-600');
                 renewalBadge.classList.remove('bg-red-600', 'bg-yellow-600', 'bg-indigo-500');
                 renewalBadge.textContent = '<%= __('server.manage.renewal_bypass') %>';
@@ -1089,17 +1108,17 @@ async function checkRenewalStatus() {
         }
 
         // Add a progress indicator
-        const totalHours = 48;
+        const totalHours = renewalConfig.renewalPeriod;
         const remainingPercentage = (data.timeRemaining.hours + (data.timeRemaining.minutes / 60)) / totalHours * 100;
         const progressBar = document.querySelector('#renewal-progress-bar');
-            if (data.timeRemaining.hours < 50) {
+            if (data.timeRemaining.hours < renewalConfig.renewalPeriod + 2) {
         if (progressBar) {
             progressBar.style.width = `${remainingPercentage}%`;
             
             // Update progress bar color based on time remaining
             if (data.timeRemaining.hours <= 6) {
                 progressBar.className = 'bg-red-600 h-2 rounded-full transition-all';
-            } else if (data.timeRemaining.hours <= 24) {
+            } else if (data.timeRemaining.hours < renewalConfig.warningThreshold) {
                 progressBar.className = 'bg-yellow-600 h-2 rounded-full transition-all';
             } else {
                 progressBar.className = 'bg-emerald-600 h-2 rounded-full transition-all';
@@ -1130,7 +1149,7 @@ document.getElementById('renew-server').addEventListener('click', async () => {
         });
         
         if (response.ok) {
-            showAlert('success', '<%= __('server.manage.renewed_success') %>', '');
+            showAlert('success', '<%= __('server.manage.renewed_success') %>'.replace('{{renewal}}', renewalConfig.renewalPeriod), '');
             await checkRenewalStatus();
         } else {
             const data = await response.json();
