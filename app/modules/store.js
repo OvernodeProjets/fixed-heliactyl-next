@@ -293,13 +293,62 @@ class StoreController {
     }
   });
 
+  // Get usage history endpoint
+  router.get('/store/usage', authMiddleware, async (req, res) => {
+    try {
+      const userId = req.session.userinfo.id;
+      const { days } = req.query;
+    
+      // Get the users' resources to edit
+      const resources = {
+          ram: 0,
+          disk: 0,
+          cpu: 0,
+          servers: 0
+        };
+      // Get the purchase history of the user
+      const history = await db.get(`purchases-${userId}`) || [];
+    
+      if (history.length > 0 && days) {
+        // Get the purchase history of the selected day
+        const date = new Date();
+        const sorterDate = new Date(date.valueOf());
+        sorterDate.setDate(sorterDate.getDate() + days);
+        const purchaseHistory = history.filter(history => sorterDate.getDate() <= history.timestamp);
+        purchaseHistory.forEach((record) => {
+          if (record.resourceType === "renewal_bypass") return;
+          // Gets the amount of resources to increase
+          const resourceValue = RESOURCE_MULTIPLIERS[record.resourceType] * record.amount;
+          const resourceTotal = resources[record.resourceType] + resourceValue;
+        
+          // Sets the increased amount
+          const resourceType = resources[record.resourceType] = resourceTotal;
+        });
+      };
+      res.json(resources);
+    } catch(error) {
+      console.error('Failed to fetch user usage data: \n' + error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   // Get purchase history endpoint
   router.get('/store/history', authMiddleware, async (req, res) => {
     try {
       const userId = req.session.userinfo.id;
+      const { days } = req.query;
       const history = await db.get(`purchases-${userId}`) || [];
+      let purchaseHistory = history;
       
-      res.json(history);
+      const date = new Date();
+      const sorterDate = new Date(date.valueOf());
+      sorterDate.setDate(sorterDate.getDate() - days);
+
+      if (history.length > 0 && days) {
+        purchaseHistory = history.filter(history => sorterDate.getDate() <= history.timestamp);
+      }
+      
+      res.json(purchaseHistory);
     } catch (error) {
       console.error('[ERROR] Failed to fetch purchase history:', error);
       res.status(500).json({ error: 'Internal server error' });

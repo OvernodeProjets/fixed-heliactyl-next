@@ -302,7 +302,8 @@
     "subtitle": "Manage your resources and subscriptions with {{currency}}",
     "tabs": {
       "store": "Store",
-      "history": "History"
+      "history": "History",
+      "usage": "Usage"
     },
     "resources": {
       "ram": "RAM",
