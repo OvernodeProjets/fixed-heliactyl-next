@@ -241,6 +241,13 @@ npm run start - starts Heliactyl
 npm run build:css - builds TailwindCSS, required for making changes to the UI
 ```
 
+
+## Troubleshooting
+
+### Velocity Proxy Issues
+If you encounter version or installation issues with Velocity (e.g., "latest" version not found), please update your Egg configuration using the fixed JSON file available here:
+[Fixed Velocity Egg](https://github.com/OvernodeProjets/minecraft-eggs/blob/main/proxy/java/velocity/egg-pterodactyl-velocity.json)
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 ```
