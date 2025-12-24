@@ -21,6 +21,7 @@ const loadConfig = require("../handlers/config.js");
 const settings = loadConfig("./config.toml");
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 const { discordLog } = require("../handlers/log.js");
+const { logTransaction } = require("../handlers/log.js");
 const NodeCache = require("node-cache");
 
 module.exports.load = async function(router, db) {
@@ -109,6 +110,18 @@ module.exports.load = async function(router, db) {
       myCache.del(cacheKey);
       myCache.del(processingKey);
     
+      await logTransaction(
+        db,
+        userId,
+        'credit',
+        settings.api.client.coins.daily.amount,
+        currentCoins + settings.api.client.coins.daily.amount,
+        { 
+          description: `Daily coins reward (${per})`,
+          senderId: 'daily-rewards',
+          receiverId: userId
+        }
+      );
       discordLog('daily coins', `${req.session.userinfo.username} has claimed their daily reward of ${settings.api.client.coins.daily.amount} ${settings.website.currency}.`);
       return res.redirect('../dashboard?err=none');
     } catch (error) {

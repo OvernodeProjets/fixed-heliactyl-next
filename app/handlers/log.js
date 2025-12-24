@@ -15,7 +15,38 @@ async function addNotification(db, userId, action, name, ip, userAgent = null) {
   await db.set(`notifications-${userId}`, notifications);
 }
 
-// Helper function to log a transaction
+/**
+ * Log a transaction to the database and Discord
+ * 
+ * @param {Object} db - Database instance
+ * @param {string} userId - User ID for the transaction
+ * @param {string} type - Transaction type: 'credit' (receiving) or 'debit' (sending)
+ * @param {number} amount - Amount of the transaction (always positive)
+ * @param {number} balanceAfter - User's balance after the transaction
+ * @param {Object} details - Additional transaction details
+ * @param {string} [details.description] - Description of the transaction
+ * @param {string} [details.senderId] - ID of the sender (use system name for rewards, e.g., 'daily-rewards', 'afk-rewards')
+ * @param {string} [details.receiverId] - ID of the receiver (usually the userId for credits)
+ * @param {string} [details.currency] - Currency name (defaults to settings.website.currency)
+ * 
+ * @returns {Promise<string>} Transaction key
+ * 
+ * @example
+ * // User receives coins (e.g., daily reward, AFK reward)
+ * await logTransaction(db, userId, 'credit', 150, currentBalance + 150, {
+ *   description: 'Daily coins reward',
+ *   senderId: 'daily-rewards',
+ *   receiverId: userId
+ * });
+ * 
+ * @example
+ * // User spends coins (e.g., store purchase)
+ * await logTransaction(db, userId, 'debit', 500, currentBalance - 500, {
+ *   description: 'Purchased 1GB RAM',
+ *   senderId: userId,
+ *   receiverId: 'store'
+ * });
+ */
 const logTransaction = async (db, userId, type, amount, balanceAfter, details = {}) => {
   if (details.currency === undefined) {
     details.currency = settings.website.currency;
