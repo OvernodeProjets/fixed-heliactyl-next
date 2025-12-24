@@ -536,7 +536,7 @@ serverSection.style.display = 'block';
                                 </svg>
                             </button>
                             <div id="server-dropdown-menu" class="hidden absolute left-0 right-0 mt-2 rounded-xl bg-[#101017] backdrop-blur-xl border border-white/5 shadow-lg py-1 z-50 max-h-60 overflow-y-auto">
-                                <% if (pterodactyl.relationships.servers.data.length > 0) { %>
+                                <% if (pterodactyl && pterodactyl.relationships && pterodactyl.relationships.servers && pterodactyl.relationships.servers.data && pterodactyl.relationships.servers.data.length > 0) { %>
                                     <% pterodactyl.relationships.servers.data.forEach(server => { %>
                                         <a
                                             class="flex cursor-pointer items-center w-full px-4 py-2 text-sm text-white/70 hover:bg-white/5"
