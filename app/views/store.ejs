@@ -420,7 +420,14 @@ function storeBilling() {
             try {
                 const response = await fetch('/api/store/resources');
                 if (!response.ok) throw new Error('Failed to fetch resources');
-                const data = await response.json();
+                let data = await response.json();
+
+                const ram = this.formatMegabytes(data.ram);
+                const disk = this.formatMegabytes(data.disk);
+                
+                data.ram = ram;
+                data.disk = disk;
+
                 this.currentUsage = data;
             } catch (error) {
                 console.error('Failed to fetch resources:', error);
@@ -482,7 +489,7 @@ function storeBilling() {
 
             const amounts = {
                 ram: amount => `${amount} GB RAM`,
-                disk: amount => `${amount * 5} GB Storage`,
+                disk: amount => `${amount} GB Storage`,
                 cpu: amount => `${amount} Core${amount > 1 ? 's' : ''}`,
                 servers: amount => `${amount} Server${amount > 1 ? 's' : ''}`
             };
@@ -514,6 +521,11 @@ function storeBilling() {
 
         formatCost(amount) {
             return `${amount.toLocaleString()}`;
+        },
+
+        formatMegabytes(megabytes) {
+          if (megabytes === 0) return '0';
+          return Math.floor(megabytes / 1024);
         },
 
         formatBytes(bytes) {
