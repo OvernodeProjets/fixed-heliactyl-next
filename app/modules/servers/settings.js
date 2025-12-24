@@ -30,7 +30,7 @@ module.exports.load = async function(router, db) {
     // PUT /api/server/:id/startup
     router.put('/server/:id/startup', authMiddleware, async (req, res) => {
       try {
-        const serverId = req.params.serverId;
+        const serverId = req.params.id;
         const { startup, environment, egg, image, skip_scripts } = req.body;
     
         // First, get the current server details

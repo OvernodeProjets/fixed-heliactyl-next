@@ -38,6 +38,7 @@ module.exports.load = async function(router, db) {
 router.get("/updateinfo", authMiddleware, async (req, res) => {
     try {
         // Get user's package and extra resources
+        const PterodactylUser = await getPteroUser(req.session.userinfo.id, db);
         const packagename = await db.get("package-" + req.session.userinfo.id);
         const package = settings.api.client.packages.list[packagename ? packagename : settings.api.client.packages.default];
         const extra = await db.get("extra-" + req.session.userinfo.id) || {
