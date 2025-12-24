@@ -441,7 +441,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (newName) {
             showConfirmationModal(
                 '<%= __('server.settings.rename_confirm_title') %>',
-                '<%= __('server.settings.rename_confirm_text', { name: "__NAME__" }) %>'.replace('__NAME__', newName),
+                '<%- __('server.settings.rename_confirm_text', { name: "__NAME__" }) %>'.replace('__NAME__', newName),
                 () => {
                     fetch(`/api/server/${serverId}/rename`, {
                         method: 'POST',
