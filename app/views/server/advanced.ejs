@@ -114,7 +114,7 @@
         item.className = 'bg-white/5 p-4 rounded-lg';
         
         let editButtonHtml = '';
-        if (variable.user_editable && !variable.rules.includes('readonly')) {
+        if (variable.is_editable && !variable.rules.includes('readonly')) {
              editButtonHtml = `
                 <button class="edit-variable ml-5 bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-1.5 px-4 rounded-full transition" data-key="${variable.env_variable}">
                     ${t.edit}
@@ -144,7 +144,7 @@
             </div>
         `;
 
-        if (variable.user_editable && !variable.rules.includes('readonly')) {
+        if (variable.is_editable && !variable.rules.includes('readonly')) {
             const editButton = item.querySelector('.edit-variable');
             editButton.addEventListener('click', () => openEditModal(variable));
         }
