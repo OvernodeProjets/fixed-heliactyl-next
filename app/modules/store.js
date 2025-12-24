@@ -60,7 +60,6 @@ class Store {
   }
 
   async purchaseRenewalBypass(userId) {
-    // Check user's balance
     const userCoins = await this.db.get(`coins-${userId}`) || 0;
     
     if (userCoins < RENEWAL_BYPASS_PRICE) {
@@ -160,7 +159,6 @@ class StoreController {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      // Check if feature is enabled
       if (settings.api.client.coins.store.renewalbypass.enabled === false) {
         return res.json({
           enabled: false,
@@ -194,23 +192,19 @@ class StoreController {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      // Check if feature is enabled
       if (settings.api.client.coins.store.renewalbypass.enabled === false) {
         return res.status(400).json({ error: 'Renewal bypass is currently disabled.' });
       }
 
       const userId = req.session.userinfo.id;
 
-      // Check if user already has renewal bypass
       const hasRenewalBypass = await db.get(`renewbypass-${userId}`);
       if (hasRenewalBypass) {
         return res.status(400).json({ error: 'Renewal bypass already purchased' });
       }
 
-      // Get user's current coins
       const userCoins = await db.get(`coins-${userId}`) || 0;
       
-      // Check if user has enough coins
       if (userCoins < RENEWAL_BYPASS_PRICE) {
         return res.status(402).json({
           error: 'Insufficient funds',
@@ -224,7 +218,6 @@ class StoreController {
       await db.set(`coins-${userId}`, newBalance);
       await db.set(`renewbypass-${userId}`, true);
 
-      // Log the purchase
       const purchase = await store.logPurchase(userId, 'renewal_bypass', 1, RENEWAL_BYPASS_PRICE);
 
       discordLog(`renewal bypass`, `${req.session.userinfo.username} purchased renewal bypass for ${RENEWAL_BYPASS_PRICE} coins.`);
@@ -327,12 +320,18 @@ class StoreController {
       // Get the purchase history of the user
       const history = await db.get(`purchases-${userId}`) || [];
     
-      if (history.length > 0 && days) {
-        // Get the purchase history of the selected day
-        const date = new Date();
-        const sorterDate = new Date(date.valueOf());
-        sorterDate.setDate(sorterDate.getDate() + days);
-        const purchaseHistory = history.filter(history => sorterDate.getDate() <= history.timestamp);
+      if (history.length > 0) {
+        let purchaseHistory = history;
+
+        // Filter by date if not 'all'
+        if (days && days !== 'all') {
+          const dayCount = parseInt(days);
+          const date = new Date();
+          const sorterDate = new Date(date.valueOf());
+          sorterDate.setDate(sorterDate.getDate() - dayCount);
+          purchaseHistory = history.filter(h => h.timestamp >= sorterDate.getTime());
+        }
+        
         purchaseHistory.forEach((record) => {
           if (record.resourceType === "renewal_bypass") return;
           // Gets the amount of resources to increase
@@ -358,13 +357,18 @@ class StoreController {
       const history = await db.get(`purchases-${userId}`) || [];
       let purchaseHistory = history;
       
-      const date = new Date();
-      const sorterDate = new Date(date.valueOf());
-      sorterDate.setDate(sorterDate.getDate() - days);
-
-      if (history.length > 0 && days) {
-        purchaseHistory = history.filter(history => sorterDate.getDate() <= history.timestamp);
+      // Filter by date if not 'all'
+      if (history.length > 0 && days && days !== 'all') {
+        const dayCount = parseInt(days);
+        const date = new Date();
+        const sorterDate = new Date(date.valueOf());
+        sorterDate.setDate(sorterDate.getDate() - dayCount);
+        
+        purchaseHistory = history.filter(h => h.timestamp >= sorterDate.getTime());
       }
+      
+      // Sort by newest first
+      purchaseHistory.sort((a, b) => b.timestamp - a.timestamp);
       
       res.json(purchaseHistory);
     } catch (error) {
