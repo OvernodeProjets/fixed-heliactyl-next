@@ -152,6 +152,7 @@ is_default = false
   new_users = true
   change_password = true
   over_resources_suspend = false
+  anti_spam_detection = true # Enable anti-spam pattern detection on registration (blocks suspicious usernames/emails)
 
     [api.client.allow.server]
     create = true

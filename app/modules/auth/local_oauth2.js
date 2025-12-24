@@ -97,6 +97,35 @@ module.exports.load = async function (router, db) {
       return res.status(400).json({ error: "Invalid email format" });
     }
 
+    // Heliactyl Anti-Spam Pattern Detection
+    if (settings.api.client.allow.anti_spam_detection !== false) {
+      const emailLocalPart = email.split('@')[0];
+      
+      // (1) Block long composite name patterns (FirstnameMiddleLastnameNumber)
+      const nameComboRegex = /^[A-Z][a-z]+[A-Z][a-z]+[A-Z][a-z]+[0-9]{2,4}$/;
+      if (nameComboRegex.test(username) || nameComboRegex.test(emailLocalPart)) {
+        return res.status(400).json({ error: "Suspicious pattern detected [HX-01]" });
+      }
+
+      // (2) Block hyphenated "Adjective-NounNumber" patterns (Quick-WittedTamale90)
+      const hyphenNameRegex = /^[A-Z][a-z]+(-[A-Z][a-z]+){1,3}[0-9]{1,3}$/;
+      if (hyphenNameRegex.test(username) || hyphenNameRegex.test(emailLocalPart)) {
+        return res.status(400).json({ error: "Suspicious pattern detected [HX-02]" });
+      }
+
+      // (3) Block random lowercase gibberish (e.g., iqjvefy, znlpxn8r)
+      const gibberishRegex = /^[a-z0-9]{6,10}$/;
+      if (gibberishRegex.test(username) && !username.match(/[aeiou]/)) {
+        return res.status(400).json({ error: "Suspicious pattern detected [HX-03]" });
+      }
+
+      // (4) Block known spam suffixes or multiple capital joins
+      const mixedCapsRegex = /[A-Z][a-z]+[A-Z][a-z]+/;
+      if (mixedCapsRegex.test(username) && username.match(/[0-9]{2,4}/)) {
+        return res.status(400).json({ error: "Suspicious pattern detected [HX-04]" });
+      }
+    }
+
     // Check password strength
     if (password.length < 12 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
       return res.status(400).json({ error: "Password must be at least 12 characters long and contain uppercase, lowercase, number, and special character" });
