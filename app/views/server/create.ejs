@@ -236,7 +236,7 @@
                             <%= __('server.create.ram_label') %>
                         </label>
                         <div class="mt-1">
-                            <input type="number" name="ram" id="ram" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border border-white/10 placeholder-gray-400 focus:ring-2" value="<%= ((packages ? packages.ram : 0)/1024 + extraresources.ram/1024 - ram/1024).toFixed(2) %>">
+                            <input type="number" name="ram" id="ram" step="0.001" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border border-white/10 placeholder-gray-400 focus:ring-2" value="<%= (Math.floor((packages ? packages.ram : 0) + extraresources.ram - ram) / 1024).toFixed(3) %>">
                         </div>
                     </div>
 
@@ -254,7 +254,7 @@
                             <%= __('server.create.disk_label') %>
                         </label>
                         <div class="mt-1">
-                            <input type="number" name="disk" id="disk" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border border-white/10 placeholder-gray-400 focus:ring-2" value="<%= ((packages ? packages.disk : 0)/1024 + extraresources.disk/1024 - disk/1024).toFixed(2) %>">
+                            <input type="number" name="disk" id="disk" step="0.001" class="transition ease-in-out delay-100 shadow-sm block w-full sm:text-sm rounded-lg bg-white/5 border-white/5 text-white focus:ring-indigo-500 focus:border-indigo-500 px-2 py-1 border border-white/10 placeholder-gray-400 focus:ring-2" value="<%= (Math.floor((packages ? packages.disk : 0) + extraresources.disk - disk) / 1024).toFixed(3) %>">
                         </div>
                     </div>
                 </div>
@@ -432,10 +432,102 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchInput.addEventListener('input', filterImages);
 });
+const eggsData = <%- JSON.stringify(Object.fromEntries(Object.entries(settings.api.client.eggs).map(([k, v]) => [k, { maximum: v.maximum || {}, minimum: v.minimum || {} }]))) %>;
+let currentEggLimits = null;
+
+// User's available resources (in GB for RAM/Disk, raw % for CPU) - use floor to avoid rounding exceeds
+const userAvailableRamGB = Math.floor(<%= (packages ? packages.ram : 0) + extraresources.ram - ram %>) / 1024;
+const userAvailableCpu = <%= (packages ? packages.cpu : 0) + extraresources.cpu - cpu %>;
+const userAvailableDiskGB = Math.floor(<%= (packages ? packages.disk : 0) + extraresources.disk - disk %>) / 1024;
 
 function selectImage(id, name) {
     selectedImage = id;
+    currentEggLimits = eggsData[id] || null;
+    
+    if (currentEggLimits) {
+        enforceInputLimits();
+    }
 }
+
+function enforceInputLimits() {
+    if (!currentEggLimits) return;
+    
+    const ramInput = document.getElementById('ram');
+    const cpuInput = document.getElementById('cpu');
+    const diskInput = document.getElementById('disk');
+    
+    // RAM limits - take the minimum of egg max and user available
+    let effectiveMaxRamGB = userAvailableRamGB;
+    if (currentEggLimits.maximum.ram) {
+        const eggMaxRamGB = currentEggLimits.maximum.ram / 1024;
+        effectiveMaxRamGB = Math.min(eggMaxRamGB, userAvailableRamGB);
+    }
+    if (parseFloat(ramInput.value) > effectiveMaxRamGB) {
+        ramInput.value = effectiveMaxRamGB.toFixed(2);
+    }
+    
+    // RAM minimum
+    if (currentEggLimits.minimum.ram) {
+        const minRamGB = currentEggLimits.minimum.ram / 1024;
+        if (parseFloat(ramInput.value) < minRamGB) {
+            ramInput.value = minRamGB.toFixed(2);
+        }
+        ramInput.title = `Max: ${effectiveMaxRamGB.toFixed(2)} GiB | Min: ${minRamGB.toFixed(2)} GiB`;
+    } else {
+        ramInput.title = `Max: ${effectiveMaxRamGB.toFixed(2)} GiB`;
+    }
+    
+    // CPU limits - take the minimum of egg max and user available
+    let effectiveMaxCpu = userAvailableCpu;
+    if (currentEggLimits.maximum.cpu) {
+        effectiveMaxCpu = Math.min(currentEggLimits.maximum.cpu, userAvailableCpu);
+    }
+    if (parseFloat(cpuInput.value) > effectiveMaxCpu) {
+        cpuInput.value = effectiveMaxCpu;
+    }
+    
+    // CPU minimum
+    if (currentEggLimits.minimum.cpu) {
+        const minCpu = currentEggLimits.minimum.cpu;
+        if (parseFloat(cpuInput.value) < minCpu) {
+            cpuInput.value = minCpu;
+        }
+        cpuInput.title = `Max: ${effectiveMaxCpu}% | Min: ${minCpu}%`;
+    } else {
+        cpuInput.title = `Max: ${effectiveMaxCpu}%`;
+    }
+    
+    // Disk limits - take the minimum of egg max and user available
+    let effectiveMaxDiskGB = userAvailableDiskGB;
+    if (currentEggLimits.maximum.disk) {
+        const eggMaxDiskGB = currentEggLimits.maximum.disk / 1024;
+        effectiveMaxDiskGB = Math.min(eggMaxDiskGB, userAvailableDiskGB);
+    }
+    if (parseFloat(diskInput.value) > effectiveMaxDiskGB) {
+        diskInput.value = effectiveMaxDiskGB.toFixed(2);
+    }
+    
+    // Disk minimum
+    if (currentEggLimits.minimum.disk) {
+        const minDiskGB = currentEggLimits.minimum.disk / 1024;
+        if (parseFloat(diskInput.value) < minDiskGB) {
+            diskInput.value = minDiskGB.toFixed(2);
+        }
+        diskInput.title = `Max: ${effectiveMaxDiskGB.toFixed(2)} GiB | Min: ${minDiskGB.toFixed(2)} GiB`;
+    } else {
+        diskInput.title = `Max: ${effectiveMaxDiskGB.toFixed(2)} GiB`;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    ['ram', 'cpu', 'disk'].forEach(inputId => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('blur', enforceInputLimits);
+            input.addEventListener('change', enforceInputLimits);
+        }
+    });
+});
 
 function selectLocation(id, name, country, zoneElement) {
     const locationCards = document.querySelectorAll('.location-card');
@@ -459,13 +551,65 @@ async function submitForm() {
     const formData = new FormData(form);
     
     const name = encodeURIComponent(formData.get('name'));
-    const ram = encodeURIComponent(parseFloat(formData.get('ram')) * 1024);
-    const disk = encodeURIComponent(parseFloat(formData.get('disk')) * 1024);
-    const cpu = encodeURIComponent(formData.get('cpu'));
+    const ramGB = parseFloat(formData.get('ram'));
+    const diskGB = parseFloat(formData.get('disk'));
+    const cpuVal = parseFloat(formData.get('cpu'));
     
-    if (!name || !ram || !disk || !cpu || !selectedLocation || !selectedImage) {
+    // Convert to MB for API
+    const ramMB = Math.floor(ramGB * 1024);
+    const diskMB = Math.floor(diskGB * 1024);
+    
+    if (!name || isNaN(ramGB) || isNaN(diskGB) || isNaN(cpuVal) || !selectedLocation || !selectedImage) {
         alertify.error('Please fill out all fields and select a location.');
         return;
+    }
+    
+    const availableRamMB = Math.floor(userAvailableRamGB * 1024);
+    const availableDiskMB = Math.floor(userAvailableDiskGB * 1024);
+    
+    if (ramMB > availableRamMB) {
+        alertify.error(`RAM exceeds available resources. Max: ${userAvailableRamGB.toFixed(2)} GiB`);
+        document.getElementById('ram').value = userAvailableRamGB.toFixed(2);
+        return;
+    }
+    
+    if (diskMB > availableDiskMB) {
+        alertify.error(`Disk exceeds available resources. Max: ${userAvailableDiskGB.toFixed(2)} GiB`);
+        document.getElementById('disk').value = userAvailableDiskGB.toFixed(2);
+        return;
+    }
+    
+    if (cpuVal > userAvailableCpu) {
+        alertify.error(`CPU exceeds available resources. Max: ${userAvailableCpu}%`);
+        document.getElementById('cpu').value = userAvailableCpu;
+        return;
+    }
+    
+    if (currentEggLimits) {
+        if (currentEggLimits.maximum.ram && ramMB > currentEggLimits.maximum.ram) {
+            alertify.error(`RAM exceeds egg limit. Max: ${(currentEggLimits.maximum.ram / 1024).toFixed(2)} GiB`);
+            return;
+        }
+        if (currentEggLimits.maximum.disk && diskMB > currentEggLimits.maximum.disk) {
+            alertify.error(`Disk exceeds egg limit. Max: ${(currentEggLimits.maximum.disk / 1024).toFixed(2)} GiB`);
+            return;
+        }
+        if (currentEggLimits.maximum.cpu && cpuVal > currentEggLimits.maximum.cpu) {
+            alertify.error(`CPU exceeds egg limit. Max: ${currentEggLimits.maximum.cpu}%`);
+            return;
+        }
+        if (currentEggLimits.minimum.ram && ramMB < currentEggLimits.minimum.ram) {
+            alertify.error(`RAM below egg minimum. Min: ${(currentEggLimits.minimum.ram / 1024).toFixed(2)} GiB`);
+            return;
+        }
+        if (currentEggLimits.minimum.disk && diskMB < currentEggLimits.minimum.disk) {
+            alertify.error(`Disk below egg minimum. Min: ${(currentEggLimits.minimum.disk / 1024).toFixed(2)} GiB`);
+            return;
+        }
+        if (currentEggLimits.minimum.cpu && cpuVal < currentEggLimits.minimum.cpu) {
+            alertify.error(`CPU below egg minimum. Min: ${currentEggLimits.minimum.cpu}%`);
+            return;
+        }
     }
     
     if (name.length < 3) {
@@ -473,22 +617,10 @@ async function submitForm() {
         return;
     }
 
-    if (selectedLocation == 28 || selectedLocation == 29) {
-        if (ram > 6144) {
-            alertify.error('This location only allows up to 6GB RAM to be used due to low capacity.');
-            return;
-        }
-
-        if (cpu > 250) {
-            alertify.error('This location only allows up to 2.5 CPU cores to be used due to low capacity.');
-            return;
-        }
-    }
-
     // Use the selected zone ID if available, otherwise use the selected location ID
     let locationId = selectedZone || selectedLocation;
 
-    const url = `/api/server/create?name=${name}&egg=${selectedImage}&ram=${ram}&disk=${disk}&cpu=${cpu}&location=${locationId}`;
+    const url = `/api/server/create?name=${name}&egg=${selectedImage}&ram=${ramMB}&disk=${diskMB}&cpu=${cpuVal}&location=${locationId}`;
     
     window.location.href = url;
 }
