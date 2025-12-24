@@ -5,7 +5,11 @@
     }) %>      
 <div id="alert-container" class="mb-4 space-y-2"></div>
     <%- include('../components/server') %>
-
+<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+  eruda.init();
+</script>
 <div class="space-y-8">
     <!-- SFTP Access Panel -->
     <div class="bg-white/5 rounded-xl overflow-hidden">
@@ -475,17 +479,13 @@ document.getElementById('reinstall-server').addEventListener('click', () => {
         '<%= __('server.settings.reinstall_confirm_text') %>',
         () => {
             fetch(`/api/server/${serverId}/reinstall`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include' // Include credentials if using sessions
+                method: 'POST'
             })
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                return response.json();
+                return;
             })
             .then(data => {
                 alert('<%= __('server.settings.reinstall_started') %>');
