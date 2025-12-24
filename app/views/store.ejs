@@ -440,13 +440,20 @@ function storeBilling() {
             try {
                 const response = await fetch(`/api/store/usage?days=${this.usageDays}`);
                 if (!response.ok) throw new Error('Failed to fetch usage history');
-                const data = await response.json();
+                let data = await response.json();
 
                 // Ensure we have at least one usage record
-                if (data.length > 0) {
+                const records = Object.values(data).every(v => v === 0);
+                if (!records) {
+                    const ram = this.formatMegabytes(data.ram);
+                    const disk = this.formatMegabytes(data.disk);
+
+                    data.ram = ram;
+                    data.disk = disk;
+
                     this.usageHistory = data;
                     // Update current usage from the most recent record
-                    this.currentUsage = data[data.length - 1].resources;
+                    this.currentUsage = data;
                 } else {
                     // If no usage data, fallback to fetched resources
                     await this.fetchResources();
