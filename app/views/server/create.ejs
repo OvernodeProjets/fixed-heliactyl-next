@@ -222,11 +222,12 @@
                         let ram = 0;
                         let disk = 0;
                         let cpu = 0;
-                        let servers = pterodactyl.relationships.servers.data.length;
-                        for (let i = 0, len = pterodactyl.relationships.servers.data.length; i < len; i++) {
-                          ram = ram + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.memory == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.memory : 0);
-                          disk = disk + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.disk == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.disk : 0);
-                          cpu = cpu + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.cpu == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.cpu : 0);
+                        const serversData = (pterodactyl && pterodactyl.relationships && pterodactyl.relationships.servers && pterodactyl.relationships.servers.data) ? pterodactyl.relationships.servers.data : [];
+                        let servers = serversData.length;
+                        for (let i = 0, len = serversData.length; i < len; i++) {
+                          ram = ram + (typeof serversData[i].attributes.limits.memory == "number" ? serversData[i].attributes.limits.memory : 0);
+                          disk = disk + (typeof serversData[i].attributes.limits.disk == "number" ? serversData[i].attributes.limits.disk : 0);
+                          cpu = cpu + (typeof serversData[i].attributes.limits.cpu == "number" ? serversData[i].attributes.limits.cpu : 0);
                         }
                     %>
 

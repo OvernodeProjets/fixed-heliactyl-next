@@ -22,19 +22,20 @@ let id;
 id = req.query.numeric
             %>
             <%
+                const serversData = (pterodactyl && pterodactyl.relationships && pterodactyl.relationships.servers && pterodactyl.relationships.servers.data) ? pterodactyl.relationships.servers.data : [];
                 let ram = 0;
                 let disk = 0;
                 let cpu = 0;
-                let servers = pterodactyl.relationships.servers.data.length;
-                for (let i = 0, len = pterodactyl.relationships.servers.data.length; i < len; i++) {
-                    ram = ram + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.memory == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.memory : 0);
-                    disk = disk + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.disk == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.disk : 0);
-                    cpu = cpu + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.cpu == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.cpu : 0);
+                let servers = serversData.length;
+                for (let i = 0, len = serversData.length; i < len; i++) {
+                    ram = ram + (typeof serversData[i].attributes.limits.memory == "number" ? serversData[i].attributes.limits.memory : 0);
+                    disk = disk + (typeof serversData[i].attributes.limits.disk == "number" ? serversData[i].attributes.limits.disk : 0);
+                    cpu = cpu + (typeof serversData[i].attributes.limits.cpu == "number" ? serversData[i].attributes.limits.cpu : 0);
                 }
             %>
             <% if (id) { %>
-                <% if (pterodactyl.relationships.servers.data.filter(name => name.attributes.id == id).length == 1) {
-                    let serverinfo = pterodactyl.relationships.servers.data.filter(name => name.attributes.id == id)[0];
+                <% if (serversData.filter(name => name.attributes.id == id).length == 1) {
+                    let serverinfo = serversData.filter(name => name.attributes.id == id)[0];
                     let attemptegg = null;
                     let attemptname = null;
                     for (let [name, value] of Object.entries(settings.api.client.eggs)) {

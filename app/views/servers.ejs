@@ -76,7 +76,7 @@
             <div class="col-span-3 ml-4"><%= __('servers.columns.ip_address') %></div>
         </div>
     
-        <% pterodactyl.data = pterodactyl.relationships.servers.data %>
+        <% pterodactyl.data = (pterodactyl && pterodactyl.relationships && pterodactyl.relationships.servers && pterodactyl.relationships.servers.data) ? pterodactyl.relationships.servers.data : [] %>
         <!-- Servers List -->
         <div class="divide-y divide-white/5 mt-4 md:mt-0" id="servers-list">
             <% if (pterodactyl.data.length === 0) { %>

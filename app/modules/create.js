@@ -146,11 +146,12 @@ router.get("/server/create", authMiddleware, async (req, res) => {
             let ram2 = 0;
             let disk2 = 0;
             let cpu2 = 0;
-            let servers2 = req.session.pterodactyl.relationships.servers.data.length;
-            for (let i = 0, len = req.session.pterodactyl.relationships.servers.data.length; i < len; i++) {
-                ram2 += req.session.pterodactyl.relationships.servers.data[i].attributes.limits.memory;
-                disk2 += req.session.pterodactyl.relationships.servers.data[i].attributes.limits.disk;
-                cpu2 += req.session.pterodactyl.relationships.servers.data[i].attributes.limits.cpu;
+            const serversData = req.session.pterodactyl?.relationships?.servers?.data || [];
+            let servers2 = serversData.length;
+            for (let i = 0, len = serversData.length; i < len; i++) {
+                ram2 += serversData[i].attributes.limits.memory;
+                disk2 += serversData[i].attributes.limits.disk;
+                cpu2 += serversData[i].attributes.limits.cpu;
             }
 
             if (servers2 >= package.servers + extra.servers) {
