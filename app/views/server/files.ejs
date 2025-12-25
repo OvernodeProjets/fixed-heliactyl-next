@@ -776,7 +776,7 @@ document.getElementById('mass-archive').addEventListener('click', () => {
     .then(data => {
         loadFileList(currentPath);
         updateMassActionsBar();
-        showToast('<%= __('server.files.archive_created', { name: "' + (data.attributes?.name || '') + '" }) %>');
+        showToast('<%- __('server.files.archive_created', { name: "' + (data.attributes?.name || '') + '" }) %>');
     }).catch(error => {
         console.error('Error creating archive:', error);
         showToast('<%= __('server.files.error_archive') %>');
@@ -875,7 +875,7 @@ function createFileRow(name, type, mimetype, size, modified) {
         </div>
         <div class="file-name-cell md:w-[90%]">
             <div class="file-icon-small">${getFileIcon(iconClass)}</div>
-            <span>${name}</span>
+            <span class="overflow-auto">${name}</span>
         </div>
         <div class="text-sm text-gray-400">${formattedSize}</div>
         <div class="text-sm text-gray-400">${fileType}</div>
