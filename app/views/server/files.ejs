@@ -1,4 +1,9 @@
 <%- include('../components/top') %>
+<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+  eruda.init();
+</script>
 <!-- todo : replace with tailwindcss -->
 <style>
     .select-all-checkbox {
@@ -742,7 +747,7 @@ document.getElementById('mass-delete').addEventListener('click', () => {
         }).then(() => {
             loadFileList(currentPath);
             updateMassActionsBar();
-            showToast('<%= __('server.files.deleted_items', { count: "' + selectedFiles.length + '" }) %>');
+            showToast('<%- __('server.files.deleted_items', { count: "' + selectedFiles.length + '" }) %>');
         }).catch(error => {
             console.error('Error deleting files:', error);
             showToast('<%= __('server.files.error_deleting') %>');
