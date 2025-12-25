@@ -899,12 +899,21 @@ function setupFileElementEvents(element, name, type) {
 
     const contextMenuButton = element.querySelector('.context-menu-button');
     if (contextMenuButton) {
+        // Desktop click
         contextMenuButton.addEventListener('click', (e) => {
             console.log('Context menu button clicked');
             e.stopPropagation();
             e.preventDefault();
             showContextMenu(e, name, type === 'file');
         });
+        
+        // Mobile touch support
+        contextMenuButton.addEventListener('touchend', (e) => {
+            console.log('Context menu button touched');
+            e.stopPropagation();
+            e.preventDefault();
+            showContextMenu(e, name, type === 'file');
+        }, { passive: false });
     }
 
     element.addEventListener('contextmenu', (e) => {
@@ -915,8 +924,8 @@ function setupFileElementEvents(element, name, type) {
 
     element.addEventListener('click', (e) => {
         console.log('Element clicked');
-        if (e.target.type === 'checkbox') {
-            // Handled by checkbox click listener
+        if (e.target.type === 'checkbox' || e.target.closest('.context-menu-button')) {
+            // Handled by checkbox or context menu button listener
         } else if (name === '..') {
             const parentPath = currentPath.split('/').slice(0, -1).join('/') || '/';
             loadFileList(parentPath);
@@ -925,6 +934,24 @@ function setupFileElementEvents(element, name, type) {
         } else {
             openFileEditor(name);
         }
+    });
+    
+    // Long-press (touch hold) for mobile - opens context menu
+    let longPressTimer;
+    element.addEventListener('touchstart', (e) => {
+        if (e.target.closest('.context-menu-button') || e.target.type === 'checkbox') return;
+        longPressTimer = setTimeout(() => {
+            e.preventDefault();
+            showContextMenu(e.touches[0], name, type === 'file');
+        }, 500); // 500ms hold
+    }, { passive: true });
+    
+    element.addEventListener('touchend', () => {
+        clearTimeout(longPressTimer);
+    });
+    
+    element.addEventListener('touchmove', () => {
+        clearTimeout(longPressTimer);
     });
 }
 
