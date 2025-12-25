@@ -264,11 +264,13 @@
         padding: 1rem;
         border-radius: 0.5rem;
         opacity: 0;
+        visibility: hidden;
         transition: opacity 0.3s ease;
         z-index: 9999;
     }
     .toast.show {
         opacity: 1;
+        visibility: visible;
     }
     .context-menu {
     position: fixed;
@@ -1907,6 +1909,8 @@ document.addEventListener('keydown', (e) => {
         }
     }
 });
+
+let isLoading = false;
 
 window.addEventListener('scroll', () => {
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !isLoading) {
