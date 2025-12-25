@@ -442,7 +442,7 @@ function initializeSidebarWebSocket(serverId) {
             showAlert('error', 'Access Denied', 'Your server has been suspended. Please contact support via our Discord (discord.gg/<%= settings.discord %>) for more information.', 100000);
             return;
         }
-        console.log('Sidebar WebSocket disconnected, reconnecting...');
+        // Silently reconnect
         setTimeout(() => initializeSidebarWebSocket(serverId), 5000);
     };
 
