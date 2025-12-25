@@ -28,10 +28,11 @@ module.exports.load = async function (router, db) {
   const ClientAPI = getClientAPI();
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
-  // Add these constants at the top of the file
   const RENEWAL_PERIOD_HOURS = settings.renewal?.renewal_period || 48;
-  const WARNING_THRESHOLD_HOURS = settings.renewal?.warning_threshold || 24; // When to start showing warnings
-  const CHECK_INTERVAL_MINUTES = settings.renewal?.check_interval || 5; // How often to check for expired servers
+  const WARNING_THRESHOLD_HOURS = settings.renewal?.warning_threshold || 24;
+  const CHECK_INTERVAL_MINUTES = settings.renewal?.check_interval || 5;
+  const AUTO_DELETE_ENABLED = settings.renewal?.auto_delete_enabled || false;
+  const AUTO_DELETE_AFTER_HOURS = settings.renewal?.auto_delete_after || 24;
 
   async function initializeRenewalSystem(db) {
     // Start the background task to check for expired servers
@@ -174,34 +175,66 @@ module.exports.load = async function (router, db) {
 
   async function handleExpiredServer(db, serverId) {
     try {
-      // Update renewal status
       const renewalData = await db.get(`renewal_${serverId}`);
-      renewalData.isActive = false;
-      await db.set(`renewal_${serverId}`, renewalData);
+      if (!renewalData) return;
 
-      // Stop the server
-      const powerResult = await ClientAPI.executePowerAction(serverId, 'stop');
+      const now = new Date();
+      const nextRenewal = new Date(renewalData.nextRenewal);
+      const hoursSinceExpiration = (now - nextRenewal) / (1000 * 60 * 60);
 
-      // If server not found (null result), clean up renewal data
-      if (powerResult === null) {
-        console.log(`Server ${serverId} not found during expiration check. Removing renewal data.`);
-        await db.delete(`renewal_${serverId}`);
-
-        // Update user data if we have the userId
-        if (renewalData.userId) {
-          console.log(`Refreshing user data for user ${renewalData.userId}`);
-          await getPteroUser(renewalData.userId, db);
+      // Check if server should be deleted (auto-delete enabled and past threshold)
+      if (AUTO_DELETE_ENABLED && hoursSinceExpiration >= AUTO_DELETE_AFTER_HOURS) {
+        console.log(`Server ${serverId} has been expired for ${Math.round(hoursSinceExpiration)}h. Auto-deleting...`);
+        
+        try {
+          const { getAppAPI } = require("../../handlers/pterodactylSingleton.js");
+          const AppAPI = getAppAPI();
+          await AppAPI.deleteServer(serverId);
+          
+          // Clean up renewal data
+          await db.delete(`renewal_${serverId}`);
+      
+          await serverActivityLog(db, serverId, 'Server Auto-Deleted', {
+            lastRenewal: renewalData.lastRenewal,
+            renewalCount: renewalData.renewalCount,
+            hoursSinceExpiration: Math.round(hoursSinceExpiration)
+          });
+          
+          // Refresh user data
+          if (renewalData.userId) {
+            await getPteroUser(renewalData.userId, db);
+          }
+          
+          console.log(`Server ${serverId} has been auto-deleted.`);
+        } catch (deleteError) {
+          console.error(`Failed to auto-delete server ${serverId}:`, deleteError);
         }
         return;
       }
 
-      console.log(`Server ${serverId} has expired and been stopped.`);
+      // If not deleting yet, just stop the server
+      if (renewalData.isActive) {
+        renewalData.isActive = false;
+        await db.set(`renewal_${serverId}`, renewalData);
 
-      // Log the expiration
-      await serverActivityLog(db, serverId, 'Server Expired', {
-        lastRenewal: renewalData.lastRenewal,
-        renewalCount: renewalData.renewalCount
-      });
+        const powerResult = await ClientAPI.executePowerAction(serverId, 'stop');
+
+        if (powerResult === null) {
+          console.log(`Server ${serverId} not found. Removing renewal data.`);
+          await db.delete(`renewal_${serverId}`);
+          if (renewalData.userId) {
+            await getPteroUser(renewalData.userId, db);
+          }
+          return;
+        }
+
+        console.log(`Server ${serverId} has expired and been stopped.`);
+        await serverActivityLog(db, serverId, 'Server Expired', {
+          lastRenewal: renewalData.lastRenewal,
+          renewalCount: renewalData.renewalCount,
+          willDeleteIn: AUTO_DELETE_ENABLED ? `${AUTO_DELETE_AFTER_HOURS}h` : 'never'
+        });
+      }
     } catch (error) {
       console.error(`Error handling expired server ${serverId}:`, error);
     }
