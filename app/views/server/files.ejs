@@ -1,9 +1,4 @@
 <%- include('../components/top') %>
-<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>
-  eruda.init();
-</script>
 <!-- todo : replace with tailwindcss -->
 <style>
     .select-all-checkbox {
@@ -278,9 +273,8 @@
     border: 1px solid #0d0d22;
     border-radius: 4px;
     padding: 5px 0;
-    min-width: 150px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    z-index: 9999;
+    z-index: 40;
 } 
 
 .context-menu-item {
@@ -545,7 +539,7 @@
 </div>
 
 <!-- Context Menu -->
-<div id="context-menu" class="context-menu z-50 bg-white/5 backdrop-blur" style="display: none;">
+<div id="context-menu" class="context-menu min-w-[100px] md:min-w-[150px] z-50 bg-white/5 backdrop-blur" style="display: none;">
     <div class="context-menu-item hover:bg-white/5" id="context-menu-edit"><%= __('server.files.context_edit') %></div>
     <div class="context-menu-item hover:bg-white/5" id="context-menu-rename"><%= __('server.files.context_rename') %></div>
     <div class="context-menu-item hover:bg-white/5" id="context-menu-download"><%= __('server.files.context_download') %></div>
@@ -631,7 +625,7 @@ function updateViewModeUI() {
 
 function sortFiles(files) {
     return [...files].sort((a, b) => {
-console.log(a, b)
+
         if (a.attributes.goBackButton === true || b.attributes.goBackButton === true) return;
         const aIsFolder = !a.attributes?.is_file;
         const bIsFolder = !b.attributes?.is_file;
@@ -925,15 +919,7 @@ function setupFileElementEvents(element, name, type, goBackButton) {
             e.preventDefault();
             showContextMenu(e, name, type === 'file');
         });
-        
-        // Mobile touch support
-        contextMenuButton.addEventListener('touchend', (e) => {
-            console.log('Context menu button touched');
-            e.stopPropagation();
-            e.preventDefault();
-            showContextMenu(e, name, type === 'file');
-        }, { passive: false });
-    }
+    };
 
     element.addEventListener('contextmenu', (e) => {
         e.preventDefault();
@@ -962,7 +948,7 @@ function setupFileElementEvents(element, name, type, goBackButton) {
         longPressTimer = setTimeout(() => {
             e.preventDefault();
             showContextMenu(e.touches[0], name, type === 'file');
-        }, 500); // 500ms hold
+        }, 1500); // 1.5s hold
     }, { passive: true });
     
     element.addEventListener('touchend', () => {
@@ -1006,16 +992,24 @@ function createFileCard(name, type, mimetype, size, goBackButton) {
     return card;
 }
 
-function showContextMenu(e, name, isFile) {
+function sshowContextMenu(e, name, isFile) {
     const contextMenu = document.getElementById('context-menu');
     contextMenu.style.display = 'block';
     
     const rect = e.target.getBoundingClientRect();
+
+    const viewWidth = window.innerWidth || document.documentElement.clientWidth;
+
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
     
     contextMenu.style.top = `${rect.bottom + scrollTop}px`;
     contextMenu.style.left = `${rect.left + scrollLeft}px`;
+    
+    if (rect.left > viewWidth) {
+      const correctLeft = rect.left - viewWidth;
+      contextMenu.left = `${rect.left - correctLeft}px`
+    }
 
     const isArchive = isFile && archiveExtensions.some(ext => name.toLowerCase().endsWith(ext));
 
@@ -1077,15 +1071,27 @@ function formatFileSize(bytes) {
 
 function showContextMenu(e, name, isFile) {
     console.log('showContextMenu called', { name, isFile });
-    e.preventDefault();
+    if (e.preventDefault) {
+      e.preventDefault();
+    }
     const contextMenu = document.getElementById('context-menu');
     
     // Position the context menu
-    const x = e.clientX;
-    const y = e.clientY;
-    contextMenu.style.display = 'block';
+    const viewWidth = window.innerWidth || document.documentElement.clientWidth;
+
+    const x = Math.trunc(e.clientX);
+    const y = Math.trunc(e.clientY);
+
     contextMenu.style.left = `${x}px`;
     contextMenu.style.top = `${y}px`;
+    contextMenu.style.display = 'block';
+
+    //realign the menu if its overflowing out of the body
+    const totalX = x + contextMenu.clientWidth;
+    if (totalX > viewWidth) {
+      const correctX = (totalX - viewWidth) + 5;
+      contextMenu.style.left = `${x - correctX}px`;
+    }
 
     console.log('Context menu positioned', { x, y });
 
