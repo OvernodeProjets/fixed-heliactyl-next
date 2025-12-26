@@ -631,6 +631,8 @@ function updateViewModeUI() {
 
 function sortFiles(files) {
     return [...files].sort((a, b) => {
+console.log(a, b)
+        if (a.attributes.goBackButton === true || b.attributes.goBackButton === true) return;
         const aIsFolder = !a.attributes?.is_file;
         const bIsFolder = !b.attributes?.is_file;
         
@@ -667,6 +669,10 @@ function filterFiles(files) {
     if (!searchTerm) return files;
     
     return files.filter(file => {
+        if (file.attributes.goBackButton) {
+          if (file.attributes.goBackButton === true) return;
+        }
+
         const name = file.attributes.name.toLowerCase();
         const type = file.attributes.is_file ? 'file' : 'folder';
         const extension = file.attributes.name.split('.').pop()?.toLowerCase() || '';
@@ -798,7 +804,7 @@ async function loadFileList(path, page = 1) {
         if (page === 1) {
             fileCache = data.data;
             if (currentPath !== '/') {
-                fileCache.unshift({ attributes: { name: '..', is_file: false } });
+                fileCache.unshift({ attributes: { name: '..', is_file: false, goBackButton: true } });
             }
         } else {
             fileCache = [...fileCache, ...data.data];
@@ -815,8 +821,8 @@ async function loadFileList(path, page = 1) {
         }
         
         sortedFiles.forEach(item => {
-            const { name, is_file: isFile, mimetype, size, modified } = item.attributes;
-            fileList.appendChild(createFileElement(name, isFile ? 'file' : 'directory', mimetype, size, modified));
+            const { name, is_file: isFile, mimetype, size, modified, goBackButton } = item.attributes;
+            fileList.appendChild(createFileElement(name, isFile ? 'file' : 'directory', mimetype, size, modified, goBackButton));
         });
         
         // Update pagination
@@ -852,15 +858,15 @@ async function loadFileList(path, page = 1) {
     }
 }
 
-function createFileElement(name, type, mimetype, size, modified) {
+function createFileElement(name, type, mimetype, size, modified, goBackButton = false) {
     if (viewMode === 'grid') {
-        return createFileCard(name, type, mimetype, size);
+        return createFileCard(name, type, mimetype, size, goBackButton);
     } else {
-        return createFileRow(name, type, mimetype, size, modified);
+        return createFileRow(name, type, mimetype, size, modified, goBackButton);
     }
 }
 
-function createFileRow(name, type, mimetype, size, modified) {
+function createFileRow(name, type, mimetype, size, modified, goBackButton) {
     const row = document.createElement('div');
     row.className = 'file-row';
     const isArchive = type === 'file' && archiveExtensions.some(ext => name.toLowerCase().endsWith(ext));
@@ -880,7 +886,7 @@ function createFileRow(name, type, mimetype, size, modified) {
         <div class="text-sm text-gray-400">${formattedSize}</div>
         <div class="text-sm text-gray-400">${fileType}</div>
         <div class="text-sm text-gray-400">${formattedDate}</div>
-        <div class="flex items-center justify-center">
+        <div class="mass-action-button-container flex items-center justify-center">
             <button class="context-menu-button text-gray-400 hover:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
@@ -888,12 +894,18 @@ function createFileRow(name, type, mimetype, size, modified) {
             </button>
         </div>
     `;
+    
 
-    setupFileElementEvents(row, name, type);
+    if (goBackButton === true) {
+      row.querySelector('.form-checkbox').classList.add('hidden');
+      row.querySelector('.mass-action-button-container').classList.add('hidden');
+    }
+
+    setupFileElementEvents(row, name, type, goBackButton);
     return row;
 }
 
-function setupFileElementEvents(element, name, type) {
+function setupFileElementEvents(element, name, type, goBackButton) {
     const checkbox = element.querySelector('input[type="checkbox"]');
     if (checkbox) {
         checkbox.addEventListener('change', () => {
@@ -924,7 +936,7 @@ function setupFileElementEvents(element, name, type) {
         console.log('Element clicked');
         if (e.target.type === 'checkbox') {
             // Handled by checkbox click listener
-        } else if (name === '..') {
+        } else if (goBackButton === true) {
             const parentPath = currentPath.split('/').slice(0, -1).join('/') || '/';
             loadFileList(parentPath);
         } else if (type === 'directory') {
@@ -935,7 +947,7 @@ function setupFileElementEvents(element, name, type) {
     });
 }
 
-function createFileCard(name, type, mimetype, size) {
+function createFileCard(name, type, mimetype, size, goBackButton) {
     const card = document.createElement('div');
     card.className = 'file-card relative bg-white/5 p-4 rounded-lg transition-all duration-200 hover:bg-white/10 cursor-pointer hover:scale-95';
     const isArchive = type === 'file' && archiveExtensions.some(ext => name.toLowerCase().endsWith(ext));
@@ -946,7 +958,7 @@ function createFileCard(name, type, mimetype, size) {
         <div class="absolute top-2 left-2">
             <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-500 rounded focus:ring-indigo-500" data-name="${name}">
         </div>
-        <div class="absolute top-2 right-2">
+        <div class="mass-action-button-container absolute top-2 right-2">
             <button class="context-menu-button text-gray-400 hover:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
@@ -958,7 +970,12 @@ function createFileCard(name, type, mimetype, size) {
         ${formattedSize ? `<div class="file-size text-sm text-gray-400 text-center">${formattedSize}</div>` : ''}
     `;
 
-    setupFileElementEvents(card, name, type);
+    if (goBackButton === true) {
+      card.querySelector('.form-checkbox').classList.add('hidden');
+      card.querySelector('.mass-action-button-container').classList.add('hidden');
+    }
+
+    setupFileElementEvents(card, name, type, goBackButton);
     return card;
 }
 
@@ -1254,7 +1271,7 @@ function openFileEditor(fileName) {
                 <h3 class="editor-title">${fileName}</h3>
             </div>
             <div class="editor-actions">
-                <button id="toggle-word-wrap" class="hidden editor-button secondary" style="display: none">
+                <button id="toggle-word-wrap" class="editor-button secondary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 7h18"></path>
                         <path d="M3 12h18"></path>
