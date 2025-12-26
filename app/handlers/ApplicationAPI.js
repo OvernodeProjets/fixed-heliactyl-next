@@ -334,6 +334,59 @@ class PterodactylApplicationModule {
     }
   }
 
+  /**
+   * Check if a location has available allocations for server deployment
+   * @param {number} locationId - The location ID to check
+   * @returns {Promise<{available: boolean, freeAllocations: number, nodes: Array}>}
+   */
+  async checkLocationAvailability(locationId) {
+    try {
+      // Get all nodes and filter by location
+      const nodesResponse = await this.listNodes(1, 100);
+      const locationNodes = nodesResponse.data.filter(
+        node => node.attributes.location_id === parseInt(locationId) && 
+                !node.attributes.maintenance_mode
+      );
+
+      if (locationNodes.length === 0) {
+        return { available: false, freeAllocations: 0, nodes: [], reason: 'No active nodes in this location' };
+      }
+
+      let totalFreeAllocations = 0;
+      const nodesWithSpace = [];
+
+      for (const node of locationNodes) {
+        try {
+          const allocations = await this.getNodeAllocations(node.attributes.id);
+          const freeAllocations = allocations.data.filter(a => !a.attributes.assigned);
+          
+          if (freeAllocations.length > 0) {
+            totalFreeAllocations += freeAllocations.length;
+            nodesWithSpace.push({
+              id: node.attributes.id,
+              name: node.attributes.name,
+              freeAllocations: freeAllocations.length
+            });
+          }
+        } catch (err) {
+          // Node might be unreachable, skip it
+          console.warn(`Could not check allocations for node ${node.attributes.id}:`, err.message);
+        }
+      }
+
+      return {
+        available: totalFreeAllocations > 0,
+        freeAllocations: totalFreeAllocations,
+        nodes: nodesWithSpace,
+        reason: totalFreeAllocations === 0 ? 'No available allocations (out of stock)' : null
+      };
+    } catch (error) {
+      this.logError('Error checking location availability:', error);
+      // Don't block server creation if check fails - let Pterodactyl handle it
+      return { available: true, freeAllocations: -1, nodes: [], reason: 'Could not verify availability' };
+    }
+  }
+
   // ==================== LOCATIONS ====================
 
   async listLocations(page = 1, perPage = 50) {

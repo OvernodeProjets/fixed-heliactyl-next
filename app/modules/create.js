@@ -216,6 +216,18 @@ router.get("/server/create", authMiddleware, async (req, res) => {
             }
                 const specs = egginfo.info;
 
+                // Pre-flight check: verify location has available allocations
+                try {
+                    const availability = await AppAPI.checkLocationAvailability(location);
+                    if (!availability.available) {
+                        console.warn(`Location ${location} out of stock:`, availability.reason);
+                        return res.redirect(`/server/new?err=NODEOUTOFSTOCK`);
+                    }
+                } catch (checkErr) {
+                    // Log but don't block - let Pterodactyl handle it
+                    console.warn('Could not pre-check location availability:', checkErr.message);
+                }
+
                 const serverSpecs = {
                   name: name.trim(),
                   user: await db.get(`users-${req.session.userinfo.id}`),
@@ -242,9 +254,37 @@ router.get("/server/create", authMiddleware, async (req, res) => {
                   }
         };
 
-    let serverinfo = await AppAPI.createServer(serverSpecs);
+    let serverinfo;
+    try {
+        serverinfo = await AppAPI.createServer(serverSpecs);
+    } catch (createError) {
+        console.error("Pterodactyl API Error (exception):", createError.response?.data || createError.message);
+        
+        // Check for specific error types
+        const errorData = createError.response?.data;
+        const errorDetail = errorData?.errors?.[0]?.detail || '';
+        
+        // Deployment/allocation errors
+        if (errorDetail.includes('deploy') || errorDetail.includes('allocation') || errorDetail.includes('No suitable')) {
+            return res.redirect(`/server/new?err=NODEOUTOFSTOCK`);
+        }
+        
+        // Rate limiting
+        if (createError.response?.status === 429) {
+            return res.redirect(`/server/new?err=RATELIMITED`);
+        }
+        
+        // Bad gateway / service unavailable from node
+        if (createError.response?.status === 502 || createError.response?.status === 503) {
+            return res.redirect(`/server/new?err=NODEUNAVAILABLE`);
+        }
+        
+        const encodedError = encodeURIComponent(JSON.stringify(errorData || { error: createError.message }));
+        return res.redirect(`/dashboard?err=PTERODACTYL&data=${encodedError}`);
+    }
+    
     if (!serverinfo || !serverinfo.attributes) {
-        console.error("Pterodactyl API Error:", serverinfo);
+        console.error("Pterodactyl API Error (no attributes):", serverinfo);
         const encodedError = encodeURIComponent(JSON.stringify(serverinfo || { error: "Unknown error" }));
         return res.redirect(`/dashboard?err=PTERODACTYL&data=${encodedError}`);
     }

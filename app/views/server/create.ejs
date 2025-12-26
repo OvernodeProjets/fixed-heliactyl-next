@@ -47,6 +47,14 @@
                     return "Failed to create server! This is most likely an issue on XEH's end, not yours.";
                   case "MISSINGEGG":
                     return "The server type for this server is not registered as a valid server type, therefore your server's RAM, disk and/or CPU could not be changed.";
+                  case "TOOMUCHSERVERS":
+                    return "You have reached your maximum server limit. Delete a server or purchase more slots.";
+                  case "NODEOUTOFSTOCK":
+                    return "The selected location is currently out of stock. Please try a different location or try again later.";
+                  case "NODEUNAVAILABLE":
+                    return "The server node is temporarily unavailable. Please try again in a few minutes.";
+                  case "RATELIMITED":
+                    return "Too many requests. Please wait a moment before creating another server.";
                   case "TOOLITTLERAM":
                   case "TOOLITTLEDISK":
                   case "TOOLITTLECPU":
