@@ -60,7 +60,7 @@
                   case "EXCEEDCPU":
                     return "The server could not be created because you have requested to create a server that exceeds your plan.";
                   default:
-                    return "An unknown error occurred. Please try again or contact support if the issue persists.";
+                    return `An unknown error occurred. Please try again or contact support if the issue persists.\nERROR: ${req.query.err}`;
                 }
               })() %>
             </p>
@@ -316,7 +316,7 @@ async function fetchDynamicLocations() {
                     
                     if (available === 0 || availableDisk <= 0) {
                         capacitySpan.className = 'text-red-400 text-xs text-right';
-                        card.classList.add('opacity-50');
+                        card.classList.add('opacity-50', 'pointer-events-none');
                     } else if (lowSlots || lowDisk) {
                         capacitySpan.className = 'text-yellow-400 text-xs text-right';
                     } else {
