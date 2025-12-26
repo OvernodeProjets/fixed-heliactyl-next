@@ -1045,10 +1045,10 @@ function getCookie(name) {
             
 <script>
     // Remove loading elements after animation
-    setTimeout(() => {
+    window.onload = function() {
         document.querySelector('.loading-bar').style.display = 'none';
         document.querySelector('.spinner').style.display = 'none';
-    }, 500);
+    };
 </script>
 <div class="mt-4 md:px-10">
     <div id="application" class="hidden min-h-[490px] flex justify-center">
