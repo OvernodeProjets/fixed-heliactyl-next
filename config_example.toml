@@ -478,9 +478,11 @@ enabled = true
 # Renewal Settings
 # ------------------------------------------------------
 [renewal]
-renewal_period = 48
-warning_threshold = 24
-check_interval = 5
+renewal_period = 48          # Hours before server needs renewal
+warning_threshold = 24       # Hours before expiration to show warning
+check_interval = 5           # Minutes between expiration checks
+auto_delete_enabled = false  # Enable automatic server deletion after expiration
+auto_delete_after = 24       # Hours after expiration before server is deleted
 
 # ------------------------------------------------------
 # Update Configuration

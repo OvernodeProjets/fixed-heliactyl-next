@@ -85,36 +85,10 @@
         const serverId = new URLSearchParams(window.location.search).get('numeric');
         let selectedNodeId = null;
         let serverNode = null;
-
-    const locations = JSON.parse('<%- JSON.stringify(settings.api.client.locations) %>');
-    const nodeData = Object.values(locations).reduce((acc, location) => {
-        if (!location.enabled && location.enabled !== undefined) return acc;
-
-        const existingCategory = acc.find(cat => cat.category === location.country);
-        const node = location.nodes[0];
-
-        const nodeInfo = {
-            id: node.id,
-            idName: node.name,
-            name: location.name,
-            location: location.region,
-            disabled: false
-        };
-        
-        if (existingCategory) {
-            existingCategory.nodes.push(nodeInfo);
-        } else {
-            acc.push({
-                category: location.country,
-                nodes: [nodeInfo]
-            });
-        }
-        
-        return acc;
-    }, []);
-
+        let nodeData = [];
         function createNodeGrid() {
             const grid = document.getElementById('node-grid');
+            grid.innerHTML = ''; 
             
             nodeData.forEach(category => {
                 const categorySection = document.createElement('div');
@@ -135,13 +109,51 @@
                 
                 category.nodes.forEach(node => {
                     const nodeCard = document.createElement('div');
+                    const memoryPercent = node.totalMemory ? Math.round((node.usedMemory / node.totalMemory) * 100) : 0;
+                    const diskPercent = node.totalDisk ? Math.round((node.usedDisk / node.totalDisk) * 100) : 0;
+                    const freeMemoryGB = (node.freeMemory / 1024).toFixed(1);
+                    const freeDiskGB = (node.freeDisk / 1024).toFixed(1);
+                    const isCurrentNode = node.idName === serverNode;
+                    
+                    // Status badge based on priority: Current > No Ports > No RAM > No Disk > Available
+                    let statusBadge = '';
+                    if (isCurrentNode) {
+                        statusBadge = `<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-500/20 text-blue-400">Current</span>`;
+                    } else if (node.noAllocations) {
+                        statusBadge = `<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-700 text-gray-300">No Ports</span>`;
+                    } else if (node.noRam) {
+                        statusBadge = `<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-500/20 text-red-400">No RAM</span>`;
+                    } else if (node.noDisk) {
+                        statusBadge = `<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-orange-500/20 text-orange-400">No Disk</span>`;
+                    } else {
+                        statusBadge = `<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-500/20 text-green-400">${node.location}</span>`;
+                    }
+                    
                     nodeCard.className = `p-4 rounded-lg ${node.disabled ? 'bg-white/5 opacity-50' : 'bg-white/5 hover:bg-white/10'} transition cursor-pointer border border-transparent`;
                     nodeCard.innerHTML = `
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between mb-3">
                             <span class="font-medium text-white">${node.name}</span>
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs ${node.disabled ? 'bg-gray-700 text-gray-300' : 'bg-indigo-500/10 text-indigo-400'}">
-                                ${node.location}
-                            </span>
+                            ${statusBadge}
+                        </div>
+                        <div class="space-y-2">
+                            <div>
+                                <div class="flex justify-between text-xs text-gray-400 mb-1">
+                                    <span>RAM</span>
+                                    <span>${freeMemoryGB} GB free</span>
+                                </div>
+                                <div class="w-full bg-white/10 rounded-full h-1.5">
+                                    <div class="h-1.5 rounded-full ${memoryPercent > 90 ? 'bg-red-500' : memoryPercent > 70 ? 'bg-amber-500' : 'bg-green-500'}" style="width: ${memoryPercent}%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs text-gray-400 mb-1">
+                                    <span>Disk</span>
+                                    <span>${freeDiskGB} GB free</span>
+                                </div>
+                                <div class="w-full bg-white/10 rounded-full h-1.5">
+                                    <div class="h-1.5 rounded-full ${diskPercent > 90 ? 'bg-red-500' : diskPercent > 70 ? 'bg-amber-500' : 'bg-green-500'}" style="width: ${diskPercent}%"></div>
+                                </div>
+                            </div>
                         </div>
                     `;
                     
@@ -283,18 +295,74 @@
         // Initialize
 
 document.addEventListener('DOMContentLoaded', async () => {
-    async function availableCapacity(nodeId) {
+    let serverMemory = 0;
+    let serverDisk = 0;
+    
+    async function availableCapacity(nodeId, requiredMemory, requiredDisk) {
         try {
-            const response = await fetch(`/api/servers/capacity/${nodeId}`);
+            const response = await fetch(`/api/servers/capacity/${nodeId}?requiredMemory=${requiredMemory}&requiredDisk=${requiredDisk}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            return data.availableAllocations || 0;
+            return {
+                // Allocations (checked first)
+                allocations: data.availableAllocations || 0,
+                // Memory (checked second)
+                freeMemory: data.freeMemory || 0,
+                totalMemory: data.totalMemory || 0,
+                usedMemory: data.usedMemory || 0,
+                hasEnoughMemory: data.hasEnoughMemory !== false,
+                // Disk (checked third)
+                freeDisk: data.freeDisk || 0,
+                totalDisk: data.totalDisk || 0,
+                usedDisk: data.usedDisk || 0,
+                hasEnoughDisk: data.hasEnoughDisk !== false
+            };
         } catch (error) {
-            console.error(`Error fetching servers for node ${nodeId}:`, error);
-            return 0;
+            console.error(`Error fetching capacity for node ${nodeId}:`, error);
+            return { allocations: 0, freeMemory: 0, totalMemory: 0, usedMemory: 0, hasEnoughMemory: false, freeDisk: 0, totalDisk: 0, usedDisk: 0, hasEnoughDisk: false };
         }
+    }
+
+    const allowedLocationIds = Object.keys(JSON.parse('<%- JSON.stringify(settings.api.client.locations || {}) %>')).map(id => parseInt(id));
+
+    try {
+        const locationsResponse = await fetch('/api/locations');
+        const locations = await locationsResponse.json();
+        
+        // Transform locations into nodeData format grouped by country
+        // Only include locations that are configured in config.toml
+        nodeData = Object.entries(locations).reduce((acc, [locationId, location]) => {
+            // Filter: only include locations that are in the config
+            if (!allowedLocationIds.includes(parseInt(locationId))) return acc;
+            if (!location.nodes || !location.nodes.length) return acc;
+            
+            for (const node of location.nodes) {
+                const existingCategory = acc.find(cat => cat.category === location.country);
+                const nodeInfo = {
+                    id: node.id,
+                    idName: node.name,
+                    name: node.name,
+                    locationName: location.name,
+                    location: location.region,
+                    disabled: false
+                };
+                
+                if (existingCategory) {
+                    existingCategory.nodes.push(nodeInfo);
+                } else {
+                    acc.push({
+                        category: location.country,
+                        nodes: [nodeInfo]
+                    });
+                }
+            }
+            
+            return acc;
+        }, []);
+    } catch (error) {
+        console.error('Error fetching locations:', error);
     }
 
     const serverResponse = await fetch(`/api/server/<%= req.query.id %>`);
@@ -303,12 +371,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('server-name-breadcrumb').textContent = serverData.attributes.name;
     document.getElementById('server-description').textContent = serverData.attributes.description || "No description set.";
     serverNode = serverData.attributes.node;
+    serverMemory = serverData.attributes.limits?.memory || 0;
+    serverDisk = serverData.attributes.limits?.disk || 0;
 
     const nodePromises = nodeData.map(async category => {
         for (const node of category.nodes) {
-            const capacity = await availableCapacity(node.id);
-            // Disable the node if no capacity or if it's the current server node
-            node.disabled = capacity <= 0 || node.idName === serverNode;
+            const capacity = await availableCapacity(node.id, serverMemory, serverDisk);
+            
+            // Check in order: 1. Allocations, 2. RAM, 3. Disk
+            const noAllocations = capacity.allocations <= 0;
+            const noRam = !capacity.hasEnoughMemory;
+            const noDisk = !capacity.hasEnoughDisk;
+            const isCurrentNode = node.idName === serverNode;
+            
+            node.disabled = noAllocations || noRam || noDisk || isCurrentNode;
+            node.freeMemory = capacity.freeMemory;
+            node.totalMemory = capacity.totalMemory;
+            node.usedMemory = capacity.usedMemory;
+            node.freeDisk = capacity.freeDisk;
+            node.totalDisk = capacity.totalDisk;
+            node.usedDisk = capacity.usedDisk;
+            
+            // Set reason for being disabled (in priority order)
+            node.noAllocations = noAllocations && !isCurrentNode;
+            node.noRam = !noAllocations && noRam && !isCurrentNode;
+            node.noDisk = !noAllocations && !noRam && noDisk && !isCurrentNode;
         }
     });
 

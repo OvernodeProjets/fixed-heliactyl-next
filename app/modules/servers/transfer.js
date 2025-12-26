@@ -68,6 +68,31 @@ module.exports.load = async function (router, db) {
     );
   }
 
+  async function getNodeCapacityInfo(nodeId) {
+    const nodeResponse = await apiRequest(`/nodes/${nodeId}?include=servers`);
+    const node = nodeResponse.attributes;
+    
+    let usedMemory = 0;
+    let usedDisk = 0;
+    if (nodeResponse.attributes.relationships?.servers?.data) {
+      for (const server of nodeResponse.attributes.relationships.servers.data) {
+        usedMemory += server.attributes.limits?.memory || 0;
+        usedDisk += server.attributes.limits?.disk || 0;
+      }
+    }
+    
+    return {
+      totalMemory: node.memory,
+      usedMemory: usedMemory,
+      freeMemory: node.memory - usedMemory,
+      memoryOverallocation: node.memory_overallocate || 0,
+      totalDisk: node.disk,
+      usedDisk: usedDisk,
+      freeDisk: node.disk - usedDisk,
+      diskOverallocation: node.disk_overallocate || 0
+    };
+  }
+
   async function transferServer(serverId, allocationId, targetNodeId) {
     const payload = `node_id=${targetNodeId}&allocation_id=${allocationId}&_token=${token}`;
     await apiRequest(
@@ -81,9 +106,36 @@ module.exports.load = async function (router, db) {
 
   router.get("/servers/capacity/:node", authMiddleware, async (req, res) => {
     const { node } = req.params;
+    const { requiredMemory, requiredDisk } = req.query;
     try {
       const allocations = await getAvailableAllocations(node);
-      res.status(200).json({ availableAllocations: allocations.length });
+      
+      const capacityInfo = await getNodeCapacityInfo(node);
+      
+      const memOverallocate = capacityInfo.memoryOverallocation;
+      const maxMemory = capacityInfo.totalMemory * (1 + memOverallocate / 100);
+      const effectiveFreeMemory = maxMemory - capacityInfo.usedMemory;
+      
+      const diskOverallocate = capacityInfo.diskOverallocation;
+      const maxDisk = capacityInfo.totalDisk * (1 + diskOverallocate / 100);
+      const effectiveFreeDisk = maxDisk - capacityInfo.usedDisk;
+      
+      const requiredMem = parseInt(requiredMemory) || 0;
+      const requiredDsk = parseInt(requiredDisk) || 0;
+      const hasEnoughMemory = effectiveFreeMemory >= requiredMem;
+      const hasEnoughDisk = effectiveFreeDisk >= requiredDsk;
+      
+      res.status(200).json({ 
+        availableAllocations: allocations.length,
+        freeMemory: Math.floor(effectiveFreeMemory),
+        totalMemory: capacityInfo.totalMemory,
+        usedMemory: capacityInfo.usedMemory,
+        hasEnoughMemory: hasEnoughMemory,
+        freeDisk: Math.floor(effectiveFreeDisk),
+        totalDisk: capacityInfo.totalDisk,
+        usedDisk: capacityInfo.usedDisk,
+        hasEnoughDisk: hasEnoughDisk
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
