@@ -259,11 +259,13 @@
         padding: 1rem;
         border-radius: 0.5rem;
         opacity: 0;
+        visibility: hidden;
         transition: opacity 0.3s ease;
         z-index: 9999;
     }
     .toast.show {
         opacity: 1;
+        visibility: visible;
     }
     .context-menu {
     position: fixed;
@@ -271,9 +273,8 @@
     border: 1px solid #0d0d22;
     border-radius: 4px;
     padding: 5px 0;
-    min-width: 150px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    z-index: 9999;
+    z-index: 40;
 } 
 
 .context-menu-item {
@@ -538,7 +539,7 @@
 </div>
 
 <!-- Context Menu -->
-<div id="context-menu" class="context-menu z-50 bg-white/5 backdrop-blur" style="display: none;">
+<div id="context-menu" class="context-menu min-w-[100px] md:min-w-[150px] z-50 bg-white/5 backdrop-blur" style="display: none;">
     <div class="context-menu-item hover:bg-white/5" id="context-menu-edit"><%= __('server.files.context_edit') %></div>
     <div class="context-menu-item hover:bg-white/5" id="context-menu-rename"><%= __('server.files.context_rename') %></div>
     <div class="context-menu-item hover:bg-white/5" id="context-menu-download"><%= __('server.files.context_download') %></div>
@@ -624,6 +625,8 @@ function updateViewModeUI() {
 
 function sortFiles(files) {
     return [...files].sort((a, b) => {
+
+        if (a.attributes.goBackButton === true || b.attributes.goBackButton === true) return;
         const aIsFolder = !a.attributes?.is_file;
         const bIsFolder = !b.attributes?.is_file;
         
@@ -660,6 +663,10 @@ function filterFiles(files) {
     if (!searchTerm) return files;
     
     return files.filter(file => {
+        if (file.attributes.goBackButton) {
+          if (file.attributes.goBackButton === true) return;
+        }
+
         const name = file.attributes.name.toLowerCase();
         const type = file.attributes.is_file ? 'file' : 'folder';
         const extension = file.attributes.name.split('.').pop()?.toLowerCase() || '';
@@ -742,7 +749,7 @@ document.getElementById('mass-delete').addEventListener('click', () => {
         }).then(() => {
             loadFileList(currentPath);
             updateMassActionsBar();
-            showToast('<%= __('server.files.deleted_items', { count: "' + selectedFiles.length + '" }) %>');
+            showToast('<%- __('server.files.deleted_items', { count: "' + selectedFiles.length + '" }) %>');
         }).catch(error => {
             console.error('Error deleting files:', error);
             showToast('<%= __('server.files.error_deleting') %>');
@@ -769,7 +776,7 @@ document.getElementById('mass-archive').addEventListener('click', () => {
     .then(data => {
         loadFileList(currentPath);
         updateMassActionsBar();
-        showToast('<%= __('server.files.archive_created', { name: "' + (data.attributes?.name || '') + '" }) %>');
+        showToast('<%- __('server.files.archive_created', { name: "' + (data.attributes?.name || '') + '" }) %>');
     }).catch(error => {
         console.error('Error creating archive:', error);
         showToast('<%= __('server.files.error_archive') %>');
@@ -791,7 +798,7 @@ async function loadFileList(path, page = 1) {
         if (page === 1) {
             fileCache = data.data;
             if (currentPath !== '/') {
-                fileCache.unshift({ attributes: { name: '..', is_file: false } });
+                fileCache.unshift({ attributes: { name: '..', is_file: false, goBackButton: true } });
             }
         } else {
             fileCache = [...fileCache, ...data.data];
@@ -808,8 +815,8 @@ async function loadFileList(path, page = 1) {
         }
         
         sortedFiles.forEach(item => {
-            const { name, is_file: isFile, mimetype, size, modified } = item.attributes;
-            fileList.appendChild(createFileElement(name, isFile ? 'file' : 'directory', mimetype, size, modified));
+            const { name, is_file: isFile, mimetype, size, modified, goBackButton } = item.attributes;
+            fileList.appendChild(createFileElement(name, isFile ? 'file' : 'directory', mimetype, size, modified, goBackButton));
         });
         
         // Update pagination
@@ -845,15 +852,15 @@ async function loadFileList(path, page = 1) {
     }
 }
 
-function createFileElement(name, type, mimetype, size, modified) {
+function createFileElement(name, type, mimetype, size, modified, goBackButton = false) {
     if (viewMode === 'grid') {
-        return createFileCard(name, type, mimetype, size);
+        return createFileCard(name, type, mimetype, size, goBackButton);
     } else {
-        return createFileRow(name, type, mimetype, size, modified);
+        return createFileRow(name, type, mimetype, size, modified, goBackButton);
     }
 }
 
-function createFileRow(name, type, mimetype, size, modified) {
+function createFileRow(name, type, mimetype, size, modified, goBackButton) {
     const row = document.createElement('div');
     row.className = 'file-row';
     const isArchive = type === 'file' && archiveExtensions.some(ext => name.toLowerCase().endsWith(ext));
@@ -868,12 +875,12 @@ function createFileRow(name, type, mimetype, size, modified) {
         </div>
         <div class="file-name-cell md:w-[90%]">
             <div class="file-icon-small">${getFileIcon(iconClass)}</div>
-            <span>${name}</span>
+            <span class="overflow-auto">${name}</span>
         </div>
         <div class="text-sm text-gray-400">${formattedSize}</div>
         <div class="text-sm text-gray-400">${fileType}</div>
         <div class="text-sm text-gray-400">${formattedDate}</div>
-        <div class="flex items-center justify-center">
+        <div class="mass-action-button-container flex items-center justify-center">
             <button class="context-menu-button text-gray-400 hover:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
@@ -881,12 +888,18 @@ function createFileRow(name, type, mimetype, size, modified) {
             </button>
         </div>
     `;
+    
 
-    setupFileElementEvents(row, name, type);
+    if (goBackButton === true) {
+      row.querySelector('.form-checkbox').classList.add('hidden');
+      row.querySelector('.mass-action-button-container').classList.add('hidden');
+    }
+
+    setupFileElementEvents(row, name, type, goBackButton);
     return row;
 }
 
-function setupFileElementEvents(element, name, type) {
+function setupFileElementEvents(element, name, type, goBackButton) {
     const checkbox = element.querySelector('input[type="checkbox"]');
     if (checkbox) {
         checkbox.addEventListener('change', () => {
@@ -906,15 +919,7 @@ function setupFileElementEvents(element, name, type) {
             e.preventDefault();
             showContextMenu(e, name, type === 'file');
         });
-        
-        // Mobile touch support
-        contextMenuButton.addEventListener('touchend', (e) => {
-            console.log('Context menu button touched');
-            e.stopPropagation();
-            e.preventDefault();
-            showContextMenu(e, name, type === 'file');
-        }, { passive: false });
-    }
+    };
 
     element.addEventListener('contextmenu', (e) => {
         e.preventDefault();
@@ -926,7 +931,7 @@ function setupFileElementEvents(element, name, type) {
         console.log('Element clicked');
         if (e.target.type === 'checkbox' || e.target.closest('.context-menu-button')) {
             // Handled by checkbox or context menu button listener
-        } else if (name === '..') {
+        } else if (goBackButton === true) {
             const parentPath = currentPath.split('/').slice(0, -1).join('/') || '/';
             loadFileList(parentPath);
         } else if (type === 'directory') {
@@ -943,7 +948,7 @@ function setupFileElementEvents(element, name, type) {
         longPressTimer = setTimeout(() => {
             e.preventDefault();
             showContextMenu(e.touches[0], name, type === 'file');
-        }, 500); // 500ms hold
+        }, 1500); // 1.5s hold
     }, { passive: true });
     
     element.addEventListener('touchend', () => {
@@ -955,7 +960,7 @@ function setupFileElementEvents(element, name, type) {
     });
 }
 
-function createFileCard(name, type, mimetype, size) {
+function createFileCard(name, type, mimetype, size, goBackButton) {
     const card = document.createElement('div');
     card.className = 'file-card relative bg-white/5 p-4 rounded-lg transition-all duration-200 hover:bg-white/10 cursor-pointer hover:scale-95';
     const isArchive = type === 'file' && archiveExtensions.some(ext => name.toLowerCase().endsWith(ext));
@@ -966,7 +971,7 @@ function createFileCard(name, type, mimetype, size) {
         <div class="absolute top-2 left-2">
             <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-500 rounded focus:ring-indigo-500" data-name="${name}">
         </div>
-        <div class="absolute top-2 right-2">
+        <div class="mass-action-button-container absolute top-2 right-2">
             <button class="context-menu-button text-gray-400 hover:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
@@ -978,60 +983,15 @@ function createFileCard(name, type, mimetype, size) {
         ${formattedSize ? `<div class="file-size text-sm text-gray-400 text-center">${formattedSize}</div>` : ''}
     `;
 
-    setupFileElementEvents(card, name, type);
+    if (goBackButton === true) {
+      card.querySelector('.form-checkbox').classList.add('hidden');
+      card.querySelector('.mass-action-button-container').classList.add('hidden');
+    }
+
+    setupFileElementEvents(card, name, type, goBackButton);
     return card;
 }
 
-function showContextMenu(e, name, isFile) {
-    const contextMenu = document.getElementById('context-menu');
-    contextMenu.style.display = 'block';
-    
-    const rect = e.target.getBoundingClientRect();
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-    
-    contextMenu.style.top = `${rect.bottom + scrollTop}px`;
-    contextMenu.style.left = `${rect.left + scrollLeft}px`;
-
-    const isArchive = isFile && archiveExtensions.some(ext => name.toLowerCase().endsWith(ext));
-
-    document.getElementById('context-menu-edit').style.display = isFile && !isArchive ? 'block' : 'none';
-    document.getElementById('context-menu-decompress').style.display = isArchive ? 'block' : 'none';
-
-        document.getElementById('context-menu-edit').onclick = () => {
-            contextMenu.style.display = 'none';
-            openFileEditor(name);
-        };
-
-        document.getElementById('context-menu-delete').onclick = () => {
-            contextMenu.style.display = 'none';
-            deleteItem(name, isFile);
-        };
-
-    document.getElementById('context-menu-decompress').onclick = () => {
-        contextMenu.style.display = 'none';
-        decompressFile(name);
-    };
-
-        document.getElementById('context-menu-rename').onclick = () => {
-            contextMenu.style.display = 'none';
-            renameItem(name, isFile);
-        };
-
-        document.getElementById('context-menu-download').onclick = () => {
-            contextMenu.style.display = 'none';
-            download(name, isFile);
-        };
-
-        document.getElementById('context-menu-clone').onclick = () => {
-            contextMenu.style.display = 'none';
-            cloneItem(name, isFile);
-        };
-
-        document.addEventListener('click', () => {
-            contextMenu.style.display = 'none';
-        }, { once: true });
-    }
 function getFileIcon(type) {
     switch (type) {
         case 'folder':
@@ -1053,15 +1013,27 @@ function formatFileSize(bytes) {
 
 function showContextMenu(e, name, isFile) {
     console.log('showContextMenu called', { name, isFile });
-    e.preventDefault();
+    if (e.preventDefault) {
+      e.preventDefault();
+    }
     const contextMenu = document.getElementById('context-menu');
     
     // Position the context menu
-    const x = e.clientX;
-    const y = e.clientY;
-    contextMenu.style.display = 'block';
+    const viewWidth = window.innerWidth || document.documentElement.clientWidth;
+
+    const x = Math.trunc(e.clientX);
+    const y = Math.trunc(e.clientY);
+
     contextMenu.style.left = `${x}px`;
     contextMenu.style.top = `${y}px`;
+    contextMenu.style.display = 'block';
+
+    //realign the menu if its overflowing out of the body
+    const totalX = x + contextMenu.clientWidth;
+    if (totalX > viewWidth) {
+      const correctX = (totalX - viewWidth) + 5;
+      contextMenu.style.left = `${x - correctX}px`;
+    }
 
     console.log('Context menu positioned', { x, y });
 
@@ -1274,7 +1246,7 @@ function openFileEditor(fileName) {
                 <h3 class="editor-title">${fileName}</h3>
             </div>
             <div class="editor-actions">
-                <button id="toggle-word-wrap" class="hidden editor-button secondary" style="display: none">
+                <button id="toggle-word-wrap" class="editor-button secondary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 7h18"></path>
                         <path d="M3 12h18"></path>
@@ -1929,6 +1901,8 @@ document.addEventListener('keydown', (e) => {
         }
     }
 });
+
+let isLoading = false;
 
 window.addEventListener('scroll', () => {
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !isLoading) {
