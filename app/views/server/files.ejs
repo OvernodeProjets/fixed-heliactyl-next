@@ -992,64 +992,6 @@ function createFileCard(name, type, mimetype, size, goBackButton) {
     return card;
 }
 
-function sshowContextMenu(e, name, isFile) {
-    const contextMenu = document.getElementById('context-menu');
-    contextMenu.style.display = 'block';
-    
-    const rect = e.target.getBoundingClientRect();
-
-    const viewWidth = window.innerWidth || document.documentElement.clientWidth;
-
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-    
-    contextMenu.style.top = `${rect.bottom + scrollTop}px`;
-    contextMenu.style.left = `${rect.left + scrollLeft}px`;
-    
-    if (rect.left > viewWidth) {
-      const correctLeft = rect.left - viewWidth;
-      contextMenu.left = `${rect.left - correctLeft}px`
-    }
-
-    const isArchive = isFile && archiveExtensions.some(ext => name.toLowerCase().endsWith(ext));
-
-    document.getElementById('context-menu-edit').style.display = isFile && !isArchive ? 'block' : 'none';
-    document.getElementById('context-menu-decompress').style.display = isArchive ? 'block' : 'none';
-
-        document.getElementById('context-menu-edit').onclick = () => {
-            contextMenu.style.display = 'none';
-            openFileEditor(name);
-        };
-
-        document.getElementById('context-menu-delete').onclick = () => {
-            contextMenu.style.display = 'none';
-            deleteItem(name, isFile);
-        };
-
-    document.getElementById('context-menu-decompress').onclick = () => {
-        contextMenu.style.display = 'none';
-        decompressFile(name);
-    };
-
-        document.getElementById('context-menu-rename').onclick = () => {
-            contextMenu.style.display = 'none';
-            renameItem(name, isFile);
-        };
-
-        document.getElementById('context-menu-download').onclick = () => {
-            contextMenu.style.display = 'none';
-            download(name, isFile);
-        };
-
-        document.getElementById('context-menu-clone').onclick = () => {
-            contextMenu.style.display = 'none';
-            cloneItem(name, isFile);
-        };
-
-        document.addEventListener('click', () => {
-            contextMenu.style.display = 'none';
-        }, { once: true });
-    }
 function getFileIcon(type) {
     switch (type) {
         case 'folder':
