@@ -1,9 +1,4 @@
 <%- include('../components/top') %>
-<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>
-  eruda.init();
-</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
@@ -1053,7 +1048,7 @@ async function checkRenewalStatus() {
     try {
         const response = await fetch(`/api/server/${serverId}/renewal/status`);
         const data = await response.json();
-        
+
         if (data.config) {
             renewalConfig = data.config;
 
@@ -1080,6 +1075,8 @@ async function checkRenewalStatus() {
         // Update time remaining
         if (data.timeRemaining.hours <= 0 && data.timeRemaining.minutes <= 0) {
             renewalTime.innerHTML = `<span class="text-red-500"><%= __('server.manage.expired') %></span>`;
+        } else if (data.hasRenewalBypass) {
+            renewalTime.textContent = "Unlimited";
         } else {
             renewalTime.textContent = `${data.timeRemaining.hours}h ${data.timeRemaining.minutes}m <%= __('server.manage.remaining_suffix') %>`;
         }
@@ -1104,7 +1101,7 @@ async function checkRenewalStatus() {
                 renewalBadge.classList.remove('bg-red-600', 'bg-yellow-600', 'bg-emerald-600');
                 renewalBadge.textContent = '<%= __('server.manage.renewal_available') %>';
             }
-        } else if (data.timeRemaining.hours > renewalConfig.renewalPeriod + 1) { // Grace period/bypass check
+        } else if (data.hasRenewalBypass || data.nextRenewal === 'Unlimited') { // Grace period
                 renewalBadge.classList.add('bg-emerald-600');
                 renewalBadge.classList.remove('bg-red-600', 'bg-yellow-600', 'bg-indigo-500');
                 renewalBadge.textContent = '<%= __('server.manage.renewal_bypass') %>';
@@ -1113,12 +1110,12 @@ async function checkRenewalStatus() {
             renewButton.classList.add('hidden');
             renewalBadge.classList.add('hidden');
         }
-console.log(data.timeRemaining.hours, renewalConfig.renewalPeriod)
+
         // Add a progress indicator
         const totalHours = renewalConfig.renewalPeriod;
-        const remainingPercentage = (data.timeRemaining.hours + (data.timeRemaining.minutes / 60)) / totalHours * 100;
+        const remainingPercentage = Math.min((data.timeRemaining.hours + (data.timeRemaining.minutes / 60)) / totalHours * 100, 100);
         const progressBar = document.querySelector('#renewal-progress-bar');
-            if (data.timeRemaining.hours < renewalConfig.renewalPeriod + 2) {
+        if (data.timeRemaining.hours < renewalConfig.renewalPeriod + 2 || data.hasRenewalBypass) {
         if (progressBar) {
             progressBar.style.width = `${remainingPercentage}%`;
             
