@@ -69,7 +69,7 @@ module.exports.load = async function (router, db) {
       if (hasRenewalBypass && !renewalData.hasRenewalBypass) {
         const updatedRenewalData = {
           ...renewalData,
-          nextRenewal: new Date('2099-12-31T23:59:59.999Z').toISOString(),
+          nextRenewal: 'Unlimited',
           hasRenewalBypass: true,
           isActive: true, // Ensure server is active if it was previously expired
           userId: user || renewalData.userId // Update userId if provided
