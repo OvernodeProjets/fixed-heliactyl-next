@@ -1,4 +1,9 @@
 <%- include('../components/top') %>
+<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+  eruda.init();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
@@ -1103,11 +1108,12 @@ async function checkRenewalStatus() {
                 renewalBadge.classList.add('bg-emerald-600');
                 renewalBadge.classList.remove('bg-red-600', 'bg-yellow-600', 'bg-indigo-500');
                 renewalBadge.textContent = '<%= __('server.manage.renewal_bypass') %>';
+                renewalBadge.classList.remove('hidden');
         } else {
             renewButton.classList.add('hidden');
             renewalBadge.classList.add('hidden');
         }
-
+console.log(data.timeRemaining.hours, renewalConfig.renewalPeriod)
         // Add a progress indicator
         const totalHours = renewalConfig.renewalPeriod;
         const remainingPercentage = (data.timeRemaining.hours + (data.timeRemaining.minutes / 60)) / totalHours * 100;
