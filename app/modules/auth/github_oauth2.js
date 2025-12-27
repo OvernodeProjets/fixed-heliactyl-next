@@ -111,6 +111,44 @@ module.exports.load = async function (router, db) {
       if (settings.api.client.oauth2.ip["duplicate check"] == true && ip !== "127.0.0.1" && ip !== "::1" && ip !== "::ffff:127.0.0.1" && !ip.startsWith("192.168.")) {
         const userIP = await db.get(`ipuser-${ip}`);
         const bypassFlag = await db.get(`antialt-bypass-${userinfo.id}`) || false;
+        
+        // Check if the IP is associated with a banned account
+        if (userIP && userIP !== userinfo.id) {
+            const linkedUserBanStatus = await db.get(`ban-${userIP}`);
+            if (linkedUserBanStatus) {
+                // Auto-ban the current user if their IP is linked to a banned account
+                const banData = {
+                  reason: `Auto-banned: IP linked to banned account (${userIP})`,
+                  expiration: null,
+                  bannedAt: new Date().toISOString(),
+                  bannedBy: 'system-antialt'
+                };
+                
+                await db.set(`ban-${userinfo.id}`, banData);
+                
+                // Add to ban history
+                const banHistory = (await db.get(`banHistory-${userinfo.id}`)) || [];
+                banHistory.push(banData);
+                await db.set(`banHistory-${userinfo.id}`, banHistory);
+                
+                await discordLog(
+                  "anti-alt",
+                  `User ID: \`${userinfo.id}\` was AUTO-BANNED because their IP is linked to banned account: \`${userIP}\`.`,
+                  [
+                    { name: "IP Address", value: ip, inline: true },
+                    { name: "Linked Banned User", value: userIP, inline: true }
+                  ],
+                  false
+                );
+                
+                const theme = await getPages();
+                return res.status(500).render(theme.settings.errors.banned, {
+                  settings,
+                  reason: `Your account has been automatically banned because your IP is linked to a banned account.`
+                });
+            }
+        }
+
         if (userIP && userIP !== userinfo.id && !bypassFlag) {
           // Send webhook notifications
           await discordLog(

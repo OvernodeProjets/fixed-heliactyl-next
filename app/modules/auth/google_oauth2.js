@@ -105,14 +105,22 @@ module.exports.load = async function (router, db) {
         
         // Check if the IP is associated with a banned account
         if (userIP && userIP !== user.id) {
-          const linkedUserBanStatus = await db.get(`banned-${userIP}`);
+          const linkedUserBanStatus = await db.get(`ban-${userIP}`);
           if (linkedUserBanStatus) {
             // Auto-ban the current user if their IP is linked to a banned account
-            await db.set(`banned-${user.id}`, {
+            const banData = {
               reason: `Auto-banned: IP linked to banned account (${userIP})`,
+              expiration: null,
               bannedAt: new Date().toISOString(),
               bannedBy: 'system-antialt'
-            });
+            };
+            
+            await db.set(`ban-${user.id}`, banData);
+            
+            // Add to ban history
+            const banHistory = (await db.get(`banHistory-${user.id}`)) || [];
+            banHistory.push(banData);
+            await db.set(`banHistory-${user.id}`, banHistory);
             
             await discordLog(
               "anti-alt",
