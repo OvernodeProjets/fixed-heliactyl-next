@@ -59,8 +59,10 @@
                   case "EXCEEDDISK":
                   case "EXCEEDCPU":
                     return "The server could not be created because you have requested to create a server that exceeds your plan.";
+                  case "NOVIABLENODEEXCEPTION":
+                    return "The location you've selected is currently full, please try again in an different location"
                   default:
-                    return `An unknown error occurred. Please try again or contact support if the issue persists.\nERROR: ${req.query.err}`;
+                    return `An unknown error occurred. Please try again or contact support if the issue persists.\n\nERROR: ${req.query.err}`;
                 }
               })() %>
             </p>

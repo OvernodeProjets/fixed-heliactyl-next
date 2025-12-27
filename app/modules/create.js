@@ -245,12 +245,12 @@ router.get("/server/create", authMiddleware, async (req, res) => {
     try {
       let serverinfo = await AppAPI.createServer(serverSpecs);
     } catch(error) {
-      return res.redirect(`/server/new?err=${error.code}`);
+      return res.redirect(`/server/new?err=${error.response.data.errors[0].code.toUpperCase()}`);
     };
     if (!serverinfo || !serverinfo.attributes) {
         console.error("Pterodactyl API Error:", serverinfo);
         const encodedError = encodeURIComponent(JSON.stringify(serverinfo || { error: "Unknown error" }));
-        return res.redirect(`/dashboard?err=${encodedError}`);
+        return res.redirect(`/dashboard?err=PTERODACTYL&data=${encodedError}`);
     }
                 let serverinfotext = serverinfo;
                 let newpterodactylinfo = req.session.pterodactyl;
