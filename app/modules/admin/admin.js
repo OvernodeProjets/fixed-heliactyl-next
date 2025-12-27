@@ -303,8 +303,6 @@ module.exports.load = async function (router, db) {
   router.get("/admin/remove_account", requireAdmin, async (req, res) => {
     let { id } = req.query;
 
-    // This doesn't delete the account and doesn't touch the renewal system.
-
     if (!id)
       return res.redirect(
           "/admin?err=REMOVEACCOUNTMISSINGID"
@@ -327,8 +325,7 @@ module.exports.load = async function (router, db) {
       }
     }
 
-    // Remove user.
-
+    // Remove user from users list
     let userids = (await db.get("users")) || [];
     userids = userids.filter((user) => user !== pterodactylID);
 
@@ -338,6 +335,7 @@ module.exports.load = async function (router, db) {
       await db.set("users", userids);
     }
 
+    // Delete basic user data
     await db.delete("users-" + id);
     if (userEmail) {
       await db.delete("user-" + userEmail);
@@ -349,9 +347,101 @@ module.exports.load = async function (router, db) {
     await db.delete("extra-" + id);
     await db.delete("package-" + id);
 
+    // Delete transactions
+    await db.delete("transactions-" + id);
+
+    // Delete advent claims (for current and previous years)
+    const currentYear = new Date().getFullYear();
+    await db.delete(`advent-claims-${id}-${currentYear}`);
+    await db.delete(`advent-claims-${id}-${currentYear - 1}`);
+
+    // Delete IP associations - find all ipuser-* entries that map to this user
+    try {
+      const ipKeys = await db.list("ipuser-*");
+      for (const key of ipKeys) {
+        const userId = await db.get(key);
+        if (userId === id) {
+          await db.delete(key);
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting IP associations:", error);
+    }
+
+    // Delete ban data
+    await db.delete(`ban-${id}`);
+    await db.delete(`banHistory-${id}`);
+    await db.delete(`antialt-bypass-${id}`);
+
+    // Delete Pterodactyl servers and renewals
+    let deletedServers = [];
+    let serverErrors = [];
+    try {
+      const pterodactylUser = await getPteroUser(id, db);
+      const servers = pterodactylUser?.attributes?.relationships?.servers?.data;
+      
+      if (servers?.length) {
+        for (const server of servers) {
+          const serverId = server.attributes.id;
+          try {
+            // Delete renewal data for this server
+            await db.delete(`renewal_${serverId}`);
+            
+            // Delete the server from Pterodactyl
+            await AppAPI.deleteServer(serverId, true);
+            deletedServers.push(server.attributes.name || server.attributes.identifier);
+          } catch (error) {
+            console.error(`Error deleting server ${serverId}:`, error);
+            serverErrors.push(server.attributes.name || server.attributes.identifier);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user servers:", error);
+    }
+
+    // Delete the Pterodactyl user account
+    try {
+      await AppAPI.deleteUser(pterodactylID);
+    } catch (error) {
+      console.error("Error deleting Pterodactyl user:", error);
+    }
+
+    // Delete any remaining keys that match the user ID pattern
+    try {
+      const userRelatedKeys = await db.list(`*-${id}`);
+      for (const key of userRelatedKeys) {
+        await db.delete(key);
+      }
+    } catch (error) {
+      console.error("Error deleting user-related keys:", error);
+    }
+
+    const logFields = [
+      { name: "User ID", value: `\`${id}\``, inline: true },
+      { name: "Pterodactyl ID", value: `\`${pterodactylID}\``, inline: true }
+    ];
+    
+    if (deletedServers.length > 0) {
+      logFields.push({
+        name: "Deleted Servers",
+        value: deletedServers.map(s => `\`${s}\``).join(", "),
+        inline: false
+      });
+    }
+    
+    if (serverErrors.length > 0) {
+      logFields.push({
+        name: "Server Deletion Errors",
+        value: serverErrors.map(s => `\`${s}\``).join(", "),
+        inline: false
+      });
+    }
+
     discordLog(
       `remove account`,
-      `${req.session.userinfo.username} removed the account with the ID \`${id}\`.`
+      `${req.session.userinfo.username} removed the account with the ID \`${id}\`.\n\n**Actions performed:**\n• ${deletedServers.length} server(s) deleted\n• Pterodactyl account deleted\n• All user data cleaned up`,
+      logFields
     );
     res.status(200).json({ message: "Account removed successfully." });
   });
