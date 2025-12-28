@@ -4,9 +4,9 @@
 - [ ] remove all style balis from ejs files
 - [ ] fix sidebar (when we scroll we see the end of the sidebar)
 - [X] Add party boost + optmize afk system
-- [ ] 
-- [ ] 
-- [ ] 
+- [ ] Add legals (configurable) like terms, privacy, etc 
+- [ ] translate all pages to english (minimum)
+- [ ] remake an clean structure of the project
 - [ ] 
 - [ ] 
 - [ ] 
