@@ -123,7 +123,55 @@
     </div>
 </nav>
 
+<!-- Toast Notification -->
+<div id="toast" class="fixed bg-blue-500 bottom-4 right-4 opacity-0 visibility-hidden text-white p-3 rounded-md transition max-w-[75%] min-w-[10%] md:max-w-[35%] md:min-w-[0] overflow-auto z-100">ggggggggggggg</div>
+
 <script>
+let timeoutToast;
+
+function showToast(type, message, duration = 5000) {
+  // clear timeouts (if any)
+  clearTimeout(timeoutToast)
+  
+  // adds the message
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  
+  // Find the type and apply the colors
+  switch (type) {
+    case 'success':
+      toast.classList.remove('bg-red-500', 'bg-amber-600', 'bg-blue-500');
+      toast.classList.add('bg-green-400');
+      break;
+    case 'warn':
+      toast.classList.remove('bg-red-500', 'bg-green-400', 'bg-blue-500');
+      toast.classList.add('bg-amber-600');
+      break;
+    case 'error':
+      toast.classList.remove('bg-green-400', 'bg-amber-600', 'bg-blue-500');
+      toast.classList.add('bg-red-500');
+      break;
+    case 'info':
+      toast.classList.remove('bg-red-500', 'bg-amber-600', 'bg-green-400');
+      toast.classList.add('bg-blue-500');
+      break;
+    default:
+      toast.classList.remove('bg-red-500, 'bg-amber-600', 'bg-blue-500');
+      toast.classList.add('bg-green-400');
+      break;
+  }
+  
+  // Make it slightly transparent
+  toast.classList.remove('opacity-0', 'visibility-hidden');
+  toast.classList.add('opacity-90', 'visibility-visible');
+  
+  // Add an timeout
+  timeoutToast = setTimeout(() => {
+    toast.classList.remove('opacity-90', 'visibility-visible');
+    toast.classList.add('opacity-0', 'visibility-hidden');
+  }, duration);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const currentPath = window.location.pathname;
     const moreMenuButton = document.getElementById('more-menu-button');
