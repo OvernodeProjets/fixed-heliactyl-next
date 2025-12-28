@@ -531,13 +531,13 @@ let q;
                     });
                     const result = await response.json();
                     if (result.success) {
-                        alert(t.saveSuccess);
+                        showToast('success', t.saveSuccess);
                     } else {
                         throw new Error(result.message || 'Unknown error occurred');
                     }
                 } catch (error) {
                     console.error('Error saving workflow:', error);
-                    alert(t.saveFailedTpl.replace('__MSG__', error.message));
+                    showToast('error', t.saveFailedTpl.replace('__MSG__', error.message));
                 }
             }
         });

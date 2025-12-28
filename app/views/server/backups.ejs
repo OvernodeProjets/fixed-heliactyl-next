@@ -261,7 +261,7 @@
             })
             .catch(error => {
                 console.error('Error downloading backup:', error);
-                alert(t.downloadError);
+                showToast('error', t.downloadError);
             });
     }
 

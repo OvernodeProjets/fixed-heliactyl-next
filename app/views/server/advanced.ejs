@@ -189,7 +189,7 @@
         })
         .catch(error => {
             console.error('Error updating variable:', error);
-            alert(t.updateError);
+            showToast('error', t.updateError);
         });
     });
 
