@@ -1151,9 +1151,9 @@ document.getElementById('renew-server').addEventListener('click', async () => {
         const response = await fetch(`/api/server/${serverId}/renewal/renew`, {
             method: 'POST'
         });
-        
+
         if (response.ok) {
-            showAlert('success', <%- JSON.stringify(__('server.manage.renewed_success')) %>.replace('{{renewal}}', renewalConfig.renewalPeriod), '');
+            showAlert('success', <%= ('server.manage.renewed_success') %>, <%- JSON.stringify(__('server.manage.renewed_success_message')) %>.replace('{{renewal}}', renewalConfig.renewalPeriod));
             await checkRenewalStatus();
         } else {
             const data = await response.json();
