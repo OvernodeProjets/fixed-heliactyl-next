@@ -533,6 +533,7 @@
     "subusers": {
       "back_to_list": "Back to server list",
       "title": "Subusers",
+      "subtitle": "Subusers help you to give access of your server to other people",
       "add": "Add Subuser",
       "email": "Email",
       "cancel": "Cancel",
@@ -640,6 +641,7 @@
     "backups": {
       "back_to_list": "Back to server list",
       "title": "Backups",
+      "subtitle": "Backups are an way, for you to secure an copy of your server",
       "create": "Create Backup",
       "empty_title": "No Backups Found",
       "empty_desc": "Create your first backup to protect your server data",
