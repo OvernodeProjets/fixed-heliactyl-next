@@ -179,7 +179,7 @@
         })
         .catch(error => {
             console.error('Error deleting subuser:', error);
-            alert('An error occurred while removing the subuser. Please try again.');
+            showToast('error', 'An error occurred while removing the subuser. Please try again.');
         })
         .finally(() => {
             subuserToDelete = null;
@@ -222,7 +222,7 @@
         })
         .catch(error => {
             console.error('Error adding subuser:', error);
-            alert('<%= __('website.subusers.add_error') %>');
+            showToast('error', '<%= __('website.subusers.add_error') %>');
         });
     });
 
@@ -252,7 +252,7 @@ document.getElementById('confirm-delete').addEventListener('click', deleteSubuse
     // Function to handle errors and display user-friendly messages
     function handleError(error, message) {
         console.error(error);
-        alert(message);
+        showToast('error', message);
     }
 
     // Function to refresh the subuser list after changes
@@ -293,7 +293,7 @@ document.getElementById('confirm-delete').addEventListener('click', deleteSubuse
         const email = document.getElementById('email').value.trim();
         
         if (!email) {
-            alert('Please enter a valid email address.');
+            showToast('error', 'Please enter a valid email address.');
             return;
         }
 
@@ -313,7 +313,7 @@ document.getElementById('confirm-delete').addEventListener('click', deleteSubuse
             refreshSubuserList();
             closeModal('add-subuser-modal');
             document.getElementById('email').value = '';
-            alert('Subuser added successfully!');
+            showToast('success', 'Subuser added successfully!');
         } catch (error) {
             handleError(error, 'An error occurred while adding the subuser. Please try again.');
         }
@@ -334,7 +334,7 @@ document.getElementById('confirm-delete').addEventListener('click', deleteSubuse
 
             refreshSubuserList();
             closeModal('confirm-delete-modal');
-            alert('<%= __('website.subusers.remove_success') %>');
+            showToast('success', '<%= __('website.subusers.remove_success') %>');
         } catch (error) {
             handleError(error, '<%= __('website.subusers.remove_error') %>');
         } finally {

@@ -562,11 +562,6 @@
     <div class="spinner"></div>
 </div>
 
-<!-- Toast Notification -->
-<div id="toast" class="toast">
-    <%= __('server.files.toast_success') %>
-</div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js" integrity="sha512-6bIYsGqvLpAiEBXPdRQeFf5cueeBECtAKJjIHer3BhBZNTV3WLcLA8Tm3pDfxUwTMIS+kAZwTUvJ1IrMdX8C5w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 let currentPath = '/home/container';
@@ -688,15 +683,6 @@ function hideLoading() {
     document.getElementById('loading-overlay').classList.remove('active');
 }
 
-function showToast(message) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.classList.add('show');
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
-}
-
 // Fetch server info
 fetch(`/api/server/${serverId}`)
     .then(response => response.json())
@@ -749,10 +735,10 @@ document.getElementById('mass-delete').addEventListener('click', () => {
         }).then(() => {
             loadFileList(currentPath);
             updateMassActionsBar();
-            showToast('<%- __('server.files.deleted_items', { count: "' + selectedFiles.length + '" }) %>');
+            showToast('success', '<%- __('server.files.deleted_items', { count: "' + selectedFiles.length + '" }) %>');
         }).catch(error => {
             console.error('Error deleting files:', error);
-            showToast('<%= __('server.files.error_deleting') %>');
+            showToast('error', '<%= __('server.files.error_deleting') %>');
         }).finally(() => {
             hideLoading();
         });
@@ -776,10 +762,10 @@ document.getElementById('mass-archive').addEventListener('click', () => {
     .then(data => {
         loadFileList(currentPath);
         updateMassActionsBar();
-        showToast('<%- __('server.files.archive_created', { name: "' + (data.attributes?.name || '') + '" }) %>');
+        showToast('success', '<%- __('server.files.archive_created', { name: "' + (data.attributes?.name || '') + '" }) %>');
     }).catch(error => {
         console.error('Error creating archive:', error);
-        showToast('<%= __('server.files.error_archive') %>');
+        showToast('error', '<%= __('server.files.error_archive') %>');
     }).finally(() => {
         hideLoading();
     });
@@ -846,7 +832,7 @@ async function loadFileList(path, page = 1) {
         
     } catch (error) {
         console.error('Error loading files:', error);
-        showToast('<%= __('server.files.error_deleting') %>');
+        showToast('error', '<%= __('server.files.error_deleting') %>');
     } finally {
         hideLoading();
     }
@@ -1232,7 +1218,7 @@ function openFileEditor(fileName) {
     const nonEditableExtensions = ['jar', 'gz', 'zip', 'rar', 'tar'];
 
     if (nonEditableExtensions.includes(fileExtension)) {
-        showToast(`Cannot edit ${fileExtension} files directly.`);
+        showToast('error', `Cannot edit ${fileExtension} files directly.`);
         return;
     }
 
@@ -1322,7 +1308,7 @@ function openFileEditor(fileName) {
         })
         .catch(error => {
             console.error('Error loading file content:', error);
-            showToast('Error loading file content. Please try again.');
+            showToast('error', 'Error loading file content. Please try again.');
         });
 
     // Show keyboard shortcuts on first interaction
@@ -1519,12 +1505,12 @@ function saveFile(fileName, shouldExit = true) {
             closeModal('file-edit-modal');
             window.location.reload();
         } else {
-            showToast('File saved successfully');
+            showToast('success' 'File saved successfully');
         }
         loadFileList(currentPath);
     }).catch(err => {
         console.error('Error:', err);
-        showToast('Error saving file. Please try again.');
+        showToast('error', 'Error saving file. Please try again.');
     }).finally(() => {
         hideLoading();
     });
@@ -1544,10 +1530,10 @@ function deleteItem(name, isFile) {
             })
         }).then(() => {
             loadFileList(currentPath);
-            showToast(`${isFile ? 'File' : 'Folder'} deleted successfully`);
+            showToast('success', `${isFile ? 'File' : 'Folder'} deleted successfully`);
         }).catch(error => {
             console.error('Error deleting item:', error);
-            showToast('Error deleting item. Please try again.');
+            showToast('error', 'Error deleting item. Please try again.');
         }).finally(() => {
             hideLoading();
         });
@@ -1574,10 +1560,10 @@ function renameItem(name, isFile) {
             })
         }).then(() => {
             loadFileList(currentPath);
-            showToast(`${isFile ? 'File' : 'Folder'} renamed successfully`);
+            showToast('success', `${isFile ? 'File' : 'Folder'} renamed successfully`);
         }).catch(error => {
             console.error('Error renaming item:', error);
-            showToast('Error renaming item. Please try again.');
+            showToast('error', 'Error renaming item. Please try again.');
         }).finally(() => {
             hideLoading();
         });
@@ -1596,10 +1582,10 @@ function cloneItem(name, isFile) {
         })
     }).then(() => {
         loadFileList(currentPath);
-        showToast(`${isFile ? 'File' : 'Folder'} cloned successfully`);
+        showToast('success', `${isFile ? 'File' : 'Folder'} cloned successfully`);
     }).catch(error => {
         console.error('Error cloning item:', error);
-        showToast('Error cloning item. Please try again.');
+        showToast('error', 'Error cloning item. Please try again.');
     }).finally(() => {
         hideLoading();
     });
@@ -1607,7 +1593,7 @@ function cloneItem(name, isFile) {
 
 function download(name, isFile) {
     if (!isFile) {
-        alert('Cannot download a folder. Archive it first before downloading');
+        showAlert('error', 'Cannot download a folder. Archive it first before downloading');
         return;
     }
     showLoading();
@@ -1621,17 +1607,17 @@ function download(name, isFile) {
     .then(data => {
         if (data.attributes && data.attributes.url) {
             window.location.href = data.attributes.url;
-            showToast('Download started');
+            showToast('info', 'Download started');
             loadFileList(currentPath);
         } else {
             console.error('Download URL not found in the response');
-            showToast('Error starting download. Please try again.');
+            showToast('error', 'Error starting download. Please try again.');
                         loadFileList(currentPath);
         }
     })
     .catch(error => {
         console.error('Error downloading file:', error);
-        showToast('Error downloading file. Please try again.');
+        showToast('error', 'Error downloading file. Please try again.');
                     loadFileList(currentPath);
     })
     .finally(() => {
@@ -1652,11 +1638,11 @@ function decompressFile(fileName) {
         })
     }).then(() => {
         loadFileList(currentPath);
-        showToast('File decompressed successfully');
+        showToast('success', 'File decompressed successfully');
                     loadFileList(currentPath);
     }).catch(error => {
         console.error('Error decompressing file:', error);
-        showToast('Error decompressing file. Please try again.');
+        showToast('error', 'Error decompressing file. Please try again.');
                     loadFileList(currentPath);
     }).finally(() => {
         hideLoading();
@@ -1744,11 +1730,11 @@ function uploadFiles(files) {
         .then(() => {
             closeModal('upload-progress-modal');
             loadFileList(currentPath);
-            showToast('Files uploaded successfully');
+            showToast('success', 'Files uploaded successfully');
         })
         .catch(error => {
             console.error('Error uploading files:', error);
-            showToast('Error uploading files. Please try again.');
+            showToast('error', 'Error uploading files. Please try again.');
         });
 }
 
@@ -1804,11 +1790,11 @@ document.getElementById('create-folder-confirm').addEventListener('click', () =>
         }).then(() => {
             closeModal('create-folder-modal');
             loadFileList(currentPath);
-            showToast('Folder created successfully');
+            showToast('success', 'Folder created successfully');
                         loadFileList(currentPath);
         }).catch(error => {
             console.error('Error creating folder:', error);
-            showToast('Error creating folder. Please try again.');
+            showToast('error', 'Error creating folder. Please try again.');
                         loadFileList(currentPath);
         }).finally(() => {
             hideLoading();
@@ -1833,11 +1819,11 @@ document.getElementById('new-file-confirm').addEventListener('click', () => {
         }).then(() => {
             closeModal('new-file-modal');
             loadFileList(currentPath);
-            showToast('File created successfully');
+            showToast('success', 'File created successfully');
                         loadFileList(currentPath);
         }).catch(error => {
             console.error('Error creating new file:', error);
-            showToast('Error creating new file. Please try again.');
+            showToast('error', 'Error creating new file. Please try again.');
                         loadFileList(currentPath);
         }).finally(() => {
             hideLoading();

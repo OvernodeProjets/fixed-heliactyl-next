@@ -416,18 +416,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(response => response.json())
                     .then(data => {
                         if (data.attributes) {
-                            alert('<%= __('server.settings.update_success') %>');
+                            showToast('success', '<%= __('server.settings.update_success') %>');
                             window.location.href = "/api/updateinfo"
                             // Update the input fields with the new values
                             dockerImageInput.value = data.attributes.container.image;
                             startupCommandInput.value = data.attributes.container.startup_command;
                         } else {
-                            alert('<%= __('server.settings.update_failed') %>');
+                            showToast('error', '<%= __('server.settings.update_failed') %>');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('<%= __('server.settings.update_error') %>');
+                        showToast('error', '<%= __('server.settings.update_error') %>');
                     });
                 }
             );
@@ -452,16 +452,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     })
                     .then(response => {
                         if (response.ok) {
-                            alert('<%= __('server.settings.rename_success') %>');
+                            showToast('success', '<%= __('server.settings.rename_success') %>');
                             // Update the server name in the UI
                             document.getElementById('server-name').textContent = newName;
                         } else {
-                            alert('<%= __('server.settings.rename_failed') %>');
+                            showToast('error', '<%= __('server.settings.rename_failed') %>');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('<%= __('server.settings.rename_error') %>');
+                        showToast('error', '<%= __('server.settings.rename_error') %>');
                     });
                 }
             );
@@ -484,13 +484,13 @@ document.getElementById('reinstall-server').addEventListener('click', () => {
                 return;
             })
             .then(data => {
-                alert('<%= __('server.settings.reinstall_started') %>');
+                showToast('success', '<%= __('server.settings.reinstall_started') %>');
                 // Optionally refresh the page or update UI
                 window.location.reload();
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('<%= __('server.settings.reinstall_error') %>')
+                showToast('error', '<%= __('server.settings.reinstall_error') %>')
             });
         }
     );

@@ -133,13 +133,13 @@ async function installPlugin(pluginId, button) {
         });
         const result = await response.json();
         if (response.ok) {
-            alert('<%= __('server.plugins.installed_success') %>');
+            showToast('success', '<%= __('server.plugins.installed_success') %>');
         } else {
-            alert(`<%= __('server.plugins.install_failed_prefix') %> ${result.error}`);
+            showToast('error', `<%= __('server.plugins.install_failed_prefix') %> ${result.error}`);
         }
     } catch (error) {
         console.error('Error installing plugin:', error);
-        alert('<%= __('server.plugins.install_error') %>');
+        showToast('error', '<%= __('server.plugins.install_error') %>');
     } finally {
         button.disabled = false;
         button.innerHTML = originalText;
