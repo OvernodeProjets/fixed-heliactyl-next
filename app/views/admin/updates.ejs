@@ -300,14 +300,14 @@ async function installUpdate(version) {
     const result = await response.json();
     
     if (result.success) {
-      alert('✅ Update installed successfully!\n\nThe application will now restart.');
+      showToast('success', 'Update installed successfully!\n\nThe application will now restart.');
       window.location.reload();
     } else {
-      alert('❌ Failed to install update:\n\n' + result.message);
+      showToast('error', 'Failed to install update:\n\n' + result.message);
     }
   } catch (error) {
     console.error('Error installing update:', error);
-    alert('❌ Failed to install update. Check the console for details.');
+    showToast('error', 'Failed to install update. Check the console for details.');
   }
 }
 
