@@ -7,7 +7,7 @@
 - [ ] Add legals (configurable) like terms, privacy, etc 
 - [ ] translate all pages to english (minimum)
 - [ ] remake an clean structure of the project
-- [ ] 
-- [ ] 
+- [ ] Add linkvertise
+- [ ] Fix advent date (should stop the 25 but it doesn't)
 - [ ] 
 - [ ] 

@@ -65,8 +65,6 @@
     --color-purple-300: oklch(82.7% 0.119 306.383);
     --color-purple-400: oklch(71.4% 0.203 305.504);
     --color-purple-500: oklch(62.7% 0.265 303.9);
-    --color-purple-600: oklch(55.8% 0.288 302.321);
-    --color-purple-900: oklch(38.1% 0.176 304.987);
     --color-pink-500: oklch(65.6% 0.241 354.308);
     --color-rose-400: oklch(71.2% 0.194 13.428);
     --color-gray-50: oklch(98.5% 0.002 247.839);
@@ -1730,6 +1728,12 @@
   .bg-indigo-600 {
     background-color: var(--color-indigo-600);
   }
+  .bg-indigo-600\/10 {
+    background-color: color-mix(in srgb, oklch(51.1% 0.262 276.966) 10%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-indigo-600) 10%, transparent);
+    }
+  }
   .bg-indigo-600\/50 {
     background-color: color-mix(in srgb, oklch(51.1% 0.262 276.966) 50%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -1785,12 +1789,6 @@
     background-color: color-mix(in srgb, oklch(62.7% 0.265 303.9) 20%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-purple-500) 20%, transparent);
-    }
-  }
-  .bg-purple-600\/10 {
-    background-color: color-mix(in srgb, oklch(55.8% 0.288 302.321) 10%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-purple-600) 10%, transparent);
     }
   }
   .bg-red-50 {
