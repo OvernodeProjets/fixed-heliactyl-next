@@ -112,7 +112,7 @@
                 <div class="px-3 py-1.5 text-xs font-medium text-white/70 uppercase tracking-wider">
                     Resources
                 </div>
-                <a href="/server/edit?numeric=<%= req.query.numeric %>" class="srv-link block rounded-lg px-3 py-1.5 text-sm text-gray-300 hover:text-indigo-300 hover:bg-indigo-500/20 transition-all duration-200">
+                <a href="/server/edit?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link block rounded-lg px-3 py-1.5 text-sm text-gray-300 hover:text-indigo-300 hover:bg-indigo-500/20 transition-all duration-200">
                     Edit Resources
                 </a>
             </div>

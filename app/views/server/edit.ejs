@@ -1,11 +1,10 @@
 <%- include('../components/top') %>
-
 <main class="flex-grow container mx-auto px-4 py-8">
-    <%- include('../components/header', {
-        title: __('server.edit.title'),
-        subtitle: __('server.edit.subtitle', { name: settings.name }),
-        breadcrumbItem: __('server.edit.breadcrumb_edit')
-    }) %>
+    <%- include('../components/server_header', {
+        backButtonText: __('server.settings.back_to_list')
+    }) %>      
+<div id="alert-container" class="mb-4 space-y-2"></div>
+    <%- include('../components/server') %>
 
     <div class="max-w-7xl mx-auto">
         <div class="bg-white/5 px-4 py-5 border-b border-white/10 rounded-t-2xl sm:px-6">
@@ -77,6 +76,17 @@ id = req.query.numeric
                 </button>
             </div>
             <script>
+                fetch(`/api/server/<%= req.query.id %>`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('server-name').textContent = data.attributes.name;
+                        if(document.getElementById('server-name-breadcrumb')) {
+                             document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
+                        }
+                        document.getElementById('server-description').textContent = data.attributes.description || "<%= __('website.subusers.no_description') %>";
+                    })
+                    .catch(error => console.error("Failed to fetch server info:", error));
+
                 async function submitForm() {
                     let ram = encodeURIComponent(document.getElementById("ram").value);
                     let disk = encodeURIComponent(document.getElementById("disk").value);

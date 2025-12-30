@@ -126,6 +126,14 @@ is_default = false
     id = "0000000000000000000"
     coins = 300
 
+# --- Linkvertise ---
+  [api.client.linkvertise]
+  enabled = false
+  userid = "YOUR_LINKVERTISE_USER_ID"
+  coins_reward = 100
+  daily_limit = 24
+  reset_interval_hours = 12
+
 # --- Discord Bot ---
   [api.client.bot]
   token = "aaaaaaaaaaaaaaa0aaaaa0aaaaaa0.a0aaaa.aaaa_a0aaAaaAaaAaaaaAaAaAaA0aaA0aaaa"
