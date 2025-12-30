@@ -746,6 +746,21 @@ serverSection.style.display = 'block';
 
                             <span class="text-sm">AFK Page</span>
                         </a>
+                        <% if (settings.api.client.linkvertise && settings.api.client.linkvertise.enabled) { %>
+                        <a href="../linkvertise"
+                            class="flex items-center gap-2 px-4 py-2 text-white/70 hover:bg-white/5 transition rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 389 599" fill="currentColor"
+                                class="size-4">
+                                <g transform="translate(-1583 -386)">
+                                    <rect width="136" height="136" rx="24" transform="translate(1740 492) rotate(-45)" />
+                                    <rect width="136" height="136" rx="24" transform="translate(1740 704) rotate(-45)" />
+                                    <rect width="136" height="136" rx="24" transform="translate(1633 809) rotate(-45)" />
+                                    <rect width="136" height="136" rx="24" transform="translate(1633 598) rotate(-45)" />
+                              </g>
+                            </svg>
+                            <span class="text-sm">Linkvertise</span>
+                        </a>
+                        <% } %>
                         <a href="../referrals"
                             class="flex items-center gap-2 px-4 py-2 text-white/70 hover:bg-white/5 transition rounded-lg">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"

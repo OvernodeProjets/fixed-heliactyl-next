@@ -1,0 +1,186 @@
+<%- include('./components/top') %>
+<main class="flex-grow container mx-auto px-4 py-8">
+    <%- include('./components/header', {
+        title: 'Linkvertise Generator',
+        subtitle: 'Support us and earn coins by completing short links!',
+        breadcrumbItem: 'Linkvertise'
+    }) %>
+
+
+    <!-- Alerts/Toasts Container -->
+    <div id="alert-container" class="fixed top-4 right-4 z-50 w-full max-w-sm space-y-2 pointer-events-none"></div>
+
+    <div class="mt-8 max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Generator Card -->
+        <div class="p-6 rounded-xl bg-white/5 border border-white/10">
+            <h2 class="text-xl font-semibold text-white mb-4">Generate Link</h2>
+            <p class="text-gray-400 mb-6">Create a link, read an article or watch an ad, and get free coins instantly.</p>
+            
+            <a href="/api/lv/gen" id="genBtn" class="block w-full text-center py-3 px-4 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors">
+                Generate Link & Earn Coins
+            </a>
+            
+            <div id="errorMsg" class="mt-4 text-center text-red-400 hidden"></div>
+        </div>
+
+        <!-- Statistics Card -->
+        <div class="p-6 rounded-xl bg-white/5 border border-white/10">
+            <h2 class="text-xl font-semibold text-white mb-4">Daily Statistics</h2>
+            
+            <div class="space-y-4">
+                <div class="flex justify-between items-center p-3 rounded-lg bg-white/5">
+                    <span class="text-gray-300">Daily Limit</span>
+                    <span id="dailyLimit" class="font-bold text-white">-/-</span>
+                </div>
+                
+                <div class="flex justify-between items-center p-3 rounded-lg bg-white/5">
+                    <span class="text-gray-300">Remaining</span>
+                    <span id="remaining" class="font-bold text-indigo-400">-</span>
+                </div>
+
+                <div class="flex justify-between items-center p-3 rounded-lg bg-white/5">
+                    <span class="text-gray-300">Resets in</span>
+                    <span id="resetTime" class="font-mono text-gray-400">--:--:--</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Instructions -->
+    <div class="mt-6 max-w-4xl mx-auto p-6 rounded-xl bg-white/5 border border-white/10">
+        <h3 class="text-lg font-semibold text-white mb-3">How it works</h3>
+        <ol class="list-decimal list-inside space-y-2 text-gray-400">
+            <li>Click the "Generate Link" button above.</li>
+            <li>You will be redirected to Linkvertise.</li>
+            <li>Complete the steps (usually watching an ad or reading an article).</li>
+            <li>You will be redirected back here automatically.</li>
+            <li>Coins will be added to your account instantly!</li>
+        </ol>
+    </div>
+</main>
+
+<script>
+    function showToast(type, title, message) {
+        const container = document.getElementById('alert-container');
+        const id = Math.random().toString(36).substr(2, 9);
+        
+        const colors = {
+            success: 'bg-emerald-500/20 border-emerald-500/50 text-emerald-200',
+            error: 'bg-red-500/20 border-red-500/50 text-red-200',
+            info: 'bg-indigo-500/20 border-indigo-500/50 text-indigo-200'
+        };
+        
+        const icon = type === 'success' 
+            ? '<svg class="w-5 h-5 flex-shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>'
+            : '<svg class="w-5 h-5 flex-shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+
+        const toast = document.createElement('div');
+        toast.className = `transform transition-all duration-300 translate-x-full pointer-events-auto flex items-center p-4 rounded-lg border backdrop-blur-sm shadow-xl ${colors[type] || colors.info}`;
+        toast.id = id;
+        toast.innerHTML = `
+            ${icon}
+            <div>
+                <h4 class="font-bold text-sm">${title}</h4>
+                <p class="text-xs opacity-90">${message}</p>
+            </div>
+        `;
+
+        container.appendChild(toast);
+        
+        requestAnimationFrame(() => {
+            toast.classList.remove('translate-x-full');
+        });
+
+        setTimeout(() => {
+            toast.classList.add('translate-x-full', 'opacity-0');
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Parse URL parameters for notifications
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        if (urlParams.has('success') && urlParams.get('success') === 'true') {
+            const reward = urlParams.get('reward') || 'some';
+            showToast('success', 'Success!', `You have earned ${reward} coins.`);
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        
+        if (urlParams.has('err')) {
+            const err = urlParams.get('err');
+            let msg = 'An unknown error occurred.';
+            let title = 'Error';
+            
+            switch(err) {
+                case 'MISSING_CODE': msg = 'No verification code received.'; break;
+                case 'BYPASSER': msg = 'Bypassing detected. Please complete the link correctly.'; break;
+                case 'INVALID_SESSION': msg = 'Session expired or invalid. Please try again.'; break;
+                case 'INVALID_CODE': msg = 'Invalid verification code.'; break;
+                default: msg = err;
+            }
+            
+            showToast('error', title, msg);
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        fetch('/api/lv/stats')
+        .then(res => res.json())
+        .then(data => {
+            if (!data.enabled) {
+                document.getElementById('genBtn').classList.add('opacity-50', 'pointer-events-none');
+                document.getElementById('genBtn').textContent = 'Linkvertise is currently disabled';
+                return;
+            }
+
+            document.getElementById('dailyLimit').textContent = data.daily_limit;
+            document.getElementById('remaining').textContent = data.remaining;
+
+            const genBtn = document.getElementById('genBtn');
+            const originalBtnText = genBtn.textContent;
+
+            const updateCountdown = () => {
+                const now = new Date();
+                
+                // Cooldown handling
+                if (data.next_available) {
+                    const nextAvail = new Date(data.next_available);
+                    const cooldownDiff = nextAvail - now;
+                    
+                    if (cooldownDiff > 0) {
+                        genBtn.classList.add('opacity-50', 'pointer-events-none', 'grayscale');
+                        const h = Math.floor(cooldownDiff / 3600000);
+                        const m = Math.floor((cooldownDiff % 3600000) / 60000);
+                        const s = Math.floor((cooldownDiff % 60000) / 1000);
+                        genBtn.textContent = `Please wait ${h}h ${m}m ${s}s`;
+                    } else if (genBtn.classList.contains('grayscale')) {
+                        genBtn.classList.remove('opacity-50', 'pointer-events-none', 'grayscale');
+                        genBtn.textContent = originalBtnText;
+                    }
+                }
+
+                // Daily Reset handling
+                const reset = new Date(data.reset_time);
+                const diff = reset - now;
+
+                if (diff <= 0) {
+                    location.reload();
+                    return;
+                }
+
+                const h = Math.floor(diff / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                document.getElementById('resetTime').textContent = 
+                    `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            };
+            
+            setInterval(updateCountdown, 1000);
+            updateCountdown();
+        })
+        .catch(console.error);
+});
+</script>
+
+<%- include('./components/bottom') %>

@@ -18,39 +18,42 @@ const heliactylModule = {
 module.exports.heliactylModule = heliactylModule;
 
 const { requireAuth } = require("../../handlers/checkMiddleware.js");
+const loadConfig = require("../../handlers/config");
+const settings = loadConfig("./config.toml");
 
-// need to be reimplented
 module.exports.load = async function(app, db) {
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
   const lvcodes = {}
   const cooldowns = {}
   const dailyLimits = {}
 
+  const lvConfig = settings.api.client.linkvertise || {
+    enabled: false,
+    userid: "000000",
+    coins_reward: 10,
+    daily_limit: 50,
+    reset_interval_hours: 12
+  };
+
   app.get(`/lv/gen`, authMiddleware, async (req, res) => {
-    // Check for the presence of specific cookies
-    const requiredCookies = ["x5385", "x4634", "g9745", "h2843"];
-    const hasCookie = requiredCookies.some(cookieName => req.cookies[cookieName] !== undefined);
-
-    if (!hasCookie) {
-      return res.status(403).send('Access denied.');
+    if (!lvConfig.enabled) {
+        return res.status(404).send('Linkvertise integration is disabled.');
     }
-
-    // Delete the matching cookie
-    requiredCookies.forEach(cookieName => {
-      if (req.cookies[cookieName]) {
-        res.clearCookie(cookieName);
-      }
-    });
 
     const userId = req.session.userinfo.id;
     const now = Date.now();
+    const resetInterval = (lvConfig.reset_interval_hours || 12) * 60 * 60 * 1000;
 
-    // Check daily limit
-    if (!dailyLimits[userId] || dailyLimits[userId].date !== new Date().toDateString()) {
-      dailyLimits[userId] = { count: 0, date: new Date().toDateString() };
+    // Initialize or reset limit if expired
+    if (!dailyLimits[userId] || now >= dailyLimits[userId].resetAt) {
+      dailyLimits[userId] = { 
+          count: 0, 
+          resetAt: now + resetInterval 
+      };
     }
-    if (dailyLimits[userId].count >= 50) {
-      return res.status(429).send('Daily limit reached. Please try again tomorrow.');
+
+    if (dailyLimits[userId].count >= lvConfig.daily_limit) {
+      return res.status(429).send('Limit reached. Please try again later.');
     }
 
     // Check cooldown
@@ -60,8 +63,12 @@ module.exports.load = async function(app, db) {
     }
 
     const code = makeid(12);
-    const referer = req.headers.referer || req.headers.referrer || '';
-    const lvurl = linkvertise('1196418', referer + `redeem?code=${code}`);
+    // Construct the callback URL dynamically based on the request host
+    const protocol = req.protocol;
+    const host = req.get('host');
+    const callbackUrl = `${protocol}://${host}/api/afkredeem?code=${code}`;
+    
+    const lvurl = linkvertise(lvConfig.userid, callbackUrl);
 
     lvcodes[userId] = {
       code: code,
@@ -69,7 +76,14 @@ module.exports.load = async function(app, db) {
       generated: now
     };
 
-    cooldowns[userId] = now + 10000; // 10 second cooldown
+    // Store pending code with a short expiration (e.g., 10 minutes) to prevent memory leaks
+    setTimeout(() => {
+        if (lvcodes[userId] && lvcodes[userId].code === code) {
+            delete lvcodes[userId];
+        }
+    }, 10 * 60 * 1000);
+
+    cooldowns[userId] = now + 3600000; // 1 hour cooldown matching Linkvertise limits
     dailyLimits[userId].count++;
 
     res.redirect(lvurl);
@@ -77,33 +91,53 @@ module.exports.load = async function(app, db) {
 
   app.get(`/afkredeem`, authMiddleware, async (req, res) => {
     const code = req.query.code;
-    if (!code) return res.send('An error occurred with your browser!');
-    if (!req.headers.referer || !req.headers.referer.includes('linkvertise.com')) return res.redirect('/afk?err=BYPASSER');
+    if (!code) return res.redirect('/linkvertise?err=MISSING_CODE');
+    
+    // Basic referer check - note that this is easily spoofed and not a security guarantee
+    // but Linkvertise should forward the user to the destination we set.
+    // if (!req.headers.referer || !req.headers.referer.includes('linkvertise.com')) return res.redirect('/linkvertise?err=BYPASSER');
 
     const userId = req.session.userinfo.id;
     const usercode = lvcodes[userId];
-    if (!usercode) return res.redirect(`/afk`);
-    if (usercode.code !== code) return res.redirect(`/afk`);
+    
+    if (!usercode) return res.redirect(`/linkvertise?err=INVALID_SESSION`);
+    if (usercode.code !== code) return res.redirect(`/linkvertise?err=INVALID_CODE`);
+    
     delete lvcodes[userId];
 
-    // Adding coins
     const coins = await db.get(`coins-${userId}`) || 0;
-    await db.set(`coins-${userId}`, coins + 10);
+    const reward = lvConfig.coins_reward || 10;
+    await db.set(`coins-${userId}`, coins + reward);
 
-    res.redirect(`/afk?err=none`);
+    res.redirect(`/linkvertise?success=true&reward=${reward}`);
   });
 
-  // New API endpoint to get the user's limit
-  app.get(`/lv/limit`, authMiddleware, async (req, res) => {
-    const userId = req.session.userinfo.id;
-    const limit = dailyLimits[userId] || { count: 0, date: new Date().toDateString() };
-    const remaining = 50 - limit.count;
+  app.get(`/lv/stats`, authMiddleware, async (req, res) => {
+    if (!lvConfig.enabled) return res.json({ enabled: false });
 
+    const userId = req.session.userinfo.id;
+    const now = Date.now();
+    const resetInterval = (lvConfig.reset_interval_hours || 12) * 60 * 60 * 1000;
+
+    // Check if we need to reset for display purposes (if user hasn't generated a link properly to trigger the reset)
+    if (!dailyLimits[userId] || now >= dailyLimits[userId].resetAt) {
+         // Don't modify state in a GET request ideally, but we need to return accurate info.
+         // We can just calculate what it WOULD be.
+         dailyLimits[userId] = { count: 0, resetAt: now + resetInterval };
+    }
+
+    const limit = dailyLimits[userId];
+    const max = lvConfig.daily_limit;
+    
+    const cooldown = cooldowns[userId] || 0;
+    
     res.json({
-      daily_limit: 50,
-      used_today: limit.count,
-      remaining: remaining,
-      reset_time: new Date(new Date().setHours(24, 0, 0, 0)).toISOString()
+        enabled: true,
+        daily_limit: max,
+        used_today: limit.count,
+        remaining: Math.max(0, max - limit.count),
+        reset_time: new Date(limit.resetAt).toISOString(),
+        next_available: cooldown > now ? new Date(cooldown).toISOString() : null
     });
   });
 }
@@ -116,7 +150,6 @@ function linkvertise(userid, link) {
 
 function btoa(str) {
   var buffer;
-
   if (str instanceof Buffer) {
     buffer = str;
   } else {
