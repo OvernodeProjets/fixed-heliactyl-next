@@ -83,7 +83,8 @@ module.exports.load = async function(app, db) {
         }
     }, 10 * 60 * 1000);
 
-    cooldowns[userId] = now + 3600000; // 1 hour cooldown matching Linkvertise limits
+    const cooldownInterval = ((lvConfig.reset_interval_hours || 12) * 60 * 60 * 1000) / (lvConfig.daily_limit || 50);
+    cooldowns[userId] = now + cooldownInterval;
     dailyLimits[userId].count++;
 
     res.redirect(lvurl);
@@ -130,6 +131,7 @@ module.exports.load = async function(app, db) {
     const max = lvConfig.daily_limit;
     
     const cooldown = cooldowns[userId] || 0;
+    const cooldownInterval = ((lvConfig.reset_interval_hours || 12) * 60 * 60 * 1000) / (lvConfig.daily_limit || 50);
     
     res.json({
         enabled: true,
@@ -137,7 +139,8 @@ module.exports.load = async function(app, db) {
         used_today: limit.count,
         remaining: Math.max(0, max - limit.count),
         reset_time: new Date(limit.resetAt).toISOString(),
-        next_available: cooldown > now ? new Date(cooldown).toISOString() : null
+        next_available: cooldown > now ? new Date(cooldown).toISOString() : null,
+        cooldown_interval: cooldownInterval
     });
   });
 }
