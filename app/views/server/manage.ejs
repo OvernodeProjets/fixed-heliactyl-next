@@ -15,7 +15,7 @@
     line-height: 1.2;
   }
   .console-line {
-    padding: 4px 6px;
+    padding: 4px 4px;
     margin: 1px 0;
     border-radius: 4px;
     transition: all 0.2s ease;
@@ -31,7 +31,6 @@
     word-break: break-word;
   }
   .console-line-info {
-    display: flex;
     align-items: center;
     gap: 4px;
     opacity: 0.5;
@@ -162,7 +161,7 @@ display:none;
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                     </svg>
-                    <span id="mobile-cpu-usage-card">0%</span>
+                    <span id="mobile-cpu-usage-card"><span id="mobile-cpu-usage-card2">0%</span> / <span id="mobile-cpu-limit-card">0%</span></span>
                 </div>
                 <div class="flex items-center text-gray-400">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -229,9 +228,9 @@ display:none;
                 <h2 class="text-xl font-semibold heavy"><%= __('server.manage.console') %></h2>
                 <span class="text-gray-300 text-sm mt-1 mb-4"><%= __('server.manage.console_hint') %></span>
                 <div class="border-t border-white/5 mt-4"></div>
-                <div style="height: 30rem;" id="console-output" class="bg-black/20 p-4 rounded-xl border border-white/5 shadow-sm scrollbar-hide mt-4 overflow-y-auto mb-4 font-mono text-[0.75rem] sm:text-[0.85rem]">
+                <div style="height: 30rem;" id="console-output" class="bg-black/20 p-1 md:p-4 rounded-md md:rounded-xl border border-white/5 shadow-sm scrollbar-hide mt-4 overflow-y-auto mb-4 font-mono text-[0.7rem] sm:text-[0.85rem]">
                 </div>
-                <div class="flex border-t border-white/5 pt-4">
+                <div class="flex border-t border-white/5 pt-2 md:pt-4">
                     <input type="text" id="console-input" class="w-[90%] md:flex-grow border-none bg-transparent text-white py-2 pr-2 focus:border-white/5 focus:outline-none focus:ring-2 focus:ring-transparent transition placeholder-white/30" placeholder="container@<%= settings.name %>~">
                     <button id="send-command" class="flex bg-indigo-500/15 hover:bg-indigo-500/20 text-indigo-200 font-medium py-2 px-2 sm:px-4 rounded-xl transition duration-300 items-center">
                         <span class="hidden sm:inline mr-1"><%= __('server.manage.send_command') %></span>
@@ -247,7 +246,7 @@ display:none;
                     <h3 class="text-sm font-semibold mb-2 text-white/60"><%= __('server.manage.cpu_usage') %></h3>
                     <div class="flex items-center">
                         <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
-                            <div class="bg-indigo-500 h-2 rounded-full transition-all" id="cpu-usage-bar" style="width: 0%"></div>
+                            <div class="bg-emerald-600 h-2 rounded-full transition-all" id="cpu-usage-bar" style="width: 0%"></div>
                         </div>
                         <span id="cpu-usage" class="text-sm font-medium">0%</span>
                     </div>
@@ -256,7 +255,7 @@ display:none;
                     <h3 class="text-sm font-semibold mb-2 text-white/60"><%= __('server.manage.memory_usage') %></h3>
                     <div class="flex items-center">
                         <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
-                            <div class="bg-indigo-500 h-2 rounded-full transition-all" id="ram-usage-bar" style="width: 0%"></div>
+                            <div class="bg-emerald-600 h-2 rounded-full transition-all" id="ram-usage-bar" style="width: 0%"></div>
                         </div>
                         <span id="ram-usage" class="text-sm font-medium">0MB</span>
                     </div>
@@ -265,7 +264,7 @@ display:none;
                     <h3 class="text-sm font-semibold mb-2 text-white/60"><%= __('server.manage.disk_usage') %></h3>
                     <div class="flex items-center">
                         <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
-                            <div class="bg-indigo-500 h-2 rounded-full transition-all" id="disk-usage-bar" style="width: 0%"></div>
+                            <div class="bg-emerald-600 h-2 rounded-full transition-all" id="disk-usage-bar" style="width: 0%"></div>
                         </div>
                         <span id="disk-usage" class="text-sm font-medium">0MB</span>
                     </div>
@@ -274,13 +273,12 @@ display:none;
                     <h3 class="text-sm font-semibold mb-2 text-white/60"><%= __('server.manage.network_out') %></h3>
                     <div class="flex items-center">
                         <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
-                            <div class="bg-indigo-500 h-2 rounded-full transition-all" id="network-usage-bar" style="width: 0%"></div>
+                            <div class="bg-emerald-600 h-2 rounded-full transition-all" id="network-usage-bar" style="width: 0%"></div>
                         </div>
                         <span id="network-usage" class="text-sm font-medium">0B</span>
                     </div>
                 </div>
             </div>
-
             <div class="card rounded-xl p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -381,7 +379,7 @@ display:none;
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                         </svg>
-                        <span id="cpu-usage-card">0%</span>
+                        <span id="cpu-usage-card"><span id="cpu-usage-card2">0%</span> / <span id="cpu-limit-card">0%</span></span>
                     </div>
                     <div class="flex items-center text-gray-400">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -648,7 +646,7 @@ function createConsoleLogElement(message, isInternal = false) {
     contentElement.innerHTML = formatConsoleOutput(message);
     
     const infoElement = document.createElement('span');
-    infoElement.className = 'console-line-info';
+    infoElement.className = 'console-line-info hidden md:flex';
     infoElement.innerHTML = `
         ${isInternal ? '<svg class="internal-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>' : ''}
         <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
@@ -749,12 +747,12 @@ function updateStats(stats) {
     const networkUsage = (stats.network.tx_bytes / 1024).toFixed(2);
 
     // Update desktop stats
-    document.getElementById('cpu-usage-card').textContent = `${cpuUsage}%`;
+    document.getElementById('cpu-usage-card2').textContent = `${cpuUsage}%`;
     document.getElementById('ram-usage-card2').textContent = `${ramUsage} MB`;
     document.getElementById('disk-usage-card2').textContent = `${diskUsage} MB`;
     
     // Update mobile stats
-    const mobileCpuElement = document.getElementById('mobile-cpu-usage-card');
+    const mobileCpuElement = document.getElementById('mobile-cpu-usage-card2');
     const mobileRamElement = document.getElementById('mobile-ram-usage-card2');
     const mobileDiskElement = document.getElementById('mobile-disk-usage-card2');
     
@@ -791,13 +789,13 @@ function updateUsageBar(type, value, unit, max = 100) {
     // Add color coding based on usage
     if (percentage > 90) {
         barElement.classList.add('bg-red-600');
-        barElement.classList.remove('bg-indigo-500', 'bg-emerald-600');
+        barElement.classList.remove('bg-yellow-600', 'bg-emerald-600');
     } else if (percentage > 75) {
-        barElement.classList.add('bg-indigo-500');
+        barElement.classList.add('bg-yellow-600');
         barElement.classList.remove('bg-red-600', 'bg-emerald-600');
     } else {
         barElement.classList.add('bg-emerald-600');
-        barElement.classList.remove('bg-red-600', 'bg-indigo-500');
+        barElement.classList.remove('bg-red-600', 'bg-yellow-600');
     }
 }
 
