@@ -1151,7 +1151,7 @@ document.getElementById('renew-server').addEventListener('click', async () => {
         });
 
         if (response.ok) {
-            showAlert('success', <%= ('server.manage.renewed_success') %>, <%- JSON.stringify(__('server.manage.renewed_success_message')) %>.replace('{{renewal}}', renewalConfig.renewalPeriod));
+            showAlert('success', '<%= __('server.manage.renewed_success') %>', <%- JSON.stringify(__('server.manage.renewed_success_message')) %>.replace('{{renewal}}', renewalConfig.renewalPeriod));
             await checkRenewalStatus();
         } else {
             const data = await response.json();
