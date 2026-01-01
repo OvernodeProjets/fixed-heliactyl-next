@@ -36,16 +36,16 @@
           </div>
           <% } else if (req.query.err && req.query.err==="PTERODACTYL" && req.query.data) { %>
             <div class="mb-4 rounded-lg bg-amber-500/10 p-4">
-              <div class="flex items-center gap-3">
-                <div class="text-amber-400">
+              <div class="flex flex-col items-center gap-3">
+                <div class="flex flex-row gap-3 items-center text-amber-400">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round"
                       d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
                   </svg>
+                  <p class="text-sm font-medium text-amber-400">This location has no available capacity.</p>
                 </div>
-                <p class="text-sm font-medium text-amber-400">This location has no available capacity.</p>
-                <p class="text-sm text-amber-300">
+                <p class="text-sm text-amber-300 ml-8">
                   <%= JSON.parse(decodeURIComponent(req.query.data)).errors[0].detail %>
                 </p>
               </div>
