@@ -45,7 +45,9 @@
         "account": "account.ejs",
         "profile": "profile.ejs",
         "events/advent": "events/advent.ejs",
-        "events/halloween": "events/halloween.ejs"
+        "events/halloween": "events/halloween.ejs",
+        "legals/tos": "legals/tos.ejs",
+        "legals/sales": "legals/sales.ejs"
     },
     "mustbeloggedin": [
         "/dashboard",

@@ -586,3 +586,40 @@ private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAa
   # Ban system
   "api ban user" = true
   "api unban user" = true
+
+# ======================================================
+# Legal Configuration (CGU/CGV)
+# ======================================================
+[legal]
+
+  [legal.tos] # Terms of Service / CGU
+  enabled = false
+  last_updated = "06/12/2025"
+  content_en = """
+# Terms of Service
+
+Write your Terms of Service in English here.
+You can use Markdown syntax.
+"""
+  content_fr = """
+# Conditions d'utilisation
+
+Écrivez vos conditions d'utilisation en français ici.
+Vous pouvez utiliser la syntaxe Markdown.
+"""
+
+  [legal.sales] # Terms of Sale / CGV
+  enabled = false
+  last_updated = "06/12/2025"
+  content_en = """
+# Terms of Sale
+
+Write your Terms of Sale in English here.
+You can use Markdown syntax.
+"""
+  content_fr = """
+# Conditions de vente
+
+Écrivez vos conditions de vente en français ici.
+Vous pouvez utiliser la syntaxe Markdown.
+"""

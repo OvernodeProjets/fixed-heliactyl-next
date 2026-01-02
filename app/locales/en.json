@@ -13,6 +13,9 @@
     "logout": "Logout",
     "login": "Login",
     "register": "Register",
+    "legal": "Legal",
+    "tos": "Terms of Service",
+    "sales": "Terms of Sale",
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",
@@ -1161,14 +1164,17 @@
       "modal_btn": "I'm not a robot or AI language model.",
       "errors": {
         "account_creation_failed": "Failed to create account. Please try again or contact support.",
-        "server_error": "A server error occurred. Please try again later.",
-        "generic": "An error occurred during authentication. Please try again.",
+        "server_error": "Server error. Please try again later.",
+        "generic": "An error occurred during authentication.",
         "recaptcha_required": "Please complete the reCAPTCHA",
         "email_required": "Please enter your email address.",
         "login_failed": "Login failed. Please try again.",
         "generic_error": "An error occurred. Please try again later.",
-        "request_failed": "Failed to process request. Please try again."
+        "request_failed": "Failed to process request. Please try again.",
+        "passwords_no_match": "Passwords do not match."
       },
+      "accept": "I agree to",
+      "and": "and",
       "success": {
         "welcome_back": "Welcome back!",
         "magic_link_sent": "Magic link sent! Check your email.",
@@ -1214,5 +1220,14 @@
         "reset": "Password reset successful!"
       }
     }
+  },
+  "legal": {
+    "tos": "Terms of Service",
+    "sales": "Terms of Sale",
+    "back": "Back to Home",
+    "register": "Get Started",
+    "last_updated": "Last updated:",
+    "tos_not_found": "Terms of Service content not found.",
+    "sales_not_found": "Terms of Sale content not found."
   }
 }

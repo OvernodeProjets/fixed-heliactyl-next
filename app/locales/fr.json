@@ -13,6 +13,9 @@
     "logout": "Se déconnecter",
     "login": "Se connecter",
     "register": "S'inscrire",
+    "legal": "Mentions Légales",
+    "tos": "Conditions d'utilisation",
+    "sales": "Conditions de vente",
     "loading": "Chargement...",
     "error": "Erreur",
     "success": "Succès",
@@ -786,13 +789,16 @@
       "errors": {
         "account_creation_failed": "Échec de création du compte. Réessayez ou contactez le support.",
         "server_error": "Erreur serveur. Réessayez plus tard.",
-        "generic": "Une erreur s’est produite lors de l’authentification.",
+        "generic": "Une erreur s'est produite lors de l'authentification.",
         "recaptcha_required": "Veuillez compléter le reCAPTCHA",
         "email_required": "Veuillez saisir votre adresse email.",
         "login_failed": "Échec de connexion. Réessayez.",
-        "generic_error": "Une erreur s’est produite. Réessayez plus tard.",
-        "request_failed": "Échec du traitement de la requête. Réessayez."
+        "generic_error": "Une erreur s'est produite. Réessayez plus tard.",
+        "request_failed": "Échec du traitement de la requête. Réessayez.",
+        "passwords_no_match": "Les mots de passe ne correspondent pas."
       },
+      "accept": "J'accepte",
+      "and": "et",
       "success": {
         "welcome_back": "Bon retour !",
         "magic_link_sent": "Lien magique envoyé ! Consultez votre email.",
@@ -1214,6 +1220,15 @@
       "resource_usage": "Utilisation des ressources",
       "network_activity": "Activité réseau"
     }
+  },
+  "legal": {
+    "tos": "Conditions d'utilisation (CGU)",
+    "sales": "Conditions de vente (CGV)",
+    "back": "Retour",
+    "register": "S'inscrire",
+    "last_updated": "Dernière mise à jour :",
+    "tos_not_found": "Contenu des conditions d'utilisation introuvable.",
+    "sales_not_found": "Contenu des conditions de vente introuvable."
   }
 }
 

@@ -50,7 +50,14 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
                     <a href="<%= settings.website.discord %>" class="text-sm font-semibold text-gray-900 hover:text-indigo-900"><%= __("website.nav.discord") %></a>
                 </div>
 
-                <div class="hidden lg:flex lg:flex-1 lg:justify-end">
+                <div class="hidden lg:flex lg:flex-1 lg:justify-end items-center gap-x-4">
+                    <div class="flex items-center gap-x-2 mr-2">
+                        <% availableLocales.forEach(l => { %>
+                            <a href="?lang=<%= l.code %>" class="text-lg hover:scale-110 transition-transform <%= locale === l.code ? 'grayscale-0 ring-2 ring-indigo-500 rounded-full p-0.5' : 'grayscale opacity-70 hover:opacity-100' %>" title="<%= l.name %>">
+                                <%= l.flag %>
+                            </a>
+                        <% }) %>
+                    </div>
                     <a href="/auth" class="rounded-lg bg-gray-950 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800">
                         <%= __("website.nav.get_started") %>
                     </a>
@@ -73,6 +80,13 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
                     <a href="/auth" class="block w-full text-center rounded-lg bg-gray-950 px-4 py-2 text-sm font-semibold text-white">
                         <%= __("website.nav.get_started") %>
                     </a>
+                    <div class="flex justify-center gap-x-4 pt-4 border-t border-gray-100">
+                        <% availableLocales.forEach(l => { %>
+                            <a href="?lang=<%= l.code %>" class="text-2xl <%= locale === l.code ? 'grayscale-0' : 'grayscale opacity-50' %>">
+                                <%= l.flag %>
+                            </a>
+                        <% }) %>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -276,13 +290,31 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
                                 <li>
                                     <a href="mailto:support@<%= settings.website.domain %>" class="text-sm leading-6 text-gray-300 hover:text-white"><%= __("website.footer.sections.contact") %></a>
                                 </li>
+                                <% if (settings.legal && settings.legal.tos && settings.legal.tos.enabled) { %>
+                                <li>
+                                    <a href="/legals/tos" class="text-sm leading-6 text-gray-300 hover:text-white"><%= __("legal.tos") %></a>
+                                </li>
+                                <% } %>
+                                <% if (settings.legal && settings.legal.sales && settings.legal.sales.enabled) { %>
+                                <li>
+                                    <a href="/legals/sales" class="text-sm leading-6 text-gray-300 hover:text-white"><%= __("legal.sales") %></a>
+                                </li>
+                                <% } %>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="mt-16 border-t border-gray-900/10 pt-8 sm:mt-20 lg:mt-24">
+            <div class="mt-16 border-t border-gray-900/10 pt-8 sm:mt-20 lg:mt-24 flex flex-col md:flex-row justify-between items-center gap-4">
                 <p class="text-xs leading-5 text-white/80"><%= __("website.footer.copyright", { year: new Date().getFullYear(), name: settings.name }) %></p>
+                <div class="flex gap-x-4">
+                    <% availableLocales.forEach(l => { %>
+                        <a href="?lang=<%= l.code %>" class="text-sm text-gray-400 hover:text-white flex items-center gap-x-1 <%= locale === l.code ? 'text-white font-bold' : '' %>">
+                            <span><%= l.flag %></span>
+                            <span><%= l.name %></span>
+                        </a>
+                    <% }) %>
+                </div>
             </div>
         </div>
     </footer>
