@@ -745,6 +745,11 @@
       "create": "Create",
       "apply_changes": "Apply Changes to Server"
     },
+    "create": {
+      "error_egg_not_allowed": "The selected server type is not available in this location.",
+      "error_location_limit": "The limit for this location is",
+      "not_allowed_here": "Not Allowed Here"
+    },
     "backups": {
       "back_to_list": "Back to server list",
       "title": "Backups",

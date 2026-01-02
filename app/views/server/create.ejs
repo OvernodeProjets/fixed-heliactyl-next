@@ -67,6 +67,12 @@
                   case "EXCEEDDISK":
                   case "EXCEEDCPU":
                     return "The server could not be created because you have requested to create a server that exceeds your plan.";
+                  case "EGGNOTALLOWEDONLOCATION":
+                    return "<%= __('server.create.error_egg_not_allowed') %>";
+                  case "LOCATIONLIMITRAM":
+                  case "LOCATIONLIMITDISK":
+                  case "LOCATIONLIMITCPU":
+                    return `<%= __('server.create.error_location_limit') %> <b>${req.query.num}</b>${req.query.err.slice(-3) === "RAM" ? "MB RAM" : req.query.err.slice(-4) === "DISK" ? "MB disk" : "% CPU"}.`;
                   default:
                     return "An unknown error occurred. Please try again or contact support if the issue persists.";
                 }
@@ -632,6 +638,71 @@ async function submitForm() {
     
     window.location.href = url;
 }
+
+// ------ Location Restrictions Logic ------
+const locationRestrictions = <%- JSON.stringify(Object.fromEntries(Object.entries(settings.api.client.locations || {}).map(([k, v]) => [k, { allowed_eggs: v.allowed_eggs, limits: v.limits }]))) %>;
+let currentLocationRestrictions = null;
+
+function applyRestrictionsForLocation(locationId) {
+    if (!locationId) return;
+    
+    // Find limits for this location (check raw location ID, then check if it's a zone)
+    // Note: If using zones, we might need parent location data. Assuming zones inherit or we look up parent.
+    // For now, simpliest valid match.
+    let restrictions = locationRestrictions[locationId];
+    
+    // If not found directly, it might be a zone. 
+    // Ideally we would need a map of zoneId -> parentLocationId to find restrictions if they are on parent.
+    // For this implementation, we assume restrictions are on the main location or we traverse if needed (omitted for brevity unless requested).
+    
+    currentLocationRestrictions = restrictions;
+    
+    // 1. Filter Eggs
+    const imageCards = document.querySelectorAll('.image-card');
+    let currentEggInvalid = false;
+    
+    imageCards.forEach(card => {
+        const eggId = card.querySelector('a').getAttribute('onclick').match(/'([^']+)'/)[1];
+        const isAllowed = !restrictions || !restrictions.allowed_eggs || restrictions.allowed_eggs.includes(eggId);
+        
+        if (isAllowed) {
+            card.classList.remove('opacity-40', 'pointer-events-none', 'grayscale');
+            // Remove "not allowed" tooltip if exists
+             const tooltip = card.querySelector('.not-allowed-tooltip');
+             if(tooltip) tooltip.remove();
+        } else {
+            card.classList.add('opacity-40', 'pointer-events-none', 'grayscale');
+            card.classList.remove('selected');
+            if (selectedImage === eggId) {
+                currentEggInvalid = true;
+            }
+            
+            // Add tooltip explaining why
+            if (!card.querySelector('.not-allowed-tooltip')) {
+                 const tooltip = document.createElement('div');
+                 tooltip.className = 'not-allowed-tooltip absolute inset-0 flex items-center justify-center';
+                 tooltip.innerHTML = '<span class="bg-red-900/90 text-white text-xs px-2 py-1 rounded font-bold"><%= __("server.create.not_allowed_here") %></span>';
+                 card.appendChild(tooltip);
+            }
+        }
+    });
+    
+    if (currentEggInvalid) {
+        selectedImage = "";
+        alertify.warning('<%= __("server.create.error_egg_not_allowed") %>');
+    }
+    
+    // 2. Update Limits visualization
+    enforceInputLimits();
+}
+
+// Hook into existing selection functions
+const originalSelectLocation = selectLocation;
+selectLocation = function(id, name, country, zoneElement) {
+    originalSelectLocation(id, name, country, zoneElement);
+    applyRestrictionsForLocation(id);
+};
+// ------------------------------------------
 
 // Initialize Alertify
 alertify.set('notifier','position', 'top-right');

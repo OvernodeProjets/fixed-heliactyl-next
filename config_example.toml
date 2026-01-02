@@ -239,6 +239,13 @@ country = "France"
 region = "eu-south"
 flag = "https://cdn-icons-png.flaticon.com/512/197/197560.png"
 cpu = "Ampere"
+# Optional: restrict allowed eggs (if not defined, all eggs are allowed)
+# allowed_eggs = ["paper", "forge", "velocity"]
+# Optional: max resource limits per server on this location
+# [api.client.locations.1.limits]
+#     max_ram = 16384    # MB
+#     max_disk = 51200   # MB
+#     max_cpu = 400      # %
 
 # --- Egg Templates ---
 [api.client.eggs.velocity]

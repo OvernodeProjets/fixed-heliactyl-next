@@ -185,6 +185,14 @@ router.get("/server/create", authMiddleware, async (req, res) => {
                 return res.redirect(`/server/new?err=INVALIDEGG`);
             }
 
+            // Check if egg is allowed in this location
+            const locationConfig = settings.api.client.locations[location];
+            if (locationConfig && locationConfig.allowed_eggs) {
+                if (!locationConfig.allowed_eggs.includes(egg)) {
+                   return res.redirect(`/server/new?err=EGGNOTALLOWEDONLOCATION`);
+                }
+            }
+
             let ram = parseFloat(req.query.ram);
             let disk = parseFloat(req.query.disk);
             let cpu = parseFloat(req.query.cpu);
@@ -195,6 +203,15 @@ router.get("/server/create", authMiddleware, async (req, res) => {
                 if (min && value < min) return `TOOLITTLE${type}&num=${min}`;
                 if (egginfo.maximum?.[type.toLowerCase()] && value > egginfo.maximum[type.toLowerCase()]) 
                     return `TOOMUCH${type}&num=${egginfo.maximum[type.toLowerCase()]}`;
+                
+                // Check location specific limits if they exist
+                 if (locationConfig && locationConfig.limits) {
+                    const limitKey = `max_${type.toLowerCase()}`;
+                    if (locationConfig.limits[limitKey] && value > locationConfig.limits[limitKey]) {
+                         return `LOCATIONLIMIT${type}&num=${locationConfig.limits[limitKey]}`;
+                    }
+                }
+
                 return null;
             };
 
