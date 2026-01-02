@@ -491,8 +491,7 @@
       "about": "{{name}} a été créé pour fournir un hébergement de serveurs de jeu {{scope}}.",
       "scope_one": "en {{country}}",
       "scope_many": "à travers {{count}} emplacements"
-    }
-    ,
+    },
     "subdomains": {
       "back_to_list": "Retour à la liste des serveurs",
       "title": "Sous‑domaines",
@@ -638,8 +637,7 @@
         "the_end": "L'End"
       },
       "no_description": "Aucune description définie."
-    }
-    ,
+    },
     "backups": {
       "back_to_list": "Retour à la liste des serveurs",
       "title": "Sauvegardes",
@@ -737,8 +735,7 @@
       "edit": "Modifier",
       "update_error": "Erreur lors de la mise à jour de la variable. Réessayez."
     }
-  }
-  ,
+  },
   "errors": {
     "common": {
       "go_home": "Retour à l’accueil",
@@ -768,8 +765,7 @@
       "title": "Compte bloqué pour double compte",
       "description": "Votre compte a été bloqué pour utilisation potentielle de comptes alternatifs (ce qui viole le contrat d'utilisateur de {{name}}). Veuillez contacter le support pour résoudre ce problème et lire notre contrat d'utilisateur avant de continuer. Vous pouvez toujours vous connecter avec le compte original / principal, il n'a pas été bloqué."
     }
-  }
-  ,
+  },
   "auth": {
     "login": {
       "title": "Connexion",
@@ -844,8 +840,7 @@
         "reset": "Mot de passe réinitialisé avec succès !"
       }
     }
-  }
-  ,
+  },
   "server": {
     "common": {
       "back_to_list": "Retour à la liste des serveurs",
@@ -1041,8 +1036,7 @@
       "error_create_folder": "Erreur lors de la création du dossier. Veuillez réessayer.",
       "created_file_success": "Fichier créé avec succès",
       "error_create_file": "Erreur lors de la création du fichier. Veuillez réessayer."
-    }
-    ,
+    },
     "import": {
       "title": "Import de serveur",
       "subtitle": "Transférez des fichiers depuis un autre serveur via SFTP",
@@ -1077,8 +1071,7 @@
         "failed_prefix": "Échec de l'import :",
         "status_error": "Erreur de récupération du statut"
       }
-    }
-    ,
+    },
     "logs": {
       "back_to_list": "Retour à la liste des serveurs",
       "title": "Journaux d'activité",
@@ -1146,8 +1139,7 @@
       "eula_failed_text": "Une erreur s'est produite lors de l'acceptation de l'EULA. Veuillez réessayer.",
       "powered_on": "allumé",
       "powered_off": "éteint"
-    }
-    ,
+    },
     "plugins": {
       "back_to_list": "Retour à la liste des serveurs",
       "search_placeholder": "Rechercher des plugins...",
