@@ -158,8 +158,8 @@ function createSubdomainCard(subdomain) {
         `<span class="px-2 py-1 text-xs rounded-full bg-indigo-500/20 text-indigo-300">${domainConfig.name}</span>` : '';
     
     div.innerHTML = `
-        <div class="grid grid-cols-[80%_1.5em] justify-between">
-            <div class="space-y-1 min-w-[0]">
+        <div class="grid grid-cols-[80%_20px] justify-between">
+            <div class="space-y-1">
                 <div class="flex items-center gap-x-2">
                     <h3 class="text-white font-medium overflow-auto">${subdomain.name}.${subdomain.domain}</h3>
                     <span class="inline-flex flex-row gap-x-1 px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-300">
