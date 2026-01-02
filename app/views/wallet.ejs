@@ -62,8 +62,8 @@
 </div>
 
 <!-- Transfer Modal -->
-<div id="transferModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200 ease-in-out">
-    <div id="modalContent" class="bg-[#191c20] p-8 rounded-lg max-w-md w-full transform scale-95 opacity-0 transition-all duration-300 ease-in-out">
+<div id="transferModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200 ease-in-out">
+    <div id="modalContent" class="bg-[#191c20] p-8 w-[85%] md:w-[50%] rounded-lg transform scale-95 opacity-0 transition-all duration-300 ease-in-out">
         <h2 class="text-2xl font-semibold text-white mb-4"><%= __("wallet.modal.transfer_title", { currency: settings.website.currency }) %></h2>
         <form id="transferForm" class="space-y-4">
             <div>
@@ -162,9 +162,9 @@ function displayRecentTransactions() {
         container.innerHTML += `
             <div class="border border-transparent hover:border-white/5 hover:bg-white/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-black/20 transition-all duration-300 flex items-center justify-between p-4 rounded-lg cursor-pointer"
                  onclick="showTransactionDetails(${JSON.stringify(transaction).replace(/"/g, '&quot;')})">
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2 md:space-x-4">
                     <div class="flex-shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="size-6 ${isReceived ? 'text-emerald-400' : 'text-rose-400'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="size-4 md:size-6 ${isReceived ? 'text-emerald-400' : 'text-rose-400'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             ${isReceived ?
                             '<path d="M12 3v18M3 11l9 9 9-9"/>' :
                             '<path d="M12 21V3M3 13l9-9 9 9"/>'}
@@ -179,7 +179,7 @@ function displayRecentTransactions() {
                     </div>
                 </div>
                 <div class="flex flex-col items-end">
-                    <p class="text-lg font-semibold ${isReceived ? 'text-emerald-400' : 'text-rose-400'} tabular-nums">
+                    <p class="text-md md:text-lg font-semibold ${isReceived ? 'text-emerald-400' : 'text-rose-400'} tabular-nums">
                         ${isReceived ? '+' : '-'}${Math.abs(transaction.amount).toLocaleString()} ${transaction.currency}
                     </p>
                 </div>

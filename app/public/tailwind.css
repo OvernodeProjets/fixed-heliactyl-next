@@ -1,4 +1,4 @@
-/*! tailwindcss v4.1.18 | MIT License | https://tailwindcss.com */
+/*! tailwindcss v4.1.17 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme {
@@ -613,9 +613,6 @@
   .ml-8 {
     margin-left: calc(var(--spacing) * 8);
   }
-  .ml-9 {
-    margin-left: calc(var(--spacing) * 9);
-  }
   .ml-auto {
     margin-left: auto;
   }
@@ -677,6 +674,10 @@
   .size-10 {
     width: calc(var(--spacing) * 10);
     height: calc(var(--spacing) * 10);
+  }
+  .size-20 {
+    width: calc(var(--spacing) * 20);
+    height: calc(var(--spacing) * 20);
   }
   .h-1 {
     height: calc(var(--spacing) * 1);
@@ -831,6 +832,9 @@
   .w-\[75\%\] {
     width: 75%;
   }
+  .w-\[80\%\] {
+    width: 80%;
+  }
   .w-\[85\%\] {
     width: 85%;
   }
@@ -885,6 +889,9 @@
   .min-w-0 {
     min-width: calc(var(--spacing) * 0);
   }
+  .min-w-\[0\] {
+    min-width: 0;
+  }
   .min-w-\[10\%\] {
     min-width: 10%;
   }
@@ -913,6 +920,9 @@
     flex-shrink: 0;
   }
   .flex-grow {
+    flex-grow: 1;
+  }
+  .flex-grow-1 {
     flex-grow: 1;
   }
   .grow-0 {
@@ -1010,6 +1020,9 @@
   }
   .grid-cols-12 {
     grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  .grid-cols-\[80\%_1\.5em\] {
+    grid-template-columns: 80% 1.5em;
   }
   .flex-col {
     flex-direction: column;
@@ -1121,6 +1134,9 @@
       margin-block-end: calc(calc(var(--spacing) * 8) * calc(1 - var(--tw-space-y-reverse)));
     }
   }
+  .gap-x-1 {
+    column-gap: calc(var(--spacing) * 1);
+  }
   .gap-x-2 {
     column-gap: calc(var(--spacing) * 2);
   }
@@ -1219,6 +1235,9 @@
         border-color: color-mix(in oklab, var(--color-white) 5%, transparent);
       }
     }
+  }
+  .self-stretch {
+    align-self: stretch;
   }
   .truncate {
     overflow: hidden;
@@ -1597,6 +1616,12 @@
     background-color: color-mix(in srgb, #000 75%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-black) 75%, transparent);
+    }
+  }
+  .bg-black\/\[50\%\] {
+    background-color: color-mix(in srgb, #000 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-black) 50%, transparent);
     }
   }
   .bg-blue-200\/20 {
@@ -4127,6 +4152,21 @@
       margin-top: calc(var(--spacing) * 0);
     }
   }
+  .md\:mt-32 {
+    @media (width >= 48rem) {
+      margin-top: calc(var(--spacing) * 32);
+    }
+  }
+  .md\:mt-\[0\] {
+    @media (width >= 48rem) {
+      margin-top: 0;
+    }
+  }
+  .md\:mr-1\.5 {
+    @media (width >= 48rem) {
+      margin-right: calc(var(--spacing) * 1.5);
+    }
+  }
   .md\:mr-2 {
     @media (width >= 48rem) {
       margin-right: calc(var(--spacing) * 2);
@@ -4173,6 +4213,12 @@
       height: calc(var(--spacing) * 4);
     }
   }
+  .md\:size-5 {
+    @media (width >= 48rem) {
+      width: calc(var(--spacing) * 5);
+      height: calc(var(--spacing) * 5);
+    }
+  }
   .md\:size-6 {
     @media (width >= 48rem) {
       width: calc(var(--spacing) * 6);
@@ -4202,6 +4248,11 @@
   .md\:w-\[50\%\] {
     @media (width >= 48rem) {
       width: 50%;
+    }
+  }
+  .md\:w-\[75\%\] {
+    @media (width >= 48rem) {
+      width: 75%;
     }
   }
   .md\:w-\[90\%\] {
@@ -4310,6 +4361,15 @@
       gap: calc(var(--spacing) * 8);
     }
   }
+  .md\:space-x-4 {
+    @media (width >= 48rem) {
+      :where(& > :not(:last-child)) {
+        --tw-space-x-reverse: 0;
+        margin-inline-start: calc(calc(var(--spacing) * 4) * var(--tw-space-x-reverse));
+        margin-inline-end: calc(calc(var(--spacing) * 4) * calc(1 - var(--tw-space-x-reverse)));
+      }
+    }
+  }
   .md\:rounded-xl {
     @media (width >= 48rem) {
       border-radius: var(--radius-xl);
@@ -4333,6 +4393,11 @@
   .md\:rounded-bl-3xl {
     @media (width >= 48rem) {
       border-bottom-left-radius: var(--radius-3xl);
+    }
+  }
+  .md\:bg-transparent {
+    @media (width >= 48rem) {
+      background-color: transparent;
     }
   }
   .md\:p-4 {
@@ -4373,6 +4438,11 @@
   .md\:px-10 {
     @media (width >= 48rem) {
       padding-inline: calc(var(--spacing) * 10);
+    }
+  }
+  .md\:py-1 {
+    @media (width >= 48rem) {
+      padding-block: calc(var(--spacing) * 1);
     }
   }
   .md\:py-12 {

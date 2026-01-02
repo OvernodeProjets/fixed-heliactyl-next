@@ -124,7 +124,7 @@ display:none;
     }) %>   
     <%- include('../components/server') %>    
     <!-- Mobile View -->
-    <div class="lg:hidden">
+    <div class="md:hidden">
         <div class="flex space-x-2 mb-4">
             <button id="mobile-start-server" class="heavy h-12 w-12 hover:scale-95 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed" title="Start Server">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 mx-auto">
@@ -222,7 +222,7 @@ display:none;
   </div>
 </div>
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div class="lg:col-span-3 space-y-6">
+        <div class="min-w-[0] lg:col-span-3 space-y-6">
             
             <div class="card rounded-xl p-6">
                 <h2 class="text-xl font-semibold heavy"><%= __('server.manage.console') %></h2>
@@ -962,7 +962,7 @@ function sendCommand() {
 
 const eulaPopupHTML = `
 <div id="eula-popup" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
-  <div class="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 slide-in">
+  <div class="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-3xl shadow-2xl w-[85%] md:w-[50%] mx-4 slide-in">
     <div class="flex items-center mb-6">
       <div class="bg-indigo-500/15 p-3 rounded-xl mr-4">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-indigo-300">
@@ -979,7 +979,7 @@ const eulaPopupHTML = `
       </p>
     </div>
     
-    <div class="flex gap-3">
+    <div class="flex flex-col gap-y-3 md:flex-row gap-3">
       <button id="decline-eula" class="flex-1 px-4 py-2.5 bg-red-600/20 border border-red-600/30 text-red-300 rounded-xl hover:bg-red-600/30 transition-all duration-300 font-medium">
         Decline
       </button>
