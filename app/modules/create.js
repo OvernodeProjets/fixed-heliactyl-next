@@ -592,6 +592,52 @@ router.get("/clear-queue", authMiddleware, async (req, res) => {
                 );
                 if (error) return res.redirect(`${redirectlink}?id=${id}&err=${error}`);
             }
+
+            // Location Limit Validation
+            try {
+                // Get server details from Application API to find the node
+                // We search by UUID to be sure we get the correct server
+                const serverUuid = checkexist[0].attributes.uuid;
+                const serversResponse = await AppAPI.listServers(1, 1, { filter: { uuid: serverUuid } });
+                
+                if (serversResponse && serversResponse.data && serversResponse.data.length > 0) {
+                    const appServer = serversResponse.data[0];
+                    const nodeId = appServer.attributes.node;
+                    
+                    // Get node details to find the location
+                    const nodeDetails = await AppAPI.getNodeDetails(nodeId);
+                    const locationId = nodeDetails.attributes.location_id;
+
+                    // Check if this location has limits in config
+                    /* 
+                       Note: settings.api.client.locations keys are usually strings. 
+                       Pterodactyl returns integer location_id. 
+                       We should check matches loosely or convert strings.
+                    */
+                    const locationConfigEntry = Object.entries(settings.api.client.locations).find(([key, val]) => key == locationId);
+                    
+                    if (locationConfigEntry) {
+                        const locationConfig = locationConfigEntry[1];
+                        if (locationConfig && locationConfig.limits) {
+                            // Check RAM
+                            if (locationConfig.limits.max_ram && ram > locationConfig.limits.max_ram) {
+                                return res.redirect(`${redirectlink}?id=${id}&err=LOCATIONLIMITRAM&num=${locationConfig.limits.max_ram}`);
+                            }
+                            // Check Disk
+                            if (locationConfig.limits.max_disk && disk > locationConfig.limits.max_disk) {
+                                return res.redirect(`${redirectlink}?id=${id}&err=LOCATIONLIMITDISK&num=${locationConfig.limits.max_disk}`);
+                            }
+                            // Check CPU
+                            if (locationConfig.limits.max_cpu && cpu > locationConfig.limits.max_cpu) {
+                                return res.redirect(`${redirectlink}?id=${id}&err=LOCATIONLIMITCPU&num=${locationConfig.limits.max_cpu}`);
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error validating location limits during server modification:", error);
+                // Continue if validation fails due to API error (or strict block?) -> Decided to continue to allow edits if API is down, but log error.
+            }
     
             let limits = {
               memory: ram ? ram : checkexist[0].attributes.limits.memory,

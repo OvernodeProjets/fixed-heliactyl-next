@@ -4,6 +4,36 @@
         backButtonText: __('server.settings.back_to_list')
     }) %>      
 <div id="alert-container" class="mb-4 space-y-2"></div>
+    <% if (req.query.err) { %>
+        <div class="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+            <div class="flex items-center gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span class="text-red-500 text-sm font-medium">
+                    <%- (() => {
+                        switch (req.query.err) {
+                            case "LOCATIONLIMITRAM":
+                            case "LOCATIONLIMITDISK":
+                            case "LOCATIONLIMITCPU":
+                                 return `${__('server.create.error_location_limit')} <b>${req.query.num}</b>${req.query.err.slice(-3) === "RAM" ? "MB RAM" : req.query.err.slice(-4) === "DISK" ? "MB disk" : "% CPU"}.`;
+                            case "MISSINGVARIABLE":
+                                return "Missing required fields.";
+                            case "EXCEEDRAM":
+                                return "You have exceeded your RAM plan.";
+                            case "EXCEEDDISK":
+                                return "You have exceeded your Disk plan.";
+                            case "EXCEEDCPU":
+                                return "You have exceeded your CPU plan.";
+                            default:
+                                if (req.query.err.startsWith("EXCEED")) return "Resource limit exceeded.";
+                                return "An error occurred while updating the server: " + req.query.err;
+                        }
+                    })() %>
+                </span>
+            </div>
+        </div>
+    <% } %>
     <%- include('../components/server') %>
 
     <div class="max-w-7xl mx-auto">
