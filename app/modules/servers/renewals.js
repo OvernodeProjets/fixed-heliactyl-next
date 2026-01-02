@@ -64,18 +64,22 @@ module.exports.load = async function (router, db) {
         await db.set(`renewal_${serverId}`, initialRenewalData);
         return initialRenewalData;
       }
-
+      
+      
       // If renewal bypass has been purchased, update the nextRenewal date
-      if (hasRenewalBypass && !renewalData.hasRenewalBypass) {
-        const updatedRenewalData = {
-          ...renewalData,
-          nextRenewal: 'Unlimited',
-          hasRenewalBypass: true,
-          isActive: true, // Ensure server is active if it was previously expired
-          userId: user || renewalData.userId // Update userId if provided
-        };
-        await db.set(`renewal_${serverId}`, updatedRenewalData);
-        return updatedRenewalData;
+      // Also reactivate if it was expired
+      if (hasRenewalBypass) {
+        if (!renewalData.hasRenewalBypass || !renewalData.isActive || renewalData.nextRenewal !== 'Unlimited') {
+           const updatedRenewalData = {
+            ...renewalData,
+            nextRenewal: 'Unlimited',
+            hasRenewalBypass: true,
+            isActive: true, // Reactivate server
+            userId: user || renewalData.userId 
+          };
+          await db.set(`renewal_${serverId}`, updatedRenewalData);
+          return updatedRenewalData;
+        }
       }
 
       // Ensure userId is stored if missing and provided
@@ -99,10 +103,13 @@ module.exports.load = async function (router, db) {
       // Update renewal data
       const updatedRenewalData = {
         lastRenewal: now.toISOString(),
-        nextRenewal: new Date(now.getTime() + RENEWAL_PERIOD_HOURS * 60 * 60 * 1000).toISOString(),
+        nextRenewal: renewalData.hasRenewalBypass ? 
+          'Unlimited' : 
+          new Date(now.getTime() + RENEWAL_PERIOD_HOURS * 60 * 60 * 1000).toISOString(),
         isActive: true,
         renewalCount: (renewalData.renewalCount || 0) + 1,
-        userId: renewalData.userId // Preserve userId
+        userId: renewalData.userId, // Preserve userId
+        hasRenewalBypass: renewalData.hasRenewalBypass // Preserve bypass status
       };
 
       await db.set(`renewal_${serverId}`, updatedRenewalData);
@@ -153,6 +160,7 @@ module.exports.load = async function (router, db) {
         const renewalData = await db.get(key);
 
         if (!renewalData || !renewalData.isActive) continue;
+        if (renewalData.nextRenewal === 'Unlimited') continue;
 
         const nextRenewal = new Date(renewalData.nextRenewal);
         const hoursUntilExpiration = (nextRenewal - now) / (1000 * 60 * 60);
@@ -248,8 +256,15 @@ module.exports.load = async function (router, db) {
 
       // Calculate time remaining
       const now = new Date();
-      const nextRenewal = new Date(renewalStatus.nextRenewal);
-      const timeRemaining = nextRenewal - now;
+      let nextRenewal, timeRemaining;
+      
+      if (renewalStatus.nextRenewal === 'Unlimited') {
+           nextRenewal = new Date('2999-12-31T23:59:59.999Z');
+           timeRemaining = nextRenewal - now;
+      } else {
+           nextRenewal = new Date(renewalStatus.nextRenewal);
+           timeRemaining = nextRenewal - now;
+      }
 
       // Format the response
       const response = {
