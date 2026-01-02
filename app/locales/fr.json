@@ -945,6 +945,9 @@
       "update_error": "Erreur lors de la mise à jour de la variable. Réessayez."
     },
     "create": {
+      "error_egg_not_allowed": "Le type de serveur sélectionné n'est pas disponible dans cet emplacement.",
+      "error_location_limit": "La limite pour cet emplacement est de",
+      "not_allowed_here": "Non autorisé ici",
       "title": "Créer un serveur",
       "error_title": "Erreur lors de la création du serveur",
       "name_label": "Nom du serveur",
@@ -1213,13 +1216,7 @@
       "network_activity": "Activité réseau"
     }
   },
-  "server": {
-    "create": {
-      "error_egg_not_allowed": "Le type de serveur sélectionné n'est pas disponible dans cet emplacement.",
-      "error_location_limit": "La limite pour cet emplacement est de",
-      "not_allowed_here": "Non autorisé ici"
-    }
-  },
+
   "legal": {
     "tos": "Conditions d'utilisation (CGU)",
     "sales": "Conditions de vente (CGV)",

@@ -68,11 +68,11 @@
                   case "EXCEEDCPU":
                     return "The server could not be created because you have requested to create a server that exceeds your plan.";
                   case "EGGNOTALLOWEDONLOCATION":
-                    return "<%= __('server.create.error_egg_not_allowed') %>";
+                    return __("server.create.error_egg_not_allowed");
                   case "LOCATIONLIMITRAM":
                   case "LOCATIONLIMITDISK":
                   case "LOCATIONLIMITCPU":
-                    return `<%= __('server.create.error_location_limit') %> <b>${req.query.num}</b>${req.query.err.slice(-3) === "RAM" ? "MB RAM" : req.query.err.slice(-4) === "DISK" ? "MB disk" : "% CPU"}.`;
+                    return `${__('server.create.error_location_limit')} <b>${req.query.num}</b>${req.query.err.slice(-3) === "RAM" ? "MB RAM" : req.query.err.slice(-4) === "DISK" ? "MB disk" : "% CPU"}.`;
                   default:
                     return "An unknown error occurred. Please try again or contact support if the issue persists.";
                 }

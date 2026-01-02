@@ -745,11 +745,6 @@
       "create": "Create",
       "apply_changes": "Apply Changes to Server"
     },
-    "create": {
-      "error_egg_not_allowed": "The selected server type is not available in this location.",
-      "error_location_limit": "The limit for this location is",
-      "not_allowed_here": "Not Allowed Here"
-    },
     "backups": {
       "back_to_list": "Back to server list",
       "title": "Backups",
@@ -848,6 +843,9 @@
       "update_error": "An error occurred while updating the variable. Please try again."
     },
     "create": {
+      "error_egg_not_allowed": "The selected server type is not available in this location.",
+      "error_location_limit": "The limit for this location is",
+      "not_allowed_here": "Not Allowed Here",
       "title": "Create Server",
       "error_title": "Error Creating Server",
       "name_label": "Server Name",
