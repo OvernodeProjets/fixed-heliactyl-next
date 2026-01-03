@@ -13,6 +13,9 @@
     "logout": "Se déconnecter",
     "login": "Se connecter",
     "register": "S'inscrire",
+    "legal": "Mentions Légales",
+    "tos": "Conditions d'utilisation",
+    "sales": "Conditions de vente",
     "loading": "Chargement...",
     "error": "Erreur",
     "success": "Succès",
@@ -488,8 +491,7 @@
       "about": "{{name}} a été créé pour fournir un hébergement de serveurs de jeu {{scope}}.",
       "scope_one": "en {{country}}",
       "scope_many": "à travers {{count}} emplacements"
-    }
-    ,
+    },
     "subdomains": {
       "back_to_list": "Retour à la liste des serveurs",
       "title": "Sous‑domaines",
@@ -636,8 +638,7 @@
         "the_end": "L'End"
       },
       "no_description": "Aucune description définie."
-    }
-    ,
+    },
     "backups": {
       "back_to_list": "Retour à la liste des serveurs",
       "title": "Sauvegardes",
@@ -736,8 +737,7 @@
       "edit": "Modifier",
       "update_error": "Erreur lors de la mise à jour de la variable. Réessayez."
     }
-  }
-  ,
+  },
   "errors": {
     "common": {
       "go_home": "Retour à l’accueil",
@@ -767,8 +767,7 @@
       "title": "Compte bloqué pour double compte",
       "description": "Votre compte a été bloqué pour utilisation potentielle de comptes alternatifs (ce qui viole le contrat d'utilisateur de {{name}}). Veuillez contacter le support pour résoudre ce problème et lire notre contrat d'utilisateur avant de continuer. Vous pouvez toujours vous connecter avec le compte original / principal, il n'a pas été bloqué."
     }
-  }
-  ,
+  },
   "auth": {
     "login": {
       "title": "Connexion",
@@ -788,13 +787,16 @@
       "errors": {
         "account_creation_failed": "Échec de création du compte. Réessayez ou contactez le support.",
         "server_error": "Erreur serveur. Réessayez plus tard.",
-        "generic": "Une erreur s’est produite lors de l’authentification.",
+        "generic": "Une erreur s'est produite lors de l'authentification.",
         "recaptcha_required": "Veuillez compléter le reCAPTCHA",
         "email_required": "Veuillez saisir votre adresse email.",
         "login_failed": "Échec de connexion. Réessayez.",
-        "generic_error": "Une erreur s’est produite. Réessayez plus tard.",
-        "request_failed": "Échec du traitement de la requête. Réessayez."
+        "generic_error": "Une erreur s'est produite. Réessayez plus tard.",
+        "request_failed": "Échec du traitement de la requête. Réessayez.",
+        "passwords_no_match": "Les mots de passe ne correspondent pas."
       },
+      "accept": "J'accepte",
+      "and": "et",
       "success": {
         "welcome_back": "Bon retour !",
         "magic_link_sent": "Lien magique envoyé ! Consultez votre email.",
@@ -840,8 +842,7 @@
         "reset": "Mot de passe réinitialisé avec succès !"
       }
     }
-  }
-  ,
+  },
   "server": {
     "common": {
       "back_to_list": "Retour à la liste des serveurs",
@@ -946,6 +947,9 @@
       "update_error": "Erreur lors de la mise à jour de la variable. Réessayez."
     },
     "create": {
+      "error_egg_not_allowed": "Le type de serveur sélectionné n'est pas disponible dans cet emplacement.",
+      "error_location_limit": "La limite pour cet emplacement est de",
+      "not_allowed_here": "Non autorisé ici",
       "title": "Créer un serveur",
       "error_title": "Erreur lors de la création du serveur",
       "name_label": "Nom du serveur",
@@ -1037,8 +1041,7 @@
       "error_create_folder": "Erreur lors de la création du dossier. Veuillez réessayer.",
       "created_file_success": "Fichier créé avec succès",
       "error_create_file": "Erreur lors de la création du fichier. Veuillez réessayer."
-    }
-    ,
+    },
     "import": {
       "title": "Import de serveur",
       "subtitle": "Transférez des fichiers depuis un autre serveur via SFTP",
@@ -1073,8 +1076,7 @@
         "failed_prefix": "Échec de l'import :",
         "status_error": "Erreur de récupération du statut"
       }
-    }
-    ,
+    },
     "logs": {
       "back_to_list": "Retour à la liste des serveurs",
       "title": "Journaux d'activité",
@@ -1142,8 +1144,7 @@
       "eula_failed_text": "Une erreur s'est produite lors de l'acceptation de l'EULA. Veuillez réessayer.",
       "powered_on": "allumé",
       "powered_off": "éteint"
-    }
-    ,
+    },
     "plugins": {
       "back_to_list": "Retour à la liste des serveurs",
       "search_placeholder": "Rechercher des plugins...",
@@ -1216,6 +1217,16 @@
       "resource_usage": "Utilisation des ressources",
       "network_activity": "Activité réseau"
     }
+  },
+
+  "legal": {
+    "tos": "Conditions d'utilisation (CGU)",
+    "sales": "Conditions de vente (CGV)",
+    "back": "Retour",
+    "register": "S'inscrire",
+    "last_updated": "Dernière mise à jour :",
+    "tos_not_found": "Contenu des conditions d'utilisation introuvable.",
+    "sales_not_found": "Contenu des conditions de vente introuvable."
   }
 }
 

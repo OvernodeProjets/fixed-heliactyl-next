@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<%
+const locationCount = Object.keys(settings.api.client.locations).length;
+const firstLocation = locationCount === 1 ? Object.values(settings.api.client.locations)[0] : null;
+%>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Sale - <%= settings.name %></title>
+    <link rel="stylesheet" href="/assets/tailwind.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        @font-face {
+            font-family: 'Ndot-55';
+            src: url('/assets/Ndot-55.otf') format('opentype');
+            font-weight: normal;
+            font-display: swap;
+        }
+        .heavy {
+            font-family: 'Ndot-55', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+        .prose h1 { font-family: 'Ndot-55', sans-serif; text-transform: uppercase; font-size: 2em; margin-top: 1.5em; margin-bottom: 0.5em; }
+        .prose h2 { font-family: 'Ndot-55', sans-serif; text-transform: uppercase; font-size: 1.5em; margin-top: 1.5em; margin-bottom: 0.5em; }
+        .prose p { margin-bottom: 1em; line-height: 1.6; }
+        .prose ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em; }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Navbar -->
+    <header x-data="{ isOpen: false }" class="fixed top-0 w-full z-50">
+        <div class="absolute inset-0 bg-gray-200/20 backdrop-blur border border-black/5 shadow-sm rounded-b-3xl"></div>
+        <nav class="relative mx-auto max-w-7xl px-6 lg:px-8 py-4 z-50">
+            <div class="flex items-center justify-between">
+                <div class="flex lg:flex-1">
+                    <a href="/" class="flex items-center">
+                        <img src="/assets/logo-text.png" class="h-10" alt="<%= settings.name %> Logo">
+                    </a>
+                </div>
+                
+                <div class="hidden lg:flex lg:gap-x-12">
+                     <a href="/#features" class="text-sm font-semibold text-gray-900 hover:text-indigo-900"><%= __("website.nav.features") %></a>
+                    <a href="/#pricing" class="text-sm font-semibold text-gray-900 hover:text-indigo-900"><%= __("website.nav.pricing") %></a>
+                    <a href="<%= settings.website.status %>" class="text-sm font-semibold text-gray-900 hover:text-indigo-900"><%= __("website.nav.status") %></a>
+                    <a href="<%= settings.website.discord %>" class="text-sm font-semibold text-gray-900 hover:text-indigo-900"><%= __("website.nav.discord") %></a>
+                </div>
+
+                <div class="hidden lg:flex lg:flex-1 lg:justify-end items-center gap-x-4">
+                    <div class="flex items-center gap-x-2 mr-2">
+                        <% availableLocales.forEach(l => { %>
+                            <a href="?lang=<%= l.code %>" class="text-lg hover:scale-110 transition-transform <%= locale === l.code ? 'grayscale-0 ring-2 ring-indigo-500 rounded-full p-0.5' : 'grayscale opacity-70 hover:opacity-100' %>" title="<%= l.name %>">
+                                <%= l.flag %>
+                            </a>
+                        <% }) %>
+                    </div>
+                    <a href="/" class="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition-colors">
+                        <%= __("legal.back") %>
+                    </a>
+                    <a href="/auth" class="rounded-lg bg-gray-950 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 transition-all hover:shadow-lg">
+                        <%= __("legal.register") %>
+                    </a>
+                </div>
+
+                <button @click="isOpen = !isOpen" class="lg:hidden p-2 text-gray-700">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-16 6h16"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile menu -->
+            <div x-show="isOpen" class="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg rounded-b-xl">
+                <div class="px-4 py-6 space-y-4">
+                    <a href="/#features" class="block text-sm font-semibold text-gray-900"><%= __("website.nav.features") %></a>
+                    <a href="/#pricing" class="block text-sm font-semibold text-gray-900"><%= __("website.nav.pricing") %></a>
+                    <a href="<%= settings.website.status %>" class="block text-sm font-semibold text-gray-900"><%= __("website.nav.status") %></a>
+                    <a href="<%= settings.website.discord %>" class="block text-sm font-semibold text-gray-900"><%= __("website.nav.discord") %></a>
+                    <a href="/auth" class="block w-full text-center rounded-lg bg-gray-950 px-4 py-2 text-sm font-semibold text-white">
+                        <%= __("website.nav.get_started") %>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Header Section -->
+    <section class="relative pt-48 pb-12 overflow-hidden">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl text-center">
+                <div class="mb-8 inline-flex items-center rounded-full px-4 py-1">
+                    <span class="text-sm font-medium text-gray-900"><%= __("legal.documents") %></span>
+                </div>
+                <h1 class="heavy text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">
+                    <%= __("legal.sales.title") %>
+                </h1>
+                  <%
+                let pageContent = __("legal.sales_not_found");
+                if (locale === 'fr' && settings.legal.sales.content_fr) {
+                pageContent = settings.legal.sales.content_fr;
+                } else if (settings.legal.sales.content_en) {
+                pageContent = settings.legal.sales.content_en;
+                } else if (settings.legal.sales.content) {
+                    pageContent = settings.legal.sales.content;
+                }
+            %>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="pb-24">
+         <div class="mx-auto max-w-4xl px-6 lg:px-8">
+            <div class="bg-gray-50 rounded-2xl p-8 md:p-12 shadow-sm ring-1 ring-gray-900/5">
+                <div id="content" class="prose prose-indigo max-w-none text-gray-700">
+                    <div class="animate-pulse flex space-x-4">
+                        <div class="flex-1 space-y-4 py-1">
+                            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                            <div class="space-y-2">
+                                <div class="h-4 bg-gray-200 rounded"></div>
+                                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-indigo-950" aria-labelledby="footer-heading">
+        <h2 id="footer-heading" class="sr-only">Footer</h2>
+        <div class="mx-auto max-w-7xl px-6 pb-8 pt-16 sm:pt-24 lg:px-8 lg:pt-32">
+            <div class="xl:grid xl:grid-cols-3 xl:gap-8">
+                <div class="space-y-8">
+                    <img class="h-12 invert" src="/assets/logo-text.png" alt="<%= settings.name %> Logo">
+                    <p class="text-sm leading-6 text-gray-300">
+                        <% if (locationCount === 1) { %>
+                            <%= __('website.footer.about', { name: settings.name, scope: __('website.footer.scope_one', { country: firstLocation.country }) }) %>
+                        <% } else { %>
+                            <%= __('website.footer.about', { name: settings.name, scope: __('website.footer.scope_many', { count: locationCount }) }) %>
+                        <% } %>
+                    </p>
+                    <div class="flex space-x-6">
+                        <a href="<%= settings.website.discord %>" class="text-white/70 hover:text-white transition">
+                             <span class="sr-only">Discord</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M20.317 4.492c-1.53-.69-3.17-1.2-4.885-1.49a.075.075 0 0 0-.079.036c-.21.369-.444.85-.608 1.23a18.566 18.566 0 0 0-5.487 0 12.36 12.36 0 0 0-.617-1.23A.077.077 0 0 0 8.562 3c-1.714.29-3.354.8-4.885 1.491a.07.07 0 0 0-.032.027C.533 9.093-.32 13.555.099 17.961a.08.08 0 0 0 .031.055 20.03 20.03 0 0 0 5.993 2.98.078.078 0 0 0 .084-.026c.462-.62.874-1.275 1.226-1.963.021-.04.001-.088-.041-.104a13.201 13.201 0 0 1-1.872-.878.075.075 0 0 1-.008-.125c.126-.093.252-.19.372-.287a.075.075 0 0 1 .078-.01c3.927 1.764 8.18 1.764 12.061 0a.075.075 0 0 1 .079.009c.12.098.245.195.372.288a.075.075 0 0 1-.006.125c-.598.344-1.22.635-1.873.877a.075.075 0 0 0-.041.105c.36.687.772 1.341 1.225 1.962a.077.077 0 0 0 .084.028 19.963 19.963 0 0 0 6.002-2.981.076.076 0 0 0 .032-.054c.5-5.094-.838-9.52-3.549-13.442a.06.06 0 0 0-.031-.028zM8.02 15.278c-1.182 0-2.157-1.069-2.157-2.38 0-1.312.956-2.38 2.157-2.38 1.21 0 2.176 1.077 2.157 2.38 0 1.312-.956 2.38-2.157 2.38zm7.975 0c-1.183 0-2.157-1.069-2.157-2.38 0-1.312.955-2.38 2.157-2.38 1.21 0 2.176 1.077 2.157 2.38 0 1.312-.946 2.38-2.157 2.38z"/>
+                            </svg>
+                        </a>
+                        <a href="https://github.com/OvernodeProjets" class="text-white/70 hover:text-white transition">
+                            <span class="sr-only">GitHub</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
+                    <div class="md:grid md:grid-cols-2 md:gap-8">
+                        <div>
+                            <h3 class="text-sm font-semibold leading-6 text-white"><%= __("website.footer.sections.product") %></h3>
+                            <ul role="list" class="mt-6 space-y-4">
+                                <li>
+                                    <a href="/#features" class="text-sm leading-6 text-gray-300 hover:text-white"><%= __("website.nav.features") %></a>
+                                </li>
+                                <li>
+                                    <a href="/#pricing" class="text-sm leading-6 text-gray-300 hover:text-white"><%= __("website.nav.pricing") %></a>
+                                </li>
+                                <li>
+                                    <a href="<%= settings.website.status %>" class="text-sm leading-6 text-gray-300 hover:text-white"><%= __("website.nav.status") %></a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="mt-10 md:mt-0">
+                            <h3 class="text-sm font-semibold leading-6 text-white"><%= __("website.footer.sections.support") %></h3>
+                            <ul role="list" class="mt-6 space-y-4">
+                                <li>
+                                    <a href="<%= settings.website.discord %>" class="text-sm leading-6 text-gray-300 hover:text-white"><%= __("website.nav.discord") %></a>
+                                </li>
+                                <li>
+                                    <a href="mailto:support@<%= settings.website.domain %>" class="text-sm leading-6 text-gray-300 hover:text-white"><%= __("website.footer.sections.contact") %></a>
+                                </li>
+                                <% if (settings.legal && settings.legal.tos && settings.legal.tos.enabled) { %>
+                                <li>
+                                    <a href="/legals/tos" class="text-sm leading-6 text-gray-300 hover:text-white">Terms of Service (CGU)</a>
+                                </li>
+                                <% } %>
+                                <% if (settings.legal && settings.legal.sales && settings.legal.sales.enabled) { %>
+                                <li>
+                                    <a href="/legals/sales" class="text-sm leading-6 text-gray-300 hover:text-white">Terms of Sale (CGV)</a>
+                                </li>
+                                <% } %>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-16 border-t border-gray-900/10 pt-8 sm:mt-20 lg:mt-24 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-xs leading-5 text-white/80"><%= __("website.footer.copyright", { year: new Date().getFullYear(), name: settings.name }) %></p>
+                <div class="flex gap-x-4">
+                    <% availableLocales.forEach(l => { %>
+                        <a href="?lang=<%= l.code %>" class="text-sm text-gray-400 hover:text-white flex items-center gap-x-1 <%= locale === l.code ? 'text-white font-bold' : '' %>">
+                            <span><%= l.flag %></span>
+                            <span><%= l.name %></span>
+                        </a>
+                    <% }) %>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+             const markdown = `<%- pageContent.replace(/\\/g, '\\\\').replace(/`/g, '\\\`').replace(/\$/g, '\\$') %>`;
+             const contentDiv = document.getElementById('content');
+             contentDiv.innerHTML = marked.parse(markdown);
+        });
+    </script>
+</body>
+</html>

@@ -97,13 +97,21 @@ class I18nManager {
 
 const i18n = new I18nManager('en');
 function i18nMiddleware(req, res, next) {
-  let userLocale = req.cookies?.locale || 
+  let userLocale = req.query.lang ||
+                   req.cookies?.locale || 
                    req.session?.locale || 
                    req.get('Accept-Language')?.split(',')[0]?.split('-')[0] || 
                    i18n.defaultLocale;
 
+  userLocale = userLocale.toLowerCase();
+
   if (!i18n.availableLocales.includes(userLocale)) {
     userLocale = i18n.defaultLocale;
+  }
+
+  if (req.query.lang && i18n.availableLocales.includes(req.query.lang.toLowerCase())) {
+    res.cookie('locale', userLocale, { maxAge: 900000, httpOnly: true });
+    if (req.session) req.session.locale = userLocale;
   }
 
   res.locals.__ = (key, replacements) => i18n.translate(userLocale, key, replacements);

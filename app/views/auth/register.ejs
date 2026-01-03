@@ -98,8 +98,15 @@
 <body class="bg-gray-100 min-h-screen flex flex-col">
     <main class="flex-grow flex items-center justify-center p-8">
         <div class="py-8 px-6 md:py-12 md:px-8 max-w-md w-full">
-            <div class="flex justify-center mb-8">
+            <div class="flex justify-between items-center mb-8">
                 <img src="/assets/logo-text.png" class="h-12">
+                <div class="flex gap-x-2">
+                    <% availableLocales.forEach(l => { %>
+                        <a href="?lang=<%= l.code %>" class="text-xl hover:scale-110 transition-transform <%= locale === l.code ? 'grayscale-0' : 'grayscale opacity-50 hover:opacity-100' %>" title="<%= l.name %>">
+                            <%= l.flag %>
+                        </a>
+                    <% }) %>
+                </div>
             </div>
             <h2 class="text-center text-2xl tracking-tight font-semibold text-gray-800"><%= __('auth.register.heading') %></h2>
             <p class="text-gray-600 text-center mt-1 text-sm"><%= __('auth.register.subtitle') %></p>
@@ -131,6 +138,25 @@
                         <div class="g-recaptcha" data-sitekey="<%= settings.security.recaptchaSiteKey %>"></div>
                     </div>
                     <% } %>
+                    
+                    <% if ((settings.legal && settings.legal.tos && settings.legal.tos.enabled) || (settings.legal && settings.legal.sales && settings.legal.sales.enabled)) { %>
+                    <div class="flex items-start mb-4">
+                        <div class="flex items-center h-5">
+                            <input id="terms" name="terms" type="checkbox" required class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-indigo-300">
+                        </div>
+                        <label for="terms" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                <%= __('auth.accept') %>
+                                <% if (settings.legal.tos && settings.legal.tos.enabled) { %>
+                                    <a href="/legals/tos" target="_blank" class="text-indigo-600 hover:underline"><%= __('legal.tos') %></a>
+                                <% } %>
+                                <% if (settings.legal.tos && settings.legal.tos.enabled && settings.legal.sales && settings.legal.sales.enabled) { %> <%= __('auth.and') %> <% } %>
+                                <% if (settings.legal.sales && settings.legal.sales.enabled) { %>
+                                    <a href="/legals/sales" target="_blank" class="text-indigo-600 hover:underline"><%= __('legal.sales') %></a>
+                                <% } %>
+                        </label>
+                    </div>
+                    <% } %>
+
                         <button style="box-shadow: inset 0px 4px 5px -3px rgba(55,65,81,1);" type="submit"
                             class="hover:scale-95 w-full py-2.5 px-4 bg-gray-800 hover:bg-gray-700 transition text-white rounded-full transition font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center">
                             <%= __('auth.register.btn') %>
@@ -178,7 +204,7 @@
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
                 const confirmPassword = document.getElementById('confirmPassword').value;
-                const captchaEnabled = <%= settings.security.enableCaptcha %>;
+                const captchaEnabled = <%= !!settings.security.enableCaptcha %>;
                 if (captchaEnabled) {
                     const recaptchaResponse = grecaptcha.getResponse();
 

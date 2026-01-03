@@ -239,6 +239,13 @@ country = "France"
 region = "eu-south"
 flag = "https://cdn-icons-png.flaticon.com/512/197/197560.png"
 cpu = "Ampere"
+# Optional: restrict allowed eggs (if not defined, all eggs are allowed)
+# allowed_eggs = ["paper", "forge", "velocity"]
+# Optional: max resource limits per server on this location
+# [api.client.locations.1.limits]
+#     max_ram = 16384    # MB
+#     max_disk = 51200   # MB
+#     max_cpu = 400      # %
 
 # --- Egg Templates ---
 [api.client.eggs.velocity]
@@ -586,3 +593,40 @@ private = "https://aaaaaaa.aaa/aaa/aaaaaaaa/0000000000000000000/aaa0aa0aa-00aaAa
   # Ban system
   "api ban user" = true
   "api unban user" = true
+
+# ======================================================
+# Legal Configuration (CGU/CGV)
+# ======================================================
+[legal]
+
+  [legal.tos] # Terms of Service / CGU
+  enabled = false
+  last_updated = "06/12/2025"
+  content_en = """
+# Terms of Service
+
+Write your Terms of Service in English here.
+You can use Markdown syntax.
+"""
+  content_fr = """
+# Conditions d'utilisation
+
+Écrivez vos conditions d'utilisation en français ici.
+Vous pouvez utiliser la syntaxe Markdown.
+"""
+
+  [legal.sales] # Terms of Sale / CGV
+  enabled = false
+  last_updated = "06/12/2025"
+  content_en = """
+# Terms of Sale
+
+Write your Terms of Sale in English here.
+You can use Markdown syntax.
+"""
+  content_fr = """
+# Conditions de vente
+
+Écrivez vos conditions de vente en français ici.
+Vous pouvez utiliser la syntaxe Markdown.
+"""
