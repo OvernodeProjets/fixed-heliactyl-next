@@ -22,16 +22,16 @@
         __('dashboard.alerts.server_modified'), "DELETED" : __('dashboard.alerts.server_deleted') }; %>
 
         <% if (req.query.err && alerts[req.query.err]) { %>
-          <div class="my-4 rounded-full shadow-sm border border-white/10 px-5 py-4">
+          <div class="my-4 rounded-3xl md:rounded-full shadow-sm border border-white/10 p-4 md:px-5">
             <span class="text-white text-xs mt-0.5">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor"
-                class="size-8 mb-0.5 text-indigo-300 rounded-full shadow-sm bg-indigo-500/15 p-1.5 mr-2.5 inline-flex">
+                class="size-7 md:size-8 mb-0.5 text-indigo-300 rounded-full shadow-sm bg-indigo-500/15 p-1.5 mr-2.5 inline-flex">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>
               <%= alerts[req.query.err] %>
                 <code style="font-family: 'JetBrains Mono'"
-                  class="text-white/60">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
+                  class="text-white/60 break-all">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
             </span>
           </div>
           <% } else if (req.query.err && req.query.err==="PTERODACTYL" && req.query.data) { %>
