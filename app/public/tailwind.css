@@ -840,11 +840,17 @@
   .w-16 {
     width: calc(var(--spacing) * 16);
   }
+  .w-25 {
+    width: calc(var(--spacing) * 25);
+  }
   .w-32 {
     width: calc(var(--spacing) * 32);
   }
   .w-40 {
     width: calc(var(--spacing) * 40);
+  }
+  .w-45 {
+    width: calc(var(--spacing) * 45);
   }
   .w-48 {
     width: calc(var(--spacing) * 48);
@@ -1632,6 +1638,12 @@
   }
   .bg-\[\#0e0e10\] {
     background-color: #0e0e10;
+  }
+  .bg-\[\#0e0e10\]\/10 {
+    background-color: color-mix(in oklab, #0e0e10 10%, transparent);
+  }
+  .bg-\[\#0e0e10\]\/25 {
+    background-color: color-mix(in oklab, #0e0e10 25%, transparent);
   }
   .bg-\[\#0e0f13\] {
     background-color: #0e0f13;
@@ -2464,9 +2476,6 @@
   .pr-2 {
     padding-right: calc(var(--spacing) * 2);
   }
-  .pr-4 {
-    padding-right: calc(var(--spacing) * 4);
-  }
   .pr-8 {
     padding-right: calc(var(--spacing) * 8);
   }
@@ -2502,9 +2511,6 @@
   }
   .pb-32 {
     padding-bottom: calc(var(--spacing) * 32);
-  }
-  .pl-2 {
-    padding-left: calc(var(--spacing) * 2);
   }
   .pl-10 {
     padding-left: calc(var(--spacing) * 10);
@@ -4544,6 +4550,11 @@
       width: calc(2/3 * 100%);
     }
   }
+  .md\:w-56 {
+    @media (width >= 48rem) {
+      width: calc(var(--spacing) * 56);
+    }
+  }
   .md\:w-64 {
     @media (width >= 48rem) {
       width: calc(var(--spacing) * 64);
@@ -4710,6 +4721,11 @@
       border-bottom-left-radius: var(--radius-3xl);
     }
   }
+  .md\:p-1\.5 {
+    @media (width >= 48rem) {
+      padding: calc(var(--spacing) * 1.5);
+    }
+  }
   .md\:p-4 {
     @media (width >= 48rem) {
       padding: calc(var(--spacing) * 4);
@@ -4728,11 +4744,6 @@
   .md\:p-12 {
     @media (width >= 48rem) {
       padding: calc(var(--spacing) * 12);
-    }
-  }
-  .md\:px-2 {
-    @media (width >= 48rem) {
-      padding-inline: calc(var(--spacing) * 2);
     }
   }
   .md\:px-3 {
@@ -4773,11 +4784,6 @@
   .md\:py-2 {
     @media (width >= 48rem) {
       padding-block: calc(var(--spacing) * 2);
-    }
-  }
-  .md\:py-4 {
-    @media (width >= 48rem) {
-      padding-block: calc(var(--spacing) * 4);
     }
   }
   .md\:py-12 {
@@ -4844,12 +4850,6 @@
     @media (width >= 48rem) {
       font-size: var(--text-xl);
       line-height: var(--tw-leading, var(--text-xl--line-height));
-    }
-  }
-  .md\:text-xs {
-    @media (width >= 48rem) {
-      font-size: var(--text-xs);
-      line-height: var(--tw-leading, var(--text-xs--line-height));
     }
   }
   .md\:text-\[1em\] {
