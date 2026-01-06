@@ -789,13 +789,13 @@ function updateUsageBar(type, value, unit, max = 100) {
     // Add color coding based on usage
     if (percentage > 90) {
         barElement.classList.add('bg-red-600');
-        barElement.classList.remove('bg-yellow-600', 'bg-emerald-600');
+        barElement.classList.remove('bg-amber-600', 'bg-emerald-600');
     } else if (percentage > 75) {
-        barElement.classList.add('bg-yellow-600');
+        barElement.classList.add('bg-amber-600');
         barElement.classList.remove('bg-red-600', 'bg-emerald-600');
     } else {
         barElement.classList.add('bg-emerald-600');
-        barElement.classList.remove('bg-red-600', 'bg-yellow-600');
+        barElement.classList.remove('bg-red-600', 'bg-amber-600');
     }
 }
 

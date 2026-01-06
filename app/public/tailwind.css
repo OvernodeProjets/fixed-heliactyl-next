@@ -430,11 +430,20 @@
   .left-8 {
     left: calc(var(--spacing) * 8);
   }
+  .z-6 {
+    z-index: 6;
+  }
   .z-10 {
     z-index: 10;
   }
+  .z-49 {
+    z-index: 49;
+  }
   .z-50 {
     z-index: 50;
+  }
+  .z-60 {
+    z-index: 60;
   }
   .z-100 {
     z-index: 100;
@@ -768,11 +777,17 @@
   .h-\[250px\] {
     height: 250px;
   }
+  .h-dvh {
+    height: 100dvh;
+  }
   .h-full {
     height: 100%;
   }
   .h-px {
     height: 1px;
+  }
+  .h-screen {
+    height: 100vh;
   }
   .max-h-60 {
     max-height: calc(var(--spacing) * 60);
@@ -840,17 +855,11 @@
   .w-16 {
     width: calc(var(--spacing) * 16);
   }
-  .w-25 {
-    width: calc(var(--spacing) * 25);
-  }
   .w-32 {
     width: calc(var(--spacing) * 32);
   }
   .w-40 {
     width: calc(var(--spacing) * 40);
-  }
-  .w-45 {
-    width: calc(var(--spacing) * 45);
   }
   .w-48 {
     width: calc(var(--spacing) * 48);
@@ -1304,9 +1313,6 @@
   .overflow-hidden {
     overflow: hidden;
   }
-  .overflow-visible {
-    overflow: visible;
-  }
   .overflow-x-auto {
     overflow-x: auto;
   }
@@ -1638,9 +1644,6 @@
   }
   .bg-\[\#0e0e10\] {
     background-color: #0e0e10;
-  }
-  .bg-\[\#0e0e10\]\/10 {
-    background-color: color-mix(in oklab, #0e0e10 10%, transparent);
   }
   .bg-\[\#0e0e10\]\/25 {
     background-color: color-mix(in oklab, #0e0e10 25%, transparent);
@@ -2948,6 +2951,9 @@
         color: color-mix(in oklab, var(--color-white) 60%, transparent);
       }
     }
+  }
+  .\!opacity-0 {
+    opacity: 0% !important;
   }
   .opacity-0 {
     opacity: 0%;
@@ -4332,13 +4338,6 @@
       }
     }
   }
-  .sm\:truncate {
-    @media (width >= 40rem) {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-  }
   .sm\:p-6 {
     @media (width >= 40rem) {
       padding: calc(var(--spacing) * 6);
@@ -4548,11 +4547,6 @@
   .md\:w-2\/3 {
     @media (width >= 48rem) {
       width: calc(2/3 * 100%);
-    }
-  }
-  .md\:w-56 {
-    @media (width >= 48rem) {
-      width: calc(var(--spacing) * 56);
     }
   }
   .md\:w-64 {

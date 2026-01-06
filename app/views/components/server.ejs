@@ -2,10 +2,10 @@
 <meta http-equiv="refresh" content="0; url=/servers?err=INVALID">
 <% } %>
 
-<nav class="sticky top-0 z-50 mb-6 bg-[#010103]/80 backdrop-blur-lg py-2 -mx-4 px-4">
+<nav class="z-50 mb-6 bg-[#010103]/80 backdrop-blur-lg py-2 -mx-4 px-2.5 md:px-4">
 
     <!-- Navigation Items -->
-<div class="block overflow-visible relative">
+<div class="block overflow-auto relative">
 
     <div class="inline-flex flex-wrap lg:flex-nowrap gap-2 lg:gap-0 lg:space-x-1 rounded-xl lg:rounded-full bg-white/5 backdrop-blur-xl p-2 lg:p-1.5">
             <!-- Core Server Management -->
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // utility: position menu under button (for fixed positioning)
     function positionMenuFixed() {
         const btnRect = moreMenuButton.getBoundingClientRect();
-        const menuWidth = Math.min(280, window.innerWidth - 16); // max 280px or screen width - 16px padding
+        const menuWidth = Math.min(240, window.innerWidth - 16); // max 280px or screen width - 16px padding
         const menuMaxHeight = window.innerHeight * 0.7; // 70% of viewport height
         
         // Calculate left position - center on small screens, align to button on larger
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
         moreMenuContent.style.width = menuWidth + 'px';
         moreMenuContent.style.maxHeight = menuMaxHeight + 'px';
         moreMenuContent.style.overflowY = 'auto';
-        moreMenuContent.style.zIndex = 99999;
+        moreMenuContent.style.zIndex = 49;
     }
 
     function resetMenuPlacement() {
