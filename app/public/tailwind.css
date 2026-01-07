@@ -430,9 +430,6 @@
   .left-8 {
     left: calc(var(--spacing) * 8);
   }
-  .z-6 {
-    z-index: 6;
-  }
   .z-10 {
     z-index: 10;
   }
@@ -777,9 +774,6 @@
   .h-\[250px\] {
     height: 250px;
   }
-  .h-dvh {
-    height: 100dvh;
-  }
   .h-full {
     height: 100%;
   }
@@ -855,6 +849,9 @@
   .w-16 {
     width: calc(var(--spacing) * 16);
   }
+  .w-20 {
+    width: calc(var(--spacing) * 20);
+  }
   .w-32 {
     width: calc(var(--spacing) * 32);
   }
@@ -863,6 +860,9 @@
   }
   .w-48 {
     width: calc(var(--spacing) * 48);
+  }
+  .w-50 {
+    width: calc(var(--spacing) * 50);
   }
   .w-56 {
     width: calc(var(--spacing) * 56);
@@ -932,6 +932,15 @@
   }
   .min-w-0 {
     min-width: calc(var(--spacing) * 0);
+  }
+  .min-w-6 {
+    min-width: calc(var(--spacing) * 6);
+  }
+  .min-w-60 {
+    min-width: calc(var(--spacing) * 60);
+  }
+  .min-w-63 {
+    min-width: calc(var(--spacing) * 63);
   }
   .min-w-\[0\] {
     min-width: 0;
@@ -1321,6 +1330,9 @@
   }
   .overflow-y-auto {
     overflow-y: auto;
+  }
+  .overflow-y-scroll {
+    overflow-y: scroll;
   }
   .rounded {
     border-radius: 0.25rem;
@@ -1718,12 +1730,6 @@
     background-color: color-mix(in srgb, #000 75%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-black) 75%, transparent);
-    }
-  }
-  .bg-black\/\[50\%\] {
-    background-color: color-mix(in srgb, #000 50%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-black) 50%, transparent);
     }
   }
   .bg-blue-200 {
@@ -2952,9 +2958,6 @@
       }
     }
   }
-  .\!opacity-0 {
-    opacity: 0% !important;
-  }
   .opacity-0 {
     opacity: 0%;
   }
@@ -2978,9 +2981,6 @@
   }
   .opacity-100 {
     opacity: 100%;
-  }
-  .opacity-\[0\] {
-    opacity: 0;
   }
   .shadow {
     --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
@@ -4554,6 +4554,11 @@
       width: calc(var(--spacing) * 64);
     }
   }
+  .md\:w-72 {
+    @media (width >= 48rem) {
+      width: calc(var(--spacing) * 72);
+    }
+  }
   .md\:w-\[50\%\] {
     @media (width >= 48rem) {
       width: 50%;
@@ -4587,6 +4592,11 @@
   .md\:max-w-full {
     @media (width >= 48rem) {
       max-width: 100%;
+    }
+  }
+  .md\:min-w-72 {
+    @media (width >= 48rem) {
+      min-width: calc(var(--spacing) * 72);
     }
   }
   .md\:min-w-\[0\] {
