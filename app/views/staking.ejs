@@ -430,7 +430,7 @@ async function confirmUnstake(positionId, isLocked) {
 
     if (confirm(confirmMessage)) {
         try {
-            const response = await fetch('/unstake', {
+            const response = await fetch('/api/unstake', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ positionId })

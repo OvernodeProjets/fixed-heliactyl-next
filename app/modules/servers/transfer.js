@@ -94,14 +94,32 @@ module.exports.load = async function (router, db) {
   }
 
   async function transferServer(serverId, allocationId, targetNodeId) {
-    const payload = `node_id=${targetNodeId}&allocation_id=${allocationId}&_token=${token}`;
-    await apiRequest(
-      `/admin/servers/view/${serverId}/manage/transfer`,
-      "POST",
-      payload,
-      true
-    );
-    console.log(`Transfer job added to queue for server ${serverId}`);
+    if (settings.pterodactyl.use_new_transfer) {
+      // V2 Transfer Method (Application API)
+      // Endpoint: POST /api/application/servers/{server_id}/transfer
+      // Body: { "node_id": targetNodeId }
+      const payload = {
+        node_id: parseInt(targetNodeId)
+      };
+      
+      await apiRequest(
+        `/servers/${serverId}/transfer`,
+        "POST",
+        payload,
+        false // isAdmin = false (uses Application API Key)
+      );
+      console.log(`[V2] Transfer initiated for server ${serverId} to node ${targetNodeId}`);
+    } else {
+      // Legacy Transfer Method (Admin Cookie/Token)
+      const payload = `node_id=${targetNodeId}&allocation_id=${allocationId}&_token=${token}`;
+      await apiRequest(
+        `/admin/servers/view/${serverId}/manage/transfer`,
+        "POST",
+        payload,
+        true // isAdmin = true (uses Cookie)
+      );
+      console.log(`[Legacy] Transfer job added to queue for server ${serverId}`);
+    }
   }
 
   router.get("/servers/capacity/:node", authMiddleware, async (req, res) => {
