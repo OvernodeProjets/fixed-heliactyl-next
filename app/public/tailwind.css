@@ -1020,6 +1020,9 @@
   .cursor-pointer {
     cursor: pointer;
   }
+  .touch-auto {
+    touch-action: auto;
+  }
   .resize {
     resize: both;
   }

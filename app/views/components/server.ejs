@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Keep menu fixed when scrolling on mobile
-   document.getElementById('container').addEventListener('scroll', () => {
+    window.addEventListener('scroll', () => {
        if (isMoreMenuOpen && moreMenuContent.style.position === 'fixed') {
             positionMenuFixed();
         }
