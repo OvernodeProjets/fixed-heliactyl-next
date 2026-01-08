@@ -11,7 +11,7 @@
  */
 
 const heliactylModule = {
-  "name": "WebSocket Server Module",
+  "name": "Allocations Server Module",
   "target_platform": "3.2.1-beta.1"
 };
 
@@ -50,4 +50,29 @@ module.exports.load = async function(router, db) {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
+    // DELETE /api/server/:id/allocations/:allocationId - Unassign an allocation
+    router.delete('/server/:id/allocations/:allocationId', authMiddleware, ownsServer(db), async (req, res) => {
+      try {
+        const serverId = req.params.id;
+        const allocationId = req.params.allocationId;
+              
+        const response = await axios.delete(
+          `${settings.pterodactyl.domain}/api/client/servers/${serverId}/network/allocations/${allocationId}`,
+            {
+              headers: {
+                'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+              },
+            }
+        );
+
+        if (!response.ok) throw new Error({ status: response.status, message: 'An Internal error occured'})
+                                                                                                                                  
+        res.status(201).json({ message:`Successfully Unassigned allocation: ${allocationId} for server ${serverId}` });
+      } catch (error) {
+        console.error('Error unassigning allocation:', error);
+        res.status(error.status).json({ message: error.message });
+      }
+    });
 };
