@@ -231,7 +231,7 @@ display:none;
                 <div style="height: 30rem;" id="console-output" class="bg-black/20 p-1 md:p-4 rounded-md md:rounded-xl border border-white/5 shadow-sm scrollbar-hide mt-4 overflow-y-auto mb-4 font-mono text-[0.7rem] sm:text-[0.85rem]">
                 </div>
                 <div class="flex border-t border-white/5 pt-2 md:pt-4">
-                    <input type="text" id="console-input" class="w-[90%] md:flex-grow border-none bg-transparent text-white py-2 pr-2 focus:border-white/5 focus:outline-none focus:ring-2 focus:ring-transparent transition placeholder-white/30" placeholder="container@<%= settings.name %>~">
+                    <input type="text" id="console-input" class="flex-grow-1 min-w-0 border-none bg-transparent text-white py-2 pr-2 focus:border-white/5 focus:outline-none focus:ring-2 focus:ring-transparent transition placeholder-white/30" placeholder="container@<%= settings.name %>~">
                     <button id="send-command" class="flex bg-indigo-500/15 hover:bg-indigo-500/20 text-indigo-200 font-medium py-2 px-2 sm:px-4 rounded-xl transition duration-300 items-center">
                         <span class="hidden sm:inline mr-1"><%= __('server.manage.send_command') %></span>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
