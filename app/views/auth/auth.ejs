@@ -158,8 +158,8 @@
     </div>
 
     <!-- Modal -->
-    <div id="modal" class="modal fixed inset-0 bg-black bg-opacity-50 backdrop-blur flex items-center justify-center z-50">
-        <div class="modal-content bg-white p-6 rounded-2xl shadow-sm max-w-md w-full mx-4">
+    <div id="modal" class="modal fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center z-50">
+        <div class="modal-content bg-white p-6 rounded-2xl shadow-sm w-[75%] md:w-[50%] mx-4">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-gray-800 text-lg font-semibold"><%= __('auth.login.modal_title') %></h2>
                 <button id="closeModal" class="text-gray-500 hover:text-gray-700">
@@ -169,7 +169,7 @@
                 </button>
             </div>
             <div id="recaptcha-container" class="mb-4"></div>
-            <button id="submitRecaptcha" class="w-full py-2 px-4 bg-indigo-600 font-medium hover:scale-95 text-white rounded-full transition font-medium hover:bg-indigo-800 hover:text-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+            <button id="submitRecaptcha" class="w-full text-xs md:text-base py-2 px-4 bg-indigo-600 font-medium hover:scale-95 text-white rounded-full transition font-medium hover:bg-indigo-800 hover:text-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                 <%= __('auth.login.modal_btn') %>
             </button>
         </div>

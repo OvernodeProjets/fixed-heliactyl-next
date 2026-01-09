@@ -45,7 +45,7 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mt-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-4">
             <!-- RAM Card -->
             <div class="bg-white/5 rounded-2xl p-8">
                 <div class="flex items-center justify-between mb-4">
@@ -153,7 +153,7 @@
             <button 
                 @click="purchaseRenewalBypass()" 
                 :disabled="!renewalBypassStatus.canAfford || isLoading || renewalBypassStatus.hasRenewalBypass"
-                class="bg-white/5 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="bg-white/5 text-white px-3 md:px-6 py-3 rounded-xl font-medium flex items-center gap-2 hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
@@ -164,7 +164,7 @@
         
         <div class="grid grid-cols-1 gap-4">
             <div class="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-6 border border-purple-500/20">
-                <div class="flex items-start gap-4">
+                <div class="flex flex-col md:flex-row items-start gap-4">
                     <div class="bg-purple-500/20 p-3 rounded-xl">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M6.625 2.655A9 9 0 0119 11a1 1 0 11-2 0 7 7 0 00-9.625-6.492 1 1 0 11-.75-1.853zM4.662 4.959A1 1 0 014.75 6.37 6.97 6.97 0 003 11a1 1 0 11-2 0 8.97 8.97 0 012.25-5.953 1 1 0 011.412-.088z" clip-rule="evenodd" />

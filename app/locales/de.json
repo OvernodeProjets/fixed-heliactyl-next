@@ -527,6 +527,7 @@
     "subusers": {
       "back_to_list": "Zur Serverliste zurück",
       "title": "Unterbenutzer",
+      "subtitle": "Unterbenutzer helfen Ihnen, anderen Personen Zugriff auf Ihren Server zu gewähren",
       "add": "Unterbenutzer hinzufügen",
       "email": "E‑Mail",
       "cancel": "Abbrechen",
@@ -616,6 +617,7 @@
     "backups": {
       "back_to_list": "Zur Serverliste zurück",
       "title": "Backups",
+      "subtitle": "Backups sind eine Möglichkeit, eine Kopie Ihres Servers zu sichern",
       "create": "Backup erstellen",
       "empty_title": "Keine Backups vorhanden",
       "empty_desc": "Erstellen Sie ein erstes Backup zum Schutz Ihrer Daten",
