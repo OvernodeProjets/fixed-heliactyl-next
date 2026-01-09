@@ -41,6 +41,13 @@ module.exports.load = async function(router, db) {
       const serverId = req.params.id;
       const userId = req.session.userinfo.id;
 
+      // Ban check
+      const isBanned = await db.get("ban-" + userId);
+      if (isBanned) {
+        ws.close(4003, 'Forbidden: Banned');
+        return;
+      }
+
       try {
         // Check server ownership (simplified check)
         const pterodactylId = await db.get("users-" + userId);

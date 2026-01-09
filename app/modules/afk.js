@@ -32,6 +32,12 @@ module.exports.load = function(app, db) {
     const userId = req.session.userinfo.id;
     const username = req.session.userinfo.username;
 
+    const isBanned = await db.get("ban-" + userId);
+    if (isBanned) {
+      ws.close(4003, 'Forbidden: Banned');
+      return;
+    }
+
     try {
       // Check for existing session across all clusters
       const hasActive = await afkManager.hasActiveSession(userId);

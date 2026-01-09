@@ -89,6 +89,14 @@ class AFKRewardsManager {
     const session = this.sessions.get(userId);
     if (!session) return;
     
+    const isBanned = await this.db.get(`ban-${userId}`);
+    if (isBanned) {
+      console.log(`[AFK] User ${username} (${userId}) found banned during reward cycle. Kicking...`);
+      await this.cleanup(userId);
+      if (this.isSocketOpen(ws)) ws.close(4003, 'Forbidden: Banned');
+      return;
+    }
+
     try {
       const rewardAmount = this.COINS_PER_MINUTE * this._cachedMultiplier;
       const currentCoins = await this.db.get(`coins-${userId}`) || 0;
