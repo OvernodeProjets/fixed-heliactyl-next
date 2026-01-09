@@ -150,6 +150,11 @@ server {
         proxy_set_header X-Website-Only "true";
     }
 
+    location /vps {
+        proxy_pass http://localhost:<port>/vps;
+        proxy_buffering off;
+    }
+
     location /legals/sales {
         proxy_pass http://localhost:<port>/legals/sales;
         proxy_buffering off;
