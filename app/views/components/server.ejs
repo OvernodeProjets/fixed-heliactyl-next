@@ -186,26 +186,15 @@ document.addEventListener('DOMContentLoaded', function() {
         isMoreMenuOpen = true;
         moreMenuButton.setAttribute('data-state', 'open');
 
-        // If touch device (no hover) we move the menu to body and use fixed positioning
-        if (!window.matchMedia("(hover: hover)").matches) {
-            // move element to body so it's not clipped by ancestor overflow
-            if (moreMenuContent.parentNode !== document.body) {
-                document.body.appendChild(moreMenuContent);
-            }
-            moreMenuContent.classList.remove('hidden', 'opacity-0', 'scale-95');
-            moreMenuContent.classList.add('opacity-100', 'scale-100');
-            // compute position
-            requestAnimationFrame(() => {
-                positionMenuFixed();
-            });
-        } else {
-            // Desktop behaviour: leave it in place (absolute)
-            moreMenuContent.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                moreMenuContent.classList.remove('opacity-0', 'scale-95');
-                moreMenuContent.classList.add('opacity-100', 'scale-100');
-            });
+        // Always move menu to body with fixed positioning to avoid overflow clipping
+        if (moreMenuContent.parentNode !== document.body) {
+            document.body.appendChild(moreMenuContent);
         }
+        moreMenuContent.classList.remove('hidden', 'opacity-0', 'scale-95');
+        moreMenuContent.classList.add('opacity-100', 'scale-100');
+        requestAnimationFrame(() => {
+            positionMenuFixed();
+        });
     };
 
     const closeMoreMenu = () => {
