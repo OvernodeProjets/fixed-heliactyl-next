@@ -219,6 +219,51 @@
       "suspended_body": "Your server has been suspended. Please contact support via our Discord ({{discord}}) for more information."
     }
   },
+  "vps": {
+    "offers": {
+      "title": "Our VPS Offers",
+      "subtitle": "Powerful and reliable virtual servers for all your projects",
+      "nav_vps": "VPS",
+      "nav_features": "Features",
+      "nav_pricing": "Pricing",
+      "nav_status": "Status",
+      "nav_discord": "Discord",
+      "nav_get_started": "Get Started",
+      "plan_start": "Start",
+      "plan_medium": "Medium",
+      "plan_premium": "Premium",
+      "plan_popular": "Popular",
+      "price_ttc": "VAT incl. / month",
+      "vcores_dedicated": "dedicated vCores",
+      "cpu_info": "intel® Xeon® CPU E5-2650 v4",
+      "ram": "RAM",
+      "ram_info": "DDR4 2333Mhz",
+      "storage_nvme": "NVME",
+      "storage_high_perf": "High performance storage",
+      "ipv4": "1 IPv4",
+      "bandwidth": "1 Gbps",
+      "antiddos": "Anti-DDoS",
+      "uptime": "Uptime",
+      "support": "Support assistance",
+      "order_now": "Order now",
+      "all_benefits_title": "All our offers include",
+      "addons_title": "Additional Options",
+      "addons_subtitle": "Customize your VPS according to your needs",
+      "addon_1_title": "100 GB NVME storage",
+      "addon_1_price": "+€3 per month",
+      "addon_2_title": "1 additional IPv4",
+      "addon_2_price": "+€2.50 per month",
+      "faq_title": "Frequently Asked Questions",
+      "faq_question_1": "Can I upgrade my VPS plan later?",
+      "faq_answer_1": "Yes, you can upgrade your plan or add extra resources (RAM, Disk, CPU) at any time through your dashboard with just a few clicks.",
+      "faq_question_2": "Are prices negotiable?",
+      "faq_answer_2": "Overnode Cloud is a registered company. Unfortunately, many charges must be taken into account, so current prices are fixed.",
+      "faq_question_3": "Where are the servers hosted?",
+      "faq_answer_3": "Our VPS are hosted in France.",
+      "faq_question_4": "Who to contact in case of a problem?",
+      "faq_answer_4": "You can contact us on Discord via tickets, by email at <a href=\"mailto:contact@overnode.fr\" class=\"text-indigo-600 hover:text-indigo-500\">contact@overnode.fr</a> or by phone <a href=\"tel:+33652517260\" class=\"text-indigo-600 hover:text-indigo-500\">+33 6 52 51 72 60</a> (open Monday to Friday from 10am to 5pm)."
+    }
+  },
   "staking": {
     "title": "Staking",
     "subtitle": "Earn compound interest rewards by staking your {{currency}}.",
@@ -425,6 +470,7 @@
     "nav": {
       "features": "Features",
       "pricing": "Pricing",
+      "vps": "VPS",
       "status": "Status",
       "discord": "Discord",
       "get_started": "Get started"
@@ -476,6 +522,11 @@
       "always_free": "Always free",
       "price": "$0",
       "forever": "forever"
+    },
+    "vps_promo": {
+      "title": "Need a VPS?",
+      "description": "Discover our high-performance and reliable virtual server offers, tailored to all your needs.",
+      "button": "View VPS Offers"
     },
     "footer": {
       "copyright": "© {{year}} {{name}}, Powered by Heliactyl. All rights reserved.",

@@ -1,5 +1,5 @@
 {
-    "index": "website.ejs",
+    "index": "website/website.ejs",
     "errors": {
         "banned": "error/banned.ejs",
         "notFound": "error/404.ejs",
@@ -7,7 +7,8 @@
         "antialt": "error/antialt.ejs"
     },
     "pages": {
-        "website": "website.ejs",
+        "website": "website/website.ejs",
+        "vps": "website/vps.ejs",
         "dashboard": "dashboard.ejs",
         "auth": "auth/auth.ejs",
         "auth/register": "auth/register.ejs",

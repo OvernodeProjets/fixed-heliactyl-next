@@ -90,6 +90,9 @@ module.exports.load = async function (router, db) {
 
       const pageToRender = theme.settings.pages[pageName];
       if (pageToRender) {
+        if (pageName === "vps" && (settings.website.vps_enabled === false || settings.website.vps_enabled === undefined)) {
+          return res.redirect("/");
+        }
         res.render(pageToRender, data);
       } else {
         res.status(404).render(theme.settings.errors.notFound, data);

@@ -219,6 +219,51 @@
       "suspended_body": "Votre serveur a été suspendu. Veuillez contacter le support via notre Discord ({{discord}}) pour plus d'informations."
     }
   },
+  "vps": {
+    "offers": {
+      "title": "Nos Offres VPS",
+      "subtitle": "Serveurs virtuels puissants et fiables pour tous vos projets",
+      "nav_vps": "VPS",
+      "nav_features": "Caractéristiques",
+      "nav_pricing": "Tarifs",
+      "nav_status": "Statut",
+      "nav_discord": "Discord",
+      "nav_get_started": "Commencer",
+      "plan_start": "Start",
+      "plan_medium": "Medium",
+      "plan_premium": "Premium",
+      "plan_popular": "Populaire",
+      "price_ttc": "TTC / mois",
+      "vcores_dedicated": "vCores dédiés",
+      "cpu_info": "intel® Xeon® CPU E5-2650 v4",
+      "ram": "RAM",
+      "ram_info": "DDR4 2333Mhz",
+      "storage_nvme": "NVME",
+      "storage_high_perf": "Stockage haute performance",
+      "ipv4": "1 IPv4",
+      "bandwidth": "1 Gbps",
+      "antiddos": "Anti-DDoS",
+      "uptime": "Disponibilité",
+      "support": "Assistance support",
+      "order_now": "Commander maintenant",
+      "all_benefits_title": "Toutes nos offres incluent",
+      "addons_title": "Options Additionnelles",
+      "addons_subtitle": "Personnalisez votre VPS selon vos besoins",
+      "addon_1_title": "100 Go de stockage NVME",
+      "addon_1_price": "+3€ par mois",
+      "addon_2_title": "1 IPv4 supplémentaire",
+      "addon_2_price": "+2,50€ par mois",
+      "faq_title": "Foire Aux Questions",
+      "faq_question_1": "Puis-je changer d'offre VPS plus tard ?",
+      "faq_answer_1": "Oui, vous pouvez augmenter votre offre ou ajouter des ressources supplémentaires (RAM, Disque, CPU) à tout moment depuis votre tableau de bord en quelques clics.",
+      "faq_question_2": "Les prix sont-ils négociables ?",
+      "faq_answer_2": "Overnode Cloud est une entreprise enregistrée. Malheureusement, de nombreuses charges doivent être prises en compte, donc les prix actuels sont fixes.",
+      "faq_question_3": "Où sont hébergés les serveurs ?",
+      "faq_answer_3": "Nos VPS sont hébergés en France.",
+      "faq_question_4": "Qui contacter en cas de problème ?",
+      "faq_answer_4": "Vous pouvez nous contacter sur Discord via ticket, par mail à <a href=\"mailto:contact@overnode.fr\" class=\"text-indigo-600 hover:text-indigo-500\">contact@overnode.fr</a> ou par téléphone au <a href=\"tel:+33652517260\" class=\"text-indigo-600 hover:text-indigo-500\">+33 6 52 51 72 60</a> (ouvert du lundi au vendredi de 10h à 17h)."
+    }
+  },
   "staking": {
     "title": "Staking",
     "subtitle": "Gagnez des intérêts composés en stakant vos {{currency}}.",
@@ -425,6 +470,7 @@
     "nav": {
       "features": "Fonctionnalités",
       "pricing": "Tarifs",
+      "vps": "VPS",
       "status": "Statut",
       "discord": "Discord",
       "get_started": "Commencer"
@@ -476,6 +522,11 @@
       "always_free": "Toujours gratuit",
       "price": "0$",
       "forever": "pour toujours"
+    },
+    "vps_promo": {
+      "title": "Besoin d'un VPS ?",
+      "description": "Découvrez nos offres de serveurs virtuels performants et fiables, adaptés à tous vos besoins.",
+      "button": "Voir les offres VPS"
     },
     "footer": {
       "copyright": "© {{year}} {{name}}, Propulsé par Heliactyl. Tous droits réservés.",

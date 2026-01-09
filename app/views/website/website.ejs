@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<%
+const locationCount = Object.keys(settings.api.client.locations).length;
+const firstLocation = locationCount === 1 ? Object.values(settings.api.client.locations)[0] : null;
+%>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= settings.name %></title>
+    <link rel="stylesheet" href="./assets/tailwind.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        @font-face {
+            font-family: 'Ndot-55';
+            src: url('/assets/Ndot-55.otf') format('opentype');
+            font-weight: normal;
+            font-display: swap;
+        }
+        .heavy {
+            font-family: 'Ndot-55', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Navbar -->
+    <%- include('components/header') %>
+
+    <!-- Hero Section -->
+    <section class="relative pt-48 pb-32 overflow-hidden">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl text-center">
+                <div class="mb-8 inline-flex items-center rounded-full px-4 py-1">
+                    <span class="text-sm font-medium text-gray-900"><%= __('website.hero.badge', { name: settings.name }) %></span>
+                </div>
+                <h1 class="heavy text-5xl sm:text-6xl font-bold tracking-tight text-gray-900">
+                    <%= __("website.hero.title") %>
+                </h1>
+                <p class="mt-6 text-lg leading-8 text-gray-600">
+                    <%= __("website.hero.subtitle") %>
+                </p>
+                <div class="mt-10 flex items-center justify-center gap-x-6">
+                    <a href="/auth" class="rounded-lg bg-gray-950 px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800">
+                        <%= __("website.hero.cta_primary") %>
+                    </a>
+                </div>
+            </div>
+            <img src="<%= settings.website.previewImage %>" alt="Platform Preview" class="mt-16 rounded-xl shadow-xl ring-1 ring-gray-900/10">
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 bg-gray-50">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl text-center">
+                <h2 class="heavy text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                    <%= __("website.features.title") %>
+                </h2>
+                <p class="mt-6 text-lg leading-8 text-gray-600">
+                    <%= __('website.content.developers_pitch') %>
+                </p>
+            </div>
+            <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+                <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+                    <div class="flex flex-col">
+                        <dt class="text-base font-semibold leading-7 text-gray-900">
+                            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                            <%= __("website.features.high_performance.title") %>
+                        </dt>
+                        <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                            <p class="flex-auto"><%= __("website.features.high_performance.description") %></p>
+                        </dd>
+                    </div>
+                    <div class="flex flex-col">
+                        <dt class="text-base font-semibold leading-7 text-gray-900">
+                            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                            </div>
+                            <%= __("website.features.ddos_protection.title") %>
+                        </dt>
+                        <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                            <p class="flex-auto"><%= __("website.features.ddos_protection.description") %></p>
+                        </dd>
+                    </div>
+                    <div class="flex flex-col">
+                        <dt class="text-base font-semibold leading-7 text-gray-900">
+                            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                            </div>
+                            <%= __("website.features.instant_deploy.title") %>
+                        </dt>
+                        <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                            <p class="flex-auto"><%= __("website.features.instant_deploy.description") %></p>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-24">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl sm:text-center">
+                <h2 class="heavy text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"><%= __("website.pricing.title") %></h2>
+                <p class="mt-6 text-lg leading-8 text-gray-600">
+                    <%= __("website.pricing.subtitle") %>
+                </p>
+            </div>
+            <div class="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-gray-200 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
+                <div class="p-8 sm:p-10 lg:flex-auto">
+                    <h3 class="text-2xl font-bold tracking-tight text-gray-900"><%= __("website.pricing.free_plan") %></h3>
+                    <p class="mt-6 text-base leading-7 text-gray-600">
+                        <%= __("website.pricing.free_description") %>
+                    </p>
+                    <div class="mt-10 flex items-center gap-x-4">
+                        <h4 class="flex-none text-sm font-semibold leading-6 text-indigo-600"><%= __("website.pricing.whats_included") %></h4>
+                        <div class="h-px flex-auto bg-gray-100"></div>
+                    </div>
+                    <ul role="list" class="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-gray-600 sm:grid-cols-2 sm:gap-6">
+                        <li class="flex gap-x-3">
+                            <svg class="h-6 w-5 flex-none text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <%= __("website.pricing.features.ram_cpu") %>
+                        </li>
+                        <li class="flex gap-x-3">
+                            <svg class="h-6 w-5 flex-none text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <% if (locationCount === 1) { %><%= __("website.pricing.features.location", { country: firstLocation.country }) %><% } else { %><%= __("website.pricing.features.locations", { count: locationCount }) %><% } %>
+                        </li>
+                        <li class="flex gap-x-3">
+                            <svg class="h-6 w-5 flex-none text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <%= __("website.pricing.features.ddos") %>
+                        </li>
+                        <li class="flex gap-x-3">
+                            <svg class="h-6 w-5 flex-none text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <%= __("website.pricing.features.uptime") %>
+                        </li>
+                    </ul>
+                </div>
+                <div class="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
+                    <div class="rounded-2xl bg-gray-50 py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
+                        <div class="mx-auto max-w-xs px-8">
+                            <p class="text-base font-semibold text-gray-600"><%= __("website.pricing.always_free") %></p>
+                            <p class="mt-6 flex items-baseline justify-center gap-x-2">
+                                <span class="text-5xl font-bold tracking-tight text-gray-900"><%= __("website.pricing.price") %></span>
+                                <span class="text-sm font-semibold leading-6 tracking-wide text-gray-600"><%= __("website.pricing.forever") %></span>
+                            </p>
+                            <a href="/auth" class="mt-10 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition hover:scale-95 focus-visible:outline-indigo-600">
+                                <%= __("website.pricing.get_started") %>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% if (settings.website.vps_enabled) { %>
+            <div class="mx-auto mt-16 max-w-2xl rounded-3xl bg-indigo-50 ring-1 ring-indigo-200 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none shadow-sm items-center justify-center p-8 text-center">
+                <div class="w-full">
+                    <h3 class="text-3xl font-bold tracking-tight text-gray-900"><%= __("website.vps_promo.title") %></h3>
+                    <p class="mt-6 text-lg leading-8 text-gray-600 max-w-2xl mx-auto">
+                        <%= __("website.vps_promo.description") %>
+                    </p>
+                    <div class="mt-10 flex items-center justify-center gap-x-6">
+                        <a href="/vps" class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all hover:scale-105">
+                            <%= __("website.vps_promo.button") %> <span aria-hidden="true">→</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <%- include('components/footer') %>
+</body>
+</html>

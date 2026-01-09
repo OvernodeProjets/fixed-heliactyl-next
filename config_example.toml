@@ -47,6 +47,9 @@ currency = "HCoins"
 discord = "https://discord.gg/"
 status = "https://status.example.com"
 previewImage = "https://i.imgur.com/srXG82j.png"
+# Note: The VPS page contains default text referencing 'Overnode'. 
+# To customize it with your own details, edit the locale files in 'app/locales/'.
+vps_enabled = false
 
 # ------------------------------------------------------
 # Cloudflare DNS Configuration
