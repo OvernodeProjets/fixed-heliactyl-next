@@ -116,6 +116,9 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
+
 <script>
     const serverId = new URLSearchParams(window.location.search).get('id');
     let subuserToDelete = null;
@@ -252,7 +255,7 @@ document.getElementById('confirm-delete').addEventListener('click', deleteSubuse
     // Function to handle errors and display user-friendly messages
     function handleError(error, message) {
         console.error(error);
-        showToast('error', message);
+        showToast('error', error);
     }
 
     // Function to refresh the subuser list after changes
@@ -275,7 +278,7 @@ document.getElementById('confirm-delete').addEventListener('click', deleteSubuse
         const openButton = document.getElementById(openButtonId);
         const closeButton = document.getElementById(closeButtonId);
 
-        openButton.addEventListener('click', () => showModal(modalId));
+        openButton?.addEventListener('click', () => showModal(modalId));
         closeButton.addEventListener('click', () => closeModal(modalId));
 
         // Close modal when clicking outside
@@ -329,7 +332,20 @@ document.getElementById('confirm-delete').addEventListener('click', deleteSubuse
             });
 
             if (!response.ok) {
-                throw new Error('<%= __('website.subusers.remove_error') %>');
+              switch (response.status) {
+                case 404:
+                    throw new Error('The selected user does not exists');
+                    break;
+                case 403:
+                    throw new Error('The selected user is locked');
+                    break;
+                case 400:
+                    throw new Error('Cannot remove the server owner');
+                    break;
+                default:
+                    throw new Error('<%= __('website.subusers.remove_error') %>' + ':\n');
+                    break;
+              }
             }
 
             refreshSubuserList();
