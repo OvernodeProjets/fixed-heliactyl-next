@@ -309,14 +309,14 @@
                                 <path d="M6 9l6 6 6-6"></path>
                             </svg>                          
                         </button>
-                        <div x-show="open" @click.outside="open = false" x-transition class="absolute left-0 right-0 mt-2 bg-[#101017] backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl py-2 z-50" style="display: none;">
-                            <a href="/profile" class="flex items-center gap-2 px-4 py-2.5 text-sm text-white/70 hover:bg-white/5 hover:text-white transition">
+                        <div x-show="open" @click.outside="open = false" x-transition class="absolute right-0 mt-2 bg-[#101017] backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl py-2 z-50 flex-grow-0 md:flex-grow-1" style="display: none;">
+                            <a href="/profile" class="flex items-center gap-2 px-4 py-2 md:py-2.5 text-sm text-white/70 hover:bg-white/5 hover:text-white transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
                                 <%= __('profile.title') %>
                             </a>
-                            <a href="/api/logout" class="flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition">
+                            <a href="/api/logout" class="flex items-center gap-2 px-4 py-2 md:py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                 </svg>
@@ -340,7 +340,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
                     </svg>
                 </button>
-                <div id="server-dropdown" class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-[#101017] backdrop-blur-xl border border-white/5 shadow-lg py-1 z-50">
+                <div id="server-dropdown" class="hidden absolute right-0 mt-2 w-27 md:w-48 rounded-xl bg-[#101017] backdrop-blur-xl border border-white/5 shadow-lg py-1 z-50">
                     <button onclick="sendPowerAction('start')" id="dropdown-start" class="flex items-center w-full px-4 py-2 text-sm text-white/70 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
