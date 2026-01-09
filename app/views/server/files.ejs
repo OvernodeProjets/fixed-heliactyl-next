@@ -1231,30 +1231,34 @@ function openFileEditor(fileName) {
                 <div class="file-icon-small">${getFileIcon('file')}</div>
                 <h3 class="editor-title">${fileName}</h3>
             </div>
-            <div class="editor-actions">
-                <button id="toggle-word-wrap" class="editor-button secondary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 7h18"></path>
-                        <path d="M3 12h18"></path>
-                        <path d="M3 17h12"></path>
-                    </svg>
-                    Word Wrap
-                </button>
-                <button id="save-file" class="editor-button primary">
+            <div class="editor-actions flex-col">
+                <div class="flex">
+                  <button id="save-file" class="editor-button primary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                         <polyline points="17 21 17 13 7 13 7 21"></polyline>
                         <polyline points="7 3 7 8 15 8"></polyline>
                     </svg>
                     Save
-                </button>
-                <button id="close-modal" class="editor-button secondary">
+                  </button>
+                  <button id="close-modal" class="editor-button secondary hover:bg-red-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
                     Exit
-                </button>
+                  </button>
+                </div>
+                <div class="flex justify-center">
+                  <button id="toggle-word-wrap" class="editor-button secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 7h18"></path>
+                        <path d="M3 12h18"></path>
+                        <path d="M3 17h12"></path>
+                    </svg>
+                    Word Wrap
+                  </button>
+                </div>
             </div>
         </div>
         <div class="editor-main">

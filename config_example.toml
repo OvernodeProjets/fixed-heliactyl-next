@@ -38,6 +38,9 @@ debug = false
 cookie_admin = "remember_web_59ba36addc2b2f9401580f014c7f58ea4e30989d=...; XSRF-TOKEN=...; pterodactyl_session=..."
 # It could be found by inspecting the network requests when transferring a server in the Pterodactyl admin panel
 transfer_token = "6hUjLqcapcMj........."
+# Toggle between the Legacy transfer method (using admin cookies) and the V2 method (using application API)
+# valid values: false (Legacy), true (V2) (v2: https://github.com/OvernodeProjets/panel)
+use_new_transfer = false
 
 [website]
 port = 3000

@@ -586,6 +586,7 @@
     "subusers": {
       "back_to_list": "Retour à la liste des serveurs",
       "title": "Sous‑utilisateurs",
+      "subtitle": "Les sous-utilisateurs vous permettent de donner accès à votre serveur à d'autres personnes",
       "add": "Ajouter un sous‑utilisateur",
       "email": "Email",
       "cancel": "Annuler",
@@ -692,6 +693,7 @@
     "backups": {
       "back_to_list": "Retour à la liste des serveurs",
       "title": "Sauvegardes",
+      "subtitle": "Les sauvegardes sont un moyen de sécuriser une copie de votre serveur",
       "create": "Créer une sauvegarde",
       "empty_title": "Aucune sauvegarde",
       "empty_desc": "Créez votre première sauvegarde pour protéger les données",

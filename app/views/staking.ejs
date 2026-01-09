@@ -110,15 +110,15 @@
 </main>
 
 <!-- New Stake Modal -->
-<div id="stake-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
-    <div class="bg-[#191c20] rounded-2xl p-6 w-full max-w-md transform transition-all duration-300 scale-95">
+<div id="stake-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+    <div class="bg-[#191c20] rounded-2xl p-6 w-[85%] md:w-[50%] transform transition-all duration-300 scale-95">
         <h3 class="text-xl font-semibold mb-6"><%= __('staking.modal.create_title') %></h3>
         <form id="stake-form">
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-400 mb-1"><%= __('staking.modal.amount_label') %></label>
                 <div class="relative">
                     <input type="number" id="stake-amount" required min="10" step="0.01"
-                           class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-indigo-500 focus:border-indigo-500">
+                           class="w-full px-3 py-2 pr-17 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-indigo-500 focus:border-indigo-500">
                     <span class="absolute right-3 top-2 text-gray-400"><%= settings.website.currency %></span>
                 </div>
                 <p class="mt-1 text-sm text-gray-400"><%= __('staking.modal.minimum', { currency: settings.website.currency }) %></p>
@@ -168,8 +168,8 @@
 </div>
 
 <!-- Position Action Modal -->
-<div id="position-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
-    <div class="bg-[#191c20] rounded-2xl p-6 w-full max-w-md transform transition-all duration-300 scale-95">
+<div id="position-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+    <div class="bg-[#191c20] rounded-2xl p-6 w-[85%] md:w-[50%] transform transition-all duration-300 scale-95">
         <h3 id="position-modal-title" class="text-xl font-semibold mb-6"></h3>
         <div id="position-modal-content"></div>
         <div class="flex justify-end space-x-3 mt-6">
@@ -372,7 +372,7 @@ async function showPositionActions(positionId) {
         modalContent.innerHTML = `
             <div class="space-y-4">
                 <div class="bg-white/5 rounded-xl p-4">
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid md:grid-cols-2 gap-4">
                         <div>
                             <p class="text-sm text-gray-400">${txtStakedAmount}</p>
                             <p class="text-lg font-medium">${position.amount.toFixed(2)} ${currency}</p>
@@ -430,7 +430,7 @@ async function confirmUnstake(positionId, isLocked) {
 
     if (confirm(confirmMessage)) {
         try {
-            const response = await fetch('/unstake', {
+            const response = await fetch('/api/unstake', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ positionId })

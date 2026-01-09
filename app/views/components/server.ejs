@@ -2,12 +2,12 @@
 <meta http-equiv="refresh" content="0; url=/servers?err=INVALID">
 <% } %>
 
-<nav class="sticky top-0 z-50 mb-6 bg-[#010103]/80 backdrop-blur-lg py-2 -mx-4 px-4">
+<nav class="z-50 mb-6 bg-[#010103]/80 backdrop-blur-lg py-2 -mx-4 px-2.5 md:px-4">
 
     <!-- Navigation Items -->
-<div class="block overflow-visible relative">
+<div class="block overflow-auto relative">
 
-    <div class="inline-flex flex-wrap md:flex-nowrap gap-2 md:gap-0 md:space-x-1 rounded-xl md:rounded-full bg-white/5 backdrop-blur-xl p-2 md:p-1.5">
+    <div class="inline-flex flex-wrap lg:flex-nowrap gap-2 lg:gap-0 lg:space-x-1 rounded-xl lg:rounded-full bg-white/5 backdrop-blur-xl p-2 lg:p-1.5">
             <!-- Core Server Management -->
             <a href="/server/manage?id=<%= req.query.id %>&numeric=<%= req.query.numeric %>&mode=<%= req.query.mode || "server" %>" class="srv-link group rounded-full px-3 md:px-4 py-1.5 text-sm text-gray-300 hover:text-indigo-300 transition-all duration-200 hover:scale-95 whitespace-nowrap">
                 Console
@@ -45,10 +45,10 @@
                 </svg>
             </button>
 
-            <div id="more-menu-content" class="backdrop-blur-xl hidden opacity-0 transform scale-95 absolute left-0 md:left-auto md:right-0 mt-2 w-56 max-h-[70vh] overflow-y-auto transition-all duration-200">
-                <div class="rounded-xl bg-[#0e0e10] backdrop-blur-xl border border-white/10 shadow-xl">
+            <div id="more-menu-content" class="hidden opacity-0 transform scale-95 absolute left-0 md:left-auto md:right-0 mt-2 w-56 max-h-[70vh] overflow-y-auto transition-all duration-200">
+                <div class="rounded-xl bg-[#0e0e10]/25 backdrop-blur-xl border border-white/10 shadow-xl">
             <!-- Monitoring -->
-            <div class="p-1.5">
+            <div class="p-1 md:p-1.5">
                 <div class="px-3 py-1.5 text-xs font-medium text-white/70 uppercase tracking-wider">
                     Monitoring
                 </div>
@@ -61,7 +61,7 @@
             </div>
 
             <!-- Network -->
-            <div class="p-1.5 border-t border-white/10">
+            <div class="p-1 md:p-1.5 border-t border-white/10">
                 <div class="px-3 py-1.5 text-xs font-medium text-white/70 uppercase tracking-wider">
                     Network
                 </div>
@@ -72,7 +72,7 @@
 
             <% if (req.query.numeric !== '0') { %>
             <!-- User Management -->
-            <div class="p-1.5 border-t border-white/10">
+            <div class="p-1 md:p-1.5 border-t border-white/10">
                 <div class="px-3 py-1.5 text-xs font-medium text-white/70 uppercase tracking-wider">
                     User Access
                 </div>
@@ -83,7 +83,7 @@
             <% } %>
 
             <!-- Advanced Management -->
-            <div class="p-1.5 border-t border-white/10">
+            <div class="p-1 md:p-1.5 border-t border-white/10">
                 <div class="px-3 py-1.5 text-xs font-medium text-white/70 uppercase tracking-wider">
                     Management
                 </div>
@@ -99,7 +99,7 @@
             </div>
 
             <!-- Import Tools -->
-            <div class="p-1.5 border-t border-white/10">
+            <div class="p-1 md:p-1.5 border-t border-white/10">
                 <div class="px-3 py-1.5 text-xs font-medium text-white/70 uppercase tracking-wider">
                     Tools
                 </div>
@@ -108,7 +108,7 @@
                 </a>
             </div>
 
-            <div class="p-1.5 border-t border-white/10">
+            <div class="p-1 md:p-1.5 border-t border-white/10">
                 <div class="px-3 py-1.5 text-xs font-medium text-white/70 uppercase tracking-wider">
                     Resources
                 </div>
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // utility: position menu under button (for fixed positioning)
     function positionMenuFixed() {
         const btnRect = moreMenuButton.getBoundingClientRect();
-        const menuWidth = Math.min(280, window.innerWidth - 16); // max 280px or screen width - 16px padding
+        const menuWidth = Math.min(240, window.innerWidth - 16); // max 280px or screen width - 16px padding
         const menuMaxHeight = window.innerHeight * 0.7; // 70% of viewport height
         
         // Calculate left position - center on small screens, align to button on larger
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
         moreMenuContent.style.width = menuWidth + 'px';
         moreMenuContent.style.maxHeight = menuMaxHeight + 'px';
         moreMenuContent.style.overflowY = 'auto';
-        moreMenuContent.style.zIndex = 99999;
+        moreMenuContent.style.zIndex = 49;
     }
 
     function resetMenuPlacement() {
