@@ -25,6 +25,14 @@
                                 return "You have exceeded your Disk plan.";
                             case "EXCEEDCPU":
                                 return "You have exceeded your CPU plan.";
+                            case "NOTOWNER":
+                                return "You do not own this server.";
+                            case "MISSINGEGG":
+                                return "Could not find egg information for this server.";
+                            case "ERRORONMODIFY":
+                                return "An error occurred while applying changes via Pterodactyl.";
+                            case "INVALIDSERVER":
+                                return "The requested server was not found or is invalid.";
                             default:
                                 if (req.query.err.startsWith("EXCEED")) return "Resource limit exceeded.";
                                 return "An error occurred while updating the server: " + req.query.err;
@@ -46,40 +54,27 @@
             </div>
         </div>
         <div class="bg-white/5 rounded-b-2xl px-4 py-5 sm:px-6 text-gray-300 text-sm">
-            <%
-let id;
-id = req.query.numeric
-            %>
-            <%
-                const serversData = (pterodactyl && pterodactyl.relationships && pterodactyl.relationships.servers && pterodactyl.relationships.servers.data) ? pterodactyl.relationships.servers.data : [];
-                let ram = 0;
-                let disk = 0;
-                let cpu = 0;
-                let servers = serversData.length;
-                for (let i = 0, len = serversData.length; i < len; i++) {
-                    ram = ram + (typeof serversData[i].attributes.limits.memory == "number" ? serversData[i].attributes.limits.memory : 0);
-                    disk = disk + (typeof serversData[i].attributes.limits.disk == "number" ? serversData[i].attributes.limits.disk : 0);
-                    cpu = cpu + (typeof serversData[i].attributes.limits.cpu == "number" ? serversData[i].attributes.limits.cpu : 0);
-                }
-            %>
-            <% if (id) { %>
-                <% if (serversData.filter(name => name.attributes.id == id).length == 1) {
-                    let serverinfo = serversData.filter(name => name.attributes.id == id)[0];
-                    let attemptegg = null;
-                    let attemptname = null;
-                    for (let [name, value] of Object.entries(settings.api.client.eggs)) {
-                        if (settings.api.client.eggs[name].info.egg == serverinfo.attributes.egg) {
-                            attemptegg = settings.api.client.eggs[name];
-                            attemptname = name;
-                        };
-                    };
-                    let egginfo = attemptegg ? attemptegg.display : "???";
-                %>
+            <!-- Loading State -->
+            <div id="loading-state" class="flex items-center justify-center py-8">
+                <svg class="animate-spin h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="ml-3 text-white"><%= __('common.loading') || 'Loading...' %></span>
+            </div>
+
+            <!-- Error State -->
+            <div id="error-state" class="hidden">
+                <p class="text-white"><%= __('server.edit.not_found') %></p>
+            </div>
+
+            <!-- Edit Form (hidden until loaded) -->
+            <div id="edit-form" class="hidden">
                 <div class="grid grid-cols-3 gap-6">
                     <div class="col-span-3 sm:col-span-2">
                         <label for="ram" class="block text-sm font-medium text-gray-400"><%= __('server.edit.ram_label') %></label>
                         <div class="mt-1 flex rounded-xl shadow-sm">
-                            <input type="text" name="ram" id="ram" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-full bg-white/10 border-white/10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-2 py-1 border placeholder-gray-400 focus:ring-2" placeholder="<%= (packages ? packages.ram : 0)/1024 + extraresources.ram/1024 - ram/1024 + serverinfo.attributes.limits.memory/1024 %>" value="<%= (packages ? packages.ram : 0)/1024 + extraresources.ram/1024 - ram/1024 + serverinfo.attributes.limits.memory/1024 %>">
+                            <input type="text" name="ram" id="ram" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-full bg-white/10 border-white/10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-2 py-1 border placeholder-gray-400 focus:ring-2">
                         </div>
                     </div>
                 </div><br>
@@ -88,7 +83,7 @@ id = req.query.numeric
                     <div class="col-span-3 sm:col-span-2">
                         <label for="cpu" class="block text-sm font-medium text-gray-400"><%= __('server.edit.cpu_label') %></label>
                         <div class="mt-1 flex rounded-xl shadow-sm">
-                            <input type="text" name="cpu" id="cpu" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-full bg-white/10 border-white/10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-2 py-1 border placeholder-gray-400 focus:ring-2" value="<%= (packages ? packages.cpu/100 : 0) + extraresources.cpu/100 - cpu/100 + serverinfo.attributes.limits.cpu/100 %>" placeholder="<%= (packages ? packages.cpu/100 : 0) + extraresources.cpu/100 - cpu/100 + serverinfo.attributes.limits.cpu/100 %>">
+                            <input type="text" name="cpu" id="cpu" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-full bg-white/10 border-white/10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-2 py-1 border placeholder-gray-400 focus:ring-2">
                         </div>
                     </div>
                 </div><br>
@@ -97,7 +92,7 @@ id = req.query.numeric
                     <div class="col-span-3 sm:col-span-2">
                         <label for="disk" class="block text-sm font-medium text-gray-400"><%= __('server.edit.disk_label') %></label>
                         <div class="mt-1 flex rounded-xl shadow-sm">
-                            <input type="text" name="disk" id="disk" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-full bg-white/10 border-white/10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-2 py-1 border placeholder-gray-400 focus:ring-2" placeholder="<%= (packages ? packages.disk : 0)/1024 + extraresources.disk/1024 - disk/1024 + serverinfo.attributes.limits.disk/1024 %>" value="<%= (packages ? packages.disk : 0)/1024 + extraresources.disk/1024 - disk/1024 + serverinfo.attributes.limits.disk/1024 %>">
+                            <input type="text" name="disk" id="disk" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-full bg-white/10 border-white/10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-2 py-1 border placeholder-gray-400 focus:ring-2">
                         </div>
                     </div>
                 </div><br><br>
@@ -105,32 +100,61 @@ id = req.query.numeric
                     <%= __('server.common.apply_changes') %>
                 </button>
             </div>
-            <script>
-                fetch(`/api/server/<%= req.query.id %>`)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('server-name').textContent = data.attributes.name;
-                        if(document.getElementById('server-name-breadcrumb')) {
-                             document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
-                        }
-                        document.getElementById('server-description').textContent = data.attributes.description || "<%= __('website.subusers.no_description') %>";
-                    })
-                    .catch(error => console.error("Failed to fetch server info:", error));
-
-                async function submitForm() {
-                    let ram = encodeURIComponent(document.getElementById("ram").value);
-                    let disk = encodeURIComponent(document.getElementById("disk").value);
-                    let cpu = encodeURIComponent(document.getElementById("cpu").value);
-                    document.location.href = `/api/server/<%= id %>/modify?ram=${ram*1024}&disk=${disk*1024}&cpu=${cpu*100}`;
-                };
-            </script>
-        <% } else { %>
-            <p class="text-white"><%= __('server.edit.not_found') %></p>
-        <% } %>
-    <% } else { %>
-        <p class="text-white"><%= __('server.edit.missing_id') %></p>
-    <% } %>
+        </div>
     </div>
 </main>
+
+<script>
+const serverId = '<%= req.query.id %>';
+const numericId = '<%= req.query.numeric %>';
+let serverData = null;
+
+async function loadServerData() {
+    try {
+        const response = await fetch(`/api/server/${serverId}`);
+        if (!response.ok) throw new Error('Failed to fetch server');
+        
+        serverData = await response.json();
+        
+        document.getElementById('server-name').textContent = serverData.attributes.name;
+        if(document.getElementById('server-name-breadcrumb')) {
+            document.getElementById('server-name-breadcrumb').textContent = serverData.attributes.name;
+        }
+        document.getElementById('server-description').textContent = serverData.attributes.description || "<%= __('website.subusers.no_description') %>";
+        
+        // Current server limits
+        const currentRam = serverData.attributes.limits.memory;
+        const currentCpu = serverData.attributes.limits.cpu;
+        const currentDisk = serverData.attributes.limits.disk;
+        
+        // Set input values (in GB for ram/disk, vCores for cpu)
+        document.getElementById('ram').value = currentRam / 1024;
+        document.getElementById('cpu').value = currentCpu / 100;
+        document.getElementById('disk').value = currentDisk / 1024;
+        
+        // Show the form
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('edit-form').classList.remove('hidden');
+        
+    } catch (error) {
+        console.error('Error loading server data:', error);
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('error-state').classList.remove('hidden');
+    }
+}
+
+async function submitForm() {
+    const ram = parseFloat(document.getElementById('ram').value) * 1024;
+    const disk = parseFloat(document.getElementById('disk').value) * 1024;
+    const cpu = parseFloat(document.getElementById('cpu').value) * 100;
+    
+    // Use the numeric ID from the fetched server data if available
+    const id = serverData?.attributes?.id || numericId;
+    
+    window.location.href = `/api/server/${id}/modify?ram=${ram}&disk=${disk}&cpu=${cpu}`;
+}
+
+document.addEventListener('DOMContentLoaded', loadServerData);
+</script>
 
 <%- include('../components/bottom') %>

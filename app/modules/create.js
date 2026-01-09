@@ -487,186 +487,163 @@ router.get("/clear-queue", authMiddleware, async (req, res) => {
 
         const { id } = req.params;
 
-          if (!id) return res.send("Missing server id.");
-    
-          let redirectlink = "/server/edit";
-    
-          let checkexist =
-            req.session.pterodactyl.relationships.servers.data.filter(
-              (name) => name.attributes.id == id
-            );
-          if (checkexist.length !== 1) return res.send("Invalid server id.");
-    
-          let ram = req.query.ram
-            ? isNaN(parseFloat(req.query.ram))
-              ? undefined
-              : parseFloat(req.query.ram)
-            : undefined;
-          let disk = req.query.disk
-            ? isNaN(parseFloat(req.query.disk))
-              ? undefined
-              : parseFloat(req.query.disk)
-            : undefined;
-          let cpu = req.query.cpu
-            ? isNaN(parseFloat(req.query.cpu))
-              ? undefined
-              : parseFloat(req.query.cpu)
-            : undefined;
+        if (!id) return res.redirect("/servers?err=MISSINGID");
 
-          if (!ram || !disk || !cpu) {
-            res.redirect(`${redirectlink}?id=${id}&err=MISSINGVARIABLE`);
-            return;
+        // Parse resources from query
+        let ram = req.query.ram ? parseFloat(req.query.ram) : undefined;
+        let disk = req.query.disk ? parseFloat(req.query.disk) : undefined;
+        let cpu = req.query.cpu ? parseFloat(req.query.cpu) : undefined;
+
+        // Helper to build redirect URL
+        const buildRedirect = (identifier, numericId, error) => {
+          return `/server/edit?id=${identifier}&numeric=${numericId}&err=${error}`;
+        };
+
+        try {
+          // Fetch server details from Pterodactyl API using the numeric ID
+          const serverDetails = await AppAPI.getServerDetails(id);
+          
+          if (!serverDetails || !serverDetails.attributes) {
+            return res.redirect("/servers?err=INVALIDSERVER");
           }
+
+          // Get identifier for redirects
+          const identifier = serverDetails.attributes.identifier;
+          const numericId = serverDetails.attributes.id;
+
+          // Check for missing resources first
+          if (isNaN(ram) || isNaN(disk) || isNaN(cpu) || !ram || !disk || !cpu) {
+            return res.redirect(buildRedirect(identifier, numericId, "MISSINGVARIABLE"));
+          }
+
+          // Verify ownership: check if this server belongs to the current user
+          const pterodactylUserId = await db.get("users-" + req.session.userinfo.id);
+          if (serverDetails.attributes.user !== pterodactylUserId) {
+            return res.redirect(buildRedirect(identifier, numericId, "NOTOWNER"));
+          }
+
+          // Get package and extra resources
+          let packagename = await db.get("package-" + req.session.userinfo.id);
+          let package = settings.api.client.packages.list[packagename ? packagename : settings.api.client.packages.default];
     
-            let packagename = await db.get("package-" + req.session.userinfo.id);
-            let package =
-              settings.api.client.packages.list[
-                packagename ? packagename : settings.api.client.packages.default
-              ];
-    
-            let pterorelationshipsserverdata =
-              req.session.pterodactyl.relationships.servers.data.filter(
-                (name) => name.attributes.id.toString() !== id
-              );
-    
-            let ram2 = 0;
-            let disk2 = 0;
-            let cpu2 = 0;
-            for (
-              let i = 0, len = pterorelationshipsserverdata.length;
-              i < len;
-              i++
-            ) {
-              ram2 =
-                ram2 + pterorelationshipsserverdata[i].attributes.limits.memory;
-              disk2 =
-                disk2 + pterorelationshipsserverdata[i].attributes.limits.disk;
-              cpu2 = cpu2 + pterorelationshipsserverdata[i].attributes.limits.cpu;
+          let extra = (await db.get("extra-" + req.session.userinfo.id)) || {
+            ram: 0,
+            disk: 0,
+            cpu: 0,
+            servers: 0,
+          };
+
+          // Get all user's servers to calculate resource usage
+          const userDetails = await getPteroUser(req.session.userinfo.id, db);
+          const allServers = userDetails?.attributes?.relationships?.servers?.data || [];
+          
+          // Filter out current server and sum resources
+          let ram2 = 0, disk2 = 0, cpu2 = 0;
+          for (const server of allServers) {
+            if (server.attributes.id.toString() !== id.toString()) {
+              ram2 += server.attributes.limits.memory;
+              disk2 += server.attributes.limits.disk;
+              cpu2 += server.attributes.limits.cpu;
             }
-            let attemptegg = null;
-            //let attemptname = null;
+          }
+
+          // Find egg info
+          let attemptegg = null;
+          for (let [name, value] of Object.entries(settings.api.client.eggs)) {
+            if (value.info.egg == serverDetails.attributes.egg) {
+              attemptegg = settings.api.client.eggs[name];
+            }
+          }
+          let egginfo = attemptegg ? attemptegg : null;
     
-            for (let [name, value] of Object.entries(settings.api.client.eggs)) {
-              if (value.info.egg == checkexist[0].attributes.egg) {
-                attemptegg = settings.api.client.eggs[name];
-                //attemptname = name;
+          if (!egginfo) {
+            return res.redirect(buildRedirect(identifier, numericId, "MISSINGEGG"));
+          }
+
+          // Validate resources
+          const validateResource = (value, type, current, max, min) => {
+            if (current + value > max) return `EXCEED${type}&num=${max - current}`;
+            if (min && value < min) return `TOOLITTLE${type}&num=${min}`;
+            if (egginfo.maximum?.[type.toLowerCase()] && value > egginfo.maximum[type.toLowerCase()]) 
+              return `TOOMUCH${type}&num=${egginfo.maximum[type.toLowerCase()]}`;
+            return null;
+          };
+
+          const resources = [
+            { value: ram, type: 'RAM', current: ram2, max: package.ram + extra.ram, min: egginfo.minimum.ram },
+            { value: disk, type: 'DISK', current: disk2, max: package.disk + extra.disk, min: egginfo.minimum.disk },
+            { value: cpu, type: 'CPU', current: cpu2, max: package.cpu + extra.cpu, min: egginfo.minimum.cpu }
+          ];
+
+          for (const resource of resources) {
+            const error = validateResource(resource.value, resource.type, resource.current, resource.max, resource.min);
+            if (error) return res.redirect(buildRedirect(identifier, numericId, error));
+          }
+
+          // Location Limit Validation
+          try {
+            const nodeId = serverDetails.attributes.node;
+            const nodeDetails = await AppAPI.getNodeDetails(nodeId);
+            const locationId = nodeDetails.attributes.location_id;
+
+            const locationConfigEntry = Object.entries(settings.api.client.locations).find(([key]) => key == locationId);
+            
+            if (locationConfigEntry) {
+              const locationConfig = locationConfigEntry[1];
+              if (locationConfig && locationConfig.limits) {
+                if (locationConfig.limits.max_ram && ram > locationConfig.limits.max_ram) {
+                  return res.redirect(buildRedirect(identifier, numericId, `LOCATIONLIMITRAM&num=${locationConfig.limits.max_ram}`));
+                }
+                if (locationConfig.limits.max_disk && disk > locationConfig.limits.max_disk) {
+                  return res.redirect(buildRedirect(identifier, numericId, `LOCATIONLIMITDISK&num=${locationConfig.limits.max_disk}`));
+                }
+                if (locationConfig.limits.max_cpu && cpu > locationConfig.limits.max_cpu) {
+                  return res.redirect(buildRedirect(identifier, numericId, `LOCATIONLIMITCPU&num=${locationConfig.limits.max_cpu}`));
+                }
               }
             }
-            let egginfo = attemptegg ? attemptegg : null;
+          } catch (error) {
+            console.error("Error validating location limits during server modification:", error);
+          }
     
-            if (!egginfo)
-              return res.redirect(
-                `${redirectlink}?id=${id}&err=MISSINGEGG`
-              );
+          // Build limits object
+          const limits = {
+            memory: ram,
+            disk: disk,
+            cpu: cpu,
+            swap: serverDetails.attributes.limits.swap,
+            io: serverDetails.attributes.limits.io,
+          };
     
-            let extra = (await db.get("extra-" + req.session.userinfo.id))
-              ? await db.get("extra-" + req.session.userinfo.id)
-              : {
-                  ram: 0,
-                  disk: 0,
-                  cpu: 0,
-                  servers: 0,
-                };
+          // Update server
+          const serverinfo = await AppAPI.updateServerBuild(id, {
+            limits: limits,
+            feature_limits: serverDetails.attributes.feature_limits,
+            allocation: serverDetails.attributes.allocation,
+          });
 
-            const validateResource = (value, type, current, max, min) => {
-                if (current + value > max) return `EXCEED${type}&num=${max - current}`;
-                if (min && value < min) return `TOOLITTLE${type}&num=${min}`;
-                if (egginfo.maximum?.[type.toLowerCase()] && value > egginfo.maximum[type.toLowerCase()]) 
-                    return `TOOMUCH${type}&num=${egginfo.maximum[type.toLowerCase()]}`;
-                return null;
-            };
+          if (!serverinfo || !serverinfo.attributes) {
+            return res.redirect(buildRedirect(identifier, numericId, "ERRORONMODIFY"));
+          }
 
-            const resources = [
-                { value: ram, type: 'RAM', current: ram2, max: package.ram + extra.ram, min: egginfo.minimum.ram },
-                { value: disk, type: 'DISK', current: disk2, max: package.disk + extra.disk, min: egginfo.minimum.disk },
-                { value: cpu, type: 'CPU', current: cpu2, max: package.cpu + extra.cpu, min: egginfo.minimum.cpu }
-            ];
+          discordLog(
+            `modified server`,
+            `${req.session.userinfo.username} modified the server called \`${serverinfo.attributes.name}\` to have the following specs:\n\`\`\`Memory: ${ram} MB\nCPU: ${cpu}%\nDisk: ${disk}\`\`\``
+          );
 
-            for (const resource of resources) {
-                const error = validateResource(
-                    resource.value,
-                    resource.type,
-                    resource.current,
-                    resource.max,
-                    resource.min
-                );
-                if (error) return res.redirect(`${redirectlink}?id=${id}&err=${error}`);
-            }
+          // Update session with fresh data
+          const freshUserData = await getPteroUser(req.session.userinfo.id, db);
+          if (freshUserData) {
+            req.session.pterodactyl = freshUserData.attributes;
+          }
 
-            // Location Limit Validation
-            try {
-                // Get server details from Application API to find the node
-                // We search by UUID to be sure we get the correct server
-                const serverUuid = checkexist[0].attributes.uuid;
-                const serversResponse = await AppAPI.listServers(1, 1, { filter: { uuid: serverUuid } });
-                
-                if (serversResponse && serversResponse.data && serversResponse.data.length > 0) {
-                    const appServer = serversResponse.data[0];
-                    const nodeId = appServer.attributes.node;
-                    
-                    // Get node details to find the location
-                    const nodeDetails = await AppAPI.getNodeDetails(nodeId);
-                    const locationId = nodeDetails.attributes.location_id;
+          adminjs.suspend(req.session.userinfo.id);
+          res.redirect("/dashboard?err=MODIFIED");
 
-                    // Check if this location has limits in config
-                    /* 
-                       Note: settings.api.client.locations keys are usually strings. 
-                       Pterodactyl returns integer location_id. 
-                       We should check matches loosely or convert strings.
-                    */
-                    const locationConfigEntry = Object.entries(settings.api.client.locations).find(([key, val]) => key == locationId);
-                    
-                    if (locationConfigEntry) {
-                        const locationConfig = locationConfigEntry[1];
-                        if (locationConfig && locationConfig.limits) {
-                            // Check RAM
-                            if (locationConfig.limits.max_ram && ram > locationConfig.limits.max_ram) {
-                                return res.redirect(`${redirectlink}?id=${id}&err=LOCATIONLIMITRAM&num=${locationConfig.limits.max_ram}`);
-                            }
-                            // Check Disk
-                            if (locationConfig.limits.max_disk && disk > locationConfig.limits.max_disk) {
-                                return res.redirect(`${redirectlink}?id=${id}&err=LOCATIONLIMITDISK&num=${locationConfig.limits.max_disk}`);
-                            }
-                            // Check CPU
-                            if (locationConfig.limits.max_cpu && cpu > locationConfig.limits.max_cpu) {
-                                return res.redirect(`${redirectlink}?id=${id}&err=LOCATIONLIMITCPU&num=${locationConfig.limits.max_cpu}`);
-                            }
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error("Error validating location limits during server modification:", error);
-                // Continue if validation fails due to API error (or strict block?) -> Decided to continue to allow edits if API is down, but log error.
-            }
-    
-            let limits = {
-              memory: ram ? ram : checkexist[0].attributes.limits.memory,
-              disk: disk ? disk : checkexist[0].attributes.limits.disk,
-              cpu: cpu ? cpu : checkexist[0].attributes.limits.cpu,
-              swap: egginfo ? checkexist[0].attributes.limits.swap : -1,
-              io: egginfo ? checkexist[0].attributes.limits.io : 500,
-            };
-    
-            let serverinfo = await AppAPI.updateServerBuild(id, {
-              limits: limits,
-              feature_limits: checkexist[0].attributes.feature_limits,
-              allocation: checkexist[0].attributes.allocation,
-            });
-            if (!serverinfo || !serverinfo.attributes)
-              return res.redirect(
-                `${redirectlink}?id=${id}&err=ERRORONMODIFY`
-              );
-            let text = serverinfo;
-            discordLog(
-              `modified server`,
-              `${req.session.userinfo.username} modified the server called \`${text.attributes.name}\` to have the following specs:\n\`\`\`Memory: ${ram} MB\nCPU: ${cpu}%\nDisk: ${disk}\`\`\``
-            );
-            pterorelationshipsserverdata.push(text);
-            req.session.pterodactyl.relationships.servers.data =
-              pterorelationshipsserverdata;
-
-            adminjs.suspend(req.session.userinfo.id);
-            res.redirect("/dashboard?err=MODIFIED");
+        } catch (error) {
+          console.error("Error modifying server:", error);
+          return res.redirect("/servers?err=ERRORONMODIFY");
+        }
       });
 
 router.get("/server/:id/delete", authMiddleware, async (req, res) => {
