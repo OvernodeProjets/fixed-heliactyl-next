@@ -31,7 +31,7 @@
               </svg>
               <%= alerts[req.query.err] %>
                 <code style="font-family: 'JetBrains Mono'"
-                  class="text-white wrap-anywhere">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
+                  class="text-white/60 wrap-anywhere">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
             </span>
           </div>
           <% } else if (req.query.err && req.query.err==="PTERODACTYL" && req.query.data) { %>
