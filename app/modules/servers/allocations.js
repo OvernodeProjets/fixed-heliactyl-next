@@ -27,6 +27,29 @@ module.exports.load = async function(router, db) {
   const ClientAPI = getClientAPI();
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
+  // GET /api/server/:id/allocations - Get list of allocations
+  router.get('/server/:id/allocations', authMiddleware, ownsServer(db), async (req, res) => {
+    try {
+      const serverId = req.params.id;
+      
+      const response = await axios.get(
+        `${settings.pterodactyl.domain}/api/client/servers/${serverId}/network/allocations`,
+        {
+          headers: {
+            'Authorization': `Bearer ${settings.pterodactyl.client_key}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      
+      res.status(200).json(response.data);
+    } catch (error) {
+      console.error('Error fetching allocation list', error);
+      res.status(500).json({ error: 'internal error occured' });
+    }
+  });
+
   // POST /api/server/:id/allocations - Assign new allocation
   router.post('/server/:id/allocations', authMiddleware, ownsServer(db), async (req, res) => {
     try {
@@ -66,13 +89,10 @@ module.exports.load = async function(router, db) {
               },
             }
         );
-
-        if (!response.ok) throw new Error({ status: response.status, message: 'An Internal error occured'})
-                                                                                                                                  
-        res.status(201).json({ message:`Successfully Unassigned allocation: ${allocationId} for server ${serverId}` });
+        res.status(200).json({});
       } catch (error) {
         console.error('Error unassigning allocation:', error);
-        res.status(error.status).json({ message: error.message });
+        res.status(500).json({error});
       }
     });
 };
