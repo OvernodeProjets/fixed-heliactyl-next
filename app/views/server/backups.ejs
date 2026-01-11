@@ -31,17 +31,7 @@
         transform: scale(1);
         opacity: 1;
     }
-    .loader {
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid #f97316;
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        animation: spin 1s linear infinite;
-        display: inline-block;
-        vertical-align: middle;
-        margin-right: 8px;
-    }
+
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
@@ -200,7 +190,7 @@
         const item = document.createElement('div');
         item.className = 'backup-list-item hover:bg-white/5 transition-colors duration-200';
         const createdDate = new Date(backup.attributes.created_at).toLocaleString();
-                const completedDate = backup.attributes.completed_at ? new Date(backup.attributes.completed_at).toLocaleString() : t.inProgress;
+        const completedDate = backup.attributes.completed_at ? new Date(backup.attributes.completed_at).toLocaleString() : t.inProgress;
 
         item.innerHTML = `
             <div class="flex flex-col text-center md:flex-row items-center gap-x-2 w-full">
@@ -269,7 +259,7 @@
             loadBackupList();
             closeModal('confirm-delete-modal');
         })
-.catch(error => {
+        .catch(error => {
             console.error('Error deleting backup:', error);
             alert(t.deleteError);
         })
@@ -360,11 +350,9 @@ document.getElementById('create-backup').addEventListener('click', async () => {
         }, 5000);
 
     } finally {
-        // Reset button state after 1 second
-        setTimeout(() => {
-            button.disabled = false;
-            button.innerHTML = originalText;
-        }, 1000);
+        // Reset button state
+        button.disabled = false;
+        button.innerHTML = originalText;
     }
 });
 
