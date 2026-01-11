@@ -374,15 +374,6 @@ document.getElementById('create-backup').addEventListener('click', async () => {
 
     document.getElementById('confirm-delete').addEventListener('click', deleteBackup);
 
-    // Load server details
-    fetch(`/api/server/${serverId}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('server-name').textContent = data.attributes.name;
-            document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
-            document.getElementById('server-description').textContent = data.attributes.description || t.noDescription;
-        });
-
     // Initial load
     loadBackupList();
 </script>

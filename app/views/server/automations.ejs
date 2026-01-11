@@ -152,15 +152,6 @@
         saveFailedTpl: <%- JSON.stringify(__('server.automations.save_failed', { message: '__MSG__' })) %>
     };
 
-        // Load server details
-        fetch(`/api/server/${serverId}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('server-name').textContent = data.attributes.name;
-                document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
-                document.getElementById('server-description').textContent = data.attributes.description || t.manageSettings;
-            });
-
         document.addEventListener('DOMContentLoaded', function () {
             let draggedElement = null;
             let offset = { x: 0, y: 0 };

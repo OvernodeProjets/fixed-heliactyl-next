@@ -100,20 +100,6 @@
 <script>
 const serverId = new URLSearchParams(window.location.search).get('id');
 
-// Load server details
-function loadServerDetails() {
-    fetch(`/api/server/${serverId}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('server-name').textContent = data.attributes.name;
-            document.getElementById('server-description').textContent = data.attributes.description || "<%= __('server.import.messages.no_description') %>";
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('<%= __('server.import.messages.load_error') %>', 'error');
-        });
-}
-
 // Show/Hide Modal
 function showImportModal() {
     document.getElementById('import-modal').classList.add('active');
@@ -251,9 +237,6 @@ function showNotification(message, type) {
 
 // Event Listeners
 document.getElementById('confirm-import').addEventListener('click', startImport);
-
-// Initialize
-document.addEventListener('DOMContentLoaded', loadServerDetails);
 </script>
 
 <%- include('../components/bottom') %>

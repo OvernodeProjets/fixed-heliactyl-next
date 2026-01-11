@@ -65,29 +65,6 @@
         noDirectIp: <%- JSON.stringify(__('server.allocations.no_direct_ip')) %>
     };
 
-    // Function to load server details
-    function loadServerDetails() {
-        document.getElementById('allocations-loading').classList.remove('hidden');
-        document.getElementById('allocations-list').classList.add('hidden');
-        document.getElementById('allocations-empty').classList.add('hidden');
-
-        fetch(`/api/server/${serverId}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('server-name').textContent = data.attributes.name;
-                document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
-                document.getElementById('server-description').textContent = data.attributes.description || t.noDescription;
-                updateAllocationsList(data.attributes.relationships.allocations.data);
-            })
-            .catch(error => {
-                console.error('Error fetching server details:', error);
-                showError(t.loadDetailsError);
-            })
-            .finally(() => {
-                document.getElementById('allocations-loading').classList.add('hidden');
-            });
-    }
-
     // Function to update the allocations list
     function updateAllocationsList(allocations) {
         const allocationsList = document.getElementById('allocations-list');
@@ -222,9 +199,6 @@
             showError(t.deleteFailed + '\n' + error);
         });
     }
-
-    // Load server details when the page loads
-    document.addEventListener('DOMContentLoaded', loadServerDetails);
 </script>
 
 <%- include('../components/bottom') %>
