@@ -152,8 +152,8 @@ display:none;
         </div>
 
         <div class="card rounded-xl p-6 mb-4">
-            <div class="flex items-center justify-between mb-2">
-                <h2 class="text-lg font-semibold text-white heavy" id="mobile-server-name-card">Loading...</h2>
+            <div class="flex items-center gap-4 justify-between mb-2">
+                <h2 class="text-lg font-semibold text-white truncate" id="mobile-server-name-card">Loading...</h2>
                 <span id="mobile-server-status" class="px-2 py-1 rounded-full text-xs font-medium text-yellow-500 bg-yellow-500/15">Loading...</span>
             </div>
             <div class="space-y-2 text-sm">
@@ -370,8 +370,8 @@ display:none;
                 </div>
             </div>
             <div class="hidden md:block card rounded-xl p-6">
-                <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-lg font-semibold text-white heavy" id="server-name-card">Loading...</h2>
+                <div class="flex items-center gap-4 justify-between mb-2">
+                    <h2 class="text-lg font-semibold text-white truncate" id="server-name-card">Loading...</h2>
                     <span id="server-status" class="px-2 py-1 rounded-full text-xs font-medium text-yellow-500 bg-yellow-500/15">Loading...</span>
                 </div>
                 <div class="space-y-2 text-sm">
@@ -454,9 +454,15 @@ function fetchServerDetails() {
             const nodeElement = document.getElementById('node');
 
             if (serverName) serverName.textContent = data.attributes.name;
-            if (serverNameCard) serverNameCard.textContent = data.attributes.name;
+            if (serverNameCard) { 
+              serverNameCard.textContent = data.attributes.name; 
+              serverNameCard.classList.add('heavy');
+            }
             const mobileServerNameCard = document.getElementById('mobile-server-name-card');
-            if (mobileServerNameCard) mobileServerNameCard.textContent = data.attributes.name;
+            if (mobileServerNameCard) { 
+              mobileServerNameCard.textContent = data.attributes.name;
+              mobileServerNameCard.classList.add('heavy');
+            }
             if (serverNameBreadcrumb) serverNameBreadcrumb.textContent = data.attributes.name;
             if (serverDescription) serverDescription.textContent = data.attributes.description || "<%= __('server.manage.no_description') %>";
             nodeName = data.attributes.node;
