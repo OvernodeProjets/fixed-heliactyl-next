@@ -199,28 +199,6 @@ display:none;
 
 <div id="alert-container" class="mb-4 space-y-2"></div>
 
-<div id="backup-warning" class="hidden" style="animation: slideDown 0.5s ease-out;">
-  <div class="bg-red-900/50 rounded-xl p-5 mb-4">
-    <div class="flex items-center">
-      <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-        </svg>
-      </div>
-      <div class="ml-3">
-        <h3 class="text-lg font-medium heavy text-red-300" id="countdown-text">
-          Critical: Backup Required
-        </h3>
-        <div class="text-sm text-red-200">
-          <p id="warning-message">
-            Your server is on an Singapore node scheduled for prolonged maintenance. Please backup all important data before 
-            <span id="local-time"></span>. Time remaining: <span id="countdown"></span>. You can temporarily move to a location such as Frankfurt, New York or similar until the location is available again.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div class="min-w-[0] lg:col-span-3 space-y-6">
             
@@ -1184,53 +1162,6 @@ function initPage() {
 }
 
 if (document.readyState !== "loading") initPage();
-</script>
-
-<script>
-(function() {
-  // Initialize the observer
-  const observer = new MutationObserver(() => {
-    const node = document.getElementById('node')?.textContent || '';
-    if (!node.includes('SG')) return;
-    
-    const warningElement = document.getElementById('backup-warning');
-    warningElement.classList.remove('hidden');
-    
-    const targetDate = new Date('2024-11-13T12:00:00Z');
-    const localTimeStr = targetDate.toLocaleString();
-    document.getElementById('local-time').textContent = localTimeStr;
-    
-    function updateCountdown() {
-      const now = new Date();
-      const diff = targetDate - now;
-      
-      if (diff <= 0) {
-        document.getElementById('countdown').textContent = 'IMMEDIATE ACTION REQUIRED';
-        document.getElementById('countdown-text').textContent = 'CRITICAL: BACKUP REQUIRED IMMEDIATELY';
-        return;
-      }
-      
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      
-      document.getElementById('countdown').textContent = 
-        `${hours}h ${minutes}m`;
-    }
-    
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
-  });
-
-  // Start observing the node for changes
-  const targetNode = document.getElementById('node');
-  if (targetNode) {
-    observer.observe(targetNode, {
-      characterData: true,
-      childList: true,
-      subtree: true
-    });
-  }
-})();
 </script>
 
 <%- include('../components/bottom') %>
