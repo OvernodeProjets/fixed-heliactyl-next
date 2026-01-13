@@ -552,9 +552,12 @@ function handleWebSocketMessage(event) {
             break;
         case 'console output':
             appendToConsole(message.args[0])
-      if (message.args[0].includes("You need to agree to the EULA")) {
-        showEulaPopup();
-      }
+            if (message.args[0].includes("You need to agree to the EULA")) {
+              showEulaPopup();
+            }
+            break;
+        case 'install logs':
+            appendToConsole(message.args[0]);
             break;
         case 'transfer logs':
             appendToConsole(message.args[0]);
@@ -864,25 +867,6 @@ switch (status) {
             'bg-emerald-500/15', 'bg-red-500/15'
         );
 }
-}
-
-function sendPlayerCommand(action, player) {
-    let command = '';
-    switch (action) {
-        case 'kick':
-            command = `kick ${player}`;
-            break;
-        case 'op':
-            command = `op ${player}`;
-            break;
-        case 'ban':
-            command = `ban ${player}`;
-            break;
-    }
-    if (command && socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({ event: 'send command', args: [command] }));
-        console.log(`${action} command sent for player ${player}`);
-    }
 }
 
 // Server control buttons
