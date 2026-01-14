@@ -200,10 +200,10 @@ display:none;
 <div id="alert-container" class="mb-4 space-y-2"></div>
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div class="min-w-[0] lg:col-span-3 space-y-6">
+        <div class="min-w-0 lg:col-span-3 space-y-6">
             
             <div class="card rounded-xl p-6">
-                <h2 class="text-xl font-semibold heavy"><%= __('server.manage.console') %></h2>
+                <h2 class="text-xl font-semibold"><%= __('server.manage.console') %></h2>
                 <span class="text-gray-300 text-sm mt-1 mb-4"><%= __('server.manage.console_hint') %></span>
                 <div class="border-t border-white/5 mt-4"></div>
                 <div style="height: 30rem;" id="console-output" class="bg-black/20 p-1 md:p-4 rounded-md md:rounded-xl border border-white/5 shadow-sm scrollbar-hide mt-4 overflow-y-auto mb-4 font-mono text-[0.7rem] sm:text-[0.85rem]">
@@ -260,7 +260,7 @@ display:none;
             <div class="card rounded-xl p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h2 class="text-xl font-semibold heavy"><%= __('server.manage.renewal_title') %></h2>
+                        <h2 class="text-xl font-semibold"><%= __('server.manage.renewal_title') %></h2>
                         <span id="renewal-subtitle" class="text-gray-300 text-sm mt-1 mb-4"><%= __('server.manage.renewal_subtitle') %></span>
                     </div>
                     <div id="renewal-badge" class="hidden ml-3 px-3 py-1 rounded-full text-[.7em] md:text-sm text-center font-medium text-white">
@@ -556,8 +556,8 @@ function handleWebSocketMessage(event) {
               showEulaPopup();
             }
             break;
-        case 'install logs':
-            appendToConsole(message.args[0]);
+        case 'install output':
+            appendToConsole(message.args[0])
             break;
         case 'transfer logs':
             appendToConsole(message.args[0]);
