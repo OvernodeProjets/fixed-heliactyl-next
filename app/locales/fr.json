@@ -739,13 +739,21 @@
         "168h": "Chaque semaine"
       },
       "power_action": "Action d'alimentation",
-      "power_actions": {"start": "Démarrer", "stop": "Arrêter", "restart": "Redémarrer", "kill": "Forcer l'arrêt"},
+      "power_actions": {
+        "start": "Démarrer",
+        "stop": "Arrêter",
+        "restart": "Redémarrer",
+        "kill": "Forcer l'arrêt"
+      },
       "webhook": "Webhook",
       "enter_url": "Entrer l'URL",
       "workflow_title": "Flux d'automatisations",
       "workflow_hint": "Glissez des actions ici pour construire votre flux.",
       "save_workflow": "Enregistrer le flux",
-      "modal": {"cancel": "Annuler", "confirm": "Confirmer"},
+      "modal": {
+        "cancel": "Annuler",
+        "confirm": "Confirmer"
+      },
       "manage_settings": "Gérez les paramètres de votre serveur",
       "delete": "Supprimer",
       "save_success": "Flux enregistré avec succès !",
@@ -948,13 +956,21 @@
         "168h": "Chaque semaine"
       },
       "power_action": "Action d'alimentation",
-      "power_actions": {"start": "Démarrer", "stop": "Arrêter", "restart": "Redémarrer", "kill": "Forcer l'arrêt"},
+      "power_actions": {
+        "start": "Démarrer",
+        "stop": "Arrêter",
+        "restart": "Redémarrer",
+        "kill": "Forcer l'arrêt"
+      },
       "webhook": "Webhook",
       "enter_url": "Entrer l'URL",
       "workflow_title": "Flux d'automatisations",
       "workflow_hint": "Glissez des actions ici pour construire votre flux.",
       "save_workflow": "Enregistrer le flux",
-      "modal": {"cancel": "Annuler", "confirm": "Confirmer"},
+      "modal": {
+        "cancel": "Annuler",
+        "confirm": "Confirmer"
+      },
       "manage_settings": "Gérez les paramètres de votre serveur",
       "delete": "Supprimer",
       "save_success": "Flux enregistré avec succès !",
@@ -1269,7 +1285,6 @@
       "network_activity": "Activité réseau"
     }
   },
-
   "legal": {
     "tos": "Conditions d'utilisation (CGU)",
     "sales": "Conditions de vente (CGV)",
@@ -1278,7 +1293,147 @@
     "last_updated": "Dernière mise à jour :",
     "tos_not_found": "Contenu des conditions d'utilisation introuvable.",
     "sales_not_found": "Contenu des conditions de vente introuvable."
+  },
+  "vps": {
+    "admin": {
+      "add_vm": "Ajouter une VM",
+      "add_vm_description": "Ajoutez une machine virtuelle Proxmox à un utilisateur.",
+      "user_id": "ID Utilisateur",
+      "user_id_placeholder": "Entrez l'ID utilisateur",
+      "node": "Nœud",
+      "select_node": "Sélectionnez un nœud",
+      "vm_id": "ID de la VM",
+      "vm_id_placeholder": "Entrez l'ID de la VM",
+      "verify_vm": "Vérifier la VM",
+      "ip": "Adresse IP",
+      "ip_placeholder": "Entrez l'adresse IP",
+      "expiration_date": "Date d'expiration",
+      "add_vm_button": "Ajouter la VM",
+      "vm_list": "Liste des VMs",
+      "loading": "Chargement...",
+      "verify_success": "VM disponible",
+      "verify_vm_error_fields": "Veuillez remplir l'ID de la VM et le nœud",
+      "verifying": "Vérification en cours...",
+      "verify_error": "Erreur lors de la vérification",
+      "vm_added_success": "VM ajoutée avec succès",
+      "vm_add_error": "Erreur lors de l'ajout de la VM",
+      "no_vms": "Aucune VM trouvée",
+      "expired": "Expiré",
+      "expiration": "Expiration",
+      "load_error": "Erreur lors du chargement",
+      "delete_confirm": "Êtes-vous sûr de vouloir supprimer cette VM ?",
+      "vm_deleted_success": "VM supprimée avec succès",
+      "vm_delete_error": "Erreur lors de la suppression de la VM",
+      "edit": "Modifier",
+      "edit_vm": "Modifier la VM",
+      "update_vm": "Mettre à jour",
+      "vm_updated_success": "VM mise à jour avec succès",
+      "vm_update_error": "Erreur lors de la mise à jour de la VM"
+    },
+    "list": {
+      "title": "Mes VPS",
+      "subtitle": "Gérez vos machines virtuelles Proxmox",
+      "no_vps": "Aucun VPS trouvé",
+      "columns": {
+        "name": "Nom",
+        "status": "Statut",
+        "memory": "RAM",
+        "cpu": "CPU",
+        "ip_address": "Adresse IP"
+      },
+      "status": {
+        "running": "En ligne",
+        "stopped": "Hors ligne",
+        "unknown": "Inconnu"
+      }
+    },
+    "manage": {
+      "title": "Gérer le VPS",
+      "subtitle": "Gérez votre machine virtuelle",
+      "back_to_list": "Retour à la liste",
+      "status": "Statut",
+      "ip_address": "Adresse IP",
+      "expiration": "Date d'expiration",
+      "expired": "Expiré",
+      "copy_ip": "Copier l'IP",
+      "reveal_ip": "Afficher l'IP",
+      "hide_ip": "Masquer l'IP",
+      "ip_copied": "IP copiée",
+      "cpu_usage": "Utilisation CPU",
+      "memory_usage": "Utilisation mémoire",
+      "ram_usage": "Utilisation RAM",
+      "disk_usage": "Utilisation disque",
+      "start": "Démarrer",
+      "stop": "Arrêter",
+      "shutdown": "Arrêter",
+      "restart": "Redémarrer",
+      "starting": "Démarrage...",
+      "stopping": "Arrêt...",
+      "shutting_down": "Arrêt en cours...",
+      "restarting": "Redémarrage...",
+      "start_success": "VM démarrée avec succès",
+      "stop_success": "VM arrêtée avec succès",
+      "shutdown_success": "VM arrêtée avec succès",
+      "shutdown_fallback": "Arrêt sécurisé échoué, arrêt forcé effectué",
+      "restart_success": "VM redémarrée avec succès",
+      "error": "Erreur lors de l'exécution de la commande",
+      "node": "Nœud",
+      "created": "Créé",
+      "console": "Console",
+      "power": "Alimentation",
+      "settings": "Paramètres",
+      "delete": "Supprimer",
+      "connection_details": "Détails de connexion",
+      "location": "Emplacement",
+      "username": "Nom d'utilisateur",
+      "password": "Mot de passe",
+      "resources": "Ressources",
+      "vcpus": "vCPUs",
+      "storage": "Stockage",
+      "uptime": "Disponibilité",
+      "system_info": "Infos système",
+      "vm_id": "ID VM",
+      "os": "Système d'exploitation",
+      "bios": "BIOS",
+      "cloud_init": "Cloud Init",
+      "ci_password_title": "Mettre à jour mot de passe",
+      "ci_password_description": "Modifiez votre mot de passe Cloud-Init. Un redémarrage est requis pour que les changements prennent effet.",
+      "ci_password_placeholder": "Nouveau mot de passe",
+      "update_password": "Mettre à jour",
+      "restart_required_warning": "⚠️ Vous devez redémarrer votre VM pour que le nouveau mot de passe prenne effet.",
+      "days_remaining": "Il reste %s jours",
+      "graphs_tab": "Graphiques d'utilisation",
+      "overview_tab": "Aperçu"
+    },
+    "graphs": {
+      "title": "Graphiques d'utilisation",
+      "loading": "Chargement des graphiques...",
+      "no_data": "Aucune donnée disponible pour cette période.",
+      "error": "Erreur lors du chargement des graphiques. Veuillez réessayer.",
+      "timeframe": {
+        "hour": "Dernière heure",
+        "day": "Dernier jour",
+        "week": "Dernière semaine",
+        "month": "Dernier mois"
+      },
+      "cpu": {
+        "title": "Utilisation CPU",
+        "label": "Utilisation CPU (%)"
+      },
+      "memory": {
+        "title": "Utilisation Mémoire",
+        "label": "Mémoire Utilisée (Go)"
+      },
+      "network": {
+        "title": "E/S Réseau",
+        "in": "Entrée Réseau",
+        "out": "Sortie Réseau"
+      },
+      "disk": {
+        "title": "E/S Disque",
+        "read": "Lecture Disque",
+        "write": "Écriture Disque"
+      }
+    }
   }
 }
-
-
