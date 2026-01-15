@@ -6,7 +6,6 @@ heliactyl.db
 storage/heliactyl.db
 storage/sessions.db
 .DS_Store
-.vscode/
 backup/
 backup-*
 tests/
