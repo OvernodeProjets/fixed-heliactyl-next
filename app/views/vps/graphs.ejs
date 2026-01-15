@@ -20,7 +20,7 @@
             <main class="flex-grow container mx-auto px-4 py-8">
                 <!-- Header -->
                 <div class="flex items-center gap-4 mb-6">
-                    <a href="/vps" class="p-2 hover:bg-white/10 rounded-lg transition">
+                    <a href="/vps/manage?id=<%= req.query.id %>" class="p-2 hover:bg-white/10 rounded-lg transition">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                             stroke="currentColor" class="w-5 h-5 text-white/70">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -128,14 +128,14 @@
 
             <script>
                 const translations = {
-                    cpu: <% - JSON.stringify(__('vps.graphs.cpu.label')) %>,
-                    memory: <% - JSON.stringify(__('vps.graphs.memory.label')) %>,
-                    netIn: <% - JSON.stringify(__('vps.graphs.network.in')) %>,
-                    netOut: <% - JSON.stringify(__('vps.graphs.network.out')) %>,
-                    diskRead: <% - JSON.stringify(__('vps.graphs.disk.read')) %>,
-                    diskWrite: <% - JSON.stringify(__('vps.graphs.disk.write')) %>,
-                    noData: <% - JSON.stringify(__('vps.graphs.no_data') || 'No data available for this timeframe.') %>,
-                    error: <% - JSON.stringify(__('vps.graphs.error') || 'Error loading graphs. Please try again.') %>
+                    cpu: <%- JSON.stringify(__('vps.graphs.cpu.label')) %>,
+                    memory: <%- JSON.stringify(__('vps.graphs.memory.label')) %>,
+                    netIn: <%- JSON.stringify(__('vps.graphs.network.in')) %>,
+                    netOut: <%- JSON.stringify(__('vps.graphs.network.out')) %>,
+                    diskRead: <%- JSON.stringify(__('vps.graphs.disk.read')) %>,
+                    diskWrite: <%- JSON.stringify(__('vps.graphs.disk.write')) %>,
+                    noData: <%- JSON.stringify(__('vps.graphs.no_data') || 'No data available for this timeframe.') %>,
+                    error: <%- JSON.stringify(__('vps.graphs.error') || 'Error loading graphs. Please try again.') %>
                 };
 
                 const vmId = '<%= req.query.id %>';

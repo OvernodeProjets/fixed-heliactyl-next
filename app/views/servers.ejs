@@ -352,6 +352,145 @@ document.querySelectorAll('.server-row').forEach(row => {
     connectToServer(serverId, numericId);
 });
 
+<% if (typeof proxmoxEnabled !== 'undefined' && proxmoxEnabled) { %>
+    // Load and display VPS
+    async function loadVPSList() {
+        try {
+            const response = await fetch('/api/vps/list');
+            const data = await response.json();
+
+            if (data.data && data.data.length > 0) {
+                const serversList = document.getElementById('servers-list');
+                data.data.forEach(vm => {
+                    const vmRow = document.createElement('div');
+                    vmRow.className = 'vps-row mb-4 bg-white/5 rounded-2xl hover:bg-white/10 border-2 border-dashed border-transparent hover:border-white/5 transition px-4 md:px-6 py-4 flex flex-col gap-3 md:grid md:grid-cols-12 md:gap-4 md:items-center cursor-pointer';
+                    vmRow.setAttribute('data-vm-id', vm.vmId);
+                    vmRow.setAttribute('data-vm-node', vm.node);
+                    vmRow.onclick = () => window.location.href = `/vps/manage?id=${vm.vmId}`;
+
+                    // Mask IP (show first part, hide rest)
+                    let maskedIP = '*.***.***.***';
+                    if (vm.ip) {
+                        const ipParts = vm.ip.split('.');
+                        if (ipParts.length === 4) {
+                            maskedIP = ipParts[0] + '.' + ipParts[1] + '.***.***';
+                        } else {
+                            maskedIP = vm.ip;
+                        }
+                    }
+
+                    vmRow.innerHTML = `
+                    <div class="flex items-center justify-between md:contents">
+                        <div class="md:col-span-2">
+                            <div class="font-medium text-white text-sm md:text-base">${vm.name || 'VM ' + vm.vmId}</div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <div class="inline-flex items-center px-2 md:px-3 py-1 rounded-full text-xs font-medium bg-zinc-500/20 text-zinc-300">
+                                <div class="size-2 rounded-full bg-zinc-400 mr-1.5 md:mr-2 vps-status-indicator"></div>
+                                <span class="vps-status-text"><%= __('vps.list.status.unknown') %></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 md:contents">
+                        <div class="flex-1 md:col-span-2">
+                            <div class="text-xs text-white/50 mb-1 md:hidden"><%= __('vps.list.columns.memory') %></div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-full bg-white/10 rounded-full h-1.5">
+                                    <div class="vps-memory-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                                </div>
+                                <span class="text-xs vps-memory-text">0 MB</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 md:col-span-2">
+                            <div class="text-xs text-white/50 mb-1 md:hidden"><%= __('vps.list.columns.cpu') %></div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-full bg-white/10 rounded-full h-1.5">
+                                    <div class="vps-cpu-bar bg-indigo-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                                </div>
+                                <span class="text-xs vps-cpu-text">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-3 md:ml-4">
+                        <div class="text-xs font-mono text-white/70 bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg shadow-sm overflow-x-auto">
+                            <span class="vps-ip-address whitespace-nowrap">${maskedIP}</span>
+                        </div>
+                    </div>
+                `;
+
+                    serversList.appendChild(vmRow);
+                    updateVPSStats(vm.vmId, vm.node, vmRow);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading VPS list:', error);
+        }
+    }
+
+    async function updateVPSStats(vmId, node, rowElement) {
+        try {
+            const statusResponse = await fetch(`/api/vps/${vmId}/status`);
+            const statusData = await statusResponse.json();
+            const status = statusData.data.status || 'unknown';
+
+            const statsResponse = await fetch(`/api/vps/${vmId}/stats`);
+            const statsData = await statsResponse.json();
+            const stats = statsData.data;
+
+            if (stats) {
+                const statusIndicator = rowElement.querySelector('.vps-status-indicator');
+                const statusText = rowElement.querySelector('.vps-status-text');
+                const statusContainer = statusIndicator.parentElement;
+
+                statusIndicator.classList.remove('bg-emerald-400', 'bg-red-400', 'bg-zinc-400');
+                statusContainer.classList.remove('bg-emerald-500/20', 'bg-red-500/20', 'text-emerald-300', 'text-red-300', 'text-zinc-300');
+
+                if (status === 'running') {
+                    statusIndicator.classList.add('bg-emerald-400');
+                    statusContainer.classList.add('bg-emerald-500/20', 'text-emerald-300');
+                    statusText.textContent = '<%= __('vps.list.status.running') %>';
+                } else {
+                    statusIndicator.classList.add('bg-red-400');
+                    statusContainer.classList.add('bg-red-500/20', 'text-red-300');
+                    statusText.textContent = '<%= __('vps.list.status.stopped') %>';
+                }
+
+                // Update memory
+                if (stats.maxmem > 0) {
+                    const memoryPercent = (stats.memory / stats.maxmem * 100).toFixed(0);
+                    const memoryBar = rowElement.querySelector('.vps-memory-bar');
+                    const memoryText = rowElement.querySelector('.vps-memory-text');
+                    memoryBar.style.width = `${memoryPercent}%`;
+                    memoryText.textContent = `${(stats.memory / 1024 / 1024).toFixed(0)} MB`;
+                }
+
+                // Update CPU
+                const cpuPercent = (stats.cpu * 100).toFixed(0);
+                const cpuBar = rowElement.querySelector('.vps-cpu-bar');
+                const cpuText = rowElement.querySelector('.vps-cpu-text');
+                cpuBar.style.width = `${cpuPercent}%`;
+                cpuText.textContent = `${cpuPercent}%`;
+            }
+        } catch (error) {
+            console.error('Error updating VPS stats:', error);
+        }
+    }
+
+    // Load VPS on page load
+    loadVPSList();
+
+    // Update VPS stats every 10 seconds
+    setInterval(() => {
+        document.querySelectorAll('.vps-row').forEach(row => {
+            const vmId = row.dataset.vmId;
+            const node = row.dataset.vmNode;
+            if (vmId && node) {
+                updateVPSStats(vmId, node, row);
+            }
+        });
+    }, 10000);
+<% } %>
+
 // Fetch and display shared servers
 fetch('/api/server/subuser-servers')
     .then(response => response.json())

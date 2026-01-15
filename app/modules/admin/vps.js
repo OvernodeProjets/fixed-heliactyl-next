@@ -241,7 +241,7 @@ module.exports.load = async function (router, db) {
       }
 
       // If userId is being changed, verify the new user exists
-      if (userId && userId !== vmData.userId) {
+      if (userId && userId.toString() !== vmData.userId.toString()) {
         const newUserPterodactylId = await db.get("users-" + userId);
         if (!newUserPterodactylId) {
           return res.status(404).json({ error: "New user not found" });
