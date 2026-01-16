@@ -676,6 +676,25 @@ router.get("/server/:id/delete", authMiddleware, async (req, res) => {
       );
     }
 
+    try {
+      const allUsers = await db.get('all_users') || [];
+      const serverIdentifier = server.attributes.identifier;
+      
+      for (const userId of allUsers) {
+        let subuserServers = await db.get(`subuser-servers-${userId}`) || [];
+        const originalLength = subuserServers.length;
+        
+        subuserServers = subuserServers.filter(s => s.id !== serverIdentifier);
+        
+        if (subuserServers.length !== originalLength) {
+          await db.set(`subuser-servers-${userId}`, subuserServers);
+          console.log(`Removed server ${serverIdentifier} from subuser-servers for user ${userId}`);
+        }
+      }
+    } catch (cleanupError) {
+      console.error('Error cleaning up subuser-servers records:', cleanupError);
+    }
+
     let pterodactylinfo = req.session.pterodactyl;
     pterodactylinfo.relationships.servers.data =
       pterodactylinfo.relationships.servers.data.filter(

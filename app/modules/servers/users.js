@@ -228,8 +228,31 @@ module.exports.load = async function(router, db) {
       console.log(`Fetching subuser servers for user ${userId}`);
       let subuserServers = await db.get(`subuser-servers-${userId}`) || [];
       
-      console.log(`Found ${subuserServers.length} subuser servers for user ${userId}`);
-      res.json(subuserServers);
+      const validServers = [];
+      let hasRemovedServers = false;
+      
+      for (const server of subuserServers) {
+        try {
+          await ClientAPI.getServerDetails(server.id, false, false);
+          validServers.push(server);
+        } catch (error) {
+          if (error.response && (error.response.status === 404 || error.response.status === 403)) {
+            console.log(`Server ${server.id} no longer exists or user has no access, removing from subuser list for user ${userId}`);
+            hasRemovedServers = true;
+          } else {
+            validServers.push(server);
+            console.warn(`Could not verify server ${server.id}, keeping it in the list:`, error.message);
+          }
+        }
+      }
+      
+      if (hasRemovedServers) {
+        await db.set(`subuser-servers-${userId}`, validServers);
+        console.log(`Updated subuser-servers for user ${userId}, removed ${subuserServers.length - validServers.length} invalid servers`);
+      }
+      
+      console.log(`Found ${validServers.length} valid subuser servers for user ${userId}`);
+      res.json(validServers);
     } catch (error) {
       console.error('Error fetching subuser servers:', error);
       res.status(500).json({ error: 'Internal server error' });
