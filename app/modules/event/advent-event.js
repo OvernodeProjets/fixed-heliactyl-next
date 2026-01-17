@@ -64,16 +64,15 @@ class AdventCalendarManager {
   constructor(db) {
     this.db = db;
     this.year = new Date().getFullYear();
-    this.totalDays = 31; // Dec 1 to Dec 31
+    this.totalDays = 25; // Dec 1 to Dec 25
   }
 
   isValidDate() {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     
-    // Create date objects for the start and end of the event
     const startDate = new Date(currentYear, 11, 1, 0, 0, 0); // December 1, 00:00:00
-    const endDate = new Date(currentYear, 11, 31, 23, 59, 59); // December 31, 23:59:59
+    const endDate = new Date(currentYear, 11, 25, 23, 59, 59); // December 25, 23:59:59
     
     return currentDate >= startDate && currentDate <= endDate;
   }
