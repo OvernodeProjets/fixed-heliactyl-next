@@ -28,6 +28,16 @@ module.exports.load = async function(router, db) {
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
   async function addUserToAllUsersList(userId) {
+    if (typeof userId !== 'string' || userId.trim() === '') {
+      console.warn(`Invalid userId: ${userId} (type: ${typeof userId}). Only string usernames are allowed.`);
+      return;
+    }
+    
+    if (!isNaN(userId)) {
+      console.warn(`Rejected numeric userId: ${userId}. Only usernames (non-numeric strings) are allowed.`);
+      return;
+    }
+    
     let allUsers = await db.get('all_users') || [];
     if (!allUsers.includes(userId)) {
       allUsers.push(userId);
@@ -262,7 +272,7 @@ module.exports.load = async function(router, db) {
   // /api/server/sync-user-servers - Sync User Servers
   router.post('/server/sync-user-servers', authMiddleware, async (req, res) => {
     try {
-      const userId = req.session.pterodactyl.id;
+      const userId = req.session.pterodactyl.username;
       console.log(`Syncing servers for user ${userId}`);
   
       // Add the current user to the all_users list
