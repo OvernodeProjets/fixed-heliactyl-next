@@ -14,30 +14,6 @@
 </style>
 
 <main class="flex-grow container mx-auto px-4 py-8">
-    <!-- Migration Alert -->
-    <div id="migration-alert" class="hidden mb-6">
-        <div class="bg-indigo-500/20 border border-indigo-500/50 rounded-2xl p-4 text-indigo-200">
-            <div class="flex items-start">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
-                </div>
-                <div class="ml-3">
-                    <h3 class="text-sm font-medium text-indigo-200"><%= __('staking.migration.title') %></h3>
-                    <div class="mt-2 text-sm text-indigo-200">
-                        <p><%= __('staking.migration.description') %></p>
-                        <ul class="list-disc list-inside mt-2">
-                            <li><%= __('staking.migration.feature_1') %></li>
-                            <li><%= __('staking.migration.feature_2') %></li>
-                            <li><%= __('staking.migration.feature_3') %></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <%- include('./components/header', {
         title: __('staking.title'),
         subtitle: __('staking.subtitle', { currency: settings.website.currency }),
@@ -194,19 +170,6 @@ const periodTitles = {
     '90d': '<%= __("staking.tiers.90d.title") %>',
     '180d': '<%= __("staking.tiers.180d.title") %>'
 };
-
-async function checkMigration() {
-    try {
-        const response = await fetch("/api/stake/positions");
-        const data = await response.json();
-        
-        if (data.message && data.message.includes('migrated')) {
-            document.getElementById('migration-alert').classList.remove('hidden');
-        }
-    } catch (error) {
-        console.error('Error checking migration:', error);
-    }
-}
 
 async function fetchStakingData() {
     try {
@@ -567,7 +530,6 @@ stakeForm.addEventListener('submit', async (e) => {
 });
 
 // Initialize
-checkMigration();
 fetchStakingData();
 setInterval(fetchStakingData, 30000); // Refresh every 30 seconds
 </script>

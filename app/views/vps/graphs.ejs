@@ -1,0 +1,410 @@
+<%- include('../components/top') %>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <style>
+        .tab-active {
+            color: #6366f1;
+            border-bottom: 2px solid #6366f1;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+    </style>
+    <% if (!req.query.id) { %>
+        <meta http-equiv="refresh" content="0; url=/vps?err=INVALID">
+        <% } %>
+
+            <main class="flex-grow container mx-auto px-4 py-8">
+                <!-- Header -->
+                <div class="flex items-center gap-4 mb-6">
+                    <a href="/vps/manage?id=<%= req.query.id %>" class="p-2 hover:bg-white/10 rounded-lg transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" class="w-5 h-5 text-white/70">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                        </svg>
+                    </a>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-5 h-5 text-indigo-400">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-white heavy" id="vm-name">
+                                <%= __('vps.manage.graphs_tab') %>
+                            </h1>
+                            <p class="text-sm text-white/50" id="vm-node">
+                                <%= __('common.loading') %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <div class="flex border-b border-white/10 mb-6">
+                    <a href="/vps/manage?id=<%= req.query.id %>"
+                        class="px-4 py-3 text-sm font-medium text-white/60 hover:text-white transition border-b-2 border-transparent hover:border-white/30">
+                        <%= __('vps.manage.overview_tab') %>
+                    </a>
+                    <a href="/vps/graphs?id=<%= req.query.id %>" class="px-4 py-3 text-sm font-medium tab-active">
+                        <%= __('vps.manage.graphs_tab') %>
+                    </a>
+                </div>
+
+                <!-- Timeframe Selector -->
+                <div class="flex gap-2 mb-6">
+                    <button data-timeframe="hour"
+                        class="timeframe-btn px-4 py-2 text-sm rounded-lg bg-indigo-500/20 text-indigo-400 transition">
+                        <%= __('vps.graphs.timeframe.hour') %>
+                    </button>
+                    <button data-timeframe="day"
+                        class="timeframe-btn px-4 py-2 text-sm rounded-lg bg-white/5 text-white/60 hover:bg-white/10 transition">
+                        <%= __('vps.graphs.timeframe.day') %>
+                    </button>
+                    <button data-timeframe="week"
+                        class="timeframe-btn px-4 py-2 text-sm rounded-lg bg-white/5 text-white/60 hover:bg-white/10 transition">
+                        <%= __('vps.graphs.timeframe.week') %>
+                    </button>
+                    <button data-timeframe="month"
+                        class="timeframe-btn px-4 py-2 text-sm rounded-lg bg-white/5 text-white/60 hover:bg-white/10 transition">
+                        <%= __('vps.graphs.timeframe.month') %>
+                    </button>
+                </div>
+
+                <div id="loading" class="text-center py-8">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+                    <p class="text-white/50 mt-2">
+                        <%= __('vps.graphs.loading') || 'Loading graphs...' %>
+                    </p>
+                </div>
+
+                <div id="graphs-container" class="hidden">
+                    <!-- CPU Usage Chart -->
+                    <div class="bg-white/5 rounded-xl p-6 mb-6 border border-white/5">
+                        <h3 class="text-lg font-semibold text-white mb-4">
+                            <%= __('vps.graphs.cpu.title') || 'CPU Usage' %>
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="cpuChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Memory Usage Chart -->
+                    <div class="bg-white/5 rounded-xl p-6 mb-6 border border-white/5">
+                        <h3 class="text-lg font-semibold text-white mb-4">
+                            <%= __('vps.graphs.memory.title') || 'Memory Usage' %>
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="memoryChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Network I/O Chart -->
+                    <div class="bg-white/5 rounded-xl p-6 mb-6 border border-white/5">
+                        <h3 class="text-lg font-semibold text-white mb-4">
+                            <%= __('vps.graphs.network.title') || 'Network I/O' %>
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="networkChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Disk I/O Chart -->
+                    <div class="bg-white/5 rounded-xl p-6 border border-white/5">
+                        <h3 class="text-lg font-semibold text-white mb-4">
+                            <%= __('vps.graphs.disk.title') || 'Disk I/O' %>
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="diskChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <script>
+                const translations = {
+                    cpu: <%- JSON.stringify(__('vps.graphs.cpu.label')) %>,
+                    memory: <%- JSON.stringify(__('vps.graphs.memory.label')) %>,
+                    netIn: <%- JSON.stringify(__('vps.graphs.network.in')) %>,
+                    netOut: <%- JSON.stringify(__('vps.graphs.network.out')) %>,
+                    diskRead: <%- JSON.stringify(__('vps.graphs.disk.read')) %>,
+                    diskWrite: <%- JSON.stringify(__('vps.graphs.disk.write')) %>,
+                    noData: <%- JSON.stringify(__('vps.graphs.no_data') || 'No data available for this timeframe.') %>,
+                    error: <%- JSON.stringify(__('vps.graphs.error') || 'Error loading graphs. Please try again.') %>
+                };
+
+                const vmId = '<%= req.query.id %>';
+                let currentTimeframe = 'hour';
+                let charts = {};
+
+                // Chart.js global configuration
+                Chart.defaults.color = 'rgba(255, 255, 255, 0.6)';
+                Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+
+                const chartOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                displayFormats: {
+                                    minute: 'HH:mm',
+                                    hour: 'HH:mm',
+                                    day: 'MMM dd'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            }
+                        }
+                    }
+                };
+
+                // Format bytes for display
+                function formatBytes(bytes) {
+                    if (bytes === 0) return '0 B';
+                    const k = 1024;
+                    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+                    const i = Math.floor(Math.log(Math.abs(bytes)) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                }
+
+                // Load VM name
+                async function loadVMInfo() {
+                    try {
+                        const response = await fetch(`/api/vps/${vmId}/details`);
+                        const data = await response.json();
+                        if (data.data) {
+                            document.getElementById('vm-name').textContent = data.data.name || `VM ${vmId}`;
+                            document.getElementById('vm-node').textContent = `Node: ${data.data.node}`;
+                        }
+                    } catch (error) {
+                        console.error('Error loading VM info:', error);
+                    }
+                }
+
+                // Load and render graphs
+                async function loadGraphs(timeframe) {
+                    document.getElementById('loading').classList.remove('hidden');
+                    document.getElementById('graphs-container').classList.add('hidden');
+
+                    try {
+                        const response = await fetch(`/api/vps/${vmId}/rrd?timeframe=${timeframe}`);
+                        const data = await response.json();
+
+                        if (!data.data || !data.data.timestamps || data.data.timestamps.length === 0) {
+                            document.getElementById('loading').innerHTML = `
+                <p class="text-white/50">${translations.noData}</p>
+            `;
+                            return;
+                        }
+
+                        const rrd = data.data;
+
+                        // Destroy existing charts
+                        Object.values(charts).forEach(chart => chart.destroy());
+                        charts = {};
+
+                        // Create CPU chart
+                        charts.cpu = new Chart(document.getElementById('cpuChart'), {
+                            type: 'line',
+                            data: {
+                                labels: rrd.timestamps,
+                                datasets: [{
+                                    label: translations.cpu,
+                                    data: rrd.cpu,
+                                    borderColor: '#6366f1',
+                                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointRadius: 0
+                                }]
+                            },
+                            options: {
+                                ...chartOptions,
+                                scales: {
+                                    ...chartOptions.scales,
+                                    y: {
+                                        ...chartOptions.scales.y,
+                                        max: 100,
+                                        ticks: {
+                                            callback: (value) => value + '%'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+
+                        // Create Memory chart
+                        const memoryData = rrd.memory.map((mem, i) => ({
+                            x: rrd.timestamps[i],
+                            y: mem / 1024 / 1024 / 1024 // Convert to GB
+                        }));
+
+                        charts.memory = new Chart(document.getElementById('memoryChart'), {
+                            type: 'line',
+                            data: {
+                                labels: rrd.timestamps,
+                                datasets: [{
+                                    label: translations.memory,
+                                    data: memoryData.map(d => d.y),
+                                    borderColor: '#10b981',
+                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointRadius: 0
+                                }]
+                            },
+                            options: {
+                                ...chartOptions,
+                                scales: {
+                                    ...chartOptions.scales,
+                                    y: {
+                                        ...chartOptions.scales.y,
+                                        ticks: {
+                                            callback: (value) => value.toFixed(1) + ' GB'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+
+                        // Create Network chart
+                        charts.network = new Chart(document.getElementById('networkChart'), {
+                            type: 'line',
+                            data: {
+                                labels: rrd.timestamps,
+                                datasets: [
+                                    {
+                                        label: translations.netIn,
+                                        data: rrd.netIn.map(v => v / 1024 / 1024), // Convert to MB
+                                        borderColor: '#3b82f6',
+                                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                        fill: true,
+                                        tension: 0.4,
+                                        pointRadius: 0
+                                    },
+                                    {
+                                        label: translations.netOut,
+                                        data: rrd.netOut.map(v => v / 1024 / 1024), // Convert to MB
+                                        borderColor: '#f59e0b',
+                                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                        fill: true,
+                                        tension: 0.4,
+                                        pointRadius: 0
+                                    }
+                                ]
+                            },
+                            options: {
+                                ...chartOptions,
+                                scales: {
+                                    ...chartOptions.scales,
+                                    y: {
+                                        ...chartOptions.scales.y,
+                                        ticks: {
+                                            callback: (value) => value.toFixed(1) + ' MB/s'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+
+                        // Create Disk I/O chart
+                        charts.disk = new Chart(document.getElementById('diskChart'), {
+                            type: 'line',
+                            data: {
+                                labels: rrd.timestamps,
+                                datasets: [
+                                    {
+                                        label: translations.diskRead,
+                                        data: rrd.diskRead.map(v => v / 1024 / 1024), // Convert to MB
+                                        borderColor: '#8b5cf6',
+                                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                                        fill: true,
+                                        tension: 0.4,
+                                        pointRadius: 0
+                                    },
+                                    {
+                                        label: translations.diskWrite,
+                                        data: rrd.diskWrite.map(v => v / 1024 / 1024), // Convert to MB
+                                        borderColor: '#ec4899',
+                                        backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                                        fill: true,
+                                        tension: 0.4,
+                                        pointRadius: 0
+                                    }
+                                ]
+                            },
+                            options: {
+                                ...chartOptions,
+                                scales: {
+                                    ...chartOptions.scales,
+                                    y: {
+                                        ...chartOptions.scales.y,
+                                        ticks: {
+                                            callback: (value) => value.toFixed(1) + ' MB/s'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+
+                        document.getElementById('loading').classList.add('hidden');
+                        document.getElementById('graphs-container').classList.remove('hidden');
+
+                    } catch (error) {
+                        console.error('Error loading graphs:', error);
+                        document.getElementById('loading').innerHTML = `
+            <p class="text-red-400"><%= __('vps.graphs.error') || 'Error loading graphs. Please try again.' %></p>
+        `;
+                    }
+                }
+
+                // Timeframe button handlers
+                document.querySelectorAll('.timeframe-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        // Update active state
+                        document.querySelectorAll('.timeframe-btn').forEach(b => {
+                            b.classList.remove('bg-indigo-500/20', 'text-indigo-400');
+                            b.classList.add('bg-white/5', 'text-white/60');
+                        });
+                        btn.classList.remove('bg-white/5', 'text-white/60');
+                        btn.classList.add('bg-indigo-500/20', 'text-indigo-400');
+
+                        // Load new data
+                        currentTimeframe = btn.dataset.timeframe;
+                        loadGraphs(currentTimeframe);
+                    });
+                });
+
+                // Initial load
+                loadVMInfo();
+                loadGraphs(currentTimeframe);
+            </script>
+
+            <%- include('../components/bottom') %>

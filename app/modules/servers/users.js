@@ -28,6 +28,16 @@ module.exports.load = async function(router, db) {
   const authMiddleware = (req, res, next) => requireAuth(req, res, next, false, db);
 
   async function addUserToAllUsersList(userId) {
+    if (typeof userId !== 'string' || userId.trim() === '') {
+      console.warn(`Invalid userId: ${userId} (type: ${typeof userId}). Only string usernames are allowed.`);
+      return;
+    }
+    
+    if (!isNaN(userId)) {
+      console.warn(`Rejected numeric userId: ${userId}. Only usernames (non-numeric strings) are allowed.`);
+      return;
+    }
+    
     let allUsers = await db.get('all_users') || [];
     if (!allUsers.includes(userId)) {
       allUsers.push(userId);
@@ -202,7 +212,7 @@ module.exports.load = async function(router, db) {
   router.delete('/server/:id/users/:subuser', authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const { id: serverId, subuser: subuserId } = req.params;
-      const response = await axios.delete(
+      await axios.delete(
         `${settings.pterodactyl.domain}/api/client/servers/${serverId}/users/${subuserId}`,
         {
           headers: {
@@ -213,11 +223,13 @@ module.exports.load = async function(router, db) {
         }
       );
 
-      if (!response.ok) throw new Error({ status: response.status, message: 'An internal error occured' })
-      res.status(204).send();
+      await updateSubuserInfo(serverId, req.session.userinfo.id);
+      res.status(200).json({ success: true });
     } catch (error) {
       console.error('Error deleting subuser:', error);
-      res.status(error.status).json({ error: error.message });
+      const status = error.response?.status || 500;
+      const message = error.response?.data?.message || error.message || 'An internal error occurred';
+      res.status(status).json({ error: message });
     }
   });
 
@@ -228,8 +240,31 @@ module.exports.load = async function(router, db) {
       console.log(`Fetching subuser servers for user ${userId}`);
       let subuserServers = await db.get(`subuser-servers-${userId}`) || [];
       
-      console.log(`Found ${subuserServers.length} subuser servers for user ${userId}`);
-      res.json(subuserServers);
+      const validServers = [];
+      let hasRemovedServers = false;
+      
+      for (const server of subuserServers) {
+        try {
+          await ClientAPI.getServerDetails(server.id, false, false);
+          validServers.push(server);
+        } catch (error) {
+          if (error.response && (error.response.status === 404 || error.response.status === 403)) {
+            console.log(`Server ${server.id} no longer exists or user has no access, removing from subuser list for user ${userId}`);
+            hasRemovedServers = true;
+          } else {
+            validServers.push(server);
+            console.warn(`Could not verify server ${server.id}, keeping it in the list:`, error.message);
+          }
+        }
+      }
+      
+      if (hasRemovedServers) {
+        await db.set(`subuser-servers-${userId}`, validServers);
+        console.log(`Updated subuser-servers for user ${userId}, removed ${subuserServers.length - validServers.length} invalid servers`);
+      }
+      
+      console.log(`Found ${validServers.length} valid subuser servers for user ${userId}`);
+      res.json(validServers);
     } catch (error) {
       console.error('Error fetching subuser servers:', error);
       res.status(500).json({ error: 'Internal server error' });
@@ -239,7 +274,7 @@ module.exports.load = async function(router, db) {
   // /api/server/sync-user-servers - Sync User Servers
   router.post('/server/sync-user-servers', authMiddleware, async (req, res) => {
     try {
-      const userId = req.session.pterodactyl.id;
+      const userId = req.session.pterodactyl.username;
       console.log(`Syncing servers for user ${userId}`);
   
       // Add the current user to the all_users list
