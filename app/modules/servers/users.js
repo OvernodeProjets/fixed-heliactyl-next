@@ -212,7 +212,7 @@ module.exports.load = async function(router, db) {
   router.delete('/server/:id/users/:subuser', authMiddleware, ownsServer(db), async (req, res) => {
     try {
       const { id: serverId, subuser: subuserId } = req.params;
-      const response = await axios.delete(
+      await axios.delete(
         `${settings.pterodactyl.domain}/api/client/servers/${serverId}/users/${subuserId}`,
         {
           headers: {
@@ -223,11 +223,13 @@ module.exports.load = async function(router, db) {
         }
       );
 
-      if (!response.ok) throw new Error({ status: response.status, message: 'An internal error occured' })
-      res.status(204).send();
+      await updateSubuserInfo(serverId, req.session.userinfo.id);
+      res.status(200).json({ success: true });
     } catch (error) {
       console.error('Error deleting subuser:', error);
-      res.status(error.status).json({ error: error.message });
+      const status = error.response?.status || 500;
+      const message = error.response?.data?.message || error.message || 'An internal error occurred';
+      res.status(status).json({ error: message });
     }
   });
 
