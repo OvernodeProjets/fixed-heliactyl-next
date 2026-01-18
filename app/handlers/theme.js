@@ -30,6 +30,7 @@ async function renderData(req, theme, db) {
     plesk,
     pterodactyl: req.session.pterodactyl,
     extra: theme.settings.variables,
+    proxmoxEnabled: settings.website?.vps_enabled || false,
     db
   };
 

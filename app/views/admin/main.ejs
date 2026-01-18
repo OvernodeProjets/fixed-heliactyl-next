@@ -48,6 +48,14 @@
         </svg>
         Alts
       </button>
+      <% if (proxmoxEnabled) { %>
+      <button onclick="switchTab('vps')" id="tab-vps" class="tab-button flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-gray-300 hover:bg-white/10 font-medium transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+        </svg>
+        VPS
+      </button>
+      <% } %>
       <button onclick="window.location.href='/admin/updates'" class="tab-button flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-gray-300 hover:bg-white/10 font-medium transition-all">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -393,8 +401,97 @@
                 </div>
             </div>
         </div>
+
+        <!-- VPS TAB -->
+        <% if (proxmoxEnabled) { %>
+        <div id="content-vps" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Add VM Form -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-white/10 rounded-lg">
+                            <svg class="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white"><%= __('vps.admin.add_vm') %></h2>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4"><%= __('vps.admin.add_vm_description') %></p>
+                    <form id="add-vm-form" onsubmit="handleAddVM(event)">
+                        <div class="mb-4">
+                            <label for="vm-user-id" class="block text-sm font-medium text-gray-300 mb-2"><%= __('vps.admin.user_id') %></label>
+                            <input type="text" id="vm-user-id" name="userId" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all" placeholder="<%= __('vps.admin.user_id_placeholder') %>" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="vm-node" class="block text-sm font-medium text-gray-300 mb-2"><%= __('vps.admin.node') %></label>
+                            <select id="vm-node" name="node" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all" required>
+                                <option value=""><%= __('vps.admin.select_node') %></option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="vm-id" class="block text-sm font-medium text-gray-300 mb-2"><%= __('vps.admin.vm_id') %></label>
+                            <input type="number" id="vm-id" name="vmId" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all" placeholder="<%= __('vps.admin.vm_id_placeholder') %>" required>
+                            <button type="button" onclick="verifyVM()" class="mt-2 text-sm text-indigo-400 hover:text-indigo-300"><%= __('vps.admin.verify_vm') %></button>
+                        </div>
+                        <div class="mb-6">
+                            <label for="vm-expiration" class="block text-sm font-medium text-gray-300 mb-2"><%= __('vps.admin.expiration_date') %></label>
+                            <input type="datetime-local" id="vm-expiration" name="expirationDate" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all" required>
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg transition-all font-medium shadow-md shadow-white/10"><%= __('vps.admin.add_vm_button') %></button>
+                    </form>
+                    <div id="vm-verify-result" class="mt-4 hidden"></div>
+                </div>
+
+                <!-- VM List -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-white/10 rounded-lg">
+                            <svg class="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white"><%= __('vps.admin.vm_list') %></h2>
+                    </div>
+                    <div id="vm-list-container" class="space-y-3">
+                        <p class="text-gray-400 text-sm"><%= __('vps.admin.loading') %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
     </div>
 </main>
+
+<!-- Edit VM Modal -->
+<% if (proxmoxEnabled) { %>
+<div id="edit-vm-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center z-50">
+    <div class="bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-white"><%= __('vps.admin.edit_vm') %></h3>
+            <button onclick="closeEditModal()" class="text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <form id="edit-vm-form" onsubmit="handleEditVM(event)">
+            <input type="hidden" id="edit-vm-id" name="vmId">
+            <div class="mb-4">
+                <label for="edit-vm-user-id" class="block text-sm font-medium text-gray-300 mb-2"><%= __('vps.admin.user_id') %></label>
+                <input type="text" id="edit-vm-user-id" name="userId" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all" required>
+            </div>
+            <div class="mb-6">
+                <label for="edit-vm-expiration" class="block text-sm font-medium text-gray-300 mb-2"><%= __('vps.admin.expiration_date') %></label>
+                <input type="datetime-local" id="edit-vm-expiration" name="expirationDate" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all" required>
+            </div>
+            <div class="flex gap-3">
+                <button type="submit" class="flex-1 bg-indigo-500 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg transition-all font-medium shadow-md shadow-white/10"><%= __('vps.admin.save_changes') %></button>
+                <button type="button" onclick="closeEditModal()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-3 rounded-lg transition-all font-medium"><%= __('common.cancel') %></button>
+            </div>
+        </form>
+    </div>
+</div>
+<% } %>
 
 <script>
 function switchTab(tabName) {
@@ -414,8 +511,18 @@ function switchTab(tabName) {
 
   // Add active state to selected button
   const activeButton = document.getElementById('tab-' + tabName);
-  activeButton.classList.remove('bg-white/5', 'text-gray-300');
-  activeButton.classList.add('bg-white/10', 'text-white');
+  if (activeButton) {
+    activeButton.classList.remove('bg-white/5', 'text-gray-300');
+    activeButton.classList.add('bg-white/10', 'text-white');
+  }
+
+  // Load VPS data if VPS tab is selected
+  <% if (proxmoxEnabled) { %>
+  if (tabName === 'vps') {
+    if (typeof loadNodes === 'function') loadNodes();
+    if (typeof loadVMList === 'function') loadVMList();
+  }
+  <% } %>
 }
 </script>
 
@@ -604,5 +711,217 @@ function handleUserInfoSubmit() {
       dataContainer.onclick = null;
     });
 }
+
+<% if (proxmoxEnabled) { %>
+// VPS Management Functions
+async function loadNodes() {
+  try {
+    const response = await fetch('/api/admin/vps/nodes');
+    const data = await response.json();
+    const nodeSelect = document.getElementById('vm-node');
+    nodeSelect.innerHTML = '<option value=""><%= __('vps.admin.select_node') %></option>';
+    data.data.forEach(node => {
+      const option = document.createElement('option');
+      option.value = node.node;
+      option.textContent = node.node;
+      nodeSelect.appendChild(option);
+    });
+  } catch (error) {
+    console.error('Error loading nodes:', error);
+  }
+}
+
+async function verifyVM() {
+  const vmId = document.getElementById('vm-id').value;
+  const node = document.getElementById('vm-node').value;
+  const resultDiv = document.getElementById('vm-verify-result');
+
+  if (!vmId || !node) {
+    showToast('error', '<%= __('vps.admin.verify_vm_error_fields') %>');
+    return;
+  }
+
+  try {
+    resultDiv.classList.remove('hidden');
+    resultDiv.innerHTML = '<p class="text-gray-400"><%= __('vps.admin.verifying') %></p>';
+
+    const response = await fetch(`/api/admin/vps/verify?vmId=${vmId}&node=${node}`);
+    const data = await response.json();
+
+    if (data.exists && data.available) {
+      resultDiv.innerHTML = `<div class="p-3 bg-emerald-500/20 border border-emerald-500/50 rounded-lg">
+        <p class="text-emerald-300 text-sm"><%= __('vps.admin.verify_success') %>: ${data.name || 'VM ' + vmId}</p>
+      </div>`;
+    } else {
+      resultDiv.innerHTML = `<div class="p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
+        <p class="text-red-300 text-sm">${data.message}</p>
+      </div>`;
+    }
+  } catch (error) {
+    resultDiv.innerHTML = `<div class="p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
+      <p class="text-red-300 text-sm"><%= __('vps.admin.verify_error') %>: ${error.message}</p>
+    </div>`;
+  }
+}
+
+async function handleAddVM(event) {
+  event.preventDefault();
+  const formData = new FormData(event.target);
+  const data = {
+    userId: formData.get('userId'),
+    node: formData.get('node'),
+    vmId: formData.get('vmId'),
+    expirationDate: formData.get('expirationDate')
+  };
+
+  try {
+    const response = await fetch('/api/admin/vps/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      showToast('success', result.message || '<%= __('vps.admin.vm_added_success') %>');
+      event.target.reset();
+      document.getElementById('vm-verify-result').classList.add('hidden');
+      loadVMList();
+    } else {
+      showToast('error', result.error || '<%= __('vps.admin.vm_add_error') %>');
+    }
+  } catch (error) {
+    showToast('error', '<%= __('vps.admin.vm_add_error') %>: ' + error.message);
+  }
+}
+
+async function loadVMList() {
+  const container = document.getElementById('vm-list-container');
+  try {
+    const response = await fetch('/api/admin/vps/list');
+    const data = await response.json();
+
+    if (data.data.length === 0) {
+      container.innerHTML = '<p class="text-gray-400 text-sm"><%= __('vps.admin.no_vms') %></p>';
+      return;
+    }
+
+    container.innerHTML = data.data.map(vm => {
+      const expirationDate = new Date(vm.expirationDate);
+      const now = new Date();
+      const isExpired = expirationDate < now;
+      const expirationText = isExpired ? '<span class="text-red-400"><%= __('vps.admin.expired') %></span>' : expirationDate.toLocaleDateString();
+
+      return `
+        <div class="p-4 bg-white/5 rounded-lg border border-white/10">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <h3 class="text-white font-medium">${vm.name || 'VM ' + vm.vmId}</h3>
+              <p class="text-gray-400 text-sm mt-1">
+                <span><%= __('vps.admin.vm_id') %>: ${vm.vmId}</span> | 
+                <span><%= __('vps.admin.user_id') %>: ${vm.userId}</span> | 
+                <span><%= __('vps.admin.node') %>: ${vm.node}</span>
+              </p>
+              <p class="text-gray-400 text-sm mt-1">
+                <span>IP: ${vm.ip || 'Auto (Cloud-Init)'}</span> | 
+                <span><%= __('vps.admin.expiration') %>: ${expirationText}</span>
+              </p>
+            </div>
+            <div class="flex gap-2 ml-4">
+              <button onclick="editVM(${vm.vmId}, ${vm.userId}, '${vm.expirationDate}', '${vm.node}')" class="px-3 py-1.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 rounded-lg text-sm transition">
+                <%= __('vps.admin.edit') %>
+              </button>
+              <button onclick="deleteVM(${vm.vmId})" class="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg text-sm transition">
+                <%= __('common.delete') %>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (error) {
+    container.innerHTML = `<p class="text-red-400 text-sm"><%= __('vps.admin.load_error') %>: ${error.message}</p>`;
+  }
+}
+
+async function deleteVM(vmId) {
+  if (!confirm('<%= __('vps.admin.delete_confirm') %>')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/admin/vps/${vmId}`, {
+      method: 'DELETE'
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      showToast('success', result.message || '<%= __('vps.admin.vm_deleted_success') %>');
+      loadVMList();
+    } else {
+      showToast('error', result.error || '<%= __('vps.admin.vm_delete_error') %>');
+    }
+  } catch (error) {
+    showToast('error', '<%= __('vps.admin.vm_delete_error') %>: ' + error.message);
+  }
+}
+
+function editVM(vmId, userId, expirationDate, node) {
+  document.getElementById('edit-vm-id').value = vmId;
+  document.getElementById('edit-vm-user-id').value = userId;
+
+  // Convert ISO date to datetime-local format
+  const date = new Date(expirationDate);
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  document.getElementById('edit-vm-expiration').value = localDate.toISOString().slice(0, 16);
+
+  document.getElementById('edit-vm-modal').classList.remove('hidden');
+  document.getElementById('edit-vm-modal').classList.add('flex');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-vm-modal').classList.add('hidden');
+  document.getElementById('edit-vm-modal').classList.remove('flex');
+  document.getElementById('edit-vm-form').reset();
+}
+
+async function handleEditVM(event) {
+  event.preventDefault();
+  const form = event.target;
+  const formData = new FormData(form);
+  const vmId = formData.get('vmId');
+
+  const data = {
+    userId: formData.get('userId'),
+    expirationDate: formData.get('expirationDate')
+  };
+
+  try {
+    const response = await fetch(`/api/admin/vps/${vmId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      showToast('success', result.message || '<%= __('vps.admin.vm_updated_success') %>');
+      closeEditModal();
+      loadVMList();
+    } else {
+      showToast('error', result.error || '<%= __('vps.admin.vm_update_error') %>');
+    }
+  } catch (error) {
+    showToast('error', '<%= __('vps.admin.vm_update_error') %>: ' + error.message);
+  }
+}
+<% } %>
 </script>
 <%- include('../components/bottom') %>

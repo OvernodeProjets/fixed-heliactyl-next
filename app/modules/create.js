@@ -676,6 +676,41 @@ router.get("/server/:id/delete", authMiddleware, async (req, res) => {
       );
     }
 
+    try {
+      const allUsers = await db.get('all_users') || [];
+      const serverIdentifier = server.attributes.identifier;
+
+      let totalRemoved = 0;
+      let errors = 0;
+      
+      for (const userId of allUsers) {
+        if (!userId) {
+          console.warn(`Skipping invalid userId: ${userId}`);
+          continue;
+        }
+        
+        try {
+          let subuserServers = await db.get(`subuser-servers-${userId}`) || [];
+          const originalLength = subuserServers.length;
+          
+          subuserServers = subuserServers.filter(s => s && s.id !== serverIdentifier);
+          
+          if (subuserServers.length !== originalLength) {
+            await db.set(`subuser-servers-${userId}`, subuserServers);
+            const removedCount = originalLength - subuserServers.length;
+            totalRemoved += removedCount;
+            console.log(`Removed server ${serverIdentifier} from subuser-servers for user ${userId} (removed ${removedCount} entries)`);
+          }
+        } catch (userError) {
+          errors++;
+          console.error(`Error cleaning up for user ${userId}:`, userError);
+          // Continue with other users even if one fails
+        }
+      }
+    } catch (cleanupError) {
+      console.error('Error cleaning up subuser-servers records:', cleanupError);
+    }
+
     let pterodactylinfo = req.session.pterodactyl;
     pterodactylinfo.relationships.servers.data =
       pterodactylinfo.relationships.servers.data.filter(

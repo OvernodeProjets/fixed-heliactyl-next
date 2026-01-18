@@ -250,23 +250,7 @@
         font-size: 0.9rem;
         word-break: break-word;
     }
-    .toast {
-        position: fixed;
-        bottom: 1rem;
-        right: 1rem;
-        background-color: #4CAF50;
-        color: white;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease;
-        z-index: 9999;
-    }
-    .toast.show {
-        opacity: 1;
-        visibility: visible;
-    }
+
     .context-menu {
     position: fixed;
     background-color: #05050e;
@@ -356,10 +340,10 @@
       <div id="alert-container" class="mb-4 space-y-2"></div> 
     <%- include('../components/server') %>
 
-    <div class="bg-white/5 rounded-xl p-4 md:p-6 mb-6">
+    <div class="bg-white/5 rounded-xl p-6 mb-6">
         <!-- Header row with title and view toggles -->
         <div class="flex flex-wrap gap-3 justify-between items-center mb-4">
-            <h2 class="text-lg md:text-xl font-semibold heavy"><%= __('server.files.title') %></h2>
+            <h2 class="text-lg md:text-xl font-semibold"><%= __('server.files.title') %></h2>
             
             <div class="flex items-center gap-2 flex-wrap">
                 <!-- View toggle buttons -->

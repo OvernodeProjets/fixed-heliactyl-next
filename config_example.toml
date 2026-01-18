@@ -55,6 +55,13 @@ previewImage = "https://i.imgur.com/srXG82j.png"
 vps_enabled = false
 
 # ------------------------------------------------------
+# Proxmox Configuration
+# ------------------------------------------------------
+[proxmox]
+api_url = "https://your-proxmox-ip:8006"
+api_key = "USER@REALM!TOKENID=SECRET"
+
+# ------------------------------------------------------
 # Cloudflare DNS Configuration
 # ------------------------------------------------------
 [cloudflare]

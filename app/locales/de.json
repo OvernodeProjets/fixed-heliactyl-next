@@ -1242,7 +1242,147 @@
       "title": "Konto wegen Alternativkonten markiert",
       "description": "Ihr Konto wurde aufgrund der möglichen Nutzung früherer Konten gesperrt (was gegen die Nutzungsbedingungen von {{name}} verstößt). Bitte wenden Sie sich an den Kundendienst, um dieses Problem zu beheben, und lesen Sie unsere Nutzungsbedingungen, bevor Sie fortfahren. Sie können sich weiterhin über Ihr ursprüngliches/Hauptkonto anmelden, dieses wurde nicht gesperrt."
     }
+  },
+  "vps": {
+    "admin": {
+      "add_vm": "VM hinzufügen",
+      "add_vm_description": "Fügen Sie einem Benutzer eine Proxmox-VM hinzu.",
+      "user_id": "Benutzer-ID",
+      "user_id_placeholder": "Benutzer-ID eingeben",
+      "node": "Knoten",
+      "select_node": "Knoten auswählen",
+      "vm_id": "VM-ID",
+      "vm_id_placeholder": "VM-ID eingeben",
+      "verify_vm": "VM überprüfen",
+      "ip": "IP-Adresse",
+      "ip_placeholder": "IP-Adresse eingeben",
+      "expiration_date": "Ablaufdatum",
+      "add_vm_button": "VM hinzufügen",
+      "vm_list": "VM-Liste",
+      "loading": "Laden...",
+      "verify_success": "VM verfügbar",
+      "verify_vm_error_fields": "Bitte VM-ID und Knoten ausfüllen",
+      "verifying": "Überprüfen...",
+      "verify_error": "Fehler beim Überprüfen der VM",
+      "vm_added_success": "VM erfolgreich hinzugefügt",
+      "vm_add_error": "Fehler beim Hinzufügen der VM",
+      "no_vms": "Keine VMs gefunden",
+      "expired": "Abgelaufen",
+      "expiration": "Ablauf",
+      "load_error": "Fehler beim Laden",
+      "delete_confirm": "Möchten Sie diese VM wirklich löschen?",
+      "vm_deleted_success": "VM erfolgreich gelöscht",
+      "vm_delete_error": "Fehler beim Löschen der VM",
+      "edit": "Bearbeiten",
+      "edit_vm": "VM bearbeiten",
+      "update_vm": "Aktualisieren",
+      "vm_updated_success": "VM erfolgreich aktualisiert",
+      "vm_update_error": "Fehler beim Aktualisieren der VM"
+    },
+    "list": {
+      "title": "Meine VPS",
+      "subtitle": "Verwalten Sie Ihre Proxmox-VMs",
+      "no_vps": "Keine VPS gefunden",
+      "columns": {
+        "name": "Name",
+        "status": "Status",
+        "memory": "RAM",
+        "cpu": "CPU",
+        "ip_address": "IP-Adresse"
+      },
+      "status": {
+        "running": "Online",
+        "stopped": "Offline",
+        "unknown": "Unbekannt"
+      }
+    },
+    "manage": {
+      "title": "VPS verwalten",
+      "subtitle": "Verwalten Sie Ihre VM",
+      "back_to_list": "Zurück zur Liste",
+      "status": "Status",
+      "ip_address": "IP-Adresse",
+      "expiration": "Ablaufdatum",
+      "expired": "Abgelaufen",
+      "copy_ip": "IP kopieren",
+      "reveal_ip": "IP anzeigen",
+      "hide_ip": "IP ausblenden",
+      "ip_copied": "IP kopiert",
+      "cpu_usage": "CPU-Auslastung",
+      "memory_usage": "Speicherauslastung",
+      "ram_usage": "RAM-Nutzung",
+      "disk_usage": "Festplattenauslastung",
+      "start": "Starten",
+      "stop": "Stoppen",
+      "shutdown": "Herunterfahren",
+      "restart": "Neustarten",
+      "starting": "Startet...",
+      "stopping": "Stoppt...",
+      "shutting_down": "Fährt herunter...",
+      "restarting": "Startet neu...",
+      "start_success": "VM erfolgreich gestartet",
+      "stop_success": "VM erfolgreich gestoppt",
+      "shutdown_success": "VM erfolgreich heruntergefahren",
+      "shutdown_fallback": "Sicheres Herunterfahren fehlgeschlagen, erzwungener Stopp durchgeführt",
+      "restart_success": "VM erfolgreich neu gestartet",
+      "error": "Fehler beim Ausführen des Befehls",
+      "node": "Knoten",
+      "created": "Erstellt",
+      "console": "Konsole",
+      "power": "Energie",
+      "settings": "Einstellungen",
+      "delete": "Löschen",
+      "connection_details": "Verbindungsdetails",
+      "location": "Standort",
+      "username": "Benutzername",
+      "password": "Passwort",
+      "resources": "Ressourcen",
+      "vcpus": "vCPUs",
+      "storage": "Speicher",
+      "uptime": "Betriebszeit",
+      "system_info": "System-Info",
+      "vm_id": "VM-ID",
+      "os": "Betriebssystem",
+      "bios": "BIOS",
+      "cloud_init": "Cloud Init",
+      "ci_password_title": "Passwort aktualisieren",
+      "ci_password_description": "Ändern Sie Ihr Cloud-Init-Passwort. Ein Neustart ist erforderlich.",
+      "ci_password_placeholder": "Neues Passwort",
+      "update_password": "Passwort aktualisieren",
+      "restart_required_warning": "⚠️ Sie müssen Ihre VM neu starten, damit das neue Passwort wirksam wird.",
+      "days_remaining": "Noch %s Tage",
+      "graphs_tab": "Nutzungsgrafiken",
+      "overview_tab": "Übersicht"
+    },
+    "graphs": {
+      "title": "Nutzungsgrafiken",
+      "loading": "Lade Grafiken...",
+      "no_data": "Keine Daten verfügbar.",
+      "error": "Fehler beim Laden der Grafiken.",
+      "timeframe": {
+        "hour": "Letzte Stunde",
+        "day": "Letzter Tag",
+        "week": "Letzte Woche",
+        "month": "Letzter Monat"
+      },
+      "cpu": {
+        "title": "CPU-Auslastung",
+        "label": "CPU-Auslastung (%)"
+      },
+      "memory": {
+        "title": "Speichernutzung",
+        "label": "Speicher (GB)"
+      },
+      "network": {
+        "title": "Netzwerk E/A",
+        "in": "Netzwerk In",
+        "out": "Netzwerk Out"
+      },
+      "disk": {
+        "title": "Festplatten E/A",
+        "read": "Lesen",
+        "write": "Schreiben"
+      }
+    }
   }
 }
-
-

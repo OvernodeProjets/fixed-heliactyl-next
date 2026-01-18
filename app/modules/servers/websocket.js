@@ -131,15 +131,13 @@ module.exports.load = async function(router, db) {
         const serverId = req.params.id;
 
         try {
-          let serverDetails = await ClientAPI.getServerDetails(
-            serverId
-          );
-          if (serverDetails.attributes.is_suspended) {
-            console.log(`Server ${serverId} is suspended. Denying WebSocket access.`);
+          const serverDetails = await ClientAPI.getServerDetails(serverId);
+          if (!serverDetails || serverDetails.attributes.is_suspended) {
+            console.log(`Server ${serverId} is suspended or not found. Denying WebSocket access.`);
             return res
               .status(403)
-              .json({ error: "Server is suspended. Cannot connect to WebSocket.", status : "suspended" });
-            }
+              .json({ error: "Server is suspended or not found.", status: "suspended" });
+          }
         } catch (error) {
           console.error("Error fetching server details for suspension check:", error);
           return res.status(500).json({ error: "Internal server error" });
@@ -162,19 +160,15 @@ module.exports.load = async function(router, db) {
       const serverId = req.params.id;
       const serverDetails = await ClientAPI.getServerDetails(serverId);
 
-      try {
-        let serverDetails = await ClientAPI.getServerDetails(
-          serverId
-        );
-        if (serverDetails.attributes.is_suspended) {
-          console.log(`Server ${serverId} is suspended. Denying WebSocket access.`);
-          return res
-            .status(403)
-            .json({ error: "Server is suspended. Cannot connect to WebSocket.", status : "suspended" });
-          }
-      } catch (error) {
-        console.error("Error fetching server details for suspension check:", error);
-        return res.status(500).json({ error: "Internal server error" });
+      if (!serverDetails) {
+        return res.status(404).json({ error: "Server not found" });
+      }
+
+      if (serverDetails.attributes.is_suspended) {
+        console.log(`Server ${serverId} is suspended. Denying access.`);
+        return res
+          .status(403)
+          .json({ error: "Server is suspended.", status: "suspended" });
       }
 
       res.json(serverDetails);

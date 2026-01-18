@@ -1,0 +1,695 @@
+<%- include('../components/top') %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+        rel="stylesheet">
+    <style>
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.875rem;
+        }
+
+        .info-value {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .copy-btn {
+            padding: 0.25rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+    <% if (!req.query.id) { %>
+        <meta http-equiv="refresh" content="0; url=/vps?err=INVALID">
+        <% } %>
+
+            <main class="flex-grow container mx-auto px-4 py-8">
+                <!-- Header Section -->
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+                    <div class="flex items-center gap-4 mb-4 lg:mb-0">
+                        <a href="/servers" class="p-2 hover:bg-white/10 rounded-lg transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor" class="w-5 h-5 text-white/70">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                            </svg>
+                        </a>
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center p-2.5 overflow-hidden ring-1 ring-inset ring-indigo-500/20">
+                                <img id="vm-icon" src="https://cdn.simpleicons.org/linux/white" alt="OS"
+                                    class="w-full h-full object-contain opacity-0 transition-opacity duration-300">
+                            </div>
+                            <div>
+                                <h1 class="text-xl font-bold text-white heavy" id="vm-name">
+                                    <%= __('common.loading') %>
+                                </h1>
+                                <div class="flex items-center gap-2 text-sm text-white/50">
+                                    <span>
+                                        <%= __('vps.manage.node') %>: <span id="vm-node-val">--</span>
+                                    </span>
+                                    <span>•</span>
+                                    <span>
+                                        <%= __('vps.manage.created') %>: <span id="vm-created-val">--</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center gap-2">
+                        <button id="start-vm"
+                            class="p-2.5 bg-white/5 hover:bg-emerald-500/20 text-white/70 hover:text-emerald-400 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="<%= __('server.automations.power_actions.start') %>">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="w-5 h-5">
+                                <path fill-rule="evenodd"
+                                    d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <button id="shutdown-vm"
+                            class="p-2.5 bg-white/5 hover:bg-red-500/20 text-white/70 hover:text-red-400 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="<%= __('server.automations.power_actions.stop') %>">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="w-5 h-5">
+                                <path fill-rule="evenodd"
+                                    d="M12 2.25a.75.75 0 0 1 .75.75v9a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM6.166 5.106a.75.75 0 0 1 0 1.06 8.25 8.25 0 1 0 11.668 0 .75.75 0 1 1 1.06-1.06c3.808 3.807 3.808 9.98 0 13.788-3.807 3.808-9.98 3.808-13.788 0-3.808-3.807-3.808-9.98 0-13.788a.75.75 0 0 1 1.06 0Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <button id="restart-vm"
+                            class="p-2.5 bg-white/5 hover:bg-yellow-500/20 text-white/70 hover:text-yellow-400 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="<%= __('server.automations.power_actions.restart') %>">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="w-5 h-5">
+                                <path fill-rule="evenodd"
+                                    d="M4.755 10.059a7.5 7.5 0 0 1 12.548-3.364l1.903 1.903h-3.183a.75.75 0 1 0 0 1.5h4.992a.75.75 0 0 0 .75-.75V4.356a.75.75 0 0 0-1.5 0v3.18l-1.9-1.9A9 9 0 0 0 3.306 9.67a.75.75 0 1 0 1.45.388Zm15.408 3.352a.75.75 0 0 0-.919.53 7.5 7.5 0 0 1-12.548 3.364l-1.902-1.903h3.183a.75.75 0 0 0 0-1.5H2.984a.75.75 0 0 0-.75.75v4.992a.75.75 0 0 0 1.5 0v-3.18l1.9 1.9a9 9 0 0 0 15.059-4.035.75.75 0 0 0-.53-.918Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div class="w-px h-6 bg-white/10 mx-1"></div>
+                        <span id="vm-status"
+                            class="px-3 py-1.5 rounded-full text-xs font-medium bg-zinc-500/20 text-zinc-400">
+                            <span class="inline-block w-2 h-2 rounded-full bg-zinc-400 mr-1.5 animate-pulse"></span>
+                            <%= __('common.loading') %>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <div class="flex border-b border-white/10 mb-6">
+                    <a href="/vps/manage?id=<%= req.query.id %>"
+                        class="px-4 py-3 text-sm font-medium text-indigo-400 border-b-2 border-indigo-500">
+                        <%= __('vps.manage.overview_tab') %>
+                    </a>
+                    <a href="/vps/graphs?id=<%= req.query.id %>"
+                        class="px-4 py-3 text-sm font-medium text-white/60 hover:text-white transition border-b-2 border-transparent hover:border-white/30">
+                        <%= __('vps.manage.graphs_tab') %>
+                    </a>
+                </div>
+
+                <div id="alert-container" class="mb-4 space-y-2"></div>
+
+                <!-- Stats Cards Row -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <!-- CPU Usage -->
+                    <div class="stat-card rounded-xl p-5">
+                        <div class="text-sm text-white/50 mb-1">
+                            <%= __('vps.manage.cpu_usage') %>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <span id="cpu-usage-value" class="text-3xl font-light text-indigo-400">0</span>
+                            <span class="text-lg text-white/50 mb-1">%</span>
+                        </div>
+                        <div class="mt-3 w-full bg-white/10 rounded-full h-1.5">
+                            <div class="bg-indigo-500 h-1.5 rounded-full transition-all" id="cpu-usage-bar"
+                                style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- RAM Usage -->
+                    <div class="stat-card rounded-xl p-5">
+                        <div class="text-sm text-white/50 mb-1">
+                            <%= __('vps.manage.ram_usage') %>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <span id="ram-usage-value" class="text-3xl font-light text-emerald-400">0</span>
+                            <span id="ram-usage-unit" class="text-lg text-white/50 mb-1">MB</span>
+                        </div>
+                        <div class="text-xs text-white/40 mt-1"><span id="ram-usage-percent">0</span>% <%=
+                                __('store.per_unit.percent').replace('/', '' ).trim() %> <span id="ram-total">0</span>
+                                GB</div>
+                    </div>
+
+                    <!-- Expiration -->
+                    <div class="stat-card rounded-xl p-5">
+                        <div class="text-sm text-white/50 mb-1">
+                            <%= __('vps.manage.expiration') %>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <span id="expiration-value" class="text-2xl font-light text-white">--</span>
+                        </div>
+                        <div class="text-xs mt-1" id="expiration-status">
+                            <span class="text-white/40">
+                                <%= __('common.loading') %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Server Details Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                    <!-- Left Column - Connection Info -->
+                    <div class="bg-white/5 rounded-xl p-5 border border-white/5">
+                        <h3 class="text-sm font-medium text-white/70 mb-4 uppercase tracking-wide">
+                            <%= __('vps.manage.connection_details') %>
+                        </h3>
+
+                        <div class="info-row">
+                            <span class="info-label">
+                                <%= __('vps.manage.location') %>
+                            </span>
+                            <span class="info-value" id="detail-location">--</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">
+                                <%= __('vps.manage.ip_address') %>
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <span class="info-value font-mono" id="detail-ip">***.***.***.***</span>
+                                <button class="copy-btn" id="copy-ip" title="Copy IP">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="w-4 h-4 text-white/50">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="info-row" id="ipv6-row" style="display: none;">
+                            <span class="info-label">IPv6 <%= __('vps.manage.ip_address') %></span>
+                            <div class="flex items-center gap-2">
+                                <span class="info-value font-mono text-xs" id="detail-ipv6">--</span>
+                                <button class="copy-btn" id="copy-ipv6" title="Copy IPv6">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="w-4 h-4 text-white/50">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="info-row" id="username-row">
+                            <span class="info-label">
+                                <%= __('vps.manage.username') %>
+                            </span>
+                            <span class="info-value font-mono" id="detail-username">--</span>
+                        </div>
+
+                        <div class="info-row" id="password-row">
+                            <span class="info-label">
+                                <%= __('vps.manage.password') %>
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <span class="info-value" id="detail-password">••••••••</span>
+                                <button class="copy-btn text-indigo-400 text-xs hover:underline" id="change-password">
+                                    <%= __('common.edit') %>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Middle Column - Resources -->
+                    <div class="bg-white/5 rounded-xl p-5 border border-white/5">
+                        <h3 class="text-sm font-medium text-white/70 mb-4 uppercase tracking-wide">
+                            <%= __('vps.manage.resources') %>
+                        </h3>
+
+                        <div class="info-row">
+                            <span class="info-label">
+                                <%= __('vps.manage.vcpus') %>
+                            </span>
+                            <span class="info-value" id="detail-vcpus">--</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">
+                                <%= __('store.resources.ram') %>
+                            </span>
+                            <span class="info-value" id="detail-ram">--</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">
+                                <%= __('vps.manage.storage') %>
+                            </span>
+                            <span class="info-value" id="detail-storage">--</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">
+                                <%= __('vps.manage.uptime') %>
+                            </span>
+                            <span class="info-value" id="detail-uptime">--</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - System Info -->
+                    <div class="bg-white/5 rounded-xl p-5 border border-white/5">
+                        <h3 class="text-sm font-medium text-white/70 mb-4 uppercase tracking-wide">
+                            <%= __('vps.manage.system_info') %>
+                        </h3>
+
+                        <div class="info-row">
+                            <span class="info-label">
+                                <%= __('vps.manage.vm_id') %>
+                            </span>
+                            <span class="info-value font-mono" id="detail-vmid">--</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">
+                                <%= __('vps.manage.os') %>
+                            </span>
+                            <span class="info-value" id="detail-os">--</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">
+                                <%= __('vps.manage.bios') %>
+                            </span>
+                            <span class="info-value" id="detail-bios">--</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">
+                                <%= __('vps.manage.cloud_init') %>
+                            </span>
+                            <span class="info-value" id="detail-cloudinit">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cloud Init Password Section -->
+                <div class="bg-white/5 rounded-xl p-5 border border-white/5 hidden" id="cloudinit-section">
+                    <h3 class="text-lg font-semibold text-white heavy mb-2">
+                        <%= __('vps.manage.ci_password_title') %>
+                    </h3>
+                    <p class="text-gray-400 text-sm mb-4">
+                        <%= __('vps.manage.ci_password_description')
+                            || 'Update your Cloud-Init password. A VM restart is required for changes to take effect.'
+                            %>
+                    </p>
+
+                    <form id="cloudinit-password-form" class="flex flex-col sm:flex-row gap-3">
+                        <input type="password" id="cloudinit-password" name="password"
+                            class="flex-1 px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all placeholder-white/30"
+                            placeholder="<%= __('vps.manage.ci_password_placeholder') %>" required minlength="8">
+                        <button type="submit"
+                            class="px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition font-medium whitespace-nowrap">
+                            <%= __('vps.manage.update_password') %>
+                        </button>
+                    </form>
+                    <div class="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                        <p class="text-yellow-300 text-xs">
+                            <%= __('vps.manage.restart_required_warning') %>
+                        </p>
+                    </div>
+                </div>
+            </main>
+
+            <script>
+                const translations = {
+                    running: "<%= __('vps.list.status.running') %>",
+                    stopped: "<%= __('vps.list.status.stopped') %>",
+                    offline: "<%= __('vps.list.status.stopped') %>",
+                    expired: "<%= __('vps.manage.expired') %>",
+                    days_remaining: "<%= __('vps.manage.days_remaining') %>"
+                };
+                const vmId = '<%= req.query.id %>';
+                let vmData = null;
+                let vmDetails = null;
+                let actualIP = '';
+                let actualIPv6 = '';
+
+                // Format uptime
+                function formatUptime(seconds) {
+                    if (!seconds || seconds <= 0) return 'Offline';
+
+                    const days = Math.floor(seconds / 86400);
+                    const hours = Math.floor((seconds % 86400) / 3600);
+                    const minutes = Math.floor((seconds % 3600) / 60);
+
+                    if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+                    if (hours > 0) return `${hours}h ${minutes}m`;
+                    return `${minutes}m`;
+                }
+
+                // Format bytes to readable
+                function formatBytes(bytes, decimals = 2) {
+                    if (!bytes || bytes === 0) return '0 B';
+                    const k = 1024;
+                    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i];
+                }
+
+                // Get OS Icon URL
+                function getOSIcon(osName) {
+                    if (!osName) return 'https://cdn.simpleicons.org/linux/white';
+                    const lower = osName.toLowerCase();
+                    const map = {
+                        'ubuntu': 'ubuntu', 'debian': 'debian', 'windows': 'windows11', 'centos': 'centos',
+                        'fedora': 'fedora', 'almalinux': 'almalinux', 'rocky': 'rockylinux', 'alpine': 'alpinelinux',
+                        'arch': 'archlinux', 'kali': 'kalilinux'
+                    };
+                    for (const [key, slug] of Object.entries(map)) {
+                        if (lower.includes(key)) return `https://cdn.simpleicons.org/${slug}/white`;
+                    }
+                    return 'https://cdn.simpleicons.org/linux/white';
+                }
+
+                // Load full VM details
+                async function loadVMDetails() {
+                    try {
+                        const response = await fetch(`/api/vps/${vmId}/details`);
+                        const data = await response.json();
+
+                        if (!data.data) {
+                            showAlert('error', 'Error', 'Failed to load VM details');
+                            return;
+                        }
+
+                        vmDetails = data.data;
+                        actualIP = vmDetails.ipAddress || vmDetails.storedIp || 'N/A';
+                        actualIPv6 = vmDetails.ipv6Address || null;
+
+                        // Update header
+                        document.getElementById('vm-name').textContent = vmDetails.name || `VM ${vmDetails.vmid}`;
+
+                        // Update OS Icon
+                        const iconImg = document.getElementById('vm-icon');
+                        if (iconImg) {
+                            iconImg.src = getOSIcon(vmDetails.os);
+                            iconImg.classList.remove('opacity-0');
+                        }
+                        document.getElementById('vm-node-val').textContent = vmDetails.node;
+
+                        if (vmDetails.createdAt) {
+                            const created = new Date(vmDetails.createdAt);
+                            document.getElementById('vm-created-val').textContent = created.toLocaleDateString();
+                        }
+
+                        // Update stats cards
+                        const cpuPercent = (vmDetails.cpuUsage * 100).toFixed(1);
+                        document.getElementById('cpu-usage-value').textContent = cpuPercent;
+                        document.getElementById('cpu-usage-bar').style.width = `${Math.min(cpuPercent, 100)}%`;
+
+                        const ramUsedMB = vmDetails.usedMemory / 1024 / 1024;
+                        const ramTotalGB = vmDetails.maxMemory / 1024 / 1024 / 1024;
+                        const ramPercent = vmDetails.maxMemory > 0 ? (vmDetails.usedMemory / vmDetails.maxMemory * 100).toFixed(1) : 0;
+
+                        if (ramUsedMB > 1024) {
+                            document.getElementById('ram-usage-value').textContent = (ramUsedMB / 1024).toFixed(2);
+                            document.getElementById('ram-usage-unit').textContent = 'GB';
+                        } else {
+                            document.getElementById('ram-usage-value').textContent = ramUsedMB.toFixed(0);
+                            document.getElementById('ram-usage-unit').textContent = 'MB';
+                        }
+                        document.getElementById('ram-usage-percent').textContent = ramPercent;
+                        document.getElementById('ram-total').textContent = ramTotalGB.toFixed(1);
+
+                        // Expiration
+                        if (vmDetails.expirationDate) {
+                            const expDate = new Date(vmDetails.expirationDate);
+                            const now = new Date();
+                            const isExpired = expDate < now;
+                            const daysLeft = Math.ceil((expDate - now) / (1000 * 60 * 60 * 24));
+
+                            document.getElementById('expiration-value').textContent = expDate.toLocaleDateString();
+
+                            if (isExpired) {
+                                document.getElementById('expiration-status').innerHTML = `<span class="text-red-400">${translations.expired}</span>`;
+                            } else if (daysLeft <= 7) {
+                                document.getElementById('expiration-status').innerHTML = `<span class="text-yellow-400">${translations.days_remaining.replace('%s', daysLeft)}</span>`;
+                            } else {
+                                document.getElementById('expiration-status').innerHTML = `<span class="text-emerald-400">${translations.days_remaining.replace('%s', daysLeft)}</span>`;
+                            }
+                        }
+
+                        // Connection details
+                        document.getElementById('detail-location').textContent = vmDetails.node;
+                        document.getElementById('detail-ip').textContent = actualIP;
+
+                        if (actualIPv6) {
+                            document.getElementById('ipv6-row').style.display = 'flex';
+                            document.getElementById('detail-ipv6').textContent = actualIPv6;
+                        }
+
+                        if (vmDetails.cloudInit && vmDetails.cloudInit.user) {
+                            document.getElementById('detail-username').textContent = vmDetails.cloudInit.user;
+                        }
+
+                        // Resources
+                        document.getElementById('detail-vcpus').textContent = `${vmDetails.vcpus} vCPU${vmDetails.vcpus > 1 ? 's' : ''}`;
+                        document.getElementById('detail-ram').textContent = `${(vmDetails.memory / 1024).toFixed(1)} GB`;
+                        document.getElementById('detail-storage').textContent = vmDetails.storageSize > 0 ? `${vmDetails.storageSize} GB` : formatBytes(vmDetails.maxDisk);
+                        document.getElementById('detail-uptime').textContent = formatUptime(vmDetails.uptime);
+
+                        // System info
+                        document.getElementById('detail-vmid').textContent = vmDetails.vmid;
+                        document.getElementById('detail-os').textContent = vmDetails.os || 'Unknown';
+                        document.getElementById('detail-bios').textContent = vmDetails.bios === 'ovmf' ? 'UEFI' : 'SeaBIOS';
+                        document.getElementById('detail-cloudinit').textContent = vmDetails.cloudInit?.enabled ? 'Enabled' : 'Disabled';
+
+                        // Show Cloud Init section if enabled
+                        if (vmDetails.cloudInit?.enabled) {
+                            document.getElementById('cloudinit-section').classList.remove('hidden');
+                        }
+
+                        updateStatus(vmDetails.status);
+
+                    } catch (error) {
+                        console.error('Error loading VM details:', error);
+                        showAlert('error', 'Error', 'Failed to load VM details');
+                    }
+                }
+
+                function updateStatus(status) {
+                    const statusEl = document.getElementById('vm-status');
+                    statusEl.classList.remove('bg-emerald-500/20', 'text-emerald-400', 'bg-red-500/20', 'text-red-400', 'bg-zinc-500/20', 'text-zinc-400');
+
+                    const startBtn = document.getElementById('start-vm');
+                    const shutdownBtn = document.getElementById('shutdown-vm');
+                    const restartBtn = document.getElementById('restart-vm');
+
+                    if (status === 'running') {
+                        statusEl.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-1.5"></span>${translations.running}`;
+                        statusEl.classList.add('bg-emerald-500/20', 'text-emerald-400');
+                        startBtn.disabled = true;
+                        shutdownBtn.disabled = false;
+                        restartBtn.disabled = false;
+                    } else if (status === 'stopped' || status === 'offline') {
+                        statusEl.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-red-400 mr-1.5"></span>${translations.stopped}`;
+                        statusEl.classList.add('bg-red-500/20', 'text-red-400');
+                        startBtn.disabled = false;
+                        shutdownBtn.disabled = true;
+                        restartBtn.disabled = true;
+                    } else {
+                        statusEl.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-yellow-400 mr-1.5 animate-pulse"></span>${status}`;
+                        statusEl.classList.add('bg-yellow-500/20', 'text-yellow-400');
+                    }
+                }
+
+                async function refreshStats() {
+                    try {
+                        const response = await fetch(`/api/vps/${vmId}/stats`);
+                        const data = await response.json();
+
+                        if (data.data) {
+                            const stats = data.data;
+
+                            const cpuPercent = (stats.cpu * 100).toFixed(1);
+                            document.getElementById('cpu-usage-value').textContent = cpuPercent;
+                            document.getElementById('cpu-usage-bar').style.width = `${Math.min(cpuPercent, 100)}%`;
+
+                            const ramUsedMB = stats.memory / 1024 / 1024;
+                            const ramTotalGB = stats.maxmem / 1024 / 1024 / 1024;
+                            const ramPercent = stats.maxmem > 0 ? (stats.memory / stats.maxmem * 100).toFixed(1) : 0;
+
+                            if (ramUsedMB > 1024) {
+                                document.getElementById('ram-usage-value').textContent = (ramUsedMB / 1024).toFixed(2);
+                                document.getElementById('ram-usage-unit').textContent = 'GB';
+                            } else {
+                                document.getElementById('ram-usage-value').textContent = ramUsedMB.toFixed(0);
+                                document.getElementById('ram-usage-unit').textContent = 'MB';
+                            }
+                            document.getElementById('ram-usage-percent').textContent = ramPercent;
+                            document.getElementById('ram-total').textContent = ramTotalGB.toFixed(1);
+
+                            document.getElementById('detail-uptime').textContent = formatUptime(stats.uptime);
+                            updateStatus(stats.status);
+                        }
+                    } catch (error) {
+                        console.error('Error refreshing stats:', error);
+                    }
+                }
+
+                function copyToClipboard(text, label) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showAlert('success', 'Copied!', `${label} copied to clipboard`);
+                    }).catch(() => {
+                        showAlert('error', 'Error', 'Failed to copy');
+                    });
+                }
+
+                document.getElementById('copy-ip').addEventListener('click', () => copyToClipboard(actualIP, 'IP Address'));
+                document.getElementById('copy-ipv6')?.addEventListener('click', () => copyToClipboard(actualIPv6, 'IPv6 Address'));
+
+                // Power controls
+                async function sendPowerAction(action) {
+                    const buttons = ['start-vm', 'shutdown-vm', 'restart-vm'];
+                    buttons.forEach(id => document.getElementById(id).disabled = true);
+
+                    try {
+                        const response = await fetch(`/api/vps/${vmId}/power`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action })
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            showAlert('success', 'Success', `Power action "${action}" sent successfully`);
+                            setTimeout(() => {
+                                refreshStats();
+                            }, 2000);
+                        } else {
+                            showAlert('error', 'Error', result.error || 'Failed to send power action');
+                        }
+                    } catch (error) {
+                        showAlert('error', 'Error', 'Failed to send power action');
+                    }
+
+                    setTimeout(() => {
+                        refreshStats();
+                    }, 1000);
+                }
+
+                document.getElementById('start-vm').addEventListener('click', () => sendPowerAction('start'));
+                document.getElementById('shutdown-vm').addEventListener('click', () => sendPowerAction('shutdown'));
+                document.getElementById('restart-vm').addEventListener('click', () => sendPowerAction('restart'));
+
+                // Change password button
+                document.getElementById('change-password').addEventListener('click', () => {
+                    const section = document.getElementById('cloudinit-section');
+                    section.classList.toggle('hidden');
+                    section.scrollIntoView({ behavior: 'smooth' });
+                });
+
+                // Cloud Init password form
+                document.getElementById('cloudinit-password-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const password = document.getElementById('cloudinit-password').value;
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Updating...';
+
+                    try {
+                        const response = await fetch(`/api/vps/${vmId}/cloudinit/password`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ password })
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            showAlert('success', 'Success', result.message || 'Password updated. Restart VM to apply.');
+                            document.getElementById('cloudinit-password').value = '';
+                        } else {
+                            showAlert('error', 'Error', result.error || 'Failed to update password');
+                        }
+                    } catch (error) {
+                        showAlert('error', 'Error', 'Failed to update password');
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '<%= __('vps.manage.update_password') %>';
+                    }
+                });
+
+                loadVMDetails();
+
+                setInterval(refreshStats, 5000);
+            </script>
+
+            <%- include('../components/bottom') %>
