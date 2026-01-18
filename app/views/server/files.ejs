@@ -667,14 +667,6 @@ function hideLoading() {
     document.getElementById('loading-overlay').classList.remove('active');
 }
 
-// Fetch server info
-fetch(`/api/server/${serverId}`)
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('server-name').textContent = data.attributes.name;
-        document.getElementById('server-description').textContent = data.attributes.description || "<%= __('server.files.no_description') %>";
-    });
-
 function getSelectedFiles() {
     return Array.from(document.querySelectorAll(viewMode === 'grid' ? '.file-card input[type="checkbox"]:checked' : '.file-row input[type="checkbox"]:checked'))
         .map(checkbox => checkbox.getAttribute('data-name'));

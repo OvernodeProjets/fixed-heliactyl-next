@@ -61,17 +61,6 @@ const serverId = new URLSearchParams(window.location.search).get('id');
 let currentPage = 1;
 let pageSize = 20;
 
-// Load server details
-function loadServerDetails() {
-    fetch(`/api/server/${serverId}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('server-name').textContent = data.attributes.name;
-            document.getElementById('server-description').textContent = data.attributes.description || "<%= __('server.logs.no_description') %>";
-        })
-        .catch(error => console.error('Error loading server details:', error));
-}
-
 // Function to format timestamp
 function formatDate(timestamp) {
     const date = new Date(timestamp);
@@ -223,10 +212,7 @@ document.getElementById('page-size').addEventListener('change', (e) => {
 });
 
 // Initialize page
-document.addEventListener('DOMContentLoaded', () => {
-    loadServerDetails();
-    loadActivityLogs();
-});
+document.addEventListener('DOMContentLoaded', () => loadActivityLogs);
 </script>
 
 <%- include('../components/bottom') %>

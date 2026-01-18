@@ -116,12 +116,6 @@ async function loadServerData() {
         
         serverData = await response.json();
         
-        document.getElementById('server-name').textContent = serverData.attributes.name;
-        if(document.getElementById('server-name-breadcrumb')) {
-            document.getElementById('server-name-breadcrumb').textContent = serverData.attributes.name;
-        }
-        document.getElementById('server-description').textContent = serverData.attributes.description || "<%= __('website.subusers.no_description') %>";
-        
         // Current server limits
         const currentRam = serverData.attributes.limits.memory;
         const currentCpu = serverData.attributes.limits.cpu;
