@@ -184,20 +184,6 @@
     const serverId = new URLSearchParams(window.location.search).get('id');
     let worldToDelete = null;
 
-    function loadServerDetails() {
-        fetch(`/api/server/${serverId}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('server-name').textContent = data.attributes.name;
-                document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
-                document.getElementById('server-description').textContent = data.attributes.description || "<%= __('website.worlds.no_description') %>";
-            })
-            .catch(error => {
-                console.error('Error fetching server details:', error);
-                showError('<%= __('website.worlds.errors.load_details') %>');
-            })
-    }
-
     function loadWorlds() {
         document.getElementById('worlds-loading').classList.remove('hidden');
         document.getElementById('worlds-list').classList.add('hidden');
@@ -471,10 +457,7 @@
     document.getElementById('confirm-delete').addEventListener('click', deleteWorld);
 
     // Initial load
-    document.addEventListener('DOMContentLoaded', () => {
-        loadServerDetails();
-        loadWorlds();
-    });
+    document.addEventListener('DOMContentLoaded', () => loadWorlds);
 
     function formatFileSize(bytes) {
         if (bytes === 0) return '0 Bytes';

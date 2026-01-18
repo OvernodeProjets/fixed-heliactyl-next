@@ -139,13 +139,7 @@
         subuserToDelete = null;
     });
 
-    fetch(`/api/server/${serverId}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('server-name').textContent = data.attributes.name;
-            document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
-            document.getElementById('server-description').textContent = data.attributes.description || "<%= __('website.subusers.no_description') %>";
-        });
+    document.getElementById('confirm-delete').addEventListener('click', deleteSubuser);
 
     loadSubuserList();
 

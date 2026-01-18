@@ -425,22 +425,18 @@ function fetchServerDetails() {
             if (data.status === 'suspended') {
                 return;
             }
-            const serverName = document.getElementById('server-name');
             const serverNameCard = document.getElementById('server-name-card');
-            const serverNameBreadcrumb = document.getElementById('server-name-breadcrumb');
-            const serverDescription = document.getElementById('server-description');
             const nodeElement = document.getElementById('node');
 
-            if (serverName) serverName.textContent = data.attributes.name;
             if (serverNameCard) serverNameCard.textContent = data.attributes.name;
             const mobileServerNameCard = document.getElementById('mobile-server-name-card');
             if (mobileServerNameCard) mobileServerNameCard.textContent = data.attributes.name;
-            if (serverNameBreadcrumb) serverNameBreadcrumb.textContent = data.attributes.name;
-            if (serverDescription) serverDescription.textContent = data.attributes.description || "<%= __('server.manage.no_description') %>";
+
             nodeName = data.attributes.node;
             if (nodeElement) nodeElement.textContent = nodeName;
             const mobileNodeElement = document.getElementById('mobile-node');
             if (mobileNodeElement) mobileNodeElement.textContent = nodeName;
+
             const limitConfigs = {
                 cpu: {
                     element: 'cpu-limit-card',

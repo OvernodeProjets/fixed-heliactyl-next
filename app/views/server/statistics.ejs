@@ -381,15 +381,6 @@ function connectWebSocket() {
 
 // Initialize
 if (document.readyState !== "loading") {
-    // Load server details
-    fetch(`/api/server/${serverId}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('server-name').textContent = data.attributes.name;
-            document.getElementById('server-description').textContent = 
-                data.attributes.description || '<%= __('server.statistics.no_description') %>';
-        });
-
     // Connect WebSocket
     connectWebSocket();
 

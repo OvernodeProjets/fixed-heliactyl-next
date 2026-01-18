@@ -65,21 +65,6 @@
         noDirectIp: <%- JSON.stringify(__('server.allocations.no_direct_ip')) %>
     };
 
-    // Function to load server details
-    function loadServerDetails() {
-        fetch(`/api/server/${serverId}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('server-name').textContent = data.attributes.name;
-                document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
-                document.getElementById('server-description').textContent = data.attributes.description || t.noDescription;
-            })
-            .catch(error => {
-                console.error('Error fetching server details:', error);
-                showError(t.loadDetailsError);
-            })
-    }
-
     // function to fetch allocations
     function fetchAllocationList() {
       document.getElementById('allocations-list').classList.add('hidden');
@@ -236,11 +221,8 @@
         });
     }
 
-    // Load server details when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-      loadServerDetails();
-      fetchAllocationList();
-    });
+    // Load server allocations when the page loads
+    document.addEventListener('DOMContentLoaded', () => fetchAllocationList);
 </script>
 
 <%- include('../components/bottom') %>

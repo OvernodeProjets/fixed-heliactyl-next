@@ -153,9 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             document.getElementById('sftp-host').textContent = `sftp://${sftpHost}:${data.attributes.sftp_details.port}`;
             document.getElementById('sftp-username').textContent = `<%= req.session.pterodactyl.username %>.${data.attributes.identifier}`;
-            document.getElementById('server-name').textContent = data.attributes.name;
-            document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
-            document.getElementById('server-description').textContent = data.attributes.description || "<%= __('server.settings.no_description') %>";
         });
 });
 </script>
