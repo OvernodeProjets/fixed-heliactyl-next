@@ -3,54 +3,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
 <style>
-  .scrollbar-hide {
+  #console-output {
     -ms-overflow-style: none;
     scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-  #console-output {
-    font-family: 'JetBrains Mono', monospace;
-    line-height: 1.2;
-  }
-  .console-line {
-    padding: 4px 4px;
-    margin: 1px 0;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .console-line:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-  .console-line-content {
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-  .console-line-info {
-    align-items: center;
-    gap: 4px;
-    opacity: 0.5;
-    transition: opacity 0.2s ease;
-    font-size: 0.7rem;
-  }
-  .console-line:hover .console-line-info {
-    opacity: 1;
-  }
-  .copy-icon, .tick-icon {
-    cursor: pointer;
-display:none;
-    width: 12px;
-    height: 12px;
-  }
-  .internal-icon {
-    margin-right: 2px;
-    color: #fbbf24;
-    width: 12px;
-    height: 12px;
   }
   #console-output::-webkit-scrollbar {
     width: 6px;
@@ -72,53 +27,9 @@ display:none;
       transform: translateY(0);
     }
   }
-  .slide-in {
-    animation: slideIn 0.3s ease-out forwards;
-  }
-  .transition-all {
-    transition: all 0.3s ease;
-  }
-  .hover-scale {
-    transition: transform 0.2s ease;
-  }
-  .card {
-    background-color: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-  }
-  .card:hover {
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px);
-  }
-  .loading-spinner {
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top: 3px solid #fff;
-    width: 24px;
-    height: 24px;
-    animation: spin 1s linear infinite;
-  }
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  .fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  .fade-out {
-    animation: fadeOut 0.5s ease-out forwards;
-  }
-  @keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
-  }
 </style>
 
-<main class="flex-grow container mx-auto px-4 py-8 transition-all">
+<main class="flex-grow container mx-auto px-4 py-8 transition-all duration-300 ease-in-out">
     <%- include('../components/server_header', {
         backButtonText: 'Back to server list'
     }) %>   
@@ -151,7 +62,7 @@ display:none;
             </div>
         </div>
 
-        <div class="card rounded-xl p-6 mb-4">
+        <div class="bg-white/5 shadow-md transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-0.5 rounded-xl p-4 md:p-6 mb-4">
             <div class="flex items-center justify-between mb-2">
                 <h2 class="text-lg font-semibold text-white heavy" id="mobile-server-name-card">Loading...</h2>
                 <span id="mobile-server-status" class="px-2 py-1 rounded-full text-xs font-medium text-yellow-500 bg-yellow-500/15">Loading...</span>
@@ -200,14 +111,13 @@ display:none;
 <div id="alert-container" class="mb-4 space-y-2"></div>
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div class="min-w-0 lg:col-span-3 space-y-6">
+        <div class="lg:col-span-3 space-y-6">
             
-            <div class="card rounded-xl p-6">
+            <div class="bg-white/5 shadow-md transition-all duration-300 ease-in-out hover:shadow-lg rounded-xl p-4 md:p-6">
                 <h2 class="text-xl font-semibold"><%= __('server.manage.console') %></h2>
                 <span class="text-gray-300 text-sm mt-1 mb-4"><%= __('server.manage.console_hint') %></span>
                 <div class="border-t border-white/5 mt-4"></div>
-                <div style="height: 30rem;" id="console-output" class="bg-black/20 p-1 md:p-4 rounded-md md:rounded-xl border border-white/5 shadow-sm scrollbar-hide mt-4 overflow-y-auto mb-4 font-mono text-[0.7rem] sm:text-[0.85rem]">
-                </div>
+                <div id="console-output" class="h-120 bg-black/20 p-1 md:p-4 rounded-md md:rounded-xl border border-white/5 shadow-sm mt-4 overflow-y-auto mb-4 font-mono text-[0.7rem] sm:text-[0.85rem]"></div>
                 <div class="flex border-t border-white/5 pt-2 md:pt-4">
                     <input type="text" id="console-input" class="flex-grow-1 min-w-0 border-none bg-transparent text-white py-2 pr-2 focus:border-white/5 focus:outline-none focus:ring-2 focus:ring-transparent transition placeholder-white/30" placeholder="container@<%= settings.name %>~">
                     <button id="send-command" class="flex bg-indigo-500/15 hover:bg-indigo-500/20 text-indigo-200 font-medium py-2 px-2 sm:px-4 rounded-xl transition duration-300 items-center">
@@ -220,44 +130,44 @@ display:none;
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white/5 rounded-l-2xl rounded-lg p-6">
+                <div class="bg-white/5 rounded-lg p-4 md:p-6 hover:-translate-y-0.5 transition-all duration-300 ease-in-out">
                     <h3 class="text-sm font-semibold mb-2 text-white/60"><%= __('server.manage.cpu_usage') %></h3>
                     <div class="flex items-center">
                         <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
-                            <div class="bg-emerald-600 h-2 rounded-full transition-all" id="cpu-usage-bar" style="width: 0%"></div>
+                            <div class="bg-emerald-600 h-2 rounded-full transition-all duration-300 ease-in-out" id="cpu-usage-bar" style="width: 0%"></div>
                         </div>
                         <span id="cpu-usage" class="text-sm font-medium">0%</span>
                     </div>
                 </div>
-                <div class="bg-white/5 rounded-lg p-6">
+                <div class="bg-white/5 rounded-lg p-4 md:p-6 hover:-translate-y-0.5 transition-all duration-300 ease-in-out">
                     <h3 class="text-sm font-semibold mb-2 text-white/60"><%= __('server.manage.memory_usage') %></h3>
                     <div class="flex items-center">
                         <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
-                            <div class="bg-emerald-600 h-2 rounded-full transition-all" id="ram-usage-bar" style="width: 0%"></div>
+                            <div class="bg-emerald-600 h-2 rounded-full transition-all duration-300 ease-in-out" id="ram-usage-bar" style="width: 0%"></div>
                         </div>
                         <span id="ram-usage" class="text-sm font-medium">0MB</span>
                     </div>
                 </div>
-                <div class="bg-white/5 rounded-lg p-6">
+                <div class="bg-white/5 rounded-lg p-4 md:p-6 hover:-translate-y-0.5 transition-all duration-300 ease-in-out">
                     <h3 class="text-sm font-semibold mb-2 text-white/60"><%= __('server.manage.disk_usage') %></h3>
                     <div class="flex items-center">
                         <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
-                            <div class="bg-emerald-600 h-2 rounded-full transition-all" id="disk-usage-bar" style="width: 0%"></div>
+                            <div class="bg-emerald-600 h-2 rounded-full transition-all duration-300 ease-in-out" id="disk-usage-bar" style="width: 0%"></div>
                         </div>
                         <span id="disk-usage" class="text-sm font-medium">0MB</span>
                     </div>
                 </div>
-                <div class="bg-white/5 rounded-r-2xl rounded-lg p-6">
+                <div class="bg-white/5 rounded-lg p-4 md:p-6 hover:-translate-y-0.5 transition-all duration-300 ease-in-out">
                     <h3 class="text-sm font-semibold mb-2 text-white/60"><%= __('server.manage.network_out') %></h3>
                     <div class="flex items-center">
                         <div class="w-full bg-white/10 rounded-xl h-2 mr-2">
-                            <div class="bg-emerald-600 h-2 rounded-full transition-all" id="network-usage-bar" style="width: 0%"></div>
+                            <div class="bg-emerald-600 h-2 rounded-full transition-all duration-300 ease-in-out" id="network-usage-bar" style="width: 0%"></div>
                         </div>
                         <span id="network-usage" class="text-sm font-medium">0B</span>
                     </div>
                 </div>
             </div>
-            <div class="card rounded-xl p-6">
+            <div class="bg-white/5 shadow-md transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-0.5 rounded-xl p-4 md:p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h2 class="text-xl font-semibold"><%= __('server.manage.renewal_title') %></h2>
@@ -280,7 +190,7 @@ display:none;
                                 <div id="renewal-time" class="text-lg font-medium"><%= __('server.manage.loading') %></div>
                             </div>
                         </div>
-                        <button id="renew-server" disabled class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-xl transition duration-300 hover-scale hidden">
+                        <button id="renew-server" disabled class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-xl transition-transform ease-in-out duration-200 hidden">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline-block mr-1 mb-0.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                             </svg>
@@ -289,7 +199,7 @@ display:none;
                     </div>
                     <div class="mt-4">
                         <div class="w-full bg-white/10 rounded-2xl h-2">
-                            <div id="renewal-progress-bar" class="bg-emerald-600 h-2 rounded-full transition-all" style="width: 0"></div>
+                            <div id="renewal-progress-bar" class="bg-emerald-600 h-2 rounded-full transition-all duration-300 ease-in-out" style="width: 0"></div>
                         </div>
                     </div>
                 </div>
@@ -347,7 +257,7 @@ display:none;
                     Settings
                 </div>
             </div>
-            <div class="hidden md:block card rounded-xl p-6">
+            <div class="hidden md:block bg-white/5 shadow-md transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-0.5 rounded-xl p-4 md:p-6">
                 <div class="flex items-center justify-between mb-2">
                     <h2 class="text-lg font-semibold text-white heavy" id="server-name-card">Loading...</h2>
                     <span id="server-status" class="px-2 py-1 rounded-full text-xs font-medium text-yellow-500 bg-yellow-500/15">Loading...</span>
@@ -407,16 +317,6 @@ const retryDelay = 5000;
 let isMinecraft = false;
 let randomId = () => Math.random().toString(36).substring(2, 8);
 let renewalConfig = { renewalPeriod: 48, warningThreshold: 24 };
-
-function showLoading(elementId) {
-    const element = document.getElementById(elementId);
-    element.innerHTML = '<div class="loading-spinner mx-auto"></div>';
-}
-
-function hideLoading(elementId) {
-    const element = document.getElementById(elementId);
-    element.innerHTML = '';
-}
 
 function fetchServerDetails() {
     fetch(`/api/server/${serverId}`)
@@ -616,17 +516,17 @@ function createConsoleLogElement(message, isInternal = false) {
     const timestamp = now.toLocaleTimeString();
     
     const logElement = document.createElement('div');
-    logElement.className = 'console-line slide-in';
+    logElement.className = 'group py-0.5 px-1 md:py-1 md:px-1.5 rounded-sm flex items-center md:justify-between transition-all duration-300 ease-in-out hover:bg-white/5 animate-[slideIn_0.3s_ease-out_forwards]';
     
     const contentElement = document.createElement('span');
-    contentElement.className = 'console-line-content';
+    contentElement.className = 'whitespace-pre-wrap wrap-anywhere';
     contentElement.innerHTML = formatConsoleOutput(message);
     
     const infoElement = document.createElement('span');
-    infoElement.className = 'console-line-info hidden md:flex';
+    infoElement.className = 'hidden group-hover:opacity-1 md:flex items-center gap-1 opacity-0.5 transition-all text-xs';
     infoElement.innerHTML = `
-        ${isInternal ? '<svg class="internal-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>' : ''}
-        <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+        ${isInternal ? '<svg class="mr-0.5 text-amber-500 size-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>' : ''}
+        <svg class="cursor-pointer hidden size-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
         </svg>
         <span class="timestamp">${timestamp}</span>
@@ -920,7 +820,7 @@ function sendCommand() {
 
 const eulaPopupHTML = `
 <div id="eula-popup" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
-  <div class="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-3xl shadow-2xl w-[85%] md:w-[50%] mx-4 slide-in">
+  <div class="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-3xl shadow-2xl w-[85%] md:w-[50%] mx-4 animate-[slideIn_0.3s_ease-out_forwards]">
     <div class="flex items-center mb-6">
       <div class="bg-indigo-500/15 p-3 rounded-xl mr-4">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-indigo-300">
@@ -938,10 +838,10 @@ const eulaPopupHTML = `
     </div>
     
     <div class="flex flex-col gap-y-3 md:flex-row gap-3">
-      <button id="decline-eula" class="flex-1 px-4 py-2.5 bg-red-600/20 border border-red-600/30 text-red-300 rounded-xl hover:bg-red-600/30 transition-all duration-300 font-medium">
+      <button id="decline-eula" class="flex-1 px-4 py-2.5 bg-red-600/20 border border-red-600/30 text-red-300 rounded-xl hover:bg-red-600/30 transition-all duration-300 ease-in-out font-medium">
         Decline
       </button>
-      <button id="accept-eula" class="flex-1 px-4 py-2.5 bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 rounded-xl hover:bg-indigo-500/25 transition-all duration-300 font-medium">
+      <button id="accept-eula" class="flex-1 px-4 py-2.5 bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 rounded-xl hover:bg-indigo-500/25 transition-all duration-300 ease-in-out font-medium">
         Accept & Start
       </button>
     </div>
@@ -1077,11 +977,11 @@ async function checkRenewalStatus() {
             
             // Update progress bar color based on time remaining
             if (data.timeRemaining.hours <= 6) {
-                progressBar.className = 'bg-red-600 h-2 rounded-full transition-all';
+                progressBar.className = 'bg-red-600 h-2 rounded-full transition-all duration-300 ease-in-out';
             } else if (data.timeRemaining.hours < renewalConfig.warningThreshold) {
-                progressBar.className = 'bg-yellow-600 h-2 rounded-full transition-all';
+                progressBar.className = 'bg-yellow-600 h-2 rounded-full transition-all duration-300 ease-in-out';
             } else {
-                progressBar.className = 'bg-emerald-600 h-2 rounded-full transition-all';
+                progressBar.className = 'bg-emerald-600 h-2 rounded-full transition-all duration-300 ease-in-out';
             }
         }
 }
