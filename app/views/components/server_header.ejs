@@ -48,13 +48,14 @@
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
   try {
+    const serverId = new URLSearchParams(window.location.search).get('id');
     const response = await fetch(`/api/server/${serverId}`);
     const data = await response.json();
     
     document.getElementById('server-name').textContent = data.attributes.name;
     document.getElementById('server-description').textContent = data.attributes.description || "<%= __('server.files.no_description') %>";
   } catch (error) {
-    console.log('Error loading server details: ' + error)
+    console.error('Error loading server details: ' + error)
   }
 })
 </script>
