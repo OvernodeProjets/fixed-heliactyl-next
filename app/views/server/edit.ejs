@@ -3,7 +3,7 @@
     <%- include('../components/server_header', {
         backButtonText: __('server.settings.back_to_list')
     }) %>      
-<div id="alert-container" class="mb-4 space-y-2"></div>
+<div id="alert-container" class="mb-4 sticky top-20 space-y-2"></div>
     <% if (req.query.err) { %>
         <div class="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
             <div class="flex items-center gap-3">
