@@ -10,3 +10,4 @@ backup/
 backup-*
 tests/
 logs/
+agents.md

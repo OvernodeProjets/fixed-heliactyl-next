@@ -8,6 +8,5 @@
 - [ ] translate all pages to english (minimum)
 - [ ] remake an clean structure of the project
 - [X] Add linkvertise
-- [ ] Fix advent date (should stop the 25 but it doesn't)
-- [ ] 
-- [ ] 
+- [X] Fix advent date (should stop the 25 but it doesn't)
+- [X] Implement caching for Pterodactyl API results
