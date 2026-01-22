@@ -26,6 +26,7 @@ const Queue = require("../handlers/Queue.js");
 const {discordLog} = require("../handlers/log.js");
 const { requireAuth } = require("../handlers/checkMiddleware.js");
 const { getAppAPI } = require('../handlers/pterodactylSingleton.js');
+const { getLocationService } = require('../handlers/LocationService.js');
 
 if (settings?.pterodactyl?.domain?.endsWith("/")) {
   settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
@@ -233,11 +234,12 @@ router.get("/server/create", authMiddleware, async (req, res) => {
             }
                 const specs = egginfo.info;
 
-                // Pre-flight check: verify location has available allocations
+                // Pre-flight check: verify location has available capacity using LocationService
                 try {
-                    const availability = await AppAPI.checkLocationAvailability(location);
-                    if (!availability.available) {
-                        console.warn(`Location ${location} out of stock:`, availability.reason);
+                    const locationService = getLocationService();
+                    const locations = await locationService.getLocations();
+                    if (!locations[location] || locations[location].availableCapacity <= 0) {
+                        console.warn(`Location ${location} out of stock: No available capacity`);
                         return res.redirect(`/server/new?err=NODEOUTOFSTOCK`);
                     }
                 } catch (checkErr) {

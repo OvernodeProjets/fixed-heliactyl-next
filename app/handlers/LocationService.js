@@ -137,7 +137,12 @@ class LocationService {
       
       const totalAllocations = allocations.length;
       const usedAllocations = allocations.filter(a => a.attributes.assigned).length;
-      const availableAllocations = totalAllocations - usedAllocations;
+      let availableAllocations = totalAllocations - usedAllocations;
+
+      // Calculate memory usage (with overallocation percentage)
+      const nodeMemory = attrs.memory * (1 + (attrs.memory_overallocate || 0) / 100);
+      const usedNodeMemory = servers.reduce((acc, server) => acc + (server.attributes.limits.memory || 0), 0);
+      const availableNodeMemory = Math.max(0, nodeMemory - usedNodeMemory);
 
       // Calculate disk usage
       // Pterodactyl node disk is in MB
@@ -145,11 +150,33 @@ class LocationService {
       const usedNodeDisk = servers.reduce((acc, server) => acc + (server.attributes.limits.disk || 0), 0);
       const availableNodeDisk = Math.max(0, nodeDisk - usedNodeDisk);
 
+      // Calculate capacity based on default package resources
+      const defaultPackageName = settings.api?.client?.packages?.default;
+      const defaultPackage = defaultPackageName ? settings.api.client.packages.list[defaultPackageName] : null;
+
+      if (defaultPackage) {
+        // Calculate max servers possible based on RAM and Disk availabilit
+        const maxServersRam = Math.floor(availableNodeMemory / defaultPackage.ram);
+        const maxServersDisk = Math.floor(availableNodeDisk / defaultPackage.disk);
+        
+        // The real available capacity is the minimum of:
+        // 1. Available allocations (ports)
+        // 2. How many servers we can fit in RAM
+        // 3. How many servers we can fit in Disk
+        availableAllocations = Math.min(availableAllocations, maxServersRam, maxServersDisk);
+      } else {
+        if (availableNodeMemory < 128 || availableNodeDisk < 128) {
+          availableAllocations = 0;
+        }
+      }
+
       const nodeData = {
         id: attrs.id,
         name: attrs.name,
         fqdn: attrs.fqdn,
-        memory: attrs.memory,
+        memory: nodeMemory,
+        usedMemory: usedNodeMemory,
+        availableMemory: availableNodeMemory,
         disk: nodeDisk,
         usedDisk: usedNodeDisk,
         availableDisk: availableNodeDisk,
