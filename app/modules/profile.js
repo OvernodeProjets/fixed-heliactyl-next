@@ -10,6 +10,7 @@ const AppAPI = new ApplicationAPI(settings.pterodactyl.domain, settings.pterodac
 const getPteroUser = require("../handlers/getPteroUser");
 const { discordLog, addNotification } = require("../handlers/log");
 const { requireAuth } = require("../handlers/checkMiddleware");
+const { deleteWorkflow } = require("./server.js");
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -261,7 +262,9 @@ module.exports.load = async function (router, db) {
         if (servers?.length) {
           const deletePromises = servers.map(async (server) => {
             try {
-              await AppAPI.deleteServer(server.attributes.id, true);
+              const serverId = server.attributes.id;
+              await AppAPI.deleteServer(serverId, true);
+              deleteWorkflow(serverId);
               return { success: true, name: server.attributes.name || server.attributes.identifier };
             } catch (error) {
               console.error(`Error deleting server ${server.attributes.id}:`, error);

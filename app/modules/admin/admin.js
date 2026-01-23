@@ -30,6 +30,7 @@ const { discordLog } = require("../../handlers/log.js");
 const getPteroUser = require("../../handlers/getPteroUser.js");
 const { getAppAPI } = require('../../handlers/pterodactylSingleton.js');
 const { requireAuth } = require("../../handlers/checkMiddleware.js");
+const { deleteWorkflow } = require("../server.js");
 
 module.exports.load = async function (router, db) {
   const AppAPI = getAppAPI();
@@ -389,6 +390,7 @@ module.exports.load = async function (router, db) {
             
             // Delete the server from Pterodactyl
             await AppAPI.deleteServer(serverId, true);
+            deleteWorkflow(serverId);
             deletedServers.push(server.attributes.name || server.attributes.identifier);
           } catch (error) {
             console.error(`Error deleting server ${serverId}:`, error);

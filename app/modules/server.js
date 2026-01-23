@@ -25,6 +25,7 @@ const axios = require("axios");
 const FormData = require("form-data");
 const path = require("path");
 const fs = require("fs");
+const cluster = require("cluster");
 const schedule = require("node-schedule");
 const { requireAuth, ownsServer } = require("../handlers/checkMiddleware.js")
 const { discordLog, serverActivityLog } = require("../handlers/log.js");
@@ -140,7 +141,25 @@ module.exports.load = async function (router, db) {
   }
 
 
-  loadScheduledWorkflows();
+  if (cluster.isWorker && cluster.worker.id === 1) {
+    loadScheduledWorkflows();
+    setInterval(async () => {
+      try {
+        const workflows = JSON.parse(fs.readFileSync(workflowsFilePath, "utf8"));
+        const instanceIds = Object.keys(workflows);
+        for (const id of instanceIds) {
+          const details = await pterodactylClient.getServerDetails(id);
+          if (details === null) {
+            console.log(`[Workflow Cleanup] Server ${id} not found, deleting orphan workflow.`);
+            deleteWorkflow(id);
+          }
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      } catch (err) {
+        // Silently fail if file doesn't exist yet or other issues
+      }
+    }, 60 * 60 * 1000); // Run every hour
+  }
 
 // GET /api/server/:id/logs - Get server activity logs
 router.get('/server/:id/logs', authMiddleware, ownsServer(db), async (req, res) => {
@@ -297,14 +316,19 @@ router.put('/server/:id/variables', authMiddleware, ownsServer(db), async (req, 
   );
 };
 
+module.exports.deleteWorkflow = deleteWorkflow;
+
 function scheduleWorkflowExecution(instanceId, workflow) {
   const blocks = workflow.blocks;
   const intervalBlock = blocks.find((block) => block.type === "interval");
 
   if (intervalBlock) {
-    const intervalMinutes = parseInt(intervalBlock.meta.selectedValue, 10);
+    let intervalMinutes = parseFloat(intervalBlock.meta.selectedValue);
+    if (isNaN(intervalMinutes) || intervalMinutes < 1) {
+      intervalMinutes = 1;
+    }
     const rule = new schedule.RecurrenceRule();
-    rule.minute = new schedule.Range(0, 59, intervalMinutes);
+    rule.minute = new schedule.Range(0, 59, Math.floor(intervalMinutes));
 
     const jobId = `job_${instanceId}`;
 
