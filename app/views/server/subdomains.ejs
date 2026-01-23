@@ -3,7 +3,7 @@
     <%- include('../components/server_header', {
         backButtonText: __('website.subdomains.back_to_list')
     }) %>
-<div id="alert-container" class="mb-4 space-y-2"></div>
+<div id="alert-container" class="mb-4 sticky top-20 space-y-2"></div>
 <%- include('../components/server') %>
 
     <!-- Subdomains Section -->
@@ -88,19 +88,6 @@
     // Load server details and subdomains
     // Initialize availableDomains from settings
     const availableDomains = JSON.parse('<%- JSON.stringify(settings.cloudflare.domains) %>');
-
-    function loadServerDetails() {
-        fetch(`/api/server/${serverId}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('server-name').textContent = data.attributes.name;
-            document.getElementById('server-description').textContent = data.attributes.description || "<%= __('website.subdomains.errors.load_details') %>";
-            })
-            .catch(error => {
-                console.error('Error fetching server details:', error);
-                showToast('<%= __('website.subdomains.errors.load_details') %>', 'error');
-            });
-    }
 
     // Set initial domain suffix
     function initializeDomainSuffix() {
@@ -303,7 +290,6 @@ function deleteSubdomain(subdomain, domain) {
 
     // Initial load
     document.addEventListener('DOMContentLoaded', () => {
-        loadServerDetails();
         initializeDomainSuffix();
         loadSubdomains();
     });

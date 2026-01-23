@@ -3,7 +3,7 @@
     <%- include('../components/server_header', {
         backButtonText: __('server.logs.back_to_list')
     }) %>      
-    <div id="alert-container" class="mb-4 space-y-2"></div>
+    <div id="alert-container" class="mb-4 sticky top-20 space-y-2"></div>
     <%- include('../components/server') %>
 
     <div class="bg-white/5 rounded-xl p-6 mt-6">
@@ -60,17 +60,6 @@
 const serverId = new URLSearchParams(window.location.search).get('id');
 let currentPage = 1;
 let pageSize = 20;
-
-// Load server details
-function loadServerDetails() {
-    fetch(`/api/server/${serverId}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('server-name').textContent = data.attributes.name;
-            document.getElementById('server-description').textContent = data.attributes.description || "<%= __('server.logs.no_description') %>";
-        })
-        .catch(error => console.error('Error loading server details:', error));
-}
 
 // Function to format timestamp
 function formatDate(timestamp) {
@@ -223,10 +212,7 @@ document.getElementById('page-size').addEventListener('change', (e) => {
 });
 
 // Initialize page
-document.addEventListener('DOMContentLoaded', () => {
-    loadServerDetails();
-    loadActivityLogs();
-});
+document.addEventListener('DOMContentLoaded', () => loadActivityLogs);
 </script>
 
 <%- include('../components/bottom') %>

@@ -3,7 +3,7 @@
     <%- include('../components/server_header', {
         backButtonText: __('server.allocations.back_to_list')
     }) %>   
-<div id="alert-container" class="mb-4 space-y-2"></div>
+<div id="alert-container" class="mb-4 sticky top-20 space-y-2"></div>
     <%- include('../components/server') %>
 
     <!-- Current Allocations -->
@@ -65,27 +65,24 @@
         noDirectIp: <%- JSON.stringify(__('server.allocations.no_direct_ip')) %>
     };
 
-    // Function to load server details
-    function loadServerDetails() {
-        document.getElementById('allocations-loading').classList.remove('hidden');
-        document.getElementById('allocations-list').classList.add('hidden');
-        document.getElementById('allocations-empty').classList.add('hidden');
+    // function to fetch allocations
+    function fetchAllocationList() {
+      document.getElementById('allocations-list').classList.add('hidden');
+      document.getElementById('allocations-empty').classList.add('hidden');
+      document.getElementById('allocations-loading').classList.remove('hidden');
 
-        fetch(`/api/server/${serverId}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('server-name').textContent = data.attributes.name;
-                document.getElementById('server-name-breadcrumb').textContent = data.attributes.name;
-                document.getElementById('server-description').textContent = data.attributes.description || t.noDescription;
-                updateAllocationsList(data.attributes.relationships.allocations.data);
-            })
-            .catch(error => {
-                console.error('Error fetching server details:', error);
-                showError(t.loadDetailsError);
-            })
-            .finally(() => {
-                document.getElementById('allocations-loading').classList.add('hidden');
-            });
+      fetch(`/api/server/${serverId}/allocations`)
+        .then(response => response.json())
+        .then(data => {
+          updateAllocationsList(data.data);
+        })
+        .catch(error => {
+          console.error('Error fetching allocation list:', error);
+          showError(t.loadDetailsError);
+        })
+        .finally(() => {
+          document.getElementById('allocations-loading').classList.add('hidden');
+        });
     }
 
     // Function to update the allocations list
@@ -183,7 +180,7 @@
             return response.json();
         })
         .then(data => {
-            loadServerDetails();
+            fetchAllocationList();
         })
         .catch(error => {
             showError(t.createLimit);
@@ -203,28 +200,29 @@
     function deleteAllocation(allocationId) {
         if (!allocationId) {
             showError('Missing allocation Id!')
+            return;
         }
         if (!confirm(t.confirmDelete + '?')) {
             return;
         }
 
         fetch(`/api/server/${serverId}/allocations/${allocationId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
         })
         .then(response => {
             if (!response.ok) {
                 if (response.status === 404) throw new Error('The selected allocation does not exist');
                 throw new Error(response.status)
             }
-            loadServerDetails();
+            fetchAllocationList();
         })
         .catch(error => {
             showError(t.deleteFailed + '\n' + error);
         });
     }
 
-    // Load server details when the page loads
-    document.addEventListener('DOMContentLoaded', loadServerDetails);
+    // Load server allocations when the page loads
+    document.addEventListener('DOMContentLoaded', () => fetchAllocationList);
 </script>
 
 <%- include('../components/bottom') %>

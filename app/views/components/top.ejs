@@ -159,17 +159,32 @@
             text-transform: uppercase;
         }
 
+  .fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .fade-out {
+    animation: fadeOut 0.5s ease-out forwards;
+  }
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
     </style>
 </head>
 <body class="min-h-full bg-[#010103] text-gray-300 m-0 overflow-x-hidden overflow-y-scroll" style="font-family: 'Inter'" x-data="{ sidebarOpen: false }" @keydown.escape="sidebarOpen = false">
-  <div class="min-h-screen relative m-[0 auto] w-full">
+  <div class="min-h-screen relative my-0 mx-auto w-full">
     <!-- Swipe gesture handler for mobile sidebar -->
     <script>
     (function() {
         let touchStartX = 0;
         let touchEndX = 0;
         const swipeThreshold = 50; // minimum distance for swipe
-        const edgeWidth = 30; // width of edge detection zone for opening
+        const edgeWidth = 65; // width of edge detection zone for opening
 
         document.addEventListener('touchstart', function(e) {
             touchStartX = e.changedTouches[0].screenX;
@@ -450,21 +465,52 @@ function showToast(type, message, duration = 5000) {
   }, duration);
 }
 
+let showAlertTimeout;
+
 function showAlert(type, title, message, time = 5000) {
+    // clear any timeouts
+    clearTimeout(showAlertTimeout);
+
     const alertContainer = document.getElementById('alert-container');
     const alertElement = document.createElement('div');
-    alertElement.className = `p-4 rounded-2xl ${type === 'error' ? 'bg-red-600 text-white' : 'bg-amber-600 text-white'} fade-in`;
+
+    alertElement.className = 'p-3 md:p-4 rounded-xl md:rounded-2xl text-white fade-in';
+    switch (type) {
+      case "success":
+        alertElement.classList.remove("bg-red-600", "bg-amber-600", "bg-blue-500");
+        alertElement.classList.add("bg-green-400");
+        break;
+      case "warning":
+        alertElement.classList.remove("bg-red-600", "bg-green-400", "bg-blue-500");
+        alertElement.classList.add("bg-amber-600");
+        break;
+      case "error":
+        alertElement.classList.remove("bg-green-400", "bg-amber-600", "bg-blue-500");
+        alertElement.classList.add("bg-red-600");
+        break;
+      case "info":
+        alertElement.classList.remove("bg-red-600", "bg-amber-600", "bg-green-400");
+        alertElement.classList.add("bg-blue-500");
+        break;
+      default:
+        alertElement.classList.remove("bg-red-600", "bg-amber-600", "bg-blue-500");
+        alertElement.classList.add("bg-green-400");
+        break;
+    }
+    
     alertElement.innerHTML = `
         <div class="flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <svg class="size-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
             </svg>
-            <h3 class="text-lg font-medium">${title}</h3>
+            <h3 class="text-md md:text-lg font-medium">${title}</h3>
         </div>
         <p class="mt-2 wrap-anywhere text-sm">${message}</p>
     `;
     alertContainer.appendChild(alertElement);
-    setTimeout(() => {
+
+    showAlertTimeout = setTimeout(() => {
+        alertElement.classList.remove('fade-in');
         alertElement.classList.add('fade-out');
         setTimeout(() => alertContainer.removeChild(alertElement), 500);
     }, time);
