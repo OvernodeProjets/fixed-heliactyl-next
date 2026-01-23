@@ -33,6 +33,9 @@ module.exports.load = async function (router, db) {
   const CHECK_INTERVAL_MINUTES = settings.renewal?.check_interval || 5;
   const AUTO_DELETE_ENABLED = settings.renewal?.auto_delete_enabled || false;
   const AUTO_DELETE_AFTER_HOURS = settings.renewal?.auto_delete_after || 24;
+  const API_DELAY_MS = settings.renewal?.api_delay_ms || 1000;
+
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
   async function initializeRenewalSystem(db) {
     // Start the background task to check for expired servers
@@ -167,7 +170,13 @@ module.exports.load = async function (router, db) {
 
         // If server is expired, shut it down
         if (hoursUntilExpiration <= 0) {
-          await handleExpiredServer(db, serverId);
+          try {
+            await handleExpiredServer(db, serverId);
+          } catch (err) {
+            console.error(`Failed to handle expired server ${serverId}:`, err.message);
+          }
+          // Delay between API calls to avoid rate limiting
+          await delay(API_DELAY_MS);
         }
         // If server is approaching expiration, log a warning
         else if (hoursUntilExpiration <= WARNING_THRESHOLD_HOURS) {

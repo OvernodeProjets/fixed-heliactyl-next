@@ -529,6 +529,7 @@ warning_threshold = 24       # Hours before expiration to show warning
 check_interval = 5           # Minutes between expiration checks
 auto_delete_enabled = false  # Enable automatic server deletion after expiration
 auto_delete_after = 24       # Hours after expiration before server is deleted
+api_delay_ms = 1000          # Delay between API calls in milliseconds (default: 1000)
 
 # ------------------------------------------------------
 # Update Configuration

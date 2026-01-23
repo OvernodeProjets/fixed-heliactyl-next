@@ -147,6 +147,16 @@ class PterodactylClientModule {
         console.log(`Server ${serverId} not found (404), cannot execute power action '${action}'`);
         return null;
       }
+      if (error.response?.status === 409) {
+        // 409 = Rate limit exceeded (TooManyRequestsHttpException)
+        console.warn(`Server ${serverId} power action '${action}' rate limited (409). Will retry on next cycle.`);
+        throw error;
+      }
+      if (error.response?.status === 400) {
+        // 400 = ConflictingServerStateException (server already in requested state)
+        console.log(`Server ${serverId} power action '${action}' returned 400 (already in state). Treating as success.`);
+        return { status: 'already_in_state' };
+      }
       console.error(`Error executing power action '${action}' for server ${serverId}:`, error.message);
       throw error;
     }
