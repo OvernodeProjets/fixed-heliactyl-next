@@ -465,12 +465,7 @@ function showToast(type, message, duration = 5000) {
   }, duration);
 }
 
-let showAlertTimeout;
-
 function showAlert(type, title, message, time = 5000) {
-    // clear any timeouts
-    clearTimeout(showAlertTimeout);
-
     const alertContainer = document.getElementById('alert-container');
     const alertElement = document.createElement('div');
 
@@ -509,7 +504,7 @@ function showAlert(type, title, message, time = 5000) {
     `;
     alertContainer.appendChild(alertElement);
 
-    showAlertTimeout = setTimeout(() => {
+    setTimeout(() => {
         alertElement.classList.remove('fade-in');
         alertElement.classList.add('fade-out');
         setTimeout(() => alertContainer.removeChild(alertElement), 500);

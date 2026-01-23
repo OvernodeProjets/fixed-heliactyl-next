@@ -328,7 +328,6 @@ function fetchServerDetails() {
             const serverNameCard = document.getElementById('server-name-card');
             const nodeElement = document.getElementById('node');
 
-            if (serverName) serverName.textContent = data.attributes.name;
             if (serverNameCard) { 
               serverNameCard.textContent = data.attributes.name; 
               serverNameCard.classList.add('heavy');
