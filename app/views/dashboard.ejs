@@ -31,7 +31,7 @@
               </svg>
               <%= alerts[req.query.err] %>
                 <code style="font-family: 'JetBrains Mono'"
-                  class="text-white/60 break-all">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
+                  class="text-white/60 wrap-anywhere">&nbsp;• action ID <%= Math.random().toString(36).substring(2, 8) %></code>
             </span>
           </div>
           <% } else if (req.query.err && req.query.err==="PTERODACTYL" && req.query.data) { %>
@@ -118,7 +118,7 @@
                                 <%= __('dashboard.welcome_title', { name: settings.name, username:
                                   req.session.userinfo.username }) %>
                               </h2>
-                              <p class="text-white/60 text-sm leading-5">
+                              <p class="text-white/60 text-sm leading-5 wrap-anywhere">
                                 <%- __('dashboard.welcome_description', { currency: settings.website.currency, discord:
                                   settings.website.discord }) %>
                               </p>

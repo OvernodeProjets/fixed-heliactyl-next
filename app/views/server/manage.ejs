@@ -63,8 +63,8 @@
         </div>
 
         <div class="bg-white/5 shadow-md transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-0.5 rounded-xl p-4 md:p-6 mb-4">
-            <div class="flex items-center justify-between mb-2">
-                <h2 class="text-lg font-semibold text-white heavy" id="mobile-server-name-card">Loading...</h2>
+            <div class="flex items-center gap-4 justify-between mb-2">
+                <h2 class="text-lg font-semibold text-white truncate" id="mobile-server-name-card">Loading...</h2>
                 <span id="mobile-server-status" class="px-2 py-1 rounded-full text-xs font-medium text-yellow-500 bg-yellow-500/15">Loading...</span>
             </div>
             <div class="space-y-2 text-sm">
@@ -258,8 +258,8 @@
                 </div>
             </div>
             <div class="hidden md:block bg-white/5 shadow-md transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-0.5 rounded-xl p-4 md:p-6">
-                <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-lg font-semibold text-white heavy" id="server-name-card">Loading...</h2>
+                <div class="flex items-center justify-between gap-4 mb-2">
+                    <h2 class="text-lg font-semibold text-white truncate" id="server-name-card">Loading...</h2>
                     <span id="server-status" class="px-2 py-1 rounded-full text-xs font-medium text-yellow-500 bg-yellow-500/15">Loading...</span>
                 </div>
                 <div class="space-y-2 text-sm">
@@ -328,10 +328,16 @@ function fetchServerDetails() {
             const serverNameCard = document.getElementById('server-name-card');
             const nodeElement = document.getElementById('node');
 
-            if (serverNameCard) serverNameCard.textContent = data.attributes.name;
+            if (serverName) serverName.textContent = data.attributes.name;
+            if (serverNameCard) { 
+              serverNameCard.textContent = data.attributes.name; 
+              serverNameCard.classList.add('heavy');
+            }
             const mobileServerNameCard = document.getElementById('mobile-server-name-card');
-            if (mobileServerNameCard) mobileServerNameCard.textContent = data.attributes.name;
-
+            if (mobileServerNameCard) { 
+              mobileServerNameCard.textContent = data.attributes.name;
+              mobileServerNameCard.classList.add('heavy');
+            }
             nodeName = data.attributes.node;
             if (nodeElement) nodeElement.textContent = nodeName;
             const mobileNodeElement = document.getElementById('mobile-node');
