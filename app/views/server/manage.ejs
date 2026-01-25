@@ -313,7 +313,6 @@ let serverStatus = 'offline';
 let nodeName = '';
 let retryCount = 0;
 const maxRetries = 5;
-const retryDelay = 5000; 
 let isMinecraft = false;
 let randomId = () => Math.random().toString(36).substring(2, 8);
 let renewalConfig = { renewalPeriod: 48, warningThreshold: 24 };
@@ -399,6 +398,18 @@ function fetchServerDetails() {
         });
 }
 
+const refreshButton = document.getElementById('refreshButton');
+refreshButton.addEventListener('click', () => {
+  if (refreshButton.disabled) {
+    showAlert('error', 'Retry Error', 'Already retrying to connect to the server.');
+    return;
+  }
+
+  refreshButton.querySelector('.spin-logo').classList.add('animate-[spin_0.7s_linear_forwards]');
+  retryCount = 0;
+  connectWebSocket();
+});
+
 function connectWebSocket() {
     fetch(`/api/server/${serverId}/websocket`)
         .then(response => response.json())
@@ -412,22 +423,21 @@ function connectWebSocket() {
                 console.log('WebSocket connected');
                 retryCount = 0;
                 socket.send(JSON.stringify({ event: 'auth', args: [data.data.token] }));
-                const alertContainer = document.getElementById('alert-container');
-                const connectionAlert = alertContainer.querySelector('.connection-alert');
-                if (connectionAlert) {
-                    alertContainer.removeChild(connectionAlert);
-                }
+
+                showConnectionError(false, "");
             };
 
             socket.onclose = (event) => {
-                console.log('WebSocket disconnected');
-                if (retryCount < maxRetries) {
-                    retryCount++;
-                    showAlert('warning', 'Connection Lost', `Attempting to reconnect... (${retryCount}/${maxRetries})`);
-                    setTimeout(connectWebSocket, retryDelay);
-                } else {
-                    showAlert('error', 'Connection Failed', 'Unable to connect after multiple attempts. Please refresh the page.');
+                if (retryCount >= maxRetries) {
+                  showConnectionError(true, 'Unable to connect to the server after multiple attempts.', false);
+                  return;
                 }
+
+                console.log('WebSocket disconnected');
+
+                retryCount++;
+                showConnectionError(true, `Connection Lost! Attempting to reconnect... (${retryCount}/${maxRetries})`)
+                connectWebSocket()
             };
 
             socket.onerror = (error) => {
