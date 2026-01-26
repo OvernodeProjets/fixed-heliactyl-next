@@ -17,8 +17,8 @@ const heliactylModule = {
 
 module.exports.heliactylModule = heliactylModule;
 
-const { getClientAPI } = require("../handlers/pterodactylSingleton.js");
-const loadConfig = require("../handlers/config");
+const { getClientAPI } = require("../../handlers/pterodactylSingleton.js");
+const loadConfig = require("../../handlers/config");
 const settings = loadConfig("./config.toml");
 const WebSocket = require("ws");
 const axios = require("axios");
@@ -27,8 +27,8 @@ const path = require("path");
 const fs = require("fs");
 const cluster = require("cluster");
 const schedule = require("node-schedule");
-const { requireAuth, ownsServer } = require("../handlers/checkMiddleware.js")
-const { discordLog, serverActivityLog } = require("../handlers/log.js");
+const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js")
+const { discordLog, serverActivityLog } = require("../../handlers/log.js");
 const pterodactylClient = getClientAPI();
 
 /**

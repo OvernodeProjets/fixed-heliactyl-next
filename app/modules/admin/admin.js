@@ -30,7 +30,7 @@ const { discordLog } = require("../../handlers/log.js");
 const getPteroUser = require("../../handlers/getPteroUser.js");
 const { getAppAPI } = require('../../handlers/pterodactylSingleton.js');
 const { requireAuth } = require("../../handlers/checkMiddleware.js");
-const { deleteWorkflow } = require("../server.js");
+const { deleteWorkflow } = require("../servers/server.js");
 
 module.exports.load = async function (router, db) {
   const AppAPI = getAppAPI();

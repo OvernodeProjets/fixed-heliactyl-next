@@ -20,7 +20,7 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
         }
         @font-face {
             font-family: 'Ndot-55';
-            src: url('/assets/Ndot-55.otf') format('opentype');
+            src: url('/assets/others/Ndot-55.otf') format('opentype');
             font-weight: normal;
             font-display: swap;
         }
@@ -43,7 +43,7 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
             <div class="flex items-center justify-between">
                 <div class="flex lg:flex-1">
                     <a href="/" class="flex items-center">
-                        <img src="/assets/logo-text.png" class="h-10" alt="<%= settings.name %> Logo">
+                        <img src="/assets/images/logo-text.png" class="h-10" alt="<%= settings.name %> Logo">
                     </a>
                 </div>
                 
@@ -142,7 +142,7 @@ const firstLocation = locationCount === 1 ? Object.values(settings.api.client.lo
         <div class="mx-auto max-w-7xl px-6 pb-8 pt-16 sm:pt-24 lg:px-8 lg:pt-32">
             <div class="xl:grid xl:grid-cols-3 xl:gap-8">
                 <div class="space-y-8">
-                    <img class="h-12 invert" src="/assets/logo-text.png" alt="<%= settings.name %> Logo">
+                    <img class="h-12 invert" src="/assets/images/logo-text.png" alt="<%= settings.name %> Logo">
                     <p class="text-sm leading-6 text-gray-300">
                         <% if (locationCount === 1) { %>
                             <%= __('website.footer.about', { name: settings.name, scope: __('website.footer.scope_one', { country: firstLocation.country }) }) %>

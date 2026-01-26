@@ -103,7 +103,7 @@ const discordLog = async (action, message = '', fields = [], isPublic = false) =
         fields : fields,
         author: { name: isPublic ? 'Heliactyl Public Logging' : 'Heliactyl Logging' },
         thumbnail: {
-          url: settings.website.domain + "/assets/logo.png" || "https://i.imgur.com/5D0jaaX.png"  // Default Heliactyl logo
+          url: settings.website.domain + "/assets/images/logo.png" || "https://i.imgur.com/5D0jaaX.png"  // Default Heliactyl logo
         },
       },
     ],

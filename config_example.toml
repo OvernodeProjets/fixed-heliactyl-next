@@ -6,7 +6,7 @@
 # General information
 # ------------------------------------------------------
 name = "Heliactyl"
-icon = "../assets/favicon.png"
+icon = "../assets/images/favicon.png"
 timezone = "Europe/Paris"
 
 # ------------------------------------------------------
