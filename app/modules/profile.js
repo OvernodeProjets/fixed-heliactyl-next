@@ -10,7 +10,7 @@ const AppAPI = new ApplicationAPI(settings.pterodactyl.domain, settings.pterodac
 const getPteroUser = require("../handlers/getPteroUser");
 const { discordLog, addNotification } = require("../handlers/log");
 const { requireAuth } = require("../handlers/checkMiddleware");
-const { deleteWorkflow } = require("./server.js");
+const { deleteWorkflow } = require("./servers/server.js");
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

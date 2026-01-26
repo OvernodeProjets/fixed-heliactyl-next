@@ -27,7 +27,7 @@ const settings = require("./app/handlers/config")("./config.toml");
 
 const VIEWS_DIR = path.join(__dirname, 'app', 'views');
 const PUBLIC_DIR = path.join(__dirname, 'app', 'public');
-const FAVICON_PATH = path.join(PUBLIC_DIR, 'favicon.ico');
+const FAVICON_PATH = path.join(PUBLIC_DIR, 'images/favicon.ico');
 
 const app = express();
 require("express-ws")(app);

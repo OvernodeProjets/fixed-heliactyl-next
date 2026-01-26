@@ -23,7 +23,7 @@ const { requireAuth, ownsServer } = require("../../handlers/checkMiddleware.js")
 const { getClientAPI } = require("../../handlers/pterodactylSingleton.js");
 const { serverActivityLog } = require("../../handlers/log.js");
 const getPteroUser = require("../../handlers/getPteroUser.js");
-const { deleteWorkflow } = require("../server.js");
+const { deleteWorkflow } = require("./server.js");
 
 module.exports.load = async function (router, db) {
   const ClientAPI = getClientAPI();
